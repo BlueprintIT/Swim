@@ -14,9 +14,28 @@
  */
 
 // Load the preferences engine
-require "prefs.php";
+require_once "prefs.php";
 
-function displayBlock($attrs)
+function printArray($array,$indent="")
+{
+	print($indent."{\n");
+	$newindent=$indent."  ";
+	while(list($key, $value) = each($array))
+  {
+  	if (is_array($value))
+  	{
+  		print($newindent."$key => Array\n");
+  		printArray($value,$newindent);
+  	}
+  	else
+  	{
+	  	print($newindent."$key => $value\n");
+	  }
+  }
+  print($indent."}\n");
+}
+
+function displayBlock($tag,$attrs,$text)
 {
   $attrlist="id=\"".$attrs['id']."\"";
   if (isset($attrs['class']))
@@ -31,52 +50,93 @@ function displayBlock($attrs)
   print("</div>");
 }
 
-function displayTemplate($name)
+function displayVar($tag,$attrs,$text)
 {
-  $template = fopen(getPref("storage.templates")."/".$name.".template","r");
-  while (!feof($template))
-  {
-    $line=fgets($template);
-    if (preg_match_all("/<block ([^>]*)\/>/",$line,$matches,PREG_OFFSET_CAPTURE))
-    {
-      $startpos=0;
-      for ($pos=0; $pos<count($matches[0]); $pos++)
-      {
-        print(substr($line,$startpos,$matches[0][$pos][1]-$startpos));
-        $startpos=$matches[0][$pos][1]+strlen($matches[0][$pos][0]);
-        if (preg_match_all("/(\S*)=\"([^\"]*)\"/",$matches[1][$pos][0],$defined))
-        {
-          $attrs=array();
-          for ($dpos=0; $dpos<count($defined[0]); $dpos++)
-          {
-            $attrs[$defined[1][$dpos]]=$defined[2][$dpos];
-          }
-          
-          if (isset($attrs['id']))
-          {
-            displayBlock($attrs);
-          }
-        }
-      }
-      print(substr($line,$startpos));
-    }
-    else
-    {
-      print($line);
-    }
-  }
-  fclose($template);
+	if (isPrefSet("page.variables.".$attrs['name']))
+	{
+		print(getPref("page.variables.".$attrs['name']));
+	}
 }
 
-// Load the site preferences
-loadPreferences();
-
 // Include various utils
-require getPref("storage.includes")."/urls.php";
+require_once getPref("storage.includes")."/logging.php";
+require_once getPref("storage.includes")."/urls.php";
+require_once getPref("storage.includes")."/parser.php";
+require_once getPref("storage.includes")."/blocks.php";
 
 // Figure out what page we are viewing
 decodeRequest();
 
-displayTemplate("base");
+// If there is no page then use the default page
+if (!isset($page))
+{
+	$page=getPref("pages.default");
+}
+
+// If the page does not exist then use the error page
+if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
+{
+	$page=getPref("pages.error");
+	// If this page doesnt exist (really shouldnt happen) then try the default page
+	if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
+	{
+		$page=getPref("pages.default");
+		// If we still dont have a valid page then we are in trouble
+		if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
+		{
+			trigger_error("This website has not been properly configured.");
+			exit;
+		}
+	}
+}
+
+// Load the page's preferences
+loadPreferences("page",getPref("storage.pages")."/".$page."/page.conf");
+
+// Find the page's template or use the default
+if (isPrefSet("page.template"))
+{
+	$template=getPref("page.template");
+}
+else
+{
+	$template=getPref("templates.default");
+}
+
+// If the template doesnt exist then there is a problem
+if (!is_dir(getPref("storage.templates")."/".$template))
+{
+	trigger_error("This website has not been properly configured.");
+	exit;
+}
+
+// If the template has prefs then load them
+if (is_readable(getPref("storage.templates")."/".$template."/template.conf"))
+{
+	loadPreferences("template",getPref("storage.templates")."/".$template."/template.conf");
+}
+
+// Find the template file name or use the default
+if (isPrefSet("template.file"))
+{
+	$templatefile=getPref("template.file");
+}
+else
+{
+	$templatefile=getPref("templates.defaultname");
+}
+
+// If the file doesnt exist then we have a problem with the template.
+if (!is_readable(getPref("storage.templates")."/".$template."/".$templatefile))
+{
+	trigger_error($template." is invalid.");
+	exit;
+}
+
+// Parse the template and display
+$parser = new TemplateParser();
+$parser->addCallback("block","displayBlock");
+$parser->addCallback("var","displayVar");
+$parser->parseFile(getPref("storage.templates")."/".$template."/".$templatefile);
 
 ?>

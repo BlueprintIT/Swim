@@ -65,6 +65,7 @@ class Parser
     {
       $this->parseText(fgets($source));
     }
+    fclose($source);
   }
   
   // Parses some text

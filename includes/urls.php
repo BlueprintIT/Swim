@@ -60,8 +60,6 @@ function decodeRequest()
 {
   global $page;
   
-  $page="";
-  
   if (getPref("url.pathencoding")=="path")
   {
     if (isset($_SERVER['PATH_INFO']))
