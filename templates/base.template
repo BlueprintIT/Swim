@@ -1,0 +1,12 @@
+<html>
+<head>
+<title>Boo!</title>
+</head>
+<body>
+<p>This is a test template</p>
+<block id="test" best="44
+54">Te
+st<var>Boo!</var>fg</block>
+<var/>
+</body>
+</html>
