@@ -37,24 +37,59 @@ function printArray($array,$indent="")
 
 function displayBlock($tag,$attrs,$text)
 {
-  $attrlist="id=\"".$attrs['id']."\"";
-  if (isset($attrs['class']))
-  {
-    $attrlist="class=\"".$attrs['class']."\" ".$attrlist;
-  }
-  if (isset($attrs['style']))
-  {
-    $attrlist="style=\"".$attrs['style']."\" ".$attrlist;
-  }
-  print("<div ".$attrlist.">");
-  print("</div>");
+	global $page;
+	
+	$id=$attrs['id'];
+	$blockpref="blocks.".$id;
+	$container=getPref($blockpref.".container");
+	$block=getPref($blockpref.".id");
+	if ($container=="page")
+	{
+		$blockdir=getCurrentVersion(getPref("storage.pages")."/".$page)."/blocks/".$block;
+	}
+	else if (isPrefSet("storage.blocks.".$container))
+	{
+		$version=getPref($blockpref.".version");
+		$blockdir=getVersion(getPref("storage.blocks.".$container)."/".$block,$version);
+	}
+	else
+	{
+		trigger_error("Block container not set");
+	}
+	if (is_readable($blockdir."/block.conf"))
+	{
+		loadPreferences("block",$blockdir."/block.conf",true,$blockpref);
+	}
+	$class=getPref($blockpref.".class");
+	if (isPrefSet($blockpref.".classfile"))
+	{
+		require_once getPref("storage.blocks.classes")."/".getPref($blockpref.".classfile");
+	}
+	else if (is_readable($blockdir."/block.class"))
+	{
+		require_once $blockdir."/block.class";
+	}
+	eval("\$object = new ".$class."(\"".$blockdir."\",\"".$blockpref."\");");
+	$object->display($attrs,$text);
 }
 
 function displayVar($tag,$attrs,$text)
 {
-	if (isPrefSet("page.variables.".$attrs['name']))
+	$name=$attrs['name'];
+	if (isset($attrs['namespace']))
 	{
-		print(getPref("page.variables.".$attrs['name']));
+		$name=$attrs['namespace'].".".$name;
+	}
+	else
+	{
+		if (strpos($name,".")===false)
+		{
+			$name="page.variables.".$name;
+		}
+	}
+	if (isPrefSet($name))
+	{
+		print(getPref($name));
 	}
 }
 
@@ -69,6 +104,8 @@ require_once getPref("storage.includes")."/urls.php";
 require_once getPref("storage.includes")."/parser.php";
 require_once getPref("storage.includes")."/blocks.php";
 require_once getPref("storage.includes")."/version.php";
+
+require_once getPref("storage.blocks.classes")."/HtmlBlock.php";
 
 // Figure out what page we are viewing
 decodeRequest();

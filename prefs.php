@@ -16,11 +16,11 @@
 class Preferences
 {
 	// Defines a name for each preference type. Never really used except for the count.
-	var $preftypes = array("page","template","site","defaults");
+	var $preftypes = array("blocks","page","template","site","defaults");
 	// Location to load preferences from. NULL means that the preference type is not loaded by default
-	var $preflocations = array(NULL,NULL,"site.conf","default.conf");
+	var $preflocations = array(NULL,NULL,NULL,"site.conf","default.conf");
 	// Which preferences can override which
-	var $prefoverrides = array(0,1,2,2);
+	var $prefoverrides = array(0,1,2,3,3);
 	var $preferences = array();
 	
 	function Preferences()
@@ -43,14 +43,21 @@ class Preferences
 	
 	// Loads preferences. With no arguments it loads all preferences from their default
 	// locations. Otherwise specify the type (numerical) and the file to load from.
-	function loadPreferences($type,$file)
+	function loadPreferences($type,$file,$merge = false,$branch = "")
 	{
     if (is_readable($file))
     {
       $source=fopen($file,"r");
       if (flock($source,LOCK_SH))
       {
-	      $this->preferences[$type]=array();
+      	if (!$merge)
+      	{
+		      $this->preferences[$type]=array();
+		    }
+		    if (strlen($branch)>0)
+		    {
+		    	$branch.=".";
+		    }
 	      while (!feof($source))
 	      {
 	        $line=fgets($source);
@@ -65,7 +72,7 @@ class Preferences
 	          {
 	            $value=false;
 	          }
-	          $this->preferences[$type][$matches[1]]=$value;
+	          $this->preferences[$type][$branch.$matches[1]]=$value;
 	        }
 	      }
 	      flock($source,LOCK_UN);
@@ -100,7 +107,7 @@ class Preferences
 	}
 	
 	// Retrieves a preference. Returns a blank string for undefined preferences.
-	function getPref($pref,$type = 0)
+	function getPref($pref,$type = 0,$default = "")
 	{
 	  for ($i=$type; $i<count($this->preftypes); $i++)
 	  {
@@ -109,7 +116,7 @@ class Preferences
 	      return $this->evaluatePref($this->preferences[$i][$pref],$type);
 	    }
 	  }
-	  return "";
+	  return $default;
 	}
 	
 	// Checks if a preference is defined
@@ -169,14 +176,14 @@ class Preferences
 $_PREFERENCES = new Preferences();
 
 // Loads a set of preferences
-function loadPreferences($type,$file)
+function loadPreferences($type,$file,$merge = false,$branch = "")
 {
 	global $_PREFERENCES;
 	if (!is_numeric($type))
 	{
 		$type=$_PREFERENCES->getPrefTypeId($type);
 	}
-	$_PREFERENCES->loadPreferences($type,$file);
+	$_PREFERENCES->loadPreferences($type,$file,$merge,$branch);
 }
 
 // Clears a set of preferences
@@ -191,10 +198,10 @@ function clearPreferences($type,$file)
 }
 
 // Retrieves a preference. Returns a blank string for undefined preferences.
-function getPref($pref)
+function getPref($pref, $default = "")
 {
 	global $_PREFERENCES;
-	return $_PREFERENCES->getPref($pref);
+	return $_PREFERENCES->getPref($pref,0,$default);
 }
 
 // Checks if a preference is defined

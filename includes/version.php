@@ -45,4 +45,14 @@ function getCurrentVersion($dir)
 	}
 }
 
+// Retrieves a particular version of a resource.
+function getVersion($dir,$version)
+{
+	if (is_dir($dir."/".$version))
+	{
+		return $dir."/".$version;
+	}
+	return false;
+}
+
  ?>
