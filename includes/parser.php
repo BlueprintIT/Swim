@@ -290,7 +290,7 @@ class TemplateParser extends StackedParser
       $this->_log->debug("Calling callback for ".$tag);
       if (isset($this->_callbacks[$tag]))
       {
-        return call_user_func($this->_callbacks[$tag],$tag,$result['attrs'],$result['text']);
+        call_user_func($this->_callbacks[$tag],$tag,$result['attrs'],$result['text']);
       }
       if (is_array($this->_current))
       {
