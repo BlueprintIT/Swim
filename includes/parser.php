@@ -13,111 +13,47 @@
  * $Revision$
  */
 
-// A simplistic parser that pulls tags we are interested in out of a text stream.
+// A simplistic parser that pulls tags out of a text stream.
 class Parser
 {
-  var $_callbacks;
-  var $_tagstack;
+  var $_tagname;
   var $_attrname;
+  var $_attrvalue;
   var $_state;
-  var $_current;
   var $_quote;
-  var $_taglist;
   var $_log;
   
   // Initialises the parser
   function Parser()
   {
-    $this->_callbacks=array();
-    $this->_tagstack=array();
+    $this->_tagname="";
     $this->_state=0;
-    $this->_current="";
     $this->_attrname="";
+    $this->_attrvalue="";
     $this->_quote="";
-    $this->_taglist="";
     $this->_log=LoggerManager::getLogger("Parser");
     $this->_log->debug("In state 0");
   }
   
-  // Adds a callback to the parser. Tags with this name will be extracted.
-  function addCallback($tagname,$function)
+  // Called when a new start tag is found
+  function onStartTag($tag)
   {
-    $this->_log->debug("Callback added for ".$tagname);
-    $this->_callbacks[$tagname]=$function;
-    if (strlen($this->_taglist)>0)
-    {
-      $this->_taglist.="|$tagname";
-    }
-    else
-    {
-      $this->_taglist=$tagname;
-    }
   }
   
-  // Adds a callback to a numebr of tag names.
-  function addCallbacks($tagnames,$function)
+  // Called when an attribute is found in a start tag
+  function onAttribute($name,$value)
   {
-    foreach ($tagnames as $tagname)
-    {
-      $this->addCallback($tagname,$function);
-    }
   }
   
-  // Called when a tag has been fully extracted to call the user function.
-  function callback($tagname,$attrs,$content)
+  // Called when an end tag is found
+  // popStack should be called if this is a valid end tag
+  function onEndTag($tag)
   {
-    $this->_log->debug("Calling callback for ".$tagname);
-    if (isset($this->_callbacks[$tagname]))
-    {
-      return call_user_func($this->_callbacks[$tagname],$tagname,$attrs,$content);
-    }
   }
   
-  // Outputs text into the current tag's buffer
-  function output($text)
+  // Called when some arbritary text is found
+  function onText($text)
   {
-    if (count($this->_tagstack)==0)
-    {
-      print($text);
-    }
-    else
-    {
-      $this->_current['text'].=$text;
-    }
-  }
-  
-  // Pushes a new tag onto the stack
-  function pushStack($tagname)
-  {
-    $this->_log->debug("Pushing ".$tagname. " onto the stack");
-    $this->_tagstack[]=array('tag' => $tagname, 'attrs' => array(), 'text' => "");
-    $this->_current=&$this->_tagstack[count($this->_tagstack)-1];
-  }
-  
-  // Pops the current tag from the stack and calls its callback function
-  function popStack()
-  {
-    $result=array_pop($this->_tagstack);
-    $this->_log->debug("Popped ".$result['tag']." off the stack");
-    if (count($this->_tagstack)>0)
-    {
-      $this->_current=&$this->_tagstack[count($this->_tagstack)-1];
-    }
-    else
-    {
-      $this->_current="";
-    }
-    if (is_array($this->_current))
-    {
-      $this->_log->debug("Buffering callback");
-      ob_start();
-    }
-    $this->callback($result['tag'],$result['attrs'],$result['text']);
-    if (is_array($this->_current))
-    {
-      $this->output(ob_get_contents());
-      ob_end_clean();
-    }
   }
   
   // Parses a whole file in one call
@@ -134,53 +70,44 @@ class Parser
   // Parses some text
   function parseText($text)
   {
+    $validregex="[A-Za-z0-9]+";
     switch($this->_state)
     {
       // State 0 is where we are scanning for a new start tag. Any text before a new
       // start tag is just outputted into the current tag bugger.
       case 0:
-        $regex="<((".$this->_taglist.")([\s$>]|\/>)";
-        if (is_array($this->_current))
-        {
-          $regex.="|\/".$this->_current['tag'].">";
-        }
-        $regex="/^(.*?)".$regex. ")/";
-        $this->_log->debug("Regex is ".$regex);
+        $regex="/^(.*?)<(\/(".$validregex.")>|(".$validregex."))/";
         if (preg_match($regex,$text,$matches))
         {
-          $this->_log->debug("Found start or end tag");
           $remaining=substr($text,strlen($matches[0]));
-          $this->output($matches[1]);
-          if (isset($matches[3]))
+          $this->onText($matches[1]);
+          if (isset($matches[4]))
           {
-            $tagname=$matches[3];
+            $tagname=$matches[4];
             $this->_log->debug("Start tag for ".$tagname);
-            $this->pushStack($tagname);
-            if ($matches[4]==">")
+            if ($this->onStartTag($tagname))
             {
-              $this->_log->debug("No attributes, remaining in state 0");
-            }
-            else if ($matches[4]=="/>")
-            {
-              $this->_log->debug("Simple tag. Popping.");
-              $this->popStack();
+              $this->_tagname=$tagname;
+              $this->_state=1;
             }
             else
             {
-              $this->_log->debug("Moving to state 1");
-              $this->_state=1;
+              $this->onText("<".$matches[2]);
             }
           }
           else
           {
-            $this->_log->debug("End tag");
-            $this->popStack();
+            $this->_log->debug("End tag for ".$matches[3]);
+            if (!$this->onEndTag($matches[3]))
+            {
+              $this->onText("<".$matches[2]);
+            }
           }
           $this->parseText($remaining);
         }
         else
         {
-          $this->output($text);
+          $this->onText($text);
         }
         break;
       // State 1 is inside a start tag, scanning for attributes and the end of the start tag.
@@ -197,17 +124,17 @@ class Parser
           else if (substr($text,0,2)=="/>")
           {
             $this->_log->debug("Found end of simple tag, popping and moving to state 0");
-            $this->popStack();
             $this->_state=0;
+            $this->onEndTag($this->_tagname);
             $this->parseText(substr($text,2));
           }
-          else if (preg_match("/^([A-Za-z:\.]+)=(\"|')/",$text,$matches))
+          else if (preg_match("/^(".$validregex.")=(\"|')/",$text,$matches))
           {
             $this->_log->debug("Found attribute ".$matches[1]." moving to state 2");
             $this->_attrname=$matches[1];
+            $this->_attrvalue="";
             $this->_quote=$matches[2];
             $this->_state=2;
-            $this->_current['attrs'][$matches[1]]="";
             $this->parseText(substr($text,strlen($matches[0])));
           }
           else
@@ -221,15 +148,161 @@ class Parser
         if (preg_match('/^(.*?)'.$this->_quote.'/',$text,$matches))
         {
           $this->_log->debug("Found end of attribute. Back to state 1.");
-          $this->_current['attrs'][$this->_attrname].=$matches[1];
+          $this->_attrvalue.=$matches[1];
           $this->_state=1;
+          $this->onAttribute($this->_attrname,$this->_attrvalue);
           $this->parseText(substr($text,strlen($matches[0])));
         }
         else
         {
-          $this->_current['attrs'][$this->_attrname].=$text;
+          $this->_attrvalue.=$text;
         }
         break;
+    }
+  }
+}
+
+// Adds a stack to the parser so proper parsing is simpler
+class StackedParser extends Parser
+{
+  var $_tagstack;
+  var $_current;
+  
+  function StackedParser()
+  {
+    $this->Parser();
+    $this->_tagstack=array();
+    $this->_current="";
+  }
+
+  // Adds the given attribute to the current tag on the stack.
+  function onAttribute($name,$value)
+  {
+    $this->_current['attrs'][$name]=$value;
+  }
+  
+  // Called when some text arrives not within any tag on the stack.
+  function onUncontainedText($text)
+  {
+  }
+  
+  // Outputs text into the current tag's buffer
+  function onText($text)
+  {
+    if (is_array($this->_current))
+    {
+      $this->_current['text'].=$text;
+    }
+    else
+    {
+      $this->onUncontainedText($text);
+    }
+  }
+
+  // Pushes a new tag onto the stack
+  function pushStack($tagname)
+  {
+    $this->_log->debug("Pushing ".$tagname. " onto the stack");
+    $this->_tagstack[]=array('tag' => $tagname, 'attrs' => array(), 'text' => "");
+    $this->_current=&$this->_tagstack[count($this->_tagstack)-1];
+  }
+  
+  // Pops the current tag from the stack and returns it.
+  function popStack()
+  {
+    $result=array_pop($this->_tagstack);
+    $this->_log->debug("Popped ".$result['tag']." off the stack");
+    if (count($this->_tagstack)>0)
+    {
+      $this->_current=&$this->_tagstack[count($this->_tagstack)-1];
+    }
+    else
+    {
+      $this->_current="";
+    }
+    return $result;
+  }  
+}
+
+// Designed for parsing very bad html but picking out the few tags we are interested in.
+class TemplateParser extends StackedParser
+{
+  var $_callbacks;
+  
+  function TemplateParser()
+  {
+    $this->StackedParser();
+    $this->_callbacks=array();
+  }
+
+  // Adds a callback to the parser. Tags with this name will be extracted.
+  function addCallback($tagname,$function)
+  {
+    $this->_log->debug("Callback added for ".$tagname);
+    $this->_callbacks[$tagname]=$function;
+  }
+  
+  // Adds a callback to a numebr of tag names.
+  function addCallbacks($tagnames,$function)
+  {
+    foreach ($tagnames as $tagname)
+    {
+      $this->addCallback($tagname,$function);
+    }
+  }
+  
+  // Called when a tag has been fully extracted to call the user function.
+  function callback($tagname,$attrs,$content)
+  {
+  }
+
+  // Any uncontained text just goes to stdout.  
+  function onUncontainedText($text)
+  {
+    print($text);
+  }
+  
+  // Checks if we are interested in the tag.
+  function onStartTag($tag)
+  {
+    if (isset($this->_callbacks[$tag]))
+    {
+      $this->pushStack($tag);
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  
+  // If this is a tag we are parsing then pop it.
+  function onEndTag($tag)
+  {
+    if ((is_array($this->_current))&&($tag==$this->_current['tag']))
+    {
+      $result=$this->popStack();
+      if (is_array($this->_current))
+      {
+        $this->_log->debug("Buffering callback");
+        ob_start();
+      }
+      $this->_log->debug("Calling callback for ".$tag);
+      if (isset($this->_callbacks[$tag]))
+      {
+        return call_user_func($this->_callbacks[$tag],$tag,$result['attrs'],$result['text']);
+      }
+      if (is_array($this->_current))
+      {
+        $text=ob_get_contents();
+        ob_end_clean();
+        $this->onText($text);
+      }
+      return true;
+    }
+    else
+    {
+      return false;
     }
   }
 }
