@@ -60,12 +60,16 @@ class Parser
   function parseFile($filename)
   {
     $this->_log->info("Parsing file ".$filename);
-    $source=fopen($filename,"r");
-    while (!feof($source))
+    if (($source=fopen($filename,"r"))!==false)
     {
-      $this->parseText(fgets($source));
-    }
-    fclose($source);
+	    while (!feof($source))
+	    {
+	      $this->parseText(fgets($source));
+	    }
+	    fclose($source);
+	    return true;
+	  }
+	  return false;
   }
   
   // Parses some text

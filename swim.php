@@ -58,11 +58,17 @@ function displayVar($tag,$attrs,$text)
 	}
 }
 
+function isValidPage($page)
+{
+	return is_readable(getCurrentVersion(getPref("storage.pages")."/".$page)."/page.conf");
+}
+
 // Include various utils
 require_once getPref("storage.includes")."/logging.php";
 require_once getPref("storage.includes")."/urls.php";
 require_once getPref("storage.includes")."/parser.php";
 require_once getPref("storage.includes")."/blocks.php";
+require_once getPref("storage.includes")."/version.php";
 
 // Figure out what page we are viewing
 decodeRequest();
@@ -74,15 +80,15 @@ if (!isset($page))
 }
 
 // If the page does not exist then use the error page
-if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
+if (!isValidPage($page))
 {
 	$page=getPref("pages.error");
 	// If this page doesnt exist (really shouldnt happen) then try the default page
-	if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
+	if (!isValidPage($page))
 	{
 		$page=getPref("pages.default");
 		// If we still dont have a valid page then we are in trouble
-		if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
+		if (!isValidPage($page))
 		{
 			trigger_error("This website has not been properly configured.");
 			exit;
@@ -91,7 +97,7 @@ if (!is_readable(getPref("storage.pages")."/".$page."/page.conf"))
 }
 
 // Load the page's preferences
-loadPreferences("page",getPref("storage.pages")."/".$page."/page.conf");
+loadPreferences("page",getCurrentVersion(getPref("storage.pages")."/".$page)."/page.conf");
 
 // Find the page's template or use the default
 if (isPrefSet("page.template"))
@@ -103,17 +109,18 @@ else
 	$template=getPref("templates.default");
 }
 
+$templatedir=getCurrentVersion(getPref("storage.templates")."/".$template);
 // If the template doesnt exist then there is a problem
-if (!is_dir(getPref("storage.templates")."/".$template))
+if ($templatedir===false)
 {
 	trigger_error("This website has not been properly configured.");
 	exit;
 }
 
 // If the template has prefs then load them
-if (is_readable(getPref("storage.templates")."/".$template."/template.conf"))
+if (is_readable($templatedir."/template.conf"))
 {
-	loadPreferences("template",getPref("storage.templates")."/".$template."/template.conf");
+	loadPreferences("template",$templatedir."/template.conf");
 }
 
 // Find the template file name or use the default
@@ -127,7 +134,7 @@ else
 }
 
 // If the file doesnt exist then we have a problem with the template.
-if (!is_readable(getPref("storage.templates")."/".$template."/".$templatefile))
+if (!is_readable($templatedir."/".$templatefile))
 {
 	trigger_error($template." is invalid.");
 	exit;
@@ -137,6 +144,6 @@ if (!is_readable(getPref("storage.templates")."/".$template."/".$templatefile))
 $parser = new TemplateParser();
 $parser->addCallback("block","displayBlock");
 $parser->addCallback("var","displayVar");
-$parser->parseFile(getPref("storage.templates")."/".$template."/".$templatefile);
+$parser->parseFile($templatedir."/".$templatefile);
 
 ?>

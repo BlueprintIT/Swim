@@ -16,17 +16,18 @@
 class Preferences
 {
 	// Defines a name for each preference type. Never really used except for the count.
-	var $preftypes = array("block","page","template","site","defaults");
+	var $preftypes = array("page","template","site","defaults");
 	// Location to load preferences from. NULL means that the preference type is not loaded by default
-	var $preflocations = array(NULL,NULL,NULL,"site.conf","default.conf");
+	var $preflocations = array(NULL,NULL,"site.conf","default.conf");
 	// Which preferences can override which
-	var $prefoverrides = array(0,1,2,3,3);
+	var $prefoverrides = array(0,1,2,2);
 	var $preferences = array();
 	
 	function Preferences()
 	{
     foreach ($this->preflocations as $type => $location)
     {
+    	$this->preferences[$type]=array();
       if (!is_null($location))
       {
         $this->loadPreferences($type,$location);
@@ -46,31 +47,41 @@ class Preferences
 	{
     if (is_readable($file))
     {
-      $this->preferences[$type]=array();
       $source=fopen($file,"r");
-      while (!feof($source))
+      if (flock($source,LOCK_SH))
       {
-        $line=fgets($source);
-        if (preg_match("/^([^=#$[\]]+)=(.*?)\s*$/",$line,$matches))
-        {
-          $value=$matches[2];
-          if ((strcasecmp($value,"true")==0)||(strcasecmp($value,"yes")==0))
-          {
-            $value=true;
-          }
-          else if ((strcasecmp($value,"false")==0)||(strcasecmp($value,"no")==0))
-          {
-            $value=false;
-          }
-          $this->preferences[$type][$matches[1]]=$value;
-        }
-      }
-      fclose($source);
+	      $this->preferences[$type]=array();
+	      while (!feof($source))
+	      {
+	        $line=fgets($source);
+	        if (preg_match("/^([^=#$[\]]+)=(.*?)\s*$/",$line,$matches))
+	        {
+	          $value=$matches[2];
+	          if ((strcasecmp($value,"true")==0)||(strcasecmp($value,"yes")==0))
+	          {
+	            $value=true;
+	          }
+	          else if ((strcasecmp($value,"false")==0)||(strcasecmp($value,"no")==0))
+	          {
+	            $value=false;
+	          }
+	          $this->preferences[$type][$matches[1]]=$value;
+	        }
+	      }
+	      flock($source,LOCK_UN);
+	      fclose($source);
+	    }
     }
     else
     {
     	trigger_error("Unable to read file ".$file);
     }
+	}
+	
+	// Clears a set of preferences
+	function clearPreferences($type)
+	{
+	  $this->preferences[$type]=array();
 	}
 	
 	// Evaluates a preference value, resolving references
@@ -157,6 +168,7 @@ class Preferences
 
 $_PREFERENCES = new Preferences();
 
+// Loads a set of preferences
 function loadPreferences($type,$file)
 {
 	global $_PREFERENCES;
@@ -165,6 +177,17 @@ function loadPreferences($type,$file)
 		$type=$_PREFERENCES->getPrefTypeId($type);
 	}
 	$_PREFERENCES->loadPreferences($type,$file);
+}
+
+// Clears a set of preferences
+function clearPreferences($type,$file)
+{
+	global $_PREFERENCES;
+	if (!is_numeric($type))
+	{
+		$type=$_PREFERENCES->getPrefTypeId($type);
+	}
+	$_PREFERENCES->clearPreferences($type,$file);
 }
 
 // Retrieves a preference. Returns a blank string for undefined preferences.
