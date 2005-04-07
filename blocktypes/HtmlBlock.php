@@ -22,8 +22,15 @@ class HtmlBlock extends Block
 	
 	function display($attrs,$text)
 	{
+		$attrlist="id=\"".$attrs['id']."\"";
+		if (isset($attrs['class']))
+		{
+			$attrlist.=" class=\"".$attrs['id']."\"";
+		}
+		print("<div ".$attrlist.">");
 		$name=$this->getPref("filename","block.html");
 		readfile($this->_dir."/".$name);
+		print("</div>");
 	}
 }
 

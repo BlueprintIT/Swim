@@ -70,7 +70,7 @@ function displayBlock($tag,$attrs,$text)
 		require_once $blockdir."/block.class";
 	}
 	eval("\$object = new ".$class."(\"".$blockdir."\",\"".$blockpref."\");");
-	$object->display($attrs,$text);
+	return $object->display($attrs,$text);
 }
 
 function displayVar($tag,$attrs,$text)

@@ -287,22 +287,27 @@ class TemplateParser extends StackedParser
     if ((is_array($this->_current))&&($tag==$this->_current['tag']))
     {
       $result=$this->popStack();
-      if (is_array($this->_current))
-      {
-        $this->_log->debug("Buffering callback");
-        ob_start();
-      }
-      $this->_log->debug("Calling callback for ".$tag);
       if (isset($this->_callbacks[$tag]))
       {
-        call_user_func($this->_callbacks[$tag],$tag,$result['attrs'],$result['text']);
+		    $this->_log->debug("Buffering callback");
+		    ob_start();
+		    $this->_log->debug("Calling callback for ".$tag);
+	      $reparse=call_user_func($this->_callbacks[$tag],$tag,$result['attrs'],$result['text']);
+		    $text=ob_get_contents();
+		    ob_end_clean();
+		    if ($reparse===true)
+		    {
+		    	$this->parseText($text);
+		    }
+		    else
+		    {
+		      $this->onText($text);
+		    }
       }
-      if (is_array($this->_current))
+      else
       {
-        $text=ob_get_contents();
-        ob_end_clean();
-        $this->onText($text);
-      }
+	      $this->onText($result['text']);
+	    }
       return true;
     }
     else
