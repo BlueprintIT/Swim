@@ -17,7 +17,7 @@
 // The current version is not necessarily the newest version, but usually will be.
 function getCurrentResource($dir)
 {
-	$newest=getVersion($dir);
+	$newest=getCurrentVersion($dir);
 	if ($newest===false)
 	{
 		return false;
@@ -29,7 +29,7 @@ function getCurrentResource($dir)
 }
 
 // Retrieves the latest version of a resource.
-function getVersion($dir)
+function getCurrentVersion($dir)
 {
 	$newest=-1;
 	if ($res=@opendir($dir))

@@ -31,6 +31,11 @@ class Page
 		$this->load();
 	}
 	
+	function display()
+	{
+		$this->template->display($this);
+	}
+	
 	function getVersion()
 	{
 		if (isset($this->request->version))
@@ -47,7 +52,7 @@ class Page
 	{
 		if (isset($this->request->version))
 		{
-			return getResourceVersion($this->request->version,$this->prefs->getPref("storage.pages")."/".$this->request->page);
+			return getResourceVersion($this->prefs->getPref("storage.pages")."/".$this->request->page,$this->request->version);
 		}
 		else
 		{
@@ -123,6 +128,11 @@ class Page
 	function load()
 	{
 		// Load the page's preferences
+		if (!isset($this->request->version))
+		{
+			$this->request->version=getCurrentVersion($this->prefs->getPref("storage.pages")."/".$this->request->page);
+		}
+		
 		$this->prefs->loadPreferences($this->getDir()."/page.conf","page");
 		
 		// Find the page's template or use the default
@@ -134,7 +144,7 @@ class Page
 		{
 			$templ=$this->prefs->getPref("templates.default");
 		}
-		$this->template = new Template($templ);
+		$this->template=loadTemplate($templ);
 		$this->prefs->setParent($this->template->prefs);
 	}
 }

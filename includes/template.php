@@ -19,6 +19,8 @@ class Template
 	var $file;
 	var $admin;
 	var $prefs;
+	var $parsing = false;
+	var $curPage;
 	
 	function Template($name)
 	{
@@ -69,6 +71,70 @@ class Template
 			exit;
 		}
 	}
+	
+	function displayBlock(&$page,$tag,$attrs,$text)
+	{
+		$block=$page->getBlock($attrs['id']);
+		return $block->display($attrs,$text);
+	}
+	
+	function displayVar(&$page,$tag,$attrs,$text)
+	{
+		$name=$attrs['name'];
+		if (isset($attrs['namespace']))
+		{
+			$name=$attrs['namespace'].".".$name;
+		}
+		else
+		{
+			if (strpos($name,".")===false)
+			{
+				$name="page.variables.".$name;
+			}
+		}
+		if ($page->prefs->isPrefSet($name))
+		{
+			print($page->prefs->getPref($name));
+		}
+	}
+	
+	function observeTag(&$parser,$tag,$attrs,$text)
+	{
+		$page=&$parser->data;
+		if ($tag=="var")
+		{
+			return $this->displayVar($page,$tag,$attrs,$text);
+		}
+		else if ($tag=="block")
+		{
+			return $this->displayBlock($page,$tag,$attrs,$text);
+		}
+	}
+	
+	function display(&$page)
+	{
+		// Parse the template and display
+		$parser = new TemplateParser();
+		$parser->data=&$page;
+		$parser->addObserver("block",$this);
+		$parser->addObserver("var",$this);
+		$parser->parseFile($this->dir."/".$this->file);
+	}
 }
+
+function &loadTemplate($name)
+{
+	global $_TEMPLATES;
+	
+	if (isset($_TEMPLATES[$name]))
+	{
+		return $_TEMPLATES[$name];
+	}
+	$template = new Template($name);
+	$_TEMPLATES[$name]=&$template;
+	return $template;
+}
+
+$_TEMPLATES = array();
 
 ?>

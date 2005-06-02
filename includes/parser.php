@@ -31,7 +31,7 @@ class Parser
     $this->_attrname="";
     $this->_attrvalue="";
     $this->_quote="";
-    $this->_log=LoggerManager::getLogger("Parser");
+    $this->_log=&LoggerManager::getLogger(get_class($this));
     $this->_log->debug("In state 0");
   }
   
@@ -233,18 +233,45 @@ class StackedParser extends Parser
 class TemplateParser extends StackedParser
 {
   var $_callbacks;
+  var $_observers;
+  var $data;
   
   function TemplateParser()
   {
     $this->StackedParser();
     $this->_callbacks=array();
+    $this->_observers=array();
   }
 
+	// Adds an object observer to the parser
+	function addObserver($tagname,&$observer)
+	{
+    $this->_log->debug("Observer added for ".$tagname);
+    if (!isset($this->_observers[$tagname]))
+    {
+    	$this->_observers[$tagname]=array();
+    }
+    $this->_observers[$tagname][]=&$observer;
+	}
+	
+  // Adds an observer to a numebr of tag names.
+  function addObservers($tagnames,&$observer)
+  {
+    foreach ($tagnames as $tagname)
+    {
+      $this->addObserver($tagname,$function);
+    }
+  }
+  
   // Adds a callback to the parser. Tags with this name will be extracted.
   function addCallback($tagname,$function)
   {
     $this->_log->debug("Callback added for ".$tagname);
-    $this->_callbacks[$tagname]=$function;
+    if (!isset($this->_callbacks[$tagname]))
+    {
+    	$this->_callbacks[$tagname]=array();
+    }
+    $this->_callbacks[$tagname][]=$function;
   }
   
   // Adds a callback to a numebr of tag names.
@@ -257,8 +284,39 @@ class TemplateParser extends StackedParser
   }
   
   // Called when a tag has been fully extracted to call the user function.
-  function callback($tagname,$attrs,$content)
+  function callCallback($callback,$tagname,$attrs,$content)
   {
+    ob_start();
+    $this->_log->debug("Calling callback for ".$tagname);
+    $reparse=$callback($this,$tagname,$attrs,$content);
+    $text=ob_get_contents();
+    ob_end_clean();
+    if ($reparse===true)
+    {
+    	$this->parseText($text);
+    }
+    else
+    {
+      $this->onText($text);
+    }
+  }
+
+  // Called when a tag has been fully extracted to call the user function.
+  function callObserver(&$observer,$tagname,$attrs,$content)
+  {
+    ob_start();
+    $this->_log->debug("Calling observer for ".$tagname);
+    $reparse=$observer->observeTag($this,$tagname,$attrs,$content);
+    $text=ob_get_contents();
+    ob_end_clean();
+    if ($reparse===true)
+    {
+    	$this->parseText($text);
+    }
+    else
+    {
+      $this->onText($text);
+    }
   }
 
   // Any uncontained text just goes to stdout.  
@@ -270,7 +328,7 @@ class TemplateParser extends StackedParser
   // Checks if we are interested in the tag.
   function onStartTag($tag)
   {
-    if (isset($this->_callbacks[$tag]))
+    if ((isset($this->_callbacks[$tag]))||(isset($this->_observers[$tag])))
     {
       $this->pushStack($tag);
       return true;
@@ -287,21 +345,21 @@ class TemplateParser extends StackedParser
     if ((is_array($this->_current))&&($tag==$this->_current['tag']))
     {
       $result=$this->popStack();
-      if (isset($this->_callbacks[$tag]))
+      if ($result['tag']!=$tag)
       {
-		    $this->_log->debug("Buffering callback");
-		    ob_start();
-		    $this->_log->debug("Calling callback for ".$tag);
-	      $reparse=call_user_func($this->_callbacks[$tag],$tag,$result['attrs'],$result['text']);
-		    $text=ob_get_contents();
-		    ob_end_clean();
-		    if ($reparse===true)
+      	$this->_log->error("Was expecting end tag for ".$tag." but got ".$result['tag']);
+      }
+      if ((isset($this->_callbacks[$tag]))||(isset($this->_observers[$tag])))
+      {
+		    $this->_log->debug("Buffering callbacks");
+		    foreach ($this->_callbacks[$tag] as $callback)
 		    {
-		    	$this->parseText($text);
+		    	$this->callCallback($callback,$tag,$result['attrs'],$result['text']);
 		    }
-		    else
+		    for ($i=0; $i<count($this->_observers[$tag]); $i++)
 		    {
-		      $this->onText($text);
+		    	$observer=&$this->_observers[$tag][$i];
+		    	$this->callObserver($observer,$tag,$result['attrs'],$result['text']);
 		    }
       }
       else

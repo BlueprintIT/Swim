@@ -29,10 +29,6 @@ $request = new Request();
 $request->decodeCurrentRequest();
 $page = new Page($request);
 
-// Parse the template and display
-$parser = new TemplateParser();
-$parser->addCallback("block","displayBlock");
-$parser->addCallback("var","displayVar");
-$parser->parseFile($page->template->dir."/".$page->template->file);
+$page->display();
 
 ?>
