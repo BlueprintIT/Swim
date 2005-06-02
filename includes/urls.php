@@ -13,6 +13,7 @@
  * $Revision$
  */
 
+
 function encodeQuery($query)
 {
   if (count($query)==0)
@@ -33,65 +34,98 @@ function decodeQuery($query)
   return $result;
 }
 
-function encodeURL($page,$query = array())
+class Request
 {
-  if (getPref("url.pathencoding")=="path")
-  {
-    $url=getPref("url.base")."/".$page;
-  }
-  else
-  {
-    $url=getPref("url.base");
-    if ((getPref("url.pathencoding")=="iterative")&&(count($query)>0))
-    {
-      $newquery['query']=encodeQuery($query);
-      $query=$newquery;
-    }
-    $query[getPref("url.querypathvar")]=$page;
-  }
-  if (count($query)>0)
-  {
-    $url.="?".encodeQuery($query);
-  }
-  return $url;
+	var $page;
+	var $query = array();
+	
+	function encode()
+	{
+		global $_PREFS;
+		
+	  if ($_PREFS->getPref("url.pathencoding")=="path")
+	  {
+	    $url=$_PREFS->getPref("url.base")."/".$this->page;
+	    $newquery=$this->query;
+	  }
+	  else
+	  {
+	    $url=$_PREFS->getPref("url.base");
+	    if (($_PREFS->getPref("url.pathencoding")=="iterative")&&(count($this->query)>0))
+	    {
+	      $newquery['query']=encodeQuery($this->query);
+	    }
+	    else
+	    {
+	    	$newquery=$this->query;
+	    }
+	    $newquery[getPref("url.querypathvar")]=$this->page;
+	  }
+	  if (count($newquery)>0)
+	  {
+	    $url.="?".encodeQuery($newquery);
+	  }
+	  return $url;
+	}
+	
+	function decodeCurrentRequest()
+	{
+		$path="";
+		if (isset($_SERVER['PATH_INFO']))
+		{
+			$path=$_SERVER['PATH_INFO'];
+		}
+		$query=$_GET;
+		$this->decode($path,$query);
+	}
+	
+	function decode($path,$query)
+	{
+		global $_PREFS;
+  	$this->query=$query;
+
+	  if ($_PREFS->getPref("url.pathencoding")=="path")
+	  {
+	  	// Site is setup to use path info to choose page
+	  	
+	    if ((isset($path))&&(strlen($path)>1))
+	    {
+	      $this->page=substr($path,1);
+	    }
+	    else
+	    {
+	    	$this->page="";
+	    }
+	  }
+	  else
+	  {
+	  	// Site uses a query variable to choose page
+	    if (isset($query[$_PREFS->getPref("url.querypathvar")]))
+	    {
+	      $this->page=$this->query[$_PREFS->getPref("url.querypathvar")];
+	      unset($this->query[$_PREFS->getPref("url.querypathvar")]);
+	    }
+	    else
+	    {
+	    	$this->page="";
+	    }
+	    if ($_PREFS->getPref("url.pathencoding")=="iterative")
+	    {
+	    	// Site is set to hold the rest of the query in another variable
+	    	
+	      if (isset($this->query['query']))
+	      {
+	        unset($this->query['query']);
+	        $this->query=decodeQuery($this->query['query']);
+	      }
+	      else
+	      {
+	        $this->query=array();
+	      }
+	    }
+	  }
+	}
 }
 
-function decodeRequest()
-{
-  global $page;
-  
-  if (getPref("url.pathencoding")=="path")
-  {
-    if (isset($_SERVER['PATH_INFO']))
-    {
-      $page=substr($_SERVER['PATH_INFO'],1);
-    }
-  }
-  else
-  {
-    if (isset($_GET[getPref("url.querypathvar")]))
-    {
-      $page=$_GET[getPref("url.querypathvar")];
-      unset($_GET[getPref("url.querypathvar")]);
-      unset($_REQUEST[getPref("url.querypathvar")]);
-    }
-    if (getPref("url.pathencoding")=="iterative")
-    {
-      if (isset($_GET['query']))
-      {
-        unset($_REQUEST['query']);
-        $_GET=decodeQuery($_GET['query']);
-        foreach ($_GET as $name => $value)
-        {
-          $_REQUEST[$name]=$value;
-        }
-      }
-      else
-      {
-        $_GET=array();
-      }
-    }
-  }
-}
 
 ?>

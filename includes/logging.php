@@ -1,5 +1,18 @@
 <?
 
+/*
+ * Swim
+ *
+ * Logging code
+ *
+ * Copyright Blueprint IT Ltd. 2005
+ *
+ * $HeadURL$
+ * $LastChangedBy$
+ * $Date$
+ * $Revision$
+ */
+
 class Logger
 {
 	function Logger()

@@ -15,35 +15,28 @@
 	
 class Preferences
 {
-	// Defines a name for each preference type. Never really used except for the count.
-	var $preftypes = array("blocks","page","template","site","defaults");
-	// Location to load preferences from. NULL means that the preference type is not loaded by default
-	var $preflocations = array(NULL,NULL,NULL,"site.conf","default.conf");
-	// Which preferences can override which
-	var $prefoverrides = array(0,1,2,3,3);
 	var $preferences = array();
+	var $parent;
+	var $overrides;
 	
 	function Preferences()
 	{
-    foreach ($this->preflocations as $type => $location)
-    {
-    	$this->preferences[$type]=array();
-      if (!is_null($location))
-      {
-        $this->loadPreferences($type,$location);
-      }
-    }
+		$this->overrides=&$this;
 	}
 	
-	// Returns the numeric form of a type.
-	function getPrefTypeId($type)
+	function setParent(&$parprefs)
 	{
-		return array_search($type,$this->preftypes);
+		$this->parent=&$parprefs;
+	}
+	
+	function setOverride(&$overprefs)
+	{
+		$this->overrides=&$overprefs;
 	}
 	
 	// Loads preferences. With no arguments it loads all preferences from their default
 	// locations. Otherwise specify the type (numerical) and the file to load from.
-	function loadPreferences($type,$file,$merge = false,$branch = "")
+	function loadPreferences($file,$branch = "",$merge = false)
 	{
     if (is_readable($file))
     {
@@ -52,7 +45,7 @@ class Preferences
       {
       	if (!$merge)
       	{
-		      $this->preferences[$type]=array();
+		      $this->preferences=array();
 		    }
 		    if (strlen($branch)>0)
 		    {
@@ -63,16 +56,19 @@ class Preferences
 	        $line=fgets($source);
 	        if (preg_match("/^([^=#$[\]]+)=(.*?)\s*$/",$line,$matches))
 	        {
-	          $value=$matches[2];
-	          if ((strcasecmp($value,"true")==0)||(strcasecmp($value,"yes")==0))
-	          {
-	            $value=true;
-	          }
-	          else if ((strcasecmp($value,"false")==0)||(strcasecmp($value,"no")==0))
-	          {
-	            $value=false;
-	          }
-	          $this->preferences[$type][$branch.$matches[1]]=$value;
+	        	if (substr($matches[1],0,strlen($branch))==$branch)
+	        	{
+		          $value=$matches[2];
+		          if ((strcasecmp($value,"true")==0)||(strcasecmp($value,"yes")==0))
+		          {
+		            $value=true;
+		          }
+		          else if ((strcasecmp($value,"false")==0)||(strcasecmp($value,"no")==0))
+		          {
+		            $value=false;
+		          }
+		          $this->preferences[$matches[1]]=$value;
+		        }
 	        }
 	      }
 	      flock($source,LOCK_UN);
@@ -85,14 +81,18 @@ class Preferences
     }
 	}
 	
-	// Clears a set of preferences
-	function clearPreferences($type)
+	function savePreferences($file)
 	{
-	  $this->preferences[$type]=array();
+	}
+	
+	// Clears a set of preferences
+	function clearPreferences()
+	{
+	  $this->preferences=array();
 	}
 	
 	// Evaluates a preference value, resolving references
-	function evaluatePref($text,$type)
+	function evaluatePref($text)
 	{
 		$count=preg_match_all('/\$\[([^=#$[\]]+)\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
 		for($p=$count-1; $p>=0; $p--)
@@ -100,121 +100,58 @@ class Preferences
 			$pref=$matches[1][$p][0];
 			$offset=$matches[0][$p][1];
 			$length=strlen($matches[0][$p][0]);
-			$replacement=$this->getPref($pref,$this->prefoverrides[$type]);
+			$replacement=$this->overrides->getPref($pref);
 			$text=substr_replace($text,$replacement,$offset,$length);
 		}
 		return $text;
 	}
 	
 	// Retrieves a preference. Returns a blank string for undefined preferences.
-	function getPref($pref,$type = 0,$default = "")
+	function getPref($pref,$default = "")
 	{
-	  for ($i=$type; $i<count($this->preftypes); $i++)
-	  {
-	    if (isset($this->preferences[$i][$pref]))
-	    {
-	      return $this->evaluatePref($this->preferences[$i][$pref],$type);
-	    }
-	  }
+    if (isset($this->preferences[$pref]))
+    {
+      return $this->evaluatePref($this->preferences[$pref]);
+    }
+    else if (isset($this->parent))
+    {
+    	return $this->parent->getPref($pref,$default);
+    }
 	  return $default;
 	}
 	
 	// Checks if a preference is defined
 	function isPrefSet($pref)
 	{
-	  for ($i=0; $i<count($this->preftypes); $i++)
+	  if (isset($this->preferences[$pref]))
 	  {
-	    if (isset($this->preferences[$i][$pref]))
-	    {
-	      return true;
-	    }
+	    return true;
+	  }
+	  else if (isset($this->parent))
+	  {
+	  	return $this->parent->isPrefSet($pref);
 	  }
 	  return false;
 	}
+}
+
+function init()
+{
+	global $_PREFS;
 	
-	// Returns a branch of the preferences in associative array form
-	function getPrefBranch($branch)
-	{
-		$result=array();
-		if (strlen($branch)>0)
-		{
-			$branch.=".";
-		}
-		for ($i=0; $i<count($this->preftypes); $i++)
-		{
-			foreach ($this->preferences[$i] as $name => $value)
-			{
-				if (substr($name,0,strlen($branch))==$branch)
-				{
-					$remains=substr($name,strlen($branch));
-					if (strlen($remains)>0)
-					{
-						$parts=explode(".",$remains);
-						$pos=0;
-						$current=&$result;
-						while ($pos<count($parts)-1)
-						{
-							if (!isset($current[$parts[$pos]]))
-							{
-								$current[$parts[$pos]]=array();
-							}
-							$current=&$current[$parts[$pos]];
-							$pos++;
-						}
-						if (!isset($current[$parts[$pos]]))
-						{
-							$current[$parts[$pos]]=$this->evaluatePref($value,$i);
-						}
-					}
-				}
-			}
-		}
-		return $result;
-	}
+	$default = new Preferences();
+	$default->loadPreferences("default.conf");
+	
+	$siteprefs = new Preferences();
+	$siteprefs->loadPreferences("site.conf");
+	$siteprefs->setParent($default);
+	
+	$default->setOverride($siteprefs);
+
+	$_PREFS = new Preferences();
+	$_PREFS->setParent($siteprefs);
 }
 
-$_PREFERENCES = new Preferences();
-
-// Loads a set of preferences
-function loadPreferences($type,$file,$merge = false,$branch = "")
-{
-	global $_PREFERENCES;
-	if (!is_numeric($type))
-	{
-		$type=$_PREFERENCES->getPrefTypeId($type);
-	}
-	$_PREFERENCES->loadPreferences($type,$file,$merge,$branch);
-}
-
-// Clears a set of preferences
-function clearPreferences($type,$file)
-{
-	global $_PREFERENCES;
-	if (!is_numeric($type))
-	{
-		$type=$_PREFERENCES->getPrefTypeId($type);
-	}
-	$_PREFERENCES->clearPreferences($type,$file);
-}
-
-// Retrieves a preference. Returns a blank string for undefined preferences.
-function getPref($pref, $default = "")
-{
-	global $_PREFERENCES;
-	return $_PREFERENCES->getPref($pref,0,$default);
-}
-
-// Checks if a preference is defined
-function isPrefSet($pref)
-{
-	global $_PREFERENCES;
-	return $_PREFERENCES->isPrefSet($pref);
-}
-
-function getPrefBranch($branch="")
-{
-	global $_PREFERENCES;
-	return $_PREFERENCES->getPrefBranch($branch);
-}
+init();
 
 ?>
