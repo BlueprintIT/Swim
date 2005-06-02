@@ -37,6 +37,8 @@ function decodeQuery($query)
 class Request
 {
 	var $page;
+	var $version;
+	var $mode = "normal";
 	var $query = array();
 	
 	function encode()
@@ -45,7 +47,12 @@ class Request
 		
 	  if ($_PREFS->getPref("url.pathencoding")=="path")
 	  {
-	    $url=$_PREFS->getPref("url.base")."/".$this->page;
+	  	$page = $this->page;
+	  	if ($this->mode=="admin")
+	  	{
+	  		$page="admin/".$page;
+	  	}
+	    $url=$_PREFS->getPref("url.base")."/".$page;
 	    $newquery=$this->query;
 	  }
 	  else
@@ -59,7 +66,11 @@ class Request
 	    {
 	    	$newquery=$this->query;
 	    }
-	    $newquery[getPref("url.querypathvar")]=$this->page;
+	    $newquery[$_PREFS->getPref("url.querypathvar")]=$this->page;
+	    if ($this->mode=="admin")
+	    {
+		    $newquery[$_PREFS->getPref("url.querymodevar")]=$this->mode;
+		  }
 	  }
 	  if (count($newquery)>0)
 	  {
@@ -77,8 +88,50 @@ class Request
 		}
 		$query=$_GET;
 		$this->decode($path,$query);
+		$this->choosePage();
 	}
 	
+	function choosePage()
+	{
+		global $_PREFS;
+		
+		// If there is no page then use the default page
+		if ($this->page=="")
+		{
+			if ($this->mode=="admin")
+			{
+				$this->page=$_PREFS->getPref("pages.admin");
+			}
+			else
+			{
+				$this->page=$_PREFS->getPref("pages.default");
+			}
+		}
+		
+		// These are the fallback pages we want to display in order of preference
+		$selection = array($_PREFS->getPref("pages.error"), $_PREFS->getPref("pages.default"));
+		
+		while (!($this->isValidPage()))
+		{
+			if (count($selection)==0)
+			{
+				trigger_error("This website has not been properly configured.");
+				exit;
+			}
+			
+			// Bad page so get the next fallback and clear the query.
+			$this->page=array_shift($selection);
+			$this->mode="normal";
+			$this->query=array();
+		}
+	}
+	
+	function isValidPage()
+	{
+		global $_PREFS;
+		return is_readable(getCurrentResource($_PREFS->getPref("storage.pages")."/".$this->page)."/page.conf");
+	}
+
 	function decode($path,$query)
 	{
 		global $_PREFS;
@@ -96,6 +149,11 @@ class Request
 	    {
 	    	$this->page="";
 	    }
+	    if (substr($this->page,0,6)=="admin/")
+	    {
+	    	$this->mode="admin";
+	    	$this->page=substr($this->page,6);
+	    }
 	  }
 	  else
 	  {
@@ -108,6 +166,11 @@ class Request
 	    else
 	    {
 	    	$this->page="";
+	    }
+	    if (isset($query[$_PREFS->getPref("url.querymodevar")]))
+	    {
+	    	$this->mode=$this->query[$_PREFS->getPref("url.querymodevar")];
+	      unset($this->query[$_PREFS->getPref("url.querymodevar")]);
 	    }
 	    if ($_PREFS->getPref("url.pathencoding")=="iterative")
 	    {

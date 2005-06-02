@@ -20,17 +20,10 @@ class HtmlBlock extends Block
 		$this->Block($dir);
 	}
 	
-	function display($attrs,$text)
+	function displayContent($attrs,$text)
 	{
-		$attrlist="id=\"".$attrs['id']."\"";
-		if (isset($attrs['class']))
-		{
-			$attrlist.=" class=\"".$attrs['id']."\"";
-		}
-		print("<div ".$attrlist.">");
 		$name=$this->prefs->getPref("block.filename","block.html");
 		readfile($this->dir."/".$name);
-		print("</div>");
 	}
 }
 

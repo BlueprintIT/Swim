@@ -27,7 +27,7 @@ class Template
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
-		$this->dir=getCurrentVersion($this->prefs->getPref("storage.templates")."/".$name);
+		$this->dir=getCurrentResource($this->prefs->getPref("storage.templates")."/".$name);
 		
 		// If the template doesnt exist then there is a problem
 		if ($this->dir===false)

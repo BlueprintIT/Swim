@@ -72,8 +72,8 @@ class Preferences
 	        }
 	      }
 	      flock($source,LOCK_UN);
-	      fclose($source);
 	    }
+      fclose($source);
     }
     else
     {

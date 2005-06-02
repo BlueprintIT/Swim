@@ -13,16 +13,21 @@
  * $Revision$
  */
 
+// Start up the session
+session_name("SwimSession");
+session_start();
+
 // Load the preferences engine
 require_once "prefs.php";
 
 // Include various utils
 require_once $_PREFS->getPref("storage.includes")."/includes.php";
-
-require_once $_PREFS->getPref("storage.blocks.classes")."/HtmlBlock.php";
+require_once $_PREFS->getPref("storage.blocks.classes")."/blocks.php";
 
 // Load the page to display
-$page = new Page();
+$request = new Request();
+$request->decodeCurrentRequest();
+$page = new Page($request);
 
 // Parse the template and display
 $parser = new TemplateParser();

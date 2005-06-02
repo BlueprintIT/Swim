@@ -15,7 +15,21 @@
 
 // Given the root dir of a resource this functon will return the dir of the current version of the resource.
 // The current version is not necessarily the newest version, but usually will be.
-function getCurrentVersion($dir)
+function getCurrentResource($dir)
+{
+	$newest=getVersion($dir);
+	if ($newest===false)
+	{
+		return false;
+	}
+	else
+	{
+		return $dir."/".$newest;
+	}
+}
+
+// Retrieves the latest version of a resource.
+function getVersion($dir)
 {
 	$newest=-1;
 	if ($res=@opendir($dir))
@@ -37,7 +51,7 @@ function getCurrentVersion($dir)
 	}
 	if ($newest>=0)
 	{
-		return $dir."/".$newest;
+		return $newest;
 	}
 	else
 	{
@@ -46,7 +60,7 @@ function getCurrentVersion($dir)
 }
 
 // Retrieves a particular version of a resource.
-function getVersion($dir,$version)
+function getResourceVersion($dir,$version)
 {
 	if (is_dir($dir."/".$version))
 	{

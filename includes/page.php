@@ -20,15 +20,39 @@ class Page
 	var $blocks;
 	var $request;
 	
-	function Page()
+	function Page($request)
 	{
 		global $_PREFS;
 		
+		$this->request = $request;
 		$this->blocks = array();
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
-		$this->choosePage();
 		$this->load();
+	}
+	
+	function getVersion()
+	{
+		if (isset($this->request->version))
+		{
+			return $this->request->version;
+		}
+		else
+		{
+			return getVersion($this->prefs->getPref("storage.pages")."/".$this->request->page);
+		}
+	}
+	
+	function getDir()
+	{
+		if (isset($this->request->version))
+		{
+			return getResourceVersion($this->request->version,$this->prefs->getPref("storage.pages")."/".$this->request->page);
+		}
+		else
+		{
+			return getCurrentResource($this->prefs->getPref("storage.pages")."/".$this->request->page);
+		}
 	}
 	
 	function getBlock($id)
@@ -36,41 +60,62 @@ class Page
 		if (!isset($this->blocks[$id]))
 		{
 			$blockpref="page.blocks.".$id;
-			$container=$this->prefs->getPref($blockpref.".container");
-			$block=$this->prefs->getPref($blockpref.".id");
-			if ($container=="page")
+			if ($this->prefs->isPrefSet($blockpref.".id"))
 			{
-				$blockdir=getCurrentVersion($this->prefs->getPref("storage.pages")."/".$this->request->page)."/blocks/".$block;
-			}
-			else if ($this->prefs->isPrefSet("storage.blocks.".$container))
-			{
-				$version=$this->prefs->getPref($blockpref.".version");
-				$blockdir=getVersion($this->prefs->getPref("storage.blocks.".$container)."/".$block,$version);
+				$container=$this->prefs->getPref($blockpref.".container");
+				$block=$this->prefs->getPref($blockpref.".id");
+				if ($container=="page")
+				{
+					$blockdir=$this->getDir()."/blocks/".$block;
+				}
+				else if ($this->prefs->isPrefSet("storage.blocks.".$container))
+				{
+					if ($this->prefs->isPrefSet($blockpref.".version"))
+					{
+						$version=$this->prefs->getPref($blockpref.".version");
+						$blockdir=getResourceVersion($this->prefs->getPref("storage.blocks.".$container)."/".$block,$version);
+					}
+					else
+					{
+						$blockdir=getCurrentResource($this->prefs->getPref("storage.blocks.".$container)."/".$block);
+					}
+				}
+				else
+				{
+					trigger_error("Block container not set");
+				}
+	
+				$blockprefs = new Preferences();
+				$blockprefs->setParent($this->prefs);
+				if (is_readable($blockdir."/block.conf"))
+				{
+					$blockprefs->loadPreferences($blockdir."/block.conf","block");
+				}
+				$class=$blockprefs->getPref("block.class");
+				if ($blockprefs->isPrefSet("block.classfile"))
+				{
+					require_once $blockprefs->getPref("storage.blocks.classes")."/".$blockprefs->getPref("block.classfile");
+				}
+				else if (is_readable($blockdir."/block.class"))
+				{
+					require_once $blockdir."/block.class";
+				}
+				if (class_exists($class))
+				{
+					$object = new $class($blockdir);
+		
+					$object->setPage($this);
+					$this->blocks[$id] = &$object;
+				}
+				else
+				{
+					trigger_error("Invalid block found");
+				}
 			}
 			else
 			{
-				trigger_error("Block container not set");
+				return new Block("");
 			}
-
-			$blockprefs = new Preferences();
-			$blockprefs->setParent($this->prefs);
-			if (is_readable($blockdir."/block.conf"))
-			{
-				$blockprefs->loadPreferences($blockdir."/block.conf","block");
-			}
-			$class=$blockprefs->getPref("block.class");
-			if ($blockprefs->isPrefSet("block.classfile"))
-			{
-				require_once $blockprefs->getPref("storage.blocks.classes")."/".$blockprefs->getPref("block.classfile");
-			}
-			else if (is_readable($blockdir."/block.class"))
-			{
-				require_once $blockdir."/block.class";
-			}
-			eval("\$object = new ".$class."(\"".$blockdir."\");");
-
-			$object->setPage($this);
-			$this->blocks[$id] = &$object;
 		}
 		return $this->blocks[$id];
 	}
@@ -78,7 +123,8 @@ class Page
 	function load()
 	{
 		// Load the page's preferences
-		$this->prefs->loadPreferences(getCurrentVersion($this->prefs->getPref("storage.pages")."/".$this->request->page)."/page.conf","page");
+		$this->prefs->loadPreferences($this->getDir()."/page.conf","page");
+		
 		// Find the page's template or use the default
 		if ($this->prefs->isPrefSet("page.template"))
 		{
@@ -90,44 +136,6 @@ class Page
 		}
 		$this->template = new Template($templ);
 		$this->prefs->setParent($this->template->prefs);
-	}
-	
-	function choosePage()
-	{
-		// Figure out what page we are attempting to view
-		$this->request = new Request();
-		$this->request->decodeCurrentRequest();
-		
-		// If there is no page then use the default page
-		if ($this->request->page=="")
-		{
-			$this->request->page=$this->prefs->getPref("pages.default");
-		}
-		
-		// These are the fallback pages we want to display in order of preference
-		$selection = array($this->prefs->getPref("pages.error"), $this->prefs->getPref("pages.default"));
-		
-		while (!($this->isValidPage()))
-		{
-			if (count($selection)==0)
-			{
-				trigger_error("This website has not been properly configured.");
-				exit;
-			}
-			
-			// Bad page so get the next fallback and clear the query.
-			$this->request->page=array_shift($selection);
-			$this->query=array();
-		}
-	}
-	
-	function decodeRequest()
-	{
-	}
-	
-	function isValidPage()
-	{
-		return is_readable(getCurrentVersion($this->prefs->getPref("storage.pages")."/".$this->request->page)."/page.conf");
 	}
 }
 
