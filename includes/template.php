@@ -118,7 +118,10 @@ class Template
 		$parser->data=&$page;
 		$parser->addObserver("block",$this);
 		$parser->addObserver("var",$this);
+		
+		ob_start();
 		$parser->parseFile($this->dir."/".$this->file);
+		ob_end_flush();
 	}
 }
 

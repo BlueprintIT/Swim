@@ -16,6 +16,12 @@
 class User
 {
 	var $user;
+	var $log;
+	
+	function User()
+	{
+		$this->log = &LoggerManager::getLogger("swim.user");
+	}
 	
 	function getUsername()
 	{
@@ -27,6 +33,19 @@ class User
 		return isset($this->user);
 	}
 	
+	function canAccess(&$page)
+	{
+		if ($this->isAdmin())
+		{
+			return true;
+		}
+		if ($page->request->mode=="admin")
+		{
+			return false;
+		}
+		return true;
+	}
+	
 	function logout()
 	{
 		unset($this->user);
@@ -36,8 +55,9 @@ class User
 	{
 		global $_PREFS;
 		
-		$result=false;
+		$success=false;
 		$expected=$user.":".md5($password).":";
+		$this->log->debug("Checking for ".$expected);
 		$file = $_PREFS->getPref("security.database");
     if (is_readable($file))
     {
@@ -47,10 +67,11 @@ class User
 	      while (!feof($source))
 	      {
 	        $line=fgets($source);
+	        $this->log->debug("Checking against ".$line);
 	        if (substr($line,0,strlen($expected))==$expected)
 	        {
 	        	$this->user=$user;
-	        	$result=true;
+	        	$success=true;
 	        	break;
 	        }
 	      }
@@ -58,9 +79,18 @@ class User
       }
       fclose($source);
   	}
-  	return $result;
+  	else
+  	{
+  		$this->log->error("Could not read security database ".$file);
+  	}
+  	return $success;
 	}
 }
+
+// Start up the session
+session_name("SwimSession");
+session_start();
+
 
 if (isset($_SESSION['Swim.User']))
 {
@@ -68,7 +98,7 @@ if (isset($_SESSION['Swim.User']))
 }
 else
 {
-	$_USER = new User;
+	$_USER = new User();
 	$_SESSION['Swim.User']=&$_USER;
 }
 

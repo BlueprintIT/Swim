@@ -94,7 +94,7 @@ class Preferences
 	// Evaluates a preference value, resolving references
 	function evaluatePref($text)
 	{
-		$count=preg_match_all('/\$\[([^=#$[\]]+)\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
+		$count=preg_match_all('/\$\[([^=#$[\]]+?)\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
 		for($p=$count-1; $p>=0; $p--)
 		{
 			$pref=$matches[1][$p][0];

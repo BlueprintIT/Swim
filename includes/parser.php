@@ -31,7 +31,7 @@ class Parser
     $this->_attrname="";
     $this->_attrvalue="";
     $this->_quote="";
-    $this->_log=&LoggerManager::getLogger(get_class($this));
+    $this->_log=&LoggerManager::getLogger("swim.parser.".get_class($this));
     $this->_log->debug("In state 0");
   }
   
