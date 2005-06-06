@@ -92,7 +92,7 @@ class PageLogOutput extends LogOutput
 	function PageLogOutput()
 	{
 		$this->LogOutput();
-		$this->pattern="<b>[$[txtlevel]]</b> $[logger]: $[text] <br />";
+		$this->pattern="<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />";
 	}
 	
 	function internalOutput($text)

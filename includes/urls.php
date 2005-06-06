@@ -50,6 +50,7 @@ class Request
 	var $query = array();
 	var $log;
 	var $nested;
+	var $pageobj;
 	
 	function Request()
 	{
@@ -137,8 +138,18 @@ class Request
 		return $url;
 	}
 	
+	function &getPage()
+	{
+		if ($this->pageobj==null)
+		{
+			$this->pageobj = &loadPage($this->page,$this->version);
+		}
+		return $this->pageobj;
+	}
+	
 	function decodeCurrentRequest()
 	{
+		$request = new Request();
 		$path="";
 		if (isset($_SERVER['PATH_INFO']))
 		{
@@ -156,8 +167,9 @@ class Request
 				$this->log->warn("POST global is not set. this should never happen");
 			}
 		}
-		$this->decode($path,$query);
-		$this->choosePage();
+		$request->decode($path,$query);
+		$request->choosePage();
+		return $request;
 	}
 	
 	function choosePage()

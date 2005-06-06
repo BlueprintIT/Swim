@@ -33,13 +33,13 @@ class User
 		return isset($this->user);
 	}
 	
-	function canAccess(&$page)
+	function canAccess(&$request,&$page)
 	{
 		if ($this->isAdmin())
 		{
 			return true;
 		}
-		if ($page->request->mode=="admin")
+		if ($request->mode=="admin")
 		{
 			return false;
 		}

@@ -20,7 +20,7 @@ class HtmlBlock extends Block
 		$this->Block($dir);
 	}
 	
-	function displayContent($attrs,$text)
+	function displayContent(&$request,&$page,$attrs,$text)
 	{
 		$name=$this->prefs->getPref("block.htmlblock.filename","block.html");
 		readfile($this->dir."/".$name);

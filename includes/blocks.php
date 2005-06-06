@@ -57,35 +57,35 @@ class Block
 	{
 	}
 	
-	function displayContent($attrs,$text)
+	function displayContent(&$request,&$page,$attrs,$text)
 	{
 		print($text);
 	}
 	
-	function displayNormal($attrs,$text)
+	function displayNormal(&$request,&$page,$attrs,$text)
 	{
 		$this->displayIntro($attrs);
-		$this->displayContent($attrs,$text);
+		$this->displayContent($request,$page,$attrs,$text);
 		$this->displayOutro($attrs);
 	}
 	
-	function displayAdmin($attrs,$text)
+	function displayAdmin(&$request,&$page,$attrs,$text)
 	{
 		$this->displayIntro($attrs);
 		$this->displayAdminControl();
-		$this->displayContent($attrs,$text);
+		$this->displayContent($request,$page,$attrs,$text);
 		$this->displayOutro($attrs);
 	}
 	
-	function display($attrs,$text)
+	function display(&$request,&$page,$attrs,$text)
 	{
-		if ($this->page->request->mode=="admin")
+		if ($request->mode=="admin")
 		{
-			$this->displayAdmin($attrs,$text);
+			$this->displayAdmin($request,$page,$attrs,$text);
 		}
 		else
 		{
-			$this->displayNormal($attrs,$text);
+			$this->displayNormal($request,$page,$attrs,$text);
 		}
 	}
 }

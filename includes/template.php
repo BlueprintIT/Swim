@@ -72,13 +72,13 @@ class Template
 		}
 	}
 	
-	function displayBlock(&$page,$tag,$attrs,$text)
+	function displayBlock(&$request,&$page,$tag,$attrs,$text)
 	{
 		$block=$page->getBlock($attrs['id']);
-		return $block->display($attrs,$text);
+		return $block->display($request,$page,$attrs,$text);
 	}
 	
-	function displayVar(&$page,$tag,$attrs,$text)
+	function displayVar(&$request,&$page,$tag,$attrs,$text)
 	{
 		$name=$attrs['name'];
 		if (isset($attrs['namespace']))
@@ -100,22 +100,23 @@ class Template
 	
 	function observeTag(&$parser,$tag,$attrs,$text)
 	{
-		$page=&$parser->data;
+		$page=&$parser->data['page'];
+		$request=&$parser->data['request'];
 		if ($tag=="var")
 		{
-			return $this->displayVar($page,$tag,$attrs,$text);
+			return $this->displayVar($request,$page,$tag,$attrs,$text);
 		}
 		else if ($tag=="block")
 		{
-			return $this->displayBlock($page,$tag,$attrs,$text);
+			return $this->displayBlock($request,$page,$tag,$attrs,$text);
 		}
 	}
 	
-	function display(&$page)
+	function display(&$request,&$page)
 	{
 		// Parse the template and display
 		$parser = new TemplateParser();
-		$parser->data=&$page;
+		$parser->data=array('page'=>&$page,'request'=>&$request);
 		$parser->addObserver("block",$this);
 		$parser->addObserver("var",$this);
 		
@@ -124,20 +125,5 @@ class Template
 		ob_end_flush();
 	}
 }
-
-function &loadTemplate($name)
-{
-	global $_TEMPLATES;
-	
-	if (isset($_TEMPLATES[$name]))
-	{
-		return $_TEMPLATES[$name];
-	}
-	$template = new Template($name);
-	$_TEMPLATES[$name]=&$template;
-	return $template;
-}
-
-$_TEMPLATES = array();
 
 ?>

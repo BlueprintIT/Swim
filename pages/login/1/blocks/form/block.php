@@ -4,10 +4,10 @@ if (($_SERVER['REQUEST_METHOD']=="POST")&&(isset($_POST['swim_action'])))
 {
 	if ($_USER->login($_POST['swim_username'],$_POST['swim_password']))
 	{
-		$newpage = new Page($page->request->nested);
-		if ($_USER->canAccess($newpage))
+		$newpage = $request->nested->getPage();
+		if ($_USER->canAccess($request->nested,$newpage))
 		{
-			redirect($page->request->nested);
+			redirect($request->nested);
 		}
 		else
 		{
@@ -21,8 +21,8 @@ if (($_SERVER['REQUEST_METHOD']=="POST")&&(isset($_POST['swim_action'])))
 }
 
 $request = new Request();
-$request->page=$page->request->page;
-$request->nested=&$page->request->nested;
+$request->page=$request->page;
+$request->nested=&$request->nested;
 
 ?>
 <form action="<?= $request->encodePath() ?>" method="POST">

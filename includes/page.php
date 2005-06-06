@@ -18,46 +18,30 @@ class Page
 	var $template;
 	var $prefs;
 	var $blocks;
-	var $request;
+	var $version;
+	var $id;
 	
-	function Page($request)
+	function Page($id,$version)
 	{
 		global $_PREFS;
 		
-		$this->request = $request;
+		$this->version=$version;
+		$this->id=$id;
 		$this->blocks = array();
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
-		$this->load();
+		$this->prefs->loadPreferences($this->getDir()."/page.conf","page");
 	}
 	
-	function display()
+	function display(&$request)
 	{
-		$this->template->display($this);
-	}
-	
-	function getVersion()
-	{
-		if (isset($this->request->version))
-		{
-			return $this->request->version;
-		}
-		else
-		{
-			return getVersion($this->prefs->getPref("storage.pages")."/".$this->request->page);
-		}
+		$this->getTemplate();
+		$this->template->display($request,$this);
 	}
 	
 	function getDir()
 	{
-		if (isset($this->request->version))
-		{
-			return getResourceVersion($this->prefs->getPref("storage.pages")."/".$this->request->page,$this->request->version);
-		}
-		else
-		{
-			return getCurrentResource($this->prefs->getPref("storage.pages")."/".$this->request->page);
-		}
+		return getResourceVersion($this->prefs->getPref("storage.pages")."/".$this->id,$this->version);
 	}
 	
 	function getBlock($id)
@@ -89,33 +73,10 @@ class Page
 				{
 					trigger_error("Block container not set");
 				}
-	
-				$blockprefs = new Preferences();
-				$blockprefs->setParent($this->prefs);
-				if (is_readable($blockdir."/block.conf"))
-				{
-					$blockprefs->loadPreferences($blockdir."/block.conf","block");
-				}
-				$class=$blockprefs->getPref("block.class");
-				if ($blockprefs->isPrefSet("block.classfile"))
-				{
-					require_once $blockprefs->getPref("storage.blocks.classes")."/".$blockprefs->getPref("block.classfile");
-				}
-				else if (is_readable($blockdir."/block.class"))
-				{
-					require_once $blockdir."/block.class";
-				}
-				if (class_exists($class))
-				{
-					$object = new $class($blockdir);
-		
-					$object->setPage($this);
-					$this->blocks[$id] = &$object;
-				}
-				else
-				{
-					trigger_error("Invalid block found");
-				}
+				
+				$blockobj = &loadBlock($blockdir);
+				$blockobj->setPage($this);
+				$this->blocks[$id]=&$blockobj;
 			}
 			else
 			{
@@ -125,27 +86,23 @@ class Page
 		return $this->blocks[$id];
 	}
 	
-	function load()
+	function &getTemplate()
 	{
-		// Load the page's preferences
-		if (!isset($this->request->version))
+		if (!isset($this->template))
 		{
-			$this->request->version=getCurrentVersion($this->prefs->getPref("storage.pages")."/".$this->request->page);
+			// Find the page's template or use the default
+			if ($this->prefs->isPrefSet("page.template"))
+			{
+				$templ=$this->prefs->getPref("page.template");
+			}
+			else
+			{
+				$templ=$this->prefs->getPref("templates.default");
+			}
+			$this->template=&loadTemplate($templ);
+			$this->prefs->setParent($this->template->prefs);
 		}
-		
-		$this->prefs->loadPreferences($this->getDir()."/page.conf","page");
-		
-		// Find the page's template or use the default
-		if ($this->prefs->isPrefSet("page.template"))
-		{
-			$templ=$this->prefs->getPref("page.template");
-		}
-		else
-		{
-			$templ=$this->prefs->getPref("templates.default");
-		}
-		$this->template=loadTemplate($templ);
-		$this->prefs->setParent($this->template->prefs);
+		return $this->template;
 	}
 }
 
