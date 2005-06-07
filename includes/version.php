@@ -24,7 +24,7 @@ function getCurrentResource($dir)
 	}
 	else
 	{
-		return $dir."/".$newest;
+		return $dir.'/'.$newest;
 	}
 }
 
@@ -36,9 +36,9 @@ function getCurrentVersion($dir)
 	{
 		while (($file=readdir($res))!== false)
 		{
-			if (!(substr($file,0,1)=="."))
+			if (!(substr($file,0,1)=='.'))
 			{
-				if ((is_dir($dir."/".$file))&&(is_numeric($file)))
+				if ((is_dir($dir.'/'.$file))&&(is_numeric($file)))
 				{
 					if ($file>$newest)
 					{
@@ -62,9 +62,9 @@ function getCurrentVersion($dir)
 // Retrieves a particular version of a resource.
 function getResourceVersion($dir,$version)
 {
-	if (is_dir($dir."/".$version))
+	if (is_dir($dir.'/'.$version))
 	{
-		return $dir."/".$version;
+		return $dir.'/'.$version;
 	}
 	return false;
 }

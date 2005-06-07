@@ -14,30 +14,26 @@
  */
 
 // Load the base includes
-require_once "base.php";
+require_once 'base.php';
 
-LoggerManager::setLogLevel("",SWIM_LOG_WARN);
-LoggerManager::setLogLevel("php",SWIM_LOG_ALL);
-LoggerManager::setLogLevel("swim.request",SWIM_LOG_ALL);
-LoggerManager::setLogLevel("swim.user",SWIM_LOG_ALL);
-LoggerManager::setLogLevel("swim.cache",SWIM_LOG_ALL);
-LoggerManager::setLogLevel("page",SWIM_LOG_ALL);
+LoggerManager::setLogLevel('',SWIM_LOG_WARN);
+LoggerManager::setLogLevel('php',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.request',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.cache',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('page',SWIM_LOG_ALL);
 
-// Load the page to display
-$request=Request::decodeCurrentRequest();
-$page = &$request->getPage();
+$log=&LoggerManager::getLogger('swim');
 
-if ($_USER->canAccess($request,$page))
+$request=&Request::decodeCurrentRequest();
+
+if ($_USER->canAccess($request))
 {
-	$page->display($request);
+	callMethod($request);
 }
 else
 {
-	$newrequest = new Request();
-	$newrequest->page="login";
-	$newrequest->nested=&$request;
-	$page = new Page($newrequest);
-	$page->display($newrequest);
 }
+
 
 ?>

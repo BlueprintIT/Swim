@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-require $_PREFS->getPref("storage.blocks.classes")."/HtmlBlock.php";
-require $_PREFS->getPref("storage.blocks.classes")."/PhpBlock.php";
+require $_PREFS->getPref('storage.blocks.classes').'/HtmlBlock.php';
+require $_PREFS->getPref('storage.blocks.classes').'/PhpBlock.php';
 
 ?>

@@ -13,23 +13,17 @@
  * $Revision$
  */
 
-function printArray($array,$indent="")
+function callMethod(&$request)
 {
-	print($indent."{\n");
-	$newindent=$indent."  ";
-	while(list($key, $value) = each($array))
-  {
-  	if (is_array($value))
-  	{
-  		print($newindent."$key => Array\n");
-  		printArray($value,$newindent);
-  	}
-  	else
-  	{
-	  	print($newindent."$key => $value\n");
-	  }
-  }
-  print($indent."}\n");
+	global $_PREFS;
+	
+	$methodfile=$request->method.".php";
+	$methodfunc='method_'.$request->method;
+	if (is_readable($_PREFS->getPref('storage.methods')))
+	{
+		require_once($_PREFS->getPref('storage.methods').'/'.$methodfile);
+		$methodfunc($request);
+	}
 }
 
 ?>

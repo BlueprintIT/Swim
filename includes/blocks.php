@@ -18,7 +18,7 @@ class Block
 	var $dir;
 	var $prefs;
 	var $page;
-	var $type = "div";
+	var $type = 'div';
 	
 	function Block($dir)
 	{
@@ -40,17 +40,17 @@ class Block
 	
 	function displayIntro($attrs)
 	{
-		$attrlist="id=\"".$attrs['id']."\"";
+		$attrlist='id=\''.$attrs['id'].'\'';
 		if (isset($attrs['class']))
 		{
-			$attrlist.=" class=\"".$attrs['id']."\"";
+			$attrlist.=' class=\''.$attrs['id'].'\'';
 		}
-		print("<".$this->type." ".$attrlist.">");
+		print('<'.$this->type.' '.$attrlist.'>');
 	}
 	
 	function displayOutro($attrs)
 	{
-		print("</".$this->type.">");
+		print('</'.$this->type.'>');
 	}
 	
 	function displayAdminControl()
@@ -77,9 +77,11 @@ class Block
 		$this->displayOutro($attrs);
 	}
 	
-	function display(&$request,&$page,$attrs,$text)
+	function display(&$data,$attrs,$text)
 	{
-		if ($request->mode=="admin")
+		$request=&$data['request'];
+		$page=&$data['page'];
+		if ($data->mode=='admin')
 		{
 			$this->displayAdmin($request,$page,$attrs,$text);
 		}

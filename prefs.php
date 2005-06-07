@@ -36,11 +36,11 @@ class Preferences
 	
 	// Loads preferences. With no arguments it loads all preferences from their default
 	// locations. Otherwise specify the type (numerical) and the file to load from.
-	function loadPreferences($file,$branch = "",$merge = false)
+	function loadPreferences($file,$branch = '',$merge = false)
 	{
     if (is_readable($file))
     {
-      $source=fopen($file,"r");
+      $source=fopen($file,'r');
       if (flock($source,LOCK_SH))
       {
       	if (!$merge)
@@ -49,21 +49,21 @@ class Preferences
 		    }
 		    if (strlen($branch)>0)
 		    {
-		    	$branch.=".";
+		    	$branch.='.';
 		    }
 	      while (!feof($source))
 	      {
 	        $line=fgets($source);
-	        if (preg_match("/^([^=#$[\]]+)=(.*?)\s*$/",$line,$matches))
+	        if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
 	        {
 	        	if (substr($matches[1],0,strlen($branch))==$branch)
 	        	{
 		          $value=$matches[2];
-		          if ((strcasecmp($value,"true")==0)||(strcasecmp($value,"yes")==0))
+		          if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
 		          {
 		            $value=true;
 		          }
-		          else if ((strcasecmp($value,"false")==0)||(strcasecmp($value,"no")==0))
+		          else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
 		          {
 		            $value=false;
 		          }
@@ -77,7 +77,7 @@ class Preferences
     }
     else
     {
-    	trigger_error("Unable to read file ".$file);
+    	trigger_error('Unable to read file '.$file);
     }
 	}
 	
@@ -107,7 +107,7 @@ class Preferences
 	}
 	
 	// Retrieves a preference. Returns a blank string for undefined preferences.
-	function getPref($pref,$default = "")
+	function getPref($pref,$default = '')
 	{
     if (isset($this->preferences[$pref]))
     {
@@ -140,10 +140,10 @@ function init()
 	global $_PREFS;
 	
 	$default = new Preferences();
-	$default->loadPreferences("default.conf");
+	$default->loadPreferences('default.conf');
 	
 	$siteprefs = new Preferences();
-	$siteprefs->loadPreferences("site.conf");
+	$siteprefs->loadPreferences('site.conf');
 	$siteprefs->setParent($default);
 	
 	$default->setOverride($siteprefs);

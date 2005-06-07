@@ -24,9 +24,9 @@ class PhpBlock extends Block
 	{
 		global $_USER;
 		
-		$log = &LoggerManager::getLogger("page");
-		$name=$this->prefs->getPref("block.phpblock.filename","block.php");
-		include($this->dir."/".$name);
+		$log = &LoggerManager::getLogger('page');
+		$name=$this->prefs->getPref('block.phpblock.filename','block.php');
+		include($this->dir.'/'.$name);
 		return true;
 	}
 }

@@ -22,18 +22,18 @@ function &loadBlock($blockdir)
 	
 	$blockprefs = new Preferences();
 	$blockprefs->setParent($_PREFS);
-	if (is_readable($blockdir."/block.conf"))
+	if (is_readable($blockdir.'/block.conf'))
 	{
-		$blockprefs->loadPreferences($blockdir."/block.conf","block");
+		$blockprefs->loadPreferences($blockdir.'/block.conf','block');
 	}
-	$class=$blockprefs->getPref("block.class");
-	if ($blockprefs->isPrefSet("block.classfile"))
+	$class=$blockprefs->getPref('block.class');
+	if ($blockprefs->isPrefSet('block.classfile'))
 	{
-		require_once $blockprefs->getPref("storage.blocks.classes")."/".$blockprefs->getPref("block.classfile");
+		require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
 	}
-	else if (is_readable($blockdir."/block.class"))
+	else if (is_readable($blockdir.'/block.class'))
 	{
-		require_once $blockdir."/block.class";
+		require_once $blockdir.'/block.class';
 	}
 	if (class_exists($class))
 	{
@@ -43,7 +43,7 @@ function &loadBlock($blockdir)
 	}
 	else
 	{
-		trigger_error("Invalid block found");
+		trigger_error('Invalid block found');
 	}
 }
 
@@ -66,7 +66,7 @@ function &loadPage($id,$version)
 
 	if (!isset($version))
 	{
-		$version=getCurrentVersion($_PREFS->getPref("storage.pages")."/".$id);
+		$version=getCurrentVersion($_PREFS->getPref('storage.pages').'/'.$id);
 	}
 	if (!isset($_PAGES[$id][$version]))
 	{

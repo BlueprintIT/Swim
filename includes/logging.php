@@ -13,21 +13,27 @@
  * $Revision$
  */
 
-define("SWIM_LOG_NONE",0);
-define("SWIM_LOG_FATAL",1);
-define("SWIM_LOG_ERROR",2);
-define("SWIM_LOG_WARN",3);
-define("SWIM_LOG_INFO",4);
-define("SWIM_LOG_DEBUG",5);
-define("SWIM_LOG_ALL",2000);
+define('SWIM_LOG_NONE',0);
+define('SWIM_LOG_FATAL',1);
+define('SWIM_LOG_ERROR',2);
+define('SWIM_LOG_WARN',3);
+define('SWIM_LOG_INFO',4);
+define('SWIM_LOG_DEBUG',5);
+define('SWIM_LOG_ALL',2000);
 
 class LogOutput
 {
 	var $pattern;
+	var $level = SWIM_LOG_ALL;
 	
 	function LogOutput()
 	{
-		$pattern="";
+		$pattern='';
+	}
+	
+	function setLevel($level)
+	{
+		$this->level=$level;
 	}
 	
 	function internalOutput($text)
@@ -42,7 +48,14 @@ class LogOutput
 			$pref=$matches[1][$p][0];
 			$offset=$matches[0][$p][1];
 			$length=strlen($matches[0][$p][0]);
-			$replacement=$vars[$pref];
+			if (isset($vars[$pref]))
+			{
+				$replacement=$vars[$pref];
+			}
+			else
+			{
+				$replacement='';
+			}
 			$text=substr_replace($text,$replacement,$offset,$length);
 		}
 		return $text;
@@ -50,28 +63,31 @@ class LogOutput
 	
 	function output(&$logger,$detail)
 	{
-		$detail['txtlevel']="UNKNOWN";
-		switch($detail['level'])
+		if ($detail['level']<=$this->level)
 		{
-			case SWIM_LOG_FATAL:
-				$detail['txtlevel']="FATAL";
-				break;
-			case SWIM_LOG_ERROR:
-				$detail['txtlevel']="ERROR";
-				break;
-			case SWIM_LOG_WARN:
-				$detail['txtlevel']="WARN";
-				break;
-			case SWIM_LOG_INFO:
-				$detail['txtlevel']="INFO";
-				break;
-			case SWIM_LOG_DEBUG:
-				$detail['txtlevel']="DEBUG";
-				break;
+			$detail['txtlevel']='UNKNOWN';
+			switch($detail['level'])
+			{
+				case SWIM_LOG_FATAL:
+					$detail['txtlevel']='FATAL';
+					break;
+				case SWIM_LOG_ERROR:
+					$detail['txtlevel']='ERROR';
+					break;
+				case SWIM_LOG_WARN:
+					$detail['txtlevel']='WARN';
+					break;
+				case SWIM_LOG_INFO:
+					$detail['txtlevel']='INFO';
+					break;
+				case SWIM_LOG_DEBUG:
+					$detail['txtlevel']='DEBUG';
+					break;
+			}
+			$detail['logger']=$logger->name;
+			
+			$this->internalOutput($this->convertPattern($this->pattern,$detail));
 		}
-		$detail['logger']=$logger->name;
-		
-		$this->internalOutput($this->convertPattern($this->pattern,$detail));
 	}
 }
 
@@ -92,7 +108,7 @@ class PageLogOutput extends LogOutput
 	function PageLogOutput()
 	{
 		$this->LogOutput();
-		$this->pattern="<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />";
+		$this->pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
 	}
 	
 	function internalOutput($text)
@@ -340,11 +356,11 @@ class LoggerManager
 }
 
 $_LOGMANAGER = new LoggerManager();
-LoggerManager::getLogger("php");
+LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)
 {
-	$log = &LoggerManager::getLogger("php");
+	$log = &LoggerManager::getLogger('php');
 	
 	$trace = array('file' => $file, 'line' => $line, 'function' => '');
 	

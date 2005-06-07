@@ -20,7 +20,7 @@ class User
 	
 	function User()
 	{
-		$this->log = &LoggerManager::getLogger("swim.user");
+		$this->log = &LoggerManager::getLogger('swim.user');
 	}
 	
 	function getUsername()
@@ -33,13 +33,13 @@ class User
 		return isset($this->user);
 	}
 	
-	function canAccess(&$request,&$page)
+	function canAccess(&$request)
 	{
 		if ($this->isAdmin())
 		{
 			return true;
 		}
-		if ($request->mode=="admin")
+		if ($request->method=='admin')
 		{
 			return false;
 		}
@@ -56,18 +56,18 @@ class User
 		global $_PREFS;
 		
 		$success=false;
-		$expected=$user.":".md5($password).":";
-		$this->log->debug("Checking for ".$expected);
-		$file = $_PREFS->getPref("security.database");
+		$expected=$user.':'.md5($password).':';
+		$this->log->debug('Checking for '.$expected);
+		$file = $_PREFS->getPref('security.database');
     if (is_readable($file))
     {
-      $source=fopen($file,"r");
+      $source=fopen($file,'r');
       if (flock($source,LOCK_SH))
       {
 	      while (!feof($source))
 	      {
 	        $line=fgets($source);
-	        $this->log->debug("Checking against ".$line);
+	        $this->log->debug('Checking against '.$line);
 	        if (substr($line,0,strlen($expected))==$expected)
 	        {
 	        	$this->user=$user;
@@ -81,14 +81,14 @@ class User
   	}
   	else
   	{
-  		$this->log->error("Could not read security database ".$file);
+  		$this->log->error('Could not read security database '.$file);
   	}
   	return $success;
 	}
 }
 
 // Start up the session
-session_name("SwimSession");
+session_name('SwimSession');
 session_start();
 
 
