@@ -60,7 +60,12 @@ class Request
 		
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
-	    return $_PREFS->getPref('url.pagegen').'/'.$this->method.'/'.$this->resource;
+	  	$url=$_PREFS->getPref('url.pagegen').'/'.$this->method;
+	  	if (isset($this->resource))
+	  	{
+	  		$url.='/'.$this->resource;
+	  	}
+	    return $url;
 	  }
 	  else
 	  {
@@ -70,6 +75,8 @@ class Request
 	
 	function makeAllVars()
 	{
+		global $_PREFS;
+		
 		$newquery=$this->query;
 		$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
 		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
@@ -87,9 +94,9 @@ class Request
 		$newquery=$this->query;
 		if (isset($this->nested))
 		{
-			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->encodeAsQuery());
+			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->makeAllVars());
 		}
-	  if ($_PREFS->getPref('url.pathencoding')!='path')
+	  if ($_PREFS->getPref('url.encoding')!='path')
 	  {
 			$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
 			$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
@@ -103,7 +110,7 @@ class Request
 		$text='';
 		foreach ($vars as $key => $value)
 		{
-			$text.='<input type="hidden" name="'.$key.'" value="'.$value.'" />'."\n";
+			$text.='<input type="hidden" name="'.$key.'" value="'.htmlentities($value).'" />'."\n";
 		}
 		return $text;
 	}

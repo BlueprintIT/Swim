@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Page viewing method
+ * Displays the error page
  *
  * Copyright Blueprint IT Ltd. 2005
  *
@@ -14,20 +14,20 @@
  */
 
 
-function method_view(&$request)
+function method_error(&$request)
 {
 	global $_PREFS;
 	
-	$pagedir=$_PREFS->getPref('storage.pages').'/'.$request->resource;
+	$pagedir=$_PREFS->getPref('storage.pages').'/'.$_PREFS->getPref('method.error.page');
 	if (is_dir($pagedir))
 	{
 		$version=getCurrentVersion($pagedir);
-		$page = new Page($request->resource,$version);
+		$page = new Page($_PREFS->getPref('method.error.page'),$version);
 		$page->display($request);
 	}
 	else
 	{
-		displayError($request);
+		// FOO
 	}
 }
 

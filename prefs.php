@@ -100,7 +100,7 @@ class Preferences
 			$pref=$matches[1][$p][0];
 			$offset=$matches[0][$p][1];
 			$length=strlen($matches[0][$p][0]);
-			$replacement=$this->overrides->getPref($pref);
+			$replacement=$this->overrides->getPref($pref,$pref);
 			$text=substr_replace($text,$replacement,$offset,$length);
 		}
 		return $text;

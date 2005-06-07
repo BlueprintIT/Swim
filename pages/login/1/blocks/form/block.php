@@ -1,27 +1,7 @@
 <?
 
-if (($_SERVER['REQUEST_METHOD']=='POST')&&(isset($_POST['swim_action'])))
-{
-	if ($_USER->login($_POST['swim_username'],$_POST['swim_password']))
-	{
-		$newpage = $request->nested->getPage();
-		if ($_USER->canAccess($request->nested,$newpage))
-		{
-			redirect($request->nested);
-		}
-		else
-		{
-			print('<p>Cant access</p>');
-		}
-	}
-	else
-	{
-		print('<p>Wrong details</p>');
-	}
-}
-
 $newrequest = new Request();
-$newrequest->page=$request->page;
+$newrequest->method='login';
 $newrequest->nested=&$request->nested;
 
 ?>

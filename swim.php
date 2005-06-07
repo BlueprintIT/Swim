@@ -25,6 +25,22 @@ LoggerManager::setLogLevel('page',SWIM_LOG_ALL);
 
 $log=&LoggerManager::getLogger('swim');
 
+function displayLogin(&$request)
+{
+	$newrequest = new Request();
+	$newrequest->method='displayLogin';
+	$newrequest->nested=&$request;
+	callMethod($newrequest);
+}
+
+function displayError($request)
+{
+	$newrequest = new Request();
+	$newrequest->method='error';
+	$newrequest->nested=&$request;
+	callMethod($newrequest);
+}
+
 $request=&Request::decodeCurrentRequest();
 
 if ($_USER->canAccess($request))
@@ -33,6 +49,7 @@ if ($_USER->canAccess($request))
 }
 else
 {
+	displayLogin($request);
 }
 
 
