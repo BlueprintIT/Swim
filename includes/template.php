@@ -16,8 +16,6 @@
 class Template
 {
 	var $dir;
-	var $file;
-	var $admin;
 	var $prefs;
 	var $parsing = false;
 	var $curPage;
@@ -43,43 +41,20 @@ class Template
 		{
 			$this->prefs->loadPreferences($this->dir.'/template.conf','template');
 		}
-		
-		// Find the template file name or use the default
-		if ($this->prefs->isPrefSet('template.file'))
-		{
-			$this->file=$this->prefs->getPref('template.file');
-		}
-		else
-		{
-			$this->file=$this->prefs->getPref('templates.defaultname');
-		}
-		
-		// Find the template admin name or use the default
-		if ($this->prefs->isPrefSet('template.admin'))
-		{
-			$this->admin=$this->prefs->getPref('template.admin');
-		}
-		else
-		{
-			$this->admin=$this->prefs->getPref('templates.adminname');
-		}
-		
-		// If the file doesnt exist then we have a problem with the template.
-		if (!is_readable($this->dir.'/'.$this->file))
-		{
-			trigger_error($name.' template is invalid.');
-			exit;
-		}
 	}
 	
-	function displayBlock(&$data,$tag,$attrs,$text)
+	function generateURL(&$parser,$tag,$attrs,$text)
 	{
-		$page=&$data['page'];
-		$block=$page->getBlock($attrs['id']);
-		return $block->display($data,$attrs,$text);
 	}
 	
-	function displayVar(&$data,$tag,$attrs,$text)
+	function displayBlock(&$parser,$tag,$attrs,$text)
+	{
+		$page=&$parser->data['page'];
+		$block=$page->getBlock($attrs['id']);
+		return $block->display($parser,$attrs,$text);
+	}
+	
+	function displayVar(&$parser,$tag,$attrs,$text)
 	{
 		$name=$attrs['name'];
 		if (isset($attrs['namespace']))
@@ -93,49 +68,70 @@ class Template
 				$name='page.variables.'.$name;
 			}
 		}
-		$page=&$data['page'];
+		$page=&$parser->data['page'];
 		if ($page->prefs->isPrefSet($name))
 		{
 			print($page->prefs->getPref($name));
 		}
+		return true;
 	}
 	
 	function observeTag(&$parser,$tag,$attrs,$text)
 	{
 		if ($tag=='var')
 		{
-			return $this->displayVar($parser->data,$tag,$attrs,$text);
+			return $this->displayVar($parser,$tag,$attrs,$text);
 		}
 		else if ($tag=='block')
 		{
-			return $this->displayBlock($parser->data,$tag,$attrs,$text);
+			return $this->displayBlock($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='url')
+		{
+			return $this->generateURL($parser,$tag,$attrs,$text);
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function internalDisplay(&$request,&$page,$mode,$xmlpref,$htmlpref)
+	{
+		if ($request->isXML())
+		{
+			$file=$this->prefs->getPref($xmlpref);
+			if (!is_readable($this->dir.'/'.$file))
+			{
+				$request->setXML(false);
+				$file=$this->prefs->getPref($htmlpref);
+			}
+		}
+		else
+		{
+			$file=$this->prefs->getPref($htmlpref);
+		}
+		
+		// Parse the template and display
+		$parser = new TemplateParser();
+		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode);
+		$parser->addObserver('block',$this);
+		$parser->addObserver('var',$this);
+		$parser->addObserver('url',$this);
+		
+		ob_start();
+		$parser->parseFile($this->dir.'/'.$file);
+		ob_end_flush();
 	}
 	
 	function displayAdmin(&$request,&$page)
 	{
-		// Parse the template and display
-		$parser = new TemplateParser();
-		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>'admin');
-		$parser->addObserver('block',$this);
-		$parser->addObserver('var',$this);
-		
-		ob_start();
-		$parser->parseFile($this->dir.'/'.$this->file);
-		ob_end_flush();
+		$this->internalDisplay($request,$page,'admin','template.adminxml','template.adminhtml');
 	}
 	
 	function display(&$request,&$page)
 	{
-		// Parse the template and display
-		$parser = new TemplateParser();
-		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>'normal');
-		$parser->addObserver('block',$this);
-		$parser->addObserver('var',$this);
-		
-		ob_start();
-		$parser->parseFile($this->dir.'/'.$this->file);
-		ob_end_flush();
+		$this->internalDisplay($request,$page,'normal','template.xmlfile','template.htmlfile');
 	}
 }
 

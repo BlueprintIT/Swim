@@ -18,14 +18,22 @@ class Block
 	var $dir;
 	var $prefs;
 	var $page;
+	var $container;
 	var $type = 'div';
+	var $id;
 	
-	function Block($dir)
+	function Block($id,$dir)
 	{
 		global $_PREFS;
+		$this->id=$id;
 		$this->dir=$dir;
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
+	}
+	
+	function setContainer($container)
+	{
+		$this->container=$container;
 	}
 	
 	function setPage(&$page)
@@ -38,13 +46,18 @@ class Block
 	{
 	}
 	
-	function displayIntro($attrs)
+	function displayIntro(&$data,$attrs)
 	{
-		$attrlist='id=\''.$attrs['id'].'\'';
+		$class="block";
+		if ($data['mode']=='admin')
+		{
+			$class.=" blockadmin";
+		}
 		if (isset($attrs['class']))
 		{
-			$attrlist.=' class=\''.$attrs['id'].'\'';
+			$class.=' '.$attrs['class'];
 		}
+		$attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
 		print('<'.$this->type.' '.$attrlist.'>');
 	}
 	
@@ -53,8 +66,18 @@ class Block
 		print('</'.$this->type.'>');
 	}
 	
-	function displayAdminControl()
+	function displayAdminControl(&$request)
 	{
+		$editres = new Request();
+		$editres->method='edit';
+		$editres->resource=$this->container;
+		if ($this->container=='page')
+		{
+			$editres->resource.='/'.$request->resource;
+		}
+		$editres->resource.='/'.$this->id;
+		$editres->nested=&$request;
+?><div class="admincontrol"><a href="<?= $editres->encode() ?>">Edit</a></div><?
 	}
 	
 	function displayContent(&$request,&$page,$attrs,$text)
@@ -62,33 +85,43 @@ class Block
 		print($text);
 	}
 	
-	function displayNormal(&$request,&$page,$attrs,$text)
+	function displayNormal(&$data,$attrs,$text)
 	{
-		$this->displayIntro($attrs);
-		$this->displayContent($request,$page,$attrs,$text);
+		$this->displayIntro($data,$attrs);
+		$this->displayContent($data['request'],$data['page'],$attrs,$text);
 		$this->displayOutro($attrs);
 	}
 	
-	function displayAdmin(&$request,&$page,$attrs,$text)
+	function displayAdmin(&$data,$attrs,$text)
 	{
-		$this->displayIntro($attrs);
-		$this->displayAdminControl();
-		$this->displayContent($request,$page,$attrs,$text);
+		$this->displayIntro($data,$attrs);
+		$this->displayAdminControl($data['request']);
+		$this->displayContent($data['request'],$data['page'],$attrs,$text);
 		$this->displayOutro($attrs);
 	}
 	
-	function display(&$data,$attrs,$text)
+	function display(&$parser,$attrs,$text)
 	{
-		$request=&$data['request'];
-		$page=&$data['page'];
-		if ($data->mode=='admin')
+		ob_start();
+		$request=&$parser->data['request'];
+		$page=&$parser->data['page'];
+		if ($parser->data['mode']=='admin')
 		{
-			$this->displayAdmin($request,$page,$attrs,$text);
+			$this->displayAdmin($parser->data,$attrs,$text);
 		}
 		else
 		{
-			$this->displayNormal($request,$page,$attrs,$text);
+			$this->displayNormal($parser->data,$attrs,$text);
 		}
+    $text=ob_get_contents();
+    ob_end_clean();
+    $parser->parseText($text);
+		return true;
+	}
+	
+	function observeTag(&$parser,$tagname,$attrs,$text)
+	{
+		return false;
 	}
 }
 

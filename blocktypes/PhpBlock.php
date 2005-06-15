@@ -15,9 +15,9 @@
 
 class PhpBlock extends Block
 {
-	function PhpBlock($dir)
+	function PhpBlock($id,$dir)
 	{
-		$this->Block($dir);
+		$this->Block($id,$dir);
 	}
 	
 	function displayContent(&$request,&$page,$attrs,$text)

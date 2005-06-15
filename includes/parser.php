@@ -229,32 +229,45 @@ class StackedParser extends Parser
   }  
 }
 
+class TagObserver
+{
+	var $callback;
+	
+	function TagObserver($callback)
+	{
+		$this->callback=$callback;
+	}
+
+  function observeTag(&$parser,$tagname,$attrs,$content)
+  {
+  	return $callback($parser,$tagname,$attrs,$content);
+  }
+}
+
 // Designed for parsing very bad html but picking out the few tags we are interested in.
 class TemplateParser extends StackedParser
 {
-  var $_callbacks;
-  var $_observers;
+  var $observers;
   var $data;
   
   function TemplateParser()
   {
     $this->StackedParser();
-    $this->_callbacks=array();
-    $this->_observers=array();
+    $this->observers=array();
   }
 
 	// Adds an object observer to the parser
 	function addObserver($tagname,&$observer)
 	{
     $this->_log->debug('Observer added for '.$tagname);
-    if (!isset($this->_observers[$tagname]))
+    if (!isset($this->observers[$tagname]))
     {
-    	$this->_observers[$tagname]=array();
+    	$this->observers[$tagname]=array();
     }
-    $this->_observers[$tagname][]=&$observer;
+    $this->observers[$tagname][]=&$observer;
 	}
 	
-  // Adds an observer to a numebr of tag names.
+  // Adds an observer to a number of tag names.
   function addObservers($tagnames,&$observer)
   {
     foreach ($tagnames as $tagname)
@@ -263,60 +276,43 @@ class TemplateParser extends StackedParser
     }
   }
   
+  function removeObserver($tag,&$observer)
+  {
+  	if (is_array($this->observer[$tag]))
+  	{
+	  	foreach (array_keys($this->observer[$tag]) as $key)
+	  	{
+	  		if ($this->observer[$tag][$key]==$observer)
+	  		{
+	  			unset($this->observer[$tag][$key]);
+	  		}
+	  	}
+	  }
+  }
+  
   // Adds a callback to the parser. Tags with this name will be extracted.
   function addCallback($tagname,$function)
   {
     $this->_log->debug('Callback added for '.$tagname);
-    if (!isset($this->_callbacks[$tagname]))
-    {
-    	$this->_callbacks[$tagname]=array();
-    }
-    $this->_callbacks[$tagname][]=$function;
+  	$this->addObserver($tagname,new TagObserver($function));
   }
   
   // Adds a callback to a numebr of tag names.
   function addCallbacks($tagnames,$function)
   {
-    foreach ($tagnames as $tagname)
-    {
-      $this->addCallback($tagname,$function);
-    }
+  	$this->addObservers($tagnames,new TagObserver($function));
   }
   
-  // Called when a tag has been fully extracted to call the user function.
-  function callCallback($callback,$tagname,$attrs,$content)
-  {
-    ob_start();
-    $this->_log->debug('Calling callback for '.$tagname);
-    $reparse=$callback($this,$tagname,$attrs,$content);
-    $text=ob_get_contents();
-    ob_end_clean();
-    if ($reparse===true)
-    {
-    	$this->parseText($text);
-    }
-    else
-    {
-      $this->onText($text);
-    }
-  }
-
   // Called when a tag has been fully extracted to call the user function.
   function callObserver(&$observer,$tagname,$attrs,$content)
   {
     ob_start();
     $this->_log->debug('Calling observer for '.$tagname);
-    $reparse=$observer->observeTag($this,$tagname,$attrs,$content);
+    $done=$observer->observeTag($this,$tagname,$attrs,$content);
     $text=ob_get_contents();
     ob_end_clean();
-    if ($reparse===true)
-    {
-    	$this->parseText($text);
-    }
-    else
-    {
-      $this->onText($text);
-    }
+    $this->onText($text);
+    return $done;
   }
 
   // Any uncontained text just goes to stdout.  
@@ -328,7 +324,7 @@ class TemplateParser extends StackedParser
   // Checks if we are interested in the tag.
   function onStartTag($tag)
   {
-    if ((isset($this->_callbacks[$tag]))||(isset($this->_observers[$tag])))
+    if (isset($this->observers[$tag]))
     {
       $this->pushStack($tag);
       return true;
@@ -349,17 +345,16 @@ class TemplateParser extends StackedParser
       {
       	$this->_log->error('Was expecting end tag for '.$tag.' but got '.$result['tag']);
       }
-      if ((isset($this->_callbacks[$tag]))||(isset($this->_observers[$tag])))
+      if (isset($this->observers[$tag]))
       {
 		    $this->_log->debug('Buffering callbacks');
-		    foreach ($this->_callbacks[$tag] as $callback)
+		    foreach (array_keys($this->observers[$tag]) as $i)
 		    {
-		    	$this->callCallback($callback,$tag,$result['attrs'],$result['text']);
-		    }
-		    for ($i=0; $i<count($this->_observers[$tag]); $i++)
-		    {
-		    	$observer=&$this->_observers[$tag][$i];
-		    	$this->callObserver($observer,$tag,$result['attrs'],$result['text']);
+		    	$observer=&$this->observers[$tag][$i];
+		    	if ($this->callObserver($observer,$tag,$result['attrs'],$result['text']))
+		    	{
+		    		break;
+		    	}
 		    }
       }
       else

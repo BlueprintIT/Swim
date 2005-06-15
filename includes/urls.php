@@ -48,10 +48,32 @@ class Request
 	var $query = array();
 	var $log;
 	var $nested;
+	var $xml;
 	
 	function Request()
 	{
 		$this->log=&LoggerManager::getLogger('swim.request');
+	}
+	
+	function isXML()
+	{
+		if (!isset($this->xml))
+		{
+			if (strpos($_SERVER['HTTP_ACCEPT'],'application/xhtml+xml')!==false)
+			{
+				$this->xml=true;
+			}
+			else
+			{
+				$this->xml=false;
+			}
+		}
+		return $this->xml;
+	}
+	
+	function setXML($value)
+	{
+		$this->xml=$value;
 	}
 	
 	function encodePath()

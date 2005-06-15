@@ -15,9 +15,9 @@
 
 class HtmlBlock extends Block
 {
-	function HtmlBlock($dir)
+	function HtmlBlock($id,$dir)
 	{
-		$this->Block($dir);
+		$this->Block($id,$dir);
 	}
 	
 	function displayContent(&$request,&$page,$attrs,$text)

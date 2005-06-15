@@ -16,7 +16,7 @@
 $_TEMPLATES = array();
 $_PAGES = array();
 
-function &loadBlock($blockdir)
+function &loadBlock($block,$blockdir)
 {
 	global $_PREFS;
 	
@@ -37,7 +37,7 @@ function &loadBlock($blockdir)
 	}
 	if (class_exists($class))
 	{
-		$object = new $class($blockdir);
+		$object = new $class($block,$blockdir);
 		$object->prefs = $blockprefs;
 		return $object;
 	}

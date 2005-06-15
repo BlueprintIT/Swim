@@ -13,7 +13,6 @@
  * $Revision$
  */
 
-
 function method_login(&$request)
 {
 	global $_PREFS,$_USER;
@@ -34,6 +33,5 @@ function method_login(&$request)
 		displayLogin($request->nested);
 	}
 }
-
 
 ?>

@@ -80,8 +80,10 @@ class Page
 					trigger_error('Block container not set');
 				}
 				
-				$blockobj = &loadBlock($blockdir);
+				$blockobj = &loadBlock($block,$blockdir);
 				$blockobj->setPage($this);
+				$blockobj->setContainer($container);
+				
 				$this->blocks[$id]=&$blockobj;
 			}
 			else
