@@ -41,37 +41,33 @@ class Preferences
     if (is_readable($file))
     {
       $source=fopen($file,'r');
-      if (flock($source,LOCK_SH))
+    	if (!$merge)
+    	{
+	      $this->preferences=array();
+	    }
+	    if (strlen($branch)>0)
+	    {
+	    	$branch.='.';
+	    }
+      while (!feof($source))
       {
-      	if (!$merge)
-      	{
-		      $this->preferences=array();
-		    }
-		    if (strlen($branch)>0)
-		    {
-		    	$branch.='.';
-		    }
-	      while (!feof($source))
-	      {
-	        $line=fgets($source);
-	        if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
-	        {
-	        	if (substr($matches[1],0,strlen($branch))==$branch)
-	        	{
-		          $value=$matches[2];
-		          if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
-		          {
-		            $value=true;
-		          }
-		          else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
-		          {
-		            $value=false;
-		          }
-		          $this->preferences[$matches[1]]=$value;
-		        }
+        $line=fgets($source);
+        if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
+        {
+        	if (substr($matches[1],0,strlen($branch))==$branch)
+        	{
+	          $value=$matches[2];
+	          if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
+	          {
+	            $value=true;
+	          }
+	          else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
+	          {
+	            $value=false;
+	          }
+	          $this->preferences[$matches[1]]=$value;
 	        }
-	      }
-	      flock($source,LOCK_UN);
+        }
 	    }
       fclose($source);
     }

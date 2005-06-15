@@ -21,6 +21,7 @@ class Block
 	var $container;
 	var $type = 'div';
 	var $id;
+	var $lock;
 	
 	function Block($id,$dir)
 	{
@@ -40,6 +41,48 @@ class Block
 	{
 		$this->page=&$page;
 		$this->prefs->setParent($page->prefs);
+	}
+	
+	function lockRead()
+	{
+		$lockfile = $this->dir.'/lock';
+		$file = fopen($lockfile,'a');
+		if (flock($file,LOCK_SH))
+		{
+			$this->lock=&$file;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function lockWrite()
+	{
+		$lockfile = $this->dir.'/lock';
+		$file = fopen($lockfile,'a');
+		if (flock($file,LOCK_EX))
+		{
+			$this->lock=&$file;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function unlock()
+	{
+		if (isset($this->lock))
+		{
+			$file=&$this->lock;
+			unset($this->lock);
+	
+			flock($file,LOCK_UN);
+			fclose($file);
+		}
 	}
 	
 	function init()
@@ -88,7 +131,9 @@ class Block
 	function displayNormal(&$data,$attrs,$text)
 	{
 		$this->displayIntro($data,$attrs);
+		$this->lockRead();
 		$this->displayContent($data['request'],$data['page'],$attrs,$text);
+		$this->unlock();
 		$this->displayOutro($attrs);
 	}
 	
@@ -96,7 +141,9 @@ class Block
 	{
 		$this->displayIntro($data,$attrs);
 		$this->displayAdminControl($data['request']);
+		$this->lockRead();
 		$this->displayContent($data['request'],$data['page'],$attrs,$text);
+		$this->unlock();
 		$this->displayOutro($attrs);
 	}
 	

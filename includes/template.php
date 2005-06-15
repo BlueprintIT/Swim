@@ -19,6 +19,7 @@ class Template
 	var $prefs;
 	var $parsing = false;
 	var $curPage;
+	var $lock;
 	
 	function Template($name)
 	{
@@ -36,10 +37,56 @@ class Template
 			exit;
 		}
 		
+		$this->lockRead();
+		
 		// If the template has prefs then load them
 		if (is_readable($this->dir.'/template.conf'))
 		{
 			$this->prefs->loadPreferences($this->dir.'/template.conf','template');
+		}
+		
+		$this->unlock();
+	}
+	
+	function lockRead()
+	{
+		$lockfile = $this->dir.'/lock';
+		$file = fopen($lockfile,'a');
+		if (flock($file,LOCK_SH))
+		{
+			$this->lock=&$file;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function lockWrite()
+	{
+		$lockfile = $this->dir.'/lock';
+		$file = fopen($lockfile,'a');
+		if (flock($file,LOCK_EX))
+		{
+			$this->lock=&$file;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function unlock()
+	{
+		if (isset($this->lock))
+		{
+			$file=&$this->lock;
+			unset($this->lock);
+	
+			flock($file,LOCK_UN);
+			fclose($file);
 		}
 	}
 	
@@ -119,9 +166,11 @@ class Template
 		$parser->addObserver('var',$this);
 		$parser->addObserver('url',$this);
 		
+		$this->lockRead();
 		ob_start();
 		$parser->parseFile($this->dir.'/'.$file);
 		ob_end_flush();
+		$this->unlock();
 	}
 	
 	function displayAdmin(&$request,&$page)

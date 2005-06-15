@@ -20,6 +20,7 @@ class Page
 	var $blocks;
 	var $version;
 	var $id;
+	var $lock;
 	
 	function Page($id,$version)
 	{
@@ -30,7 +31,10 @@ class Page
 		$this->blocks = array();
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
+		
+		$this->lockRead();
 		$this->prefs->loadPreferences($this->getDir().'/page.conf','page');
+		$this->unlock();
 	}
 	
 	function display(&$request)
@@ -48,6 +52,48 @@ class Page
 	function getDir()
 	{
 		return getResourceVersion($this->prefs->getPref('storage.pages').'/'.$this->id,$this->version);
+	}
+	
+	function lockRead()
+	{
+		$lockfile = $this->getDir().'/lock';
+		$file = fopen($lockfile,'a');
+		if (flock($file,LOCK_SH))
+		{
+			$this->lock=&$file;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function lockWrite()
+	{
+		$lockfile = $this->getDir().'/lock';
+		$file = fopen($lockfile,'a');
+		if (flock($file,LOCK_EX))
+		{
+			$this->lock=&$file;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	function unlock()
+	{
+		if (isset($this->lock))
+		{
+			$file=&$this->lock;
+			unset($this->lock);
+	
+			flock($file,LOCK_UN);
+			fclose($file);
+		}
 	}
 	
 	function getBlock($id)

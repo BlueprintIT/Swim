@@ -13,6 +13,53 @@
  * $Revision$
  */
 
+function lockSecurityRead()
+{
+	global $_PREFS,$_LOCKS;
+	
+	$lockfile = $_PREFS->getPref('security.lock');
+	$file = fopen($lockfile,'a');
+	if (flock($file,LOCK_SH))
+	{
+		$_LOCKS['security']=&$file;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+function lockSecurityWrite()
+{
+	global $_PREFS,$_LOCKS;
+	
+	$lockfile = $_PREFS->getPref('security.lock');
+	$file = fopen($lockfile,'a');
+	if (flock($file,LOCK_EX))
+	{
+		$_LOCKS['security']=&$file;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+function unlockSecurity()
+{
+	global $_LOCKS;
+	
+	if (isset($_LOCKS['security']))
+	{
+		$file=&$_LOCKS['security'];
+		unset($_LOCKS['security']);
+		flock($file,LOCK_UN);
+		fclose($file);
+	}
+}
+
 class User
 {
 	var $user;
@@ -61,9 +108,9 @@ class User
 		$file = $_PREFS->getPref('security.database');
     if (is_readable($file))
     {
-      $source=fopen($file,'r');
-      if (flock($source,LOCK_SH))
-      {
+			if (lockSecurityRead())
+			{
+	      $source=fopen($file,'r');
 	      while (!feof($source))
 	      {
 	        $line=fgets($source);
@@ -75,9 +122,9 @@ class User
 	        	break;
 	        }
 	      }
-	      flock($source,LOCK_UN);
+	      fclose($source);
+	      unlockSecurity();
       }
-      fclose($source);
   	}
   	else
   	{
