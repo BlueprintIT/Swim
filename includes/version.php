@@ -71,19 +71,116 @@ function getTempVersion($dir)
 	return $result;
 }
 
+function recursiveDelete($dir,$ignorelock=false)
+{
+	$log=LoggerManager::getLogger('swim.version');
+	if ($res=@opendir($dir))
+	{
+		while (($file=readdir($res))!== false)
+		{
+			if (($file!='.')&&($file!='..'))
+			{
+				if ((($file=='lock')||($file=='templock'))&&($ignorelock))
+				{
+					continue;
+				}
+				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
+				{
+					unlink($dir.'/'.$file);
+				}
+				else if (is_dir($dir.'/'.$file))
+				{
+					recursiveDelete($dir.'/'.$file);
+					rmdir($dir.'/'.$file);
+				}
+				else
+				{
+					log->warn('Found unknown directory entry at '.$dir.'/'.$file);
+					unlink($dir.'/'.$file);
+				}
+			}
+		}
+		closedir($res);
+	}
+}
+
+function recursiveCopy($dir,$target,$ignorelock=false)
+{
+	$log=LoggerManager::getLogger('swim.version');
+	if ($res=@opendir($dir))
+	{
+		while (($file=readdir($res))!== false)
+		{
+			if (($file!='.')&&($file!='..'))
+			{
+				if ((($file=='lock')||($file=='templock'))&&($ignorelock))
+				{
+					continue;
+				}
+				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
+				{
+					copy($dir.'/'.$file,$target.'/'.$file);
+				}
+				else if (is_dir($dir.'/'.$file))
+				{
+					mkdir($target.'/'.$file);
+					recursiveCopy($dir.'/'.$file,$target.'/'.$file);
+				}
+				else
+				{
+					log->warn('Found unknown directory entry at '.$dir.'/'.$file);
+					opy($dir.'/'.$file,$target.'/'.$file);
+				}
+			}
+		}
+		closedir($res);
+	}
+}
+
 // Clears the temporary version lock and wipes the temp contents.
 function freeTempVersion($dir)
 {
+	$temp=getTempVersion($dir);
+	if ($temp!==false)
+	{
+		$lock=lockResourceWrite($dir.'/'.$temp);
+		recursiveDelete($dir.'/'.$temp,true);
+		unlockResource($lock);
+		unlink($dir.'/'.$temp.'/templock');
+		return true;
+	}
+	return false;
 }
 
-// Clones a version to the temporary version.
-function cloneTemp($version)
+// Clones a version to the temporary version. This sets the lock on the temp version for the current user
+function cloneTemp($dir,$version)
 {
+	$next=getTempVersion($dir);
+	if ($next!==false)
+	{
+		$targetlock=lockResourceWrite($dir.'/'.$next);
+		$sourcelock=lockResourceRead($dir.'/'.$version);
+		recursiveCopy($dir.'/'.$version,$dir.'/'.$next,true);
+		unlockResource($sourcelock);
+		unlockResource($targetlock);
+		return true;
+	}
+	return false;
 }
 
 // Clones a version to the next version of this resource. If source is false this clones the temporary version.
-function cloneVersion($version=false)
+function cloneVersion($dir,$version=false)
 {
+	$next=createNextVersion($dir);
+	if ($version===false)
+	{
+		$version=getTempVersion($dir);
+	}
+	$targetlock=lockResourceWrite($dir.'/'.$next);
+	$sourcelock=lockResourceRead($dir.'/'.$version);
+	recursiveCopy($dir.'/'.$version,$dir.'/'.$next,true);
+	unlockResource($sourcelock);
+	unlockResource($targetlock);
 }
 
 // Returns the next version of a resource

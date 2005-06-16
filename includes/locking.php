@@ -13,6 +13,8 @@
  * $Revision$
  */
 
+$_LOCKS = array();
+
 function lockResourceRead($dir,$id=false)
 {
 	global $_LOCKS;
