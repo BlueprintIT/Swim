@@ -17,6 +17,7 @@
 require_once 'base.php';
 
 LoggerManager::setLogLevel('',SWIM_LOG_WARN);
+LoggerManager::setLogLevel('swim.version',SWIM_LOG_DEBUG);
 
 $log=&LoggerManager::getLogger('swim');
 

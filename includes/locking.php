@@ -69,12 +69,19 @@ function lockResourceWrite($dir,$id=false)
 
 function unlockResource($id)
 {
+	global $_LOCKS;
+	
 	if (isset($_LOCKS[$id]))
 	{
 		$lock=$_LOCKS[$id];
 		unset($_LOCKS[$id]);
 		flock($lock,LOCK_UN);
 		fclose($lock);
+	}
+	else
+	{
+		$log=LoggerManager::getLogger('swim.locking');
+		$log->warn('Attempt to unlock unlocked id '.$id);
 	}
 }
 

@@ -46,42 +46,42 @@ function getTempVersion($dir)
 	{
 		mkdir($temp);
 	}
-	$lock=fopen($temp.'/templock','r+');
-	if (flock($lock,LOCK_EX))
+	
+	$lock=lockResourceWrite($temp);
+	if (is_file($temp.'/templock'))
 	{
-		$stat=fstat($lock);
-		if ($stat['size']==0)
+		$file=fopen($temp.'/templock','r');
+		$line=trim(fgets($file));
+		fclose($file);
+		if ($line==$_USER->getUsername())
 		{
-			// Mark this user as owner of the temp version.
-			fputs($lock,'LOCK:'.$_USER->getUsername());
 			$result='temp';
 		}
-		else
-		{
-			$line=fgets($lock);
-			if ($line=='LOCK:'.$_USER->getUsername())
-			{
-				// This user already owns the temp version.
-				$result='temp';
-			}
-		}
-		flock($lock,LOCK_UN);
 	}
-	fclose($lock);
+	else
+	{
+		$file=fopen($temp.'/templock','w');
+		fwrite($file,$_USER->getUsername());
+		fclose($file);
+		$result='temp';
+	}
+	unlockResource($lock);
 	return $result;
 }
 
 function recursiveDelete($dir,$ignorelock=false)
 {
 	$log=LoggerManager::getLogger('swim.version');
+	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
 		while (($file=readdir($res))!== false)
 		{
-			if (($file!='.')&&($file!='..'))
+			if ($file[0]!='.')
 			{
 				if ((($file=='lock')||($file=='templock'))&&($ignorelock))
 				{
+					$log->debug('Ignoring lock file '.$file);
 					continue;
 				}
 				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
@@ -95,7 +95,7 @@ function recursiveDelete($dir,$ignorelock=false)
 				}
 				else
 				{
-					log->warn('Found unknown directory entry at '.$dir.'/'.$file);
+					$log->warn('Found unknown directory entry at '.$dir.'/'.$file);
 					unlink($dir.'/'.$file);
 				}
 			}
@@ -107,14 +107,16 @@ function recursiveDelete($dir,$ignorelock=false)
 function recursiveCopy($dir,$target,$ignorelock=false)
 {
 	$log=LoggerManager::getLogger('swim.version');
+	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{
 		while (($file=readdir($res))!== false)
 		{
-			if (($file!='.')&&($file!='..'))
+			if ($file[0]!='.')
 			{
 				if ((($file=='lock')||($file=='templock'))&&($ignorelock))
 				{
+					$log->debug('Ignoring lock file '.$file);
 					continue;
 				}
 				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
@@ -128,8 +130,8 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 				}
 				else
 				{
-					log->warn('Found unknown directory entry at '.$dir.'/'.$file);
-					opy($dir.'/'.$file,$target.'/'.$file);
+					$log->warn('Found unknown directory entry at '.$dir.'/'.$file);
+					copy($dir.'/'.$file,$target.'/'.$file);
 				}
 			}
 		}
@@ -145,8 +147,8 @@ function freeTempVersion($dir)
 	{
 		$lock=lockResourceWrite($dir.'/'.$temp);
 		recursiveDelete($dir.'/'.$temp,true);
-		unlockResource($lock);
 		unlink($dir.'/'.$temp.'/templock');
+		unlockResource($lock);
 		return true;
 	}
 	return false;
@@ -163,7 +165,7 @@ function cloneTemp($dir,$version)
 		recursiveCopy($dir.'/'.$version,$dir.'/'.$next,true);
 		unlockResource($sourcelock);
 		unlockResource($targetlock);
-		return true;
+		return $next;
 	}
 	return false;
 }
@@ -266,4 +268,4 @@ function getResourceVersion($dir,$version)
 	return false;
 }
 
- ?>
+?>

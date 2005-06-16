@@ -85,11 +85,11 @@ class Block
 	function displayAdminControl(&$request)
 	{
 		$editres = new Request();
-		$editres->method='edit';
+		$editres->method='editblock';
 		$editres->resource=$this->container;
 		if ($this->container=='page')
 		{
-			$editres->resource.='/'.$request->resource;
+			$editres->resource.='/page/'.$request->resource;
 		}
 		$editres->resource.='/'.$this->id;
 		$editres->nested=&$request;
