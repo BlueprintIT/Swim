@@ -20,40 +20,35 @@ function &loadBlock($block,$blockdir)
 {
 	global $_PREFS;
 	
-	$file = fopen($blockdir.'/lock','a');
-	if (flock($file,LOCK_SH))
+	$lock=lockResourceRead($blockdir);
+
+	$blockprefs = new Preferences();
+	$blockprefs->setParent($_PREFS);
+	if (is_readable($blockdir.'/block.conf'))
 	{
-		$blockprefs = new Preferences();
-		$blockprefs->setParent($_PREFS);
-		if (is_readable($blockdir.'/block.conf'))
-		{
-			$blockprefs->loadPreferences($blockdir.'/block.conf','block');
-		}
-		$class=$blockprefs->getPref('block.class');
-		if ($blockprefs->isPrefSet('block.classfile'))
-		{
-			require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
-		}
-		else if (is_readable($blockdir.'/block.class'))
-		{
-			require_once $blockdir.'/block.class';
-		}
-		flock($file,LOCK_UN);
-		fclose($file);
-		if (class_exists($class))
-		{
-			$object = new $class($block,$blockdir);
-			$object->prefs = $blockprefs;
-			return $object;
-		}
-		else
-		{
-			trigger_error('Invalid block found');
-		}
+		$blockprefs->loadPreferences($blockdir.'/block.conf','block');
+	}
+	$class=$blockprefs->getPref('block.class');
+	if ($blockprefs->isPrefSet('block.classfile'))
+	{
+		require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
+	}
+	else if (is_readable($blockdir.'/block.class'))
+	{
+		require_once $blockdir.'/block.class';
+	}
+
+	unlockResource($lock);
+
+	if (class_exists($class))
+	{
+		$object = new $class($block,$blockdir);
+		$object->prefs = $blockprefs;
+		return $object;
 	}
 	else
 	{
-		fclose($file);
+		trigger_error('Invalid block found');
 	}
 }
 

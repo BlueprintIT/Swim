@@ -58,44 +58,17 @@ class Page
 	
 	function lockRead()
 	{
-		$lockfile = $this->getDir().'/lock';
-		$file = fopen($lockfile,'a');
-		if (flock($file,LOCK_SH))
-		{
-			$this->lock=&$file;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		$this->lock=lockResourceRead($this->getDir());
 	}
 	
 	function lockWrite()
 	{
-		$lockfile = $this->getDir().'/lock';
-		$file = fopen($lockfile,'a');
-		if (flock($file,LOCK_EX))
-		{
-			$this->lock=&$file;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		$this->lock=lockResourceWrite($this->getDir());
 	}
 	
 	function unlock()
 	{
-		if (isset($this->lock))
-		{
-			$file=&$this->lock;
-			unset($this->lock);
-	
-			flock($file,LOCK_UN);
-			fclose($file);
-		}
+		unlockResource($this->lock);
 	}
 	
 	function getBlock($id)
@@ -147,14 +120,7 @@ class Page
 		if (!isset($this->template))
 		{
 			// Find the page's template or use the default
-			if ($this->prefs->isPrefSet('page.template'))
-			{
-				$templ=$this->prefs->getPref('page.template');
-			}
-			else
-			{
-				$templ=$this->prefs->getPref('templates.default');
-			}
+			$templ=$this->prefs->getPref('page.template');
 			$this->template=&loadTemplate($templ);
 			$this->prefs->setParent($this->template->prefs);
 		}

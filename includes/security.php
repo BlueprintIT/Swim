@@ -15,59 +15,98 @@
 
 function lockSecurityRead()
 {
-	global $_PREFS,$_LOCKS;
-	
-	$lockfile = $_PREFS->getPref('security.lock');
-	$file = fopen($lockfile,'a');
-	if (flock($file,LOCK_SH))
-	{
-		$_LOCKS['security']=&$file;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	global $_PREFS;
+	lockResourceRead($_PREFS->getPref('storage.security'),'security');
+	return true;
 }
 
 function lockSecurityWrite()
 {
-	global $_PREFS,$_LOCKS;
-	
-	$lockfile = $_PREFS->getPref('security.lock');
-	$file = fopen($lockfile,'a');
-	if (flock($file,LOCK_EX))
-	{
-		$_LOCKS['security']=&$file;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	global $_PREFS;
+	lockResourceWrite($_PREFS->getPref('storage.security'),'security');
+	return true;
 }
 
 function unlockSecurity()
 {
-	global $_LOCKS;
+	unlockResource('security');
+}
+
+function login($username,$password)
+{
+	global $_USER;
 	
-	if (isset($_LOCKS['security']))
+	$newuser = new User($username);
+	if ($newuser->userExists())
 	{
-		$file=&$_LOCKS['security'];
-		unset($_LOCKS['security']);
-		flock($file,LOCK_UN);
-		fclose($file);
+		if (md5($password)==$newuser->account['password'])
+		{
+			$newuser->logged=true;
+			$_USER=&$newuser;
+			$_SESSION['Swim.User']=&$_USER;
+			
+			return $_USER;
+		}
 	}
+	return false;
+}
+
+function logout()
+{
+	global $_USER;
+	
+	$_USER->become('guest');
 }
 
 class User
 {
 	var $user;
+	var $groups;
+	var $account;
 	var $log;
+	var $logged = false;
 	
-	function User()
+	function User($username)
 	{
 		$this->log = &LoggerManager::getLogger('swim.user');
+		$this->become($username);
+	}
+	
+	function become($username)
+	{
+		global $_PREFS;
+		
+		$this->user=$username;
+		$this->groups = array();
+		$this->account = array();
+		$this->logged=false;
+		
+		$file = $_PREFS->getPref('security.database');
+    if (is_readable($file))
+    {
+			if (lockSecurityRead())
+			{
+	      $source=fopen($file,'r');
+	      while (!feof($source))
+	      {
+	        $line=trim(fgets($source));
+	        if (substr($line,0,strlen($username)+1)==$username.':')
+	        {
+	        	$details=explode(':',$line);
+	        	$this->account = array('username'=>$details[0],'password'=>$details[1],'groups'=>$details[2]);
+	        	$this->groups = explode(',',$this->account['groups']);
+	        	break;
+	        }
+	      }
+	      fclose($source);
+	      unlockSecurity();
+      }
+  	}
+	}
+	
+	function userExists()
+	{
+		return count($this->account)>0;
 	}
 	
 	function getUsername()
@@ -75,9 +114,31 @@ class User
 		return $this->user;
 	}
 	
+	function inGroup($group)
+	{
+		$result=in_array($group,$this->groups);
+		if ($this->log->isDebugEnabled())
+		{
+			if ($result)
+			{
+				$this->log->debug('User is in group '.$group);
+			}
+			else
+			{
+				$this->log->debug('User is not in group '.$group);
+			}
+		}
+		return $result;
+	}
+	
+	function isLoggedIn()
+	{
+		return $this->logged;
+	}
+	
 	function isAdmin()
 	{
-		return isset($this->user);
+		return $this->inGroup('admin');
 	}
 	
 	function canAccess(&$request)
@@ -92,46 +153,6 @@ class User
 		}
 		return true;
 	}
-	
-	function logout()
-	{
-		unset($this->user);
-	}
-	
-	function login($user,$password)
-	{
-		global $_PREFS;
-		
-		$success=false;
-		$expected=$user.':'.md5($password).':';
-		$this->log->debug('Checking for '.$expected);
-		$file = $_PREFS->getPref('security.database');
-    if (is_readable($file))
-    {
-			if (lockSecurityRead())
-			{
-	      $source=fopen($file,'r');
-	      while (!feof($source))
-	      {
-	        $line=fgets($source);
-	        $this->log->debug('Checking against '.$line);
-	        if (substr($line,0,strlen($expected))==$expected)
-	        {
-	        	$this->user=$user;
-	        	$success=true;
-	        	break;
-	        }
-	      }
-	      fclose($source);
-	      unlockSecurity();
-      }
-  	}
-  	else
-  	{
-  		$this->log->error('Could not read security database '.$file);
-  	}
-  	return $success;
-	}
 }
 
 // Start up the session
@@ -145,7 +166,7 @@ if (isset($_SESSION['Swim.User']))
 }
 else
 {
-	$_USER = new User();
+	$_USER = new User('guest');
 	$_SESSION['Swim.User']=&$_USER;
 }
 

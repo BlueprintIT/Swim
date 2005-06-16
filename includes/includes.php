@@ -15,6 +15,7 @@
 
 // Include all the support routines
 
+require $_PREFS->getPref('storage.includes').'/locking.php';
 require $_PREFS->getPref('storage.includes').'/logging.php';
 require $_PREFS->getPref('storage.includes').'/security.php';
 require $_PREFS->getPref('storage.includes').'/page.php';

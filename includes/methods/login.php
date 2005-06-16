@@ -15,11 +15,12 @@
 
 function method_login(&$request)
 {
-	global $_PREFS,$_USER;
+	global $_PREFS;
 	
-	if ($_USER->login($request->query['swim_username'],$request->query['swim_password']))
+	$user=login($request->query['swim_username'],$request->query['swim_password']);
+	if ($user!==false)
 	{
-		if ($_USER->canAccess($request->nested))
+		if ($user->canAccess($request->nested))
 		{
 			redirect($request->nested);
 		}

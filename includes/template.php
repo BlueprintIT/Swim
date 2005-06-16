@@ -50,44 +50,17 @@ class Template
 	
 	function lockRead()
 	{
-		$lockfile = $this->dir.'/lock';
-		$file = fopen($lockfile,'a');
-		if (flock($file,LOCK_SH))
-		{
-			$this->lock=&$file;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		$this->lock=lockResourceRead($this->dir);
 	}
 	
 	function lockWrite()
 	{
-		$lockfile = $this->dir.'/lock';
-		$file = fopen($lockfile,'a');
-		if (flock($file,LOCK_EX))
-		{
-			$this->lock=&$file;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		$this->lock=lockResourceWrite($this->dir);
 	}
 	
 	function unlock()
 	{
-		if (isset($this->lock))
-		{
-			$file=&$this->lock;
-			unset($this->lock);
-	
-			flock($file,LOCK_UN);
-			fclose($file);
-		}
+		unlockResource($this->lock);
 	}
 	
 	function generateURL(&$parser,$tag,$attrs,$text)
