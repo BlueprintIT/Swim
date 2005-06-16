@@ -21,11 +21,13 @@ class Page
 	var $version;
 	var $id;
 	var $lock;
+	var $container;
 	
-	function Page($id,$version)
+	function Page($container,$id,$version)
 	{
 		global $_PREFS;
 		
+		$this->container=$container;
 		$this->version=$version;
 		$this->id=$id;
 		$this->blocks = array();
@@ -51,7 +53,7 @@ class Page
 	
 	function getDir()
 	{
-		return getResourceVersion($this->prefs->getPref('storage.pages').'/'.$this->id,$this->version);
+		return getResourceVersion($this->prefs->getPref('storage.pages.'.$this->container).'/'.$this->id,$this->version);
 	}
 	
 	function lockRead()
@@ -160,10 +162,35 @@ class Page
 	}
 }
 
-function isValidPage($id)
+function isValidPage($container,$id,$version=false)
 {
 	global $_PREFS;
-	return is_readable(getCurrentResource($_PREFS->getPref('storage.pages').'/'.$id).'/page.conf');
+	
+	$log=&LoggerManager::getLogger('swim.page');
+	
+	$basedir=$_PREFS->getPref('storage.pages.'.$container).'/'.$id;
+	$log->debug('Page storage is '.$basedir);
+	if (is_dir($basedir))
+	{
+		if ($version===false)
+		{
+			$version=getCurrentVersion($basedir);
+			$log->debug('Found default version of '.$version);
+		}
+		if ((is_dir($basedir.'/'.$version))&&(is_readable($basedir.'/'.$version.'/page.conf')))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		$log->debug('Invalid storage location');
+		return false;
+	}
 }
 
 ?>

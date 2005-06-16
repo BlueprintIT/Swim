@@ -70,19 +70,26 @@ function &loadTemplate($name)
 	return $template;
 }
 
-function &loadPage($id,$version)
+function &loadPage($container,$id,$version=false)
 {
 	global $_PREFS,$_PAGES;
 
-	if (!isset($version))
+	if ($version===false)
 	{
-		$version=getCurrentVersion($_PREFS->getPref('storage.pages').'/'.$id);
+		$version=getCurrentVersion($_PREFS->getPref('storage.pages.'.$container).'/'.$id);
 	}
 	if (!isset($_PAGES[$id][$version]))
 	{
-		$_PAGES[$id][$version] = new Page($id,$version);
+		if (isValidPage($container,$id,$version))
+		{
+			$_PAGES[$container][$id][$version] = new Page($container,$id,$version);
+		}
+		else
+		{
+			$_PAGES[$container][$id][$version]=false;
+		}
 	}
-	return $_PAGES[$id][$version];
+	return $_PAGES[$container][$id][$version];
 }
 
  ?>

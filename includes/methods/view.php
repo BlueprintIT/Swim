@@ -18,11 +18,10 @@ function method_view(&$request)
 {
 	global $_PREFS;
 	
-	$pagedir=$_PREFS->getPref('storage.pages').'/'.$request->resource;
-	if (is_dir($pagedir))
+	$version=false;
+	if (isValidPage('global',$request->resource,$version))
 	{
-		$version=getCurrentVersion($pagedir);
-		$page = new Page($request->resource,$version);
+		$page = &loadPage('global',$request->resource,$version);
 		$page->display($request);
 	}
 	else

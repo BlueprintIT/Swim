@@ -18,17 +18,18 @@ function method_error(&$request)
 {
 	global $_PREFS;
 	
-	$pagedir=$_PREFS->getPref('storage.pages').'/'.$_PREFS->getPref('method.error.page');
-	if (is_dir($pagedir))
+	print 'Error page';
+	/*
+	$version=false;
+	if (isValidPage('global',$_PREFS->getPref('method.error.page'),$version))
 	{
-		$version=getCurrentVersion($pagedir);
-		$page = new Page($_PREFS->getPref('method.error.page'),$version);
+		$page = &loadPage('global',$_PREFS->getPref('method.error.page'),$version);
 		$page->display($request);
 	}
 	else
 	{
-		// FOO
-	}
+		// TODO figure out what to do here
+	}*/
 }
 
 

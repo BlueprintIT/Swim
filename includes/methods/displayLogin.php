@@ -18,11 +18,10 @@ function method_displayLogin(&$request)
 {
 	global $_PREFS;
 	
-	$pagedir=$_PREFS->getPref('storage.pages').'/'.$_PREFS->getPref('method.login.page');
-	if (is_dir($pagedir))
+	$version=false;
+	if (isValidPage('internal',$_PREFS->getPref('method.login.page'),$version))
 	{
-		$version=getCurrentVersion($pagedir);
-		$page = new Page($_PREFS->getPref('method.login.page'),$version);
+		$page = &loadPage('internal',$_PREFS->getPref('method.login.page'),$version);
 		$page->display($request);
 	}
 	else
