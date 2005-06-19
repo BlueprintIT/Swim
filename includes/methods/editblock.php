@@ -31,7 +31,18 @@ function method_editblock(&$request)
 		$resource=$_PREFS->getPref('storage.blocks.'.$container).'/'.$block;
 		$blockrel='';
 	}
-	cloneTemp($resource,getCurrentVersion($resource));
+	$temp=getTempVersion($resource);
+	$blockdir=$resource.'/'.$temp.$blockrel;
+	if (!is_readable($blockdir.'/block.conf'))
+	{
+		cloneTemp($resource,getCurrentVersion($resource));
+	}
+	$block=&loadBlock('content',$blockdir);
+	$block->setContainer($container);
+	$block=&$block->getBlockEditor();
+	$page=&loadPage('internal','admin');
+	$page->setBlock('content',$block);
+	$page->display($request);
 }
 
 

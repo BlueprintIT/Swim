@@ -32,6 +32,11 @@ class Block
 		$this->prefs->setParent($_PREFS);
 	}
 	
+	function &getBlockEditor()
+	{
+		return null;
+	}
+	
 	function setContainer($container)
 	{
 		$this->container=$container;

@@ -26,5 +26,6 @@ require $_PREFS->getPref('storage.includes').'/parser.php';
 require $_PREFS->getPref('storage.includes').'/blocks.php';
 require $_PREFS->getPref('storage.includes').'/version.php';
 require $_PREFS->getPref('storage.includes').'/cache.php';
+require $_PREFS->getPref('storage.includes').'/mimetypes.php';
 
 ?>

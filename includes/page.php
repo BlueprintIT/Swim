@@ -71,6 +71,12 @@ class Page
 		unlockResource($this->lock);
 	}
 	
+	function setBlock($id,&$block)
+	{
+		$block->setPage($this);
+		$this->blocks[$id]=&$block;
+	}
+	
 	function getBlock($id)
 	{
 		if (!isset($this->blocks[$id]))
@@ -109,7 +115,7 @@ class Page
 			}
 			else
 			{
-				return new Block('');
+				$this->blocks[$id]=null;
 			}
 		}
 		return $this->blocks[$id];
@@ -133,6 +139,11 @@ function isValidPage($container,$id,$version=false)
 	global $_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.page');
+	
+	if (!($_PREFS->isPrefSet('storage.pages.'.$container)))
+	{
+		return false;
+	}
 	
 	$basedir=$_PREFS->getPref('storage.pages.'.$container).'/'.$id;
 	$log->debug('Page storage is '.$basedir);
