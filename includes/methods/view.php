@@ -14,63 +14,40 @@
  */
 
 
-function displayFile(&$request,$dir,$file)
-{
-	$file=$dir.'/'.$file;
-	if (is_readable($file))
-	{
-		$stats=stat($file);
-		setModifiedDate($stats['mtime']);
-		setContentType(determineContentType($file));
-		readfile($file);
-	}
-	else
-	{
-		displayError($request);
-	}
-}
-
 function method_view(&$request)
 {
-	$data=decodeResource($request->resource);
-	$version=false;
+	global $_USER;
 	
-	if ($data!==false)
+	$resource=&Resource::decodeResource($request->resource);
+
+	if ($resource!==false)
 	{
-		if (isset($data['file']))
+		if ($resource->isFile())
 		{
-			if ($data['type']=='page')
+			if ($_USER->canRead($resource))
 			{
-				$page=&loadPage($data['container'],$data['page']);
-				displayFile($request,$page->getDir(),$data['file']);
-			}
-			else if ($data['type']=='template')
-			{
-				$template = &loadTemplate($data['template']);
-				displayFile($request,$template->dir,$data['file']);
-			}
-			else if ($data['type']=='block')
-			{
-				if (isset($data['page']))
+				$file=$resource->dir.'/'.$resource->path;
+				if (is_readable($file))
 				{
-					$page=&loadPage($data['container'],$data['page']);
-					$block=&$page->getBlock($data['block']);
+					$stats=stat($file);
+					setModifiedDate($stats['mtime']);
+					setContentType(determineContentType($file));
+					readfile($file);
 				}
 				else
 				{
-					$blockdir=getCurrentResource($_PREFS->getPref('storage.blocks.'.$data['container']).'/'.$data['block']);
-					$block=&loadBlock($data['block'],$blockdir);
+					displayError($request);
 				}
-				displayFile($request,$block->dir,$data['file']);
+			}
+			else
+			{
+				displayLogin($request);
 			}
 		}
-		else if ($data['type']=='page')
+		else if ($resource->isPage())
 		{
-			if (isValidPage('global',$request->resource,$version))
-			{
-				$page = &loadPage('global',$request->resource,$version);
-				$page->display($request);
-			}
+			$page = &$resource->getPage();
+			$page->display($request);
 		}
 		else
 		{

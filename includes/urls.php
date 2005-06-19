@@ -13,114 +13,221 @@
  * $Revision$
  */
 
-function decodeBlockResource($container,$args,&$result)
+class Resource
 {
-	global $_PREFS;
+	var $type;
+	var $path;
+	var $dir;
+	var $container;
+	var $template;
+	var $page;
+	var $block;
+	var $version = false;
 	
-	if (($_PREFS->isPrefSet('storage.blocks.'.$container))&&(count($args)>0))
+	var $_block;
+	var $_page;
+	var $_template;
+	
+	function isFile()
 	{
-		$blockdir=getCurrentResource($_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0]);
-		
-		if (is_dir($blockdir))
+		return isset($this->path);
+	}
+	
+	function isPage()
+	{
+		return (($this->type=='page')&&(!isset($this->path)));
+	}
+	
+	function isBlock()
+	{
+		return (($this->type=='block')&&(!isset($this->path)));
+	}
+	
+	function isTemplate()
+	{
+		return (($this->type=='template')&&(!isset($this->path)));
+	}
+	
+	function &getBlock()
+	{
+		if ($this->type=='block')
 		{
-			$result['type']='block';
-			$result['container']=$container;
-			$result['block']=$args[0];
-			if (count($args)>1)
+			if (!isset($this->_block))
 			{
-				$result['file']=implode('/',array_slice($args,1));
+				if (isset($this->page))
+				{
+					$page=&$this->getPage();
+					$this->_block=&$page->getBlock($this->block);
+				}
+				else
+				{
+					$this->_block=&loadBlock($this->block,$this->dir);
+				}
+			}
+			return $this->_block;
+		}
+		return null;
+	}
+	
+	function &getPage()
+	{
+		if (($this->type=='page')||(($this->type=='block')&&(isset($this->page))))
+		{
+			if (!isset($this->_page))
+			{
+				$this->_page=&loadPage($this->container,$this->page,$this->version);
+			}
+			return $this->_page;
+		}
+		return null;
+	}
+	
+	function &getTemplate()
+	{
+		if ($this->type=='template')
+		{
+			if (!isset($this->_template))
+			{
+				$this->_template=&loadTemplate($this->template);
+			}
+			return $this->_template;
+		}
+		return null;
+	}
+	
+	function decodeTemplateResource($args,&$result)
+	{
+		global $_PREFS;
+		
+		if (is_dir($_PREFS->getPref('storage.templates').'/'.$parts[1]))
+		{
+			$result->type='template';
+			$result->template=$args[1];
+			if (!isset($result->version))
+			{
+				$result->version=getCurrentVersion($_PREFS->getPref('storage.templates').'/'.$args[1]);
+			}
+			$result->dir=getResourceVersion($_PREFS->getPref('storage.templates').'/'.$args[1],$result->version);
+			if (count($args)>=3)
+			{
+				$result->path=implode('/',array_slice($args,2));
 			}
 			return true;
 		}
+		return false;
 	}
-	return false;
-}
-
-function decodePageResource($container,$args,&$result)
-{
-	$log=LoggerManager::getLogger('swim.decode');
-	$log->debug('Testing container '.$container);
-	$log->debug('Argument has '.count($args).' items');
-	if (count($args)>0)
+	
+	function decodeBlockResource($container,$args,&$result)
 	{
-		if (isValidPage($container,$args[0]))
+		global $_PREFS;
+		
+		if (($_PREFS->isPrefSet('storage.blocks.'.$container))&&(count($args)>0))
 		{
-			$log->debug('Found valid page');
-			$result['type']='page';
-			$result['container']=$container;
-			$result['page']=$args[0];
-			if (count($args)>=2)
+			if (!isset($result->version))
 			{
-				$page=&loadPage($container,$args[0]);
+				$result->version=getCurrentVersion($_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0]);
+			}
+			$blockdir=getResourceVersion($_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0],$result->version);
+			
+			if (is_dir($blockdir))
+			{
+				$result->type='block';
+				$result->container=$container;
+				$result->block=$args[0];
+				$result->dir=$blockdir;
+				if (count($args)>1)
+				{
+					$result->path=implode('/',array_slice($args,1));
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	function decodePageResource($container,$args,&$result)
+	{
+		$log=LoggerManager::getLogger('swim.resource');
+		$log->debug('Testing container '.$container);
+		$log->debug('Argument has '.count($args).' items');
+		if (count($args)>0)
+		{
+			$version=false;
+			if (isset($result->version))
+			{
+				$version=$result->version;
+			}
+			if (isValidPage($container,$args[0],$version))
+			{
+				$log->debug('Found valid page');
+				$result->_page=&loadPage($container,$args[0],$version);
+				$result->version=$result->_page->version;
+				$result->type='page';
+				$result->container=$container;
+				$result->page=$args[0];
+				$result->dir=$result->_page->getDir();
 				if (count($args)>=2)
 				{
 					$log->debug('Checking for block '.$args[1]);
-					$block=&$page->getBlock($args[1]);
+					$block=&$result->_page->getBlock($args[1]);
 					if ($block!==null)
 					{
-						$result['type']='block';
-						$result['block']=$args[1];
+						$result->type='block';
+						$result->block=$args[1];
+						$result->_block=&$block;
 						if (count($args)>=3)
 						{
-							$result['file']=implode('/',array_slice($args,2));
+							$result->path=implode('/',array_slice($args,2));
 						}
 						return true;
 					}
+					$result->path=implode('/',array_slice($args,1));
 				}
-				$result['file']=implode('/',array_slice($args,1));
+				return true;
 			}
-			return true;
 		}
-	}
-	return false;
-}
-
-function decodeResource($resource)
-{
-	global $_PREFS;
-	
-	$log=LoggerManager::getLogger('swim.decode');
-	
-	$log->debug('Decoding '.$resource);
-	
-	$parts=explode('/',$resource);
-	if (count($parts)==0)
-	{
-		$log->info('No resource to decode');
 		return false;
 	}
-	$result = array();
-	if (($parts[0]=='template')&&(count($parts)>=2))
+	
+	function &decodeResource($resource)
 	{
-		$log->debug('Template resource');
-		if (is_dir($_PREFS->getPref('storage.templates').'/'.$parts[1]))
+		global $_PREFS;
+		
+		$log=LoggerManager::getLogger('swim.resource');
+		
+		$log->debug('Decoding '.$resource);
+		
+		$parts=explode('/',$resource);
+		if (count($parts)==0)
 		{
-			$result['type']='template';
-			$result['template']=$parts[1];
-			if (count($parts)>=3)
-			{
-				$result['file']=implode('/',array_slice($parts,2));
-			}
-			return $result;
+			$log->info('No resource to decode');
+			return false;
 		}
-	}
-	if (($parts[0]=='block')&&(count($parts)>=2))
-	{
-		$log->debug('Block resource');
-		if (decodeBlockResource($parts[1],array_slice($parts,2),$result))
+		$result = new Resource();
+		if (($parts[0]=='template')&&(count($parts)>=2))
+		{
+			$log->debug('Template resource');
+			if (Resource::decodeTemplateResource($parts,$result))
+				return $result;
+		}
+		if (($parts[0]=='block')&&(count($parts)>=2))
+		{
+			$log->debug('Block resource');
+			if (Resource::decodeBlockResource($parts[1],array_slice($parts,2),$result))
+				return $result;
+				
+			if (Resource::decodeBlockResource('global',array_slice($parts,1),$result))
+				return $result;
+		}
+		$log->debug('Assuming page resource');
+		if (Resource::decodePageResource($parts[0],array_slice($parts,1),$result))
 			return $result;
 			
-		if (decodeBlockResource('global',array_slice($parts,1),$result))
+		if (Resource::decodePageResource('global',$parts,$result))
 			return $result;
+			
+		return false;
 	}
-	$log->debug('Assuming page resource');
-	if (decodePageResource($parts[0],array_slice($parts,1),$result))
-		return $result;
-		
-	if (decodePageResource('global',$parts,$result))
-		return $result;
-		
-	return false;
 }
 
 function encodeQuery($query)

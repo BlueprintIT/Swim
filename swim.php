@@ -22,14 +22,6 @@ $log=&LoggerManager::getLogger('swim');
 
 $request=&Request::decodeCurrentRequest();
 
-if ($_USER->canAccess($request))
-{
-	callMethod($request);
-}
-else
-{
-	displayLogin($request);
-}
-
+callMethod($request);
 
 ?>

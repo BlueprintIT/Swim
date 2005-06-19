@@ -136,22 +136,14 @@ class User
 		return $this->logged;
 	}
 	
-	function isAdmin()
+	function canRead(&$resource)
 	{
-		return $this->inGroup('admin');
+		return true;
 	}
 	
-	function canAccess(&$request)
+	function canWrite(&$resource)
 	{
-		if ($this->isAdmin())
-		{
-			return true;
-		}
-		if ($request->method=='admin')
-		{
-			return false;
-		}
-		return true;
+		return $this->inGroup('admin');
 	}
 }
 
