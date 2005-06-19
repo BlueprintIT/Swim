@@ -22,36 +22,38 @@ function method_view(&$request)
 
 	if ($resource!==false)
 	{
-		if ($resource->isFile())
+		if ($_USER->canRead($resource))
 		{
-			if ($_USER->canRead($resource))
+			if ($resource->isFile())
 			{
 				$file=$resource->dir.'/'.$resource->path;
 				if (is_readable($file))
 				{
+					$resource->lockRead();
 					$stats=stat($file);
 					setModifiedDate($stats['mtime']);
 					setContentType(determineContentType($file));
 					readfile($file);
+					$resource->unlock();
 				}
 				else
 				{
 					displayError($request);
 				}
 			}
+			else if ($resource->isPage())
+			{
+				$page = &$resource->getPage();
+				$page->display($request);
+			}
 			else
 			{
-				displayLogin($request);
+				displayError($request);
 			}
-		}
-		else if ($resource->isPage())
-		{
-			$page = &$resource->getPage();
-			$page->display($request);
 		}
 		else
 		{
-			displayError($request);
+			displayLogin($request);
 		}
 	}
 	else

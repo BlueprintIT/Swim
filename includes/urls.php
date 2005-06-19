@@ -48,6 +48,63 @@ class Resource
 		return (($this->type=='template')&&(!isset($this->path)));
 	}
 	
+	function lockRead()
+	{
+		if ($this->isBlock())
+		{
+			$res=$this->getBlock();
+			$res->lockRead();
+		}
+		else if ($this->isPage())
+		{
+			$res=$this->getPage();
+			$res->lockRead();
+		}
+		else if ($this->isTemplate())
+		{
+			$res=$this->getTemplate();
+			$res->lockRead();
+		}
+	}
+	
+	function lockWrite()
+	{
+		if ($this->isBlock())
+		{
+			$res=$this->getBlock();
+			$res->lockWrite();
+		}
+		else if ($this->isPage())
+		{
+			$res=$this->getPage();
+			$res->lockWrite();
+		}
+		else if ($this->isTemplate())
+		{
+			$res=$this->getTemplate();
+			$res->lockWrite();
+		}
+	}
+	
+	function unlock()
+	{
+		if ($this->isBlock())
+		{
+			$res=$this->getBlock();
+			$res->unlock();
+		}
+		else if ($this->isPage())
+		{
+			$res=$this->getPage();
+			$res->unlock();
+		}
+		else if ($this->isTemplate())
+		{
+			$res=$this->getTemplate();
+			$res->unlock();
+		}
+	}
+	
 	function &getBlock()
 	{
 		if ($this->type=='block')

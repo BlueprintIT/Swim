@@ -13,6 +13,13 @@
  * $Revision$
  */
 
+define('PERMISSION_UNKNOWN',0);
+define('PERMISSION_ALLOWED',1);
+define('PERMISSION_DENIED',-1);
+
+define('PERMISSION_READ',0);
+define('PERMISSION_WRITE',1);
+
 function lockSecurityRead()
 {
 	global $_PREFS;
@@ -72,6 +79,17 @@ class User
 		$this->become($username);
 	}
 	
+	function __sleep()
+	{
+		unset($this->log);
+		return array('user','groups','account','logged');
+	}
+	
+	function __wakeup()
+	{
+		$this->log = &LoggerManager::getLogger('swim.user');
+	}
+	
 	function become($username)
 	{
 		global $_PREFS;
@@ -113,7 +131,31 @@ class User
 	{
 		return $this->user;
 	}
-	
+
+	function inAnyGroup($groups)
+	{
+		foreach ($groups as $group)
+		{
+			if ($this->inGroup($group))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+		
+	function inAllGroups($groups)
+	{
+		foreach ($groups as $group)
+		{
+			if (!($this->inGroup($group)))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+		
 	function inGroup($group)
 	{
 		$result=in_array($group,$this->groups);
@@ -136,14 +178,145 @@ class User
 		return $this->logged;
 	}
 	
+	function checkSpecificPermission($permission,$dir,$file,$lock)
+	{
+		$this->log->debug('Checking permission on '.$file.' in dir '.$dir);
+		
+		$perm=PERMISSION_UNKNOWN;
+		if (is_readable($dir.'/access'))
+		{
+			if ($lock)
+			{
+				$lck=lockResourceRead($dir);
+			}
+			$access=fopen($dir.'/access','r');
+			$line=fgets($access);
+			while ($line!==false)
+			{
+				$line=trim($line);
+				$parts=explode(':',$line);
+				$files=$parts[0];
+				if (($files[0]!='/')||($files[strlen($files)-1]!='/'))
+				{
+					$files=preg_quote($files,'/');
+					$files='/'.preg_replace(array('/\\*/','/\\?/'),array('.*','.'),$files).'/';
+				}
+				if (preg_match($files,$file))
+				{
+					$denymatch=$parts[($permission*2)+2];
+					if (strlen($denymatch)>0)
+					{
+						if ($this->inAnyGroup(explode(',',$denymatch)))
+							return PERMISSION_DENIED;
+					}
+					if ($perm==PERMISSION_UNKNOWN)
+					{
+						$allowmatch=$parts[($permission*2)+1];
+						if (strlen($allowmatch)>0)
+						{
+							if ($this->inAnyGroup(explode(',',$allowmatch)))
+							{
+								$perm=PERMISSION_DENIED;
+								break;
+							}
+						}
+					}
+				}
+				$line=fgets($access);
+			}
+			fclose($access);
+			if ($lock)
+			{
+				unlockResource($lck);
+			}
+		}
+		return $perm;
+	}
+	
+	function checkPermission($permission,&$resource)
+	{
+		global $_PREFS;
+		
+		$resource->lockRead();
+		if ($resource->isFile())
+		{
+			$paths=explode('/',$resource->path);
+			$file=$paths[count($paths)-1];
+			$pos=count($paths)-1;
+			while ($pos>0)
+			{
+				$path=$resource->dir.'/'.implode('/',array_slice($paths,0,$pos));
+				$perm=$this->checkSpecificPermission($permission,$path,$file,false);
+				if ($perm!=PERMISSION_UNKNOWN)
+				{
+					$resource->unlock();
+					return $perm;
+				}
+				$pos--;
+			}
+		}
+		else
+		{
+			$file=$resource->type.'.conf';
+		}
+		$path=$resource->dir;
+		$perm=$this->checkSpecificPermission($permission,$path,$file,false);
+		$resource->unlock();
+		if ($perm!=PERMISSION_UNKNOWN)
+		{
+			return $perm;
+		}
+		
+		if (($resource->isBlock())&&(isset($resource->page)))
+		{
+			$path=&$resource->getPage();
+			$path=$path->getDir();
+			$perm=$this->checkSpecificPermission($permission,$path,$file,true);
+			if ($perm!=PERMISSION_UNKNOWN)
+			{
+				return $perm;
+			}
+		}
+		
+		if (isset($resource->template))
+		{
+			$path='storage.templates';
+		}
+		else if (isset($resource->page))
+		{
+			$path='storage.pages.'.$resource->container;
+		}
+		else if (isset($resource->block))
+		{
+			$path='storage.blocks.'.$resource->container;
+		}
+		$path=$_PREFS->getPref($path);
+		$perm=$this->checkSpecificPermission($permission,$path,$file,true);
+		if ($perm!=PERMISSION_UNKNOWN)
+		{
+			return $perm;
+		}
+
+		$path=$_PREFS->getPref('storage.basedir');
+		return $this->checkSpecificPermission($permission,$path,$file,true);
+	}
+	
+	function getPermission($permission,&$resource)
+	{
+		$perm=$this->checkPermission($permission,$resource);
+		return $perm == PERMISSION_ALLOWED;
+	}
+	
 	function canRead(&$resource)
 	{
 		return true;
+		return $this->getPermission(PERMISSION_READ,$resource);
 	}
 	
 	function canWrite(&$resource)
 	{
 		return $this->inGroup('admin');
+		return $this->getPermission(PERMISSION_WRITE,$resource);
 	}
 }
 
