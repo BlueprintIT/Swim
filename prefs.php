@@ -18,6 +18,7 @@ class Preferences
 	var $preferences = array();
 	var $parent;
 	var $overrides;
+	var $log;
 	
 	function Preferences()
 	{
@@ -103,6 +104,23 @@ class Preferences
 	
 	function savePreferences($file)
 	{
+    $source=fopen($file,'w');
+  	if ($source===false)
+  	{
+  		return;
+    }
+    flock($source,LOCK_EX);
+    foreach ($this->preferences as $key => $value)
+    {
+    	fwrite($source,$key.'='.$value."\n");
+    }
+    flock($source,LOCK_UN);
+    fclose($source);
+	}
+	
+	function setPref($name,$value)
+	{
+		$this->preferences[$name]=$value;
 	}
 	
 	// Clears a set of preferences

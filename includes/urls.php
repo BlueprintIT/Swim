@@ -270,11 +270,29 @@ class Resource
 		return false;
 	}
 	
-	function &decodeResource($resource)
+	function &decodeResource($request)
 	{
 		global $_PREFS;
 		
 		$log=LoggerManager::getLogger('swim.resource');
+		
+		if (is_object($request))
+		{
+			$resource=$request->resource;
+			if (isset($request->query['version']))
+			{
+				$version=$request->query['version'];
+			}
+			else
+			{
+				$version=false;
+			}
+		}
+		else
+		{
+			$resource=$request;
+			$version=false;
+		}
 		
 		$log->debug('Decoding '.$resource);
 		
@@ -295,23 +313,23 @@ class Resource
 		if (($parts[0]=='template')&&(count($parts)>=2))
 		{
 			$log->debug('Template resource');
-			if (Resource::decodeTemplateResource($parts,$result))
+			if (Resource::decodeTemplateResource($parts,$result,$version))
 				return $result;
 		}
 		if (($parts[0]=='block')&&(count($parts)>=2))
 		{
 			$log->debug('Block resource');
-			if (Resource::decodeBlockResource($parts[1],array_slice($parts,2),$result))
+			if (Resource::decodeBlockResource($parts[1],array_slice($parts,2),$result,$version))
 				return $result;
 				
-			if (Resource::decodeBlockResource('global',array_slice($parts,1),$result))
+			if (Resource::decodeBlockResource('global',array_slice($parts,1),$result,$version))
 				return $result;
 		}
 		$log->debug('Assuming page resource');
-		if (Resource::decodePageResource($parts[0],array_slice($parts,1),$result))
+		if (Resource::decodePageResource($parts[0],array_slice($parts,1),$result,$version))
 			return $result;
 			
-		if (Resource::decodePageResource('global',$parts,$result))
+		if (Resource::decodePageResource('global',$parts,$result,$version))
 			return $result;
 			
 		return false;
@@ -327,7 +345,17 @@ function encodeQuery($query)
   $result='';
   foreach ($query as $name => $value)
   {
-    $result.='&'.urlencode($name).'='.urlencode($value);
+  	if (is_array($value))
+  	{
+  		foreach ($value as $key => $var)
+  		{
+  			$result.='&'.urlencode($name).'['.$key.']='.urlencode($var);
+  		}
+  	}
+  	else
+  	{
+	    $result.='&'.urlencode($name).'='.urlencode($value);
+	  }
   }
   return substr($result,1);
 }

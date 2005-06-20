@@ -86,8 +86,11 @@ class Page
 		unlockResource($this->lock);
 	}
 	
-	function saveProperties()
+	function savePreferences()
 	{
+		$this->lockWrite();
+		$this->prefs->savePreferences($this->getDir().'/page.conf');
+		$this->unlock();
 	}
 	
 	function setBlock($id,&$block)

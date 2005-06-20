@@ -155,6 +155,7 @@ class Block
 		$editres = new Request();
 		$editres->method='edit';
 		$editres->resource=$request->resource.'/'.$this->id;
+		$editres->query['version']=$this->version;
 		$editres->nested=&$request;
 ?><div class="admincontrol"><a href="<?= $editres->encode() ?>">Edit</a></div><?
 	}

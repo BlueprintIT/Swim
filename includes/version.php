@@ -186,6 +186,7 @@ function cloneVersion($dir,$version=false)
 	recursiveCopy($dir.'/'.$version,$dir.'/'.$next,true);
 	unlockResource($sourcelock);
 	unlockResource($targetlock);
+	return $next;
 }
 
 // Returns the next version of a resource

@@ -17,7 +17,7 @@ function method_cancel(&$request)
 {
 	global $_USER;
 	
-	$resource = Resource::decodeResource($request->resource);
+	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{
