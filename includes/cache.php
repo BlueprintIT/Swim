@@ -16,10 +16,24 @@
 $_TEMPLATES = array();
 $_PAGES = array();
 
-function &loadBlock($block,$blockdir)
+function &loadBlock($container,$id,$version=false)
 {
 	global $_PREFS;
 	
+	if (is_object($container))
+	{
+		$blockdir=$container->getDir().'/blocks/'.$id;
+		$version=$container->version;
+	}
+	else
+	{
+		$resource=$_PREFS->getPref('storage.blocks.'.$container).'/'.$id;
+		if ($version===false)
+		{
+			$version=getCurrentVersion($resource);
+		}
+		$blockdir=getResourceVersion($resource,$version);
+	}
 	$lock=lockResourceRead($blockdir);
 
 	$blockprefs = new Preferences();
@@ -42,8 +56,13 @@ function &loadBlock($block,$blockdir)
 
 	if (class_exists($class))
 	{
-		$object = new $class($block,$blockdir);
+		$object = new $class();
+		$object->setContainer($container);
+		$object->setID($container);
+		$object->setVersion($version);
 		$object->prefs = $blockprefs;
+		$object->blockInit();
+		$object->init();
 		return $object;
 	}
 	else
@@ -52,7 +71,7 @@ function &loadBlock($block,$blockdir)
 	}
 }
 
-function &loadTemplate($name)
+function &loadTemplate($name,$version=false)
 {
 	global $_TEMPLATES;
 	
@@ -60,7 +79,7 @@ function &loadTemplate($name)
 	{
 		return $_TEMPLATES[$name];
 	}
-	$template = new Template($name);
+	$template = new Template('templates',$name);
 	$_TEMPLATES[$name]=&$template;
 	return $template;
 }

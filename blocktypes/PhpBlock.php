@@ -15,9 +15,9 @@
 
 class PhpBlock extends Block
 {
-	function PhpBlock($id,$dir)
+	function PhpBlock()
 	{
-		$this->Block($id,$dir);
+		$this->Block();
 	}
 	
 	function displayContent(&$request,&$page,$attrs,$text)
@@ -26,7 +26,7 @@ class PhpBlock extends Block
 		
 		$log = &LoggerManager::getLogger('page');
 		$name=$this->prefs->getPref('block.phpblock.filename','block.php');
-		include($this->dir.'/'.$name);
+		include($this->getDir().'/'.$name);
 		return true;
 	}
 }

@@ -16,19 +16,18 @@
 class Block
 {
 	var $dir;
+	var $resource;
 	var $prefs;
-	var $page;
+	var $version;
 	var $container;
 	var $type = 'div';
 	var $id;
 	var $lock;
 	var $modified;
 	
-	function Block($id,$dir)
+	function Block()
 	{
 		global $_PREFS;
-		$this->id=$id;
-		$this->dir=$dir;
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 	}
@@ -38,25 +37,74 @@ class Block
 		return null;
 	}
 	
+	function setID($id)
+	{
+		$this->id=$id;
+	}
+	
+	function setVersion($version)
+	{
+		$this->version=$version;
+	}
+	
 	function setContainer($container)
 	{
 		$this->container=$container;
+		if (is_object($container))
+		{
+			$this->prefs->setParent($container->prefs);
+		}
 	}
 	
-	function setPage(&$page)
+	function getResource()
 	{
-		$this->page=&$page;
-		$this->prefs->setParent($page->prefs);
+		if (!isset($this->resource))
+		{
+			if (is_object($this->container))
+			{
+				$this->resource=$this->container->getResource();
+			}
+			else
+			{
+				$this->resource=$this->prefs->getPref('storage.blocks.'.$this->container).'/'.$this->id;
+			}
+		}
+		return $this->resource;
+	}
+	
+	function getDir()
+	{
+		if (!isset($this->dir))
+		{
+			if (is_object($container))
+			{
+				$this->dir=$container->getDir().'/blocks/'.$id;
+			}
+			else
+			{
+				$resource=$this->getResource();
+				$this->dir=getResourceVersion($resource,$this->version);
+			}
+		}
+		return $this->dir;
+	}
+	
+	function init()
+	{
+	}
+	
+	function blockInit()
+	{
 	}
 	
 	function lockRead()
 	{
-		$this->lock=lockResourceRead($this->dir);
+		$this->lock=lockResourceRead($this->getDir());
 	}
 	
 	function lockWrite()
 	{
-		$this->lock=lockResourceWrite($this->dir);
+		$this->lock=lockResourceWrite($this->getDir());
 	}
 	
 	function unlock()
@@ -64,15 +112,11 @@ class Block
 		unlockResource($this->lock);
 	}
 	
-	function init()
-	{
-	}
-	
 	function getModifiedDate()
 	{
 		if (!isset($this->modified))
 		{
-			$stat=stat($this->dir.'/block.conf');
+			$stat=stat($this->getDir().'/block.conf');
 			$this->modified=$stat['mtime'];
 		}
 		return $this->modified;
@@ -101,13 +145,8 @@ class Block
 	function displayAdminControl(&$request)
 	{
 		$editres = new Request();
-		$editres->method='editblock';
-		$editres->resource=$this->container;
-		if ($this->container=='page')
-		{
-			$editres->resource.='/page/'.$request->resource;
-		}
-		$editres->resource.='/'.$this->id;
+		$editres->method='edit';
+		$editres->resource=$request->resource.'/'.$this->id;
 		$editres->nested=&$request;
 ?><div class="admincontrol"><a href="<?= $editres->encode() ?>">Edit</a></div><?
 	}

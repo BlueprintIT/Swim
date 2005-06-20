@@ -20,14 +20,7 @@ function method_login(&$request)
 	$user=login($request->query['swim_username'],$request->query['swim_password']);
 	if ($user!==false)
 	{
-		if ($user->canAccess($request->nested))
-		{
-			redirect($request->nested);
-		}
-		else
-		{
-			displayLogin($request->nested);
-		}
+		redirect($request->nested);
 	}
 	else
 	{

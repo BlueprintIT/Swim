@@ -245,7 +245,7 @@ class User
 			$path=dirname($path);
 			while ($path!='.')
 			{
-				$perm=$this->checkSpecificPermission($permission,$resource->dir.'/'.$path,$file,false);
+				$perm=$this->checkSpecificPermission($permission,$resource->getDir().'/'.$path,$file,false);
 				if ($perm!=PERMISSION_UNKNOWN)
 				{
 					$resource->unlock();
@@ -258,7 +258,8 @@ class User
 		{
 			$file=$resource->type.'.conf';
 		}
-		$path=$resource->dir;
+		
+		$path=$resource->getDir();
 		$perm=$this->checkSpecificPermission($permission,$path,$file,false);
 		$resource->unlock();
 		if ($perm!=PERMISSION_UNKNOWN)
@@ -266,18 +267,35 @@ class User
 			return $perm;
 		}
 		
-		if (($resource->isBlock())&&(isset($resource->page)))
+		$path=$resource->getResource();
+		$perm=$this->checkSpecificPermission($permission,$path,$file,false);
+		$resource->unlock();
+		if ($perm!=PERMISSION_UNKNOWN)
 		{
-			$path=&$resource->getPage();
-			$path=$path->getDir();
-			$perm=$this->checkSpecificPermission($permission,$path,$file,true);
-			if ($perm!=PERMISSION_UNKNOWN)
-			{
-				return $perm;
-			}
+			return $perm;
 		}
 		
-		if (isset($resource->template))
+		if (isset($resource->block))
+		{
+			$block=&$resource->getBlock();
+			if (is_object($block->container))
+			{
+				$path=$block->container->getDir();
+				$perm=$this->checkSpecificPermission($permission,$path,$file,true);
+				if ($perm!=PERMISSION_UNKNOWN)
+				{
+					return $perm;
+				}
+				
+				$page=&$resource->getPage();
+				$path='storage.pages.'.$page->container;
+			}
+			else
+			{
+				$path='storage.blocks.'.$resource->container;
+			}
+		}
+		else if (isset($resource->template))
 		{
 			$path='storage.templates';
 		}
@@ -285,10 +303,7 @@ class User
 		{
 			$path='storage.pages.'.$resource->container;
 		}
-		else if (isset($resource->block))
-		{
-			$path='storage.blocks.'.$resource->container;
-		}
+
 		$path=$_PREFS->getPref($path);
 		$perm=$this->checkSpecificPermission($permission,$path,$file,true);
 		if ($perm!=PERMISSION_UNKNOWN)
@@ -308,13 +323,13 @@ class User
 	
 	function canRead(&$resource)
 	{
-		//return true;
+		return true;
 		return $this->getPermission(PERMISSION_READ,$resource);
 	}
 	
 	function canWrite(&$resource)
 	{
-		//return $this->inGroup('admin');
+		return $this->inGroup('admin');
 		return $this->getPermission(PERMISSION_WRITE,$resource);
 	}
 }

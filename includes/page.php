@@ -21,19 +21,28 @@ class Page
 	var $version;
 	var $id;
 	var $lock;
+	var $resource;
+	var $dir;
 	var $container;
 	var $modified;
 	
-	function Page($container,$id,$version)
+	function Page($container,$id,$version=false)
 	{
 		global $_PREFS;
-		
+	
 		$this->container=$container;
-		$this->version=$version;
 		$this->id=$id;
 		$this->blocks = array();
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
+		
+		$this->resource=$this->prefs->getPref('storage.pages.'.$this->container).'/'.$this->id;
+		if ($version===false)
+		{
+			$version=getCurrentVersion($this->resource);
+		}
+		$this->version=$version;
+		$this->dir=getResourceVersion($this->resource,$this->version);
 		
 		$this->lockRead();
 		$this->prefs->loadPreferences($this->getDir().'/page.conf','page');
@@ -54,7 +63,12 @@ class Page
 	
 	function getDir()
 	{
-		return getResourceVersion($this->prefs->getPref('storage.pages.'.$this->container).'/'.$this->id,$this->version);
+		return $this->dir;
+	}
+	
+	function getResource()
+	{
+		return $this->resource;
 	}
 	
 	function lockRead()
@@ -75,6 +89,7 @@ class Page
 	function setBlock($id,&$block)
 	{
 		$block->setPage($this);
+		$block->setID($id);
 		$this->blocks[$id]=&$block;
 	}
 	
@@ -99,28 +114,21 @@ class Page
 				$block=$this->prefs->getPref($blockpref.'.id');
 				if ($container=='page')
 				{
-					$blockdir=$this->getDir().'/blocks/'.$block;
+					$container=$this;
 				}
-				else if ($this->prefs->isPrefSet('storage.blocks.'.$container))
+				else
 				{
 					if ($this->prefs->isPrefSet($blockpref.'.version'))
 					{
 						$version=$this->prefs->getPref($blockpref.'.version');
-						$blockdir=getResourceVersion($this->prefs->getPref('storage.blocks.'.$container).'/'.$block,$version);
 					}
 					else
 					{
-						$blockdir=getCurrentResource($this->prefs->getPref('storage.blocks.'.$container).'/'.$block);
+						$version=false;
 					}
 				}
-				else
-				{
-					trigger_error('Block container not set');
-				}
 				
-				$blockobj = &loadBlock($block,$blockdir);
-				$blockobj->setPage($this);
-				$blockobj->setContainer($container);
+				$blockobj = &loadBlock($container,$block,$version);
 				
 				$this->blocks[$id]=&$blockobj;
 			}

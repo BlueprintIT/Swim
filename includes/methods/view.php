@@ -26,7 +26,7 @@ function method_view(&$request)
 		{
 			if ($resource->isFile())
 			{
-				$file=$resource->dir.'/'.$resource->path;
+				$file=$resource->getDir().'/'.$resource->path;
 				if (is_readable($file))
 				{
 					$resource->lockRead();

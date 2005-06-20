@@ -17,12 +17,9 @@ class Resource
 {
 	var $type;
 	var $path;
-	var $dir;
-	var $container;
 	var $template;
 	var $page;
 	var $block;
-	var $version = false;
 	var $lock;
 	
 	var $_block;
@@ -71,11 +68,11 @@ class Resource
 			$path=dirname($this->path);
 			if ($path=='.')
 			{
-				$path=$this->dir;
+				$path=$this->getDir();
 			}
 			else
 			{
-				$path=$this->dir.'/'.$path;
+				$path=$this->getDir().'/'.$path;
 			}
 			$this->lock=lockResourceRead($path);
 		}
@@ -103,11 +100,11 @@ class Resource
 			$path=dirname($this->path);
 			if ($path=='.')
 			{
-				$path=$this->dir;
+				$path=$this->getDir();
 			}
 			else
 			{
-				$path=$this->dir.'/'.$path;
+				$path=$this->getDir().'/'.$path;
 			}
 			$this->lock=lockResourceWrite($path);
 		}
@@ -136,66 +133,64 @@ class Resource
 		}
 	}
 	
+	function getResource()
+	{
+		if (isset($this->_block))
+		{
+			return $this->_block->getResource();
+		}
+		if (isset($this->_page))
+		{
+			return $this->_page->getResource();
+		}
+		if (isset($this->_template))
+		{
+			return $this->_template->getResource();
+		}
+	}
+	
+	function getDir()
+	{
+		if (isset($this->_block))
+		{
+			return $this->_block->getDir();
+		}
+		if (isset($this->_page))
+		{
+			return $this->_page->getDir();
+		}
+		if (isset($this->_template))
+		{
+			return $this->_template->getDir();
+		}
+	}
+	
 	function &getBlock()
 	{
-		if ($this->type=='block')
-		{
-			if (!isset($this->_block))
-			{
-				if (isset($this->page))
-				{
-					$page=&$this->getPage();
-					$this->_block=&$page->getBlock($this->block);
-				}
-				else
-				{
-					$this->_block=&loadBlock($this->block,$this->dir);
-				}
-			}
-			return $this->_block;
-		}
-		return null;
+		return $this->_block;
 	}
 	
 	function &getPage()
 	{
-		if (($this->type=='page')||(($this->type=='block')&&(isset($this->page))))
-		{
-			if (!isset($this->_page))
-			{
-				$this->_page=&loadPage($this->container,$this->page,$this->version);
-			}
-			return $this->_page;
-		}
-		return null;
+		return $this->_page;
 	}
 	
 	function &getTemplate()
 	{
-		if ($this->type=='template')
-		{
-			if (!isset($this->_template))
-			{
-				$this->_template=&loadTemplate($this->template);
-			}
-			return $this->_template;
-		}
-		return null;
+		return $this->_template;
 	}
 	
-	function decodeTemplateResource($args,&$result)
+	function decodeTemplateResource($args,&$result,$version=false)
 	{
 		global $_PREFS;
 		
-		if (is_dir($_PREFS->getPref('storage.templates').'/'.$parts[1]))
+		$template=&loadTemplate($args[0],$version);
+		if ($template!==false)
 		{
 			$result->type='template';
 			$result->template=$args[1];
-			if (!isset($result->version))
-			{
-				$result->version=getCurrentVersion($_PREFS->getPref('storage.templates').'/'.$args[1]);
-			}
-			$result->dir=getResourceVersion($_PREFS->getPref('storage.templates').'/'.$args[1],$result->version);
+			$result->_template=&$template;
+			$result->resource=$_PREFS->getPref('storage.templates').'/'.$args[1];
 			if (count($args)>=3)
 			{
 				$result->path=implode('/',array_slice($args,2));
@@ -205,24 +200,19 @@ class Resource
 		return false;
 	}
 	
-	function decodeBlockResource($container,$args,&$result)
+	function decodeBlockResource($container,$args,&$result,$version=false)
 	{
 		global $_PREFS;
 		
 		if (($_PREFS->isPrefSet('storage.blocks.'.$container))&&(count($args)>0))
 		{
-			if (!isset($result->version))
-			{
-				$result->version=getCurrentVersion($_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0]);
-			}
-			$blockdir=getResourceVersion($_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0],$result->version);
-			
-			if (is_dir($blockdir))
+			$result->resource=$_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0];
+			$block=&loadBlock($container,$args[0],$version);
+			if ($block!==false)
 			{
 				$result->type='block';
-				$result->container=$container;
 				$result->block=$args[0];
-				$result->dir=$blockdir;
+				$result->_block=&$block;
 				if (count($args)>1)
 				{
 					$result->path=implode('/',array_slice($args,1));
@@ -233,27 +223,21 @@ class Resource
 		return false;
 	}
 	
-	function decodePageResource($container,$args,&$result)
+	function decodePageResource($container,$args,&$result,$version=false)
 	{
 		$log=LoggerManager::getLogger('swim.resource');
 		$log->debug('Testing container '.$container);
 		$log->debug('Argument has '.count($args).' items');
 		if (count($args)>0)
 		{
-			$version=false;
-			if (isset($result->version))
-			{
-				$version=$result->version;
-			}
-			if (isValidPage($container,$args[0],$version))
+			$page=&loadPage($container,$args[0],$version);
+			if ($page!==false)
 			{
 				$log->debug('Found valid page');
-				$result->_page=&loadPage($container,$args[0],$version);
-				$result->version=$result->_page->version;
+				$result->_page=&$page;
+				$result->version=$page->version;
 				$result->type='page';
-				$result->container=$container;
 				$result->page=$args[0];
-				$result->dir=$result->_page->getDir();
 				if (count($args)>=2)
 				{
 					$log->debug('Checking for block '.$args[1]);
@@ -296,7 +280,6 @@ class Resource
 		{
 			$result->type='file';
 			$result->container=$parts[1];
-			$result->dir=$_PREFS->getPref('storage.files.'.$result->container);
 			$result->path=implode('/',array_slice($parts,2));
 			return $result;
 		}

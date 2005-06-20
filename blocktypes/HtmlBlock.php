@@ -15,29 +15,29 @@
 
 class HtmlBlock extends Block
 {
-	function HtmlBlock($id,$dir)
+	function HtmlBlock()
 	{
-		$this->Block($id,$dir);
+		$this->Block();
 	}
 	
 	function &getBlockEditor()
 	{
-		return new HtmlEditBlock($this->id,$this->dir);
+		return new HtmlEditBlock();
 	}
 	
 	function displayContent(&$request,&$page,$attrs,$text)
 	{
 		$name=$this->prefs->getPref('block.htmlblock.filename','block.html');
-		readfile($this->dir.'/'.$name);
+		readfile($this->getDir().'/'.$name);
 		return true;
 	}
 }
 
 class HtmlEditBlock extends Block
 {
-	function HtmlEditBlock($id,$dir)
+	function HtmlEditBlock()
 	{
-		$this->Block($id,$dir);
+		$this->Block();
 	}
 
 	function displayContent(&$request,&$page,$attrs,$text)

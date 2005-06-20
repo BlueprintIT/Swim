@@ -16,21 +16,31 @@
 class Template
 {
 	var $dir;
-	var $name;
+	var $resource;
+	var $container;
+	var $id;
 	var $prefs;
 	var $parsing = false;
 	var $curPage;
 	var $lock;
+	var $version;
 	
-	function Template($name)
+	function Template($container,$id,$version=false)
 	{
 		global $_PREFS;
 		
-		$this->name=$name;
+		$this->container=$container;
+		$this->id=$id;
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
-		$this->dir=getCurrentResource($this->prefs->getPref('storage.templates').'/'.$name);
+		$this->resource=$this->prefs->getPref('storage.templates').'/'.$id;
+		if ($version==false)
+		{
+			$version=getCurrentVersion($this->resource);
+		}
+		$this->version=$version;
+		$this->dir=getResourceVersion($this->resource,$version);
 		
 		// If the template doesnt exist then there is a problem
 		if ($this->dir===false)
@@ -48,6 +58,16 @@ class Template
 		}
 		
 		$this->unlock();
+	}
+	
+	function getDir()
+	{
+		return $this->dir;
+	}
+	
+	function getResource()
+	{
+		return $this->resource;
 	}
 	
 	function lockRead()
@@ -73,7 +93,7 @@ class Template
 		}
 		else
 		{
-			$url='template/'.$this->name.'/'.$url;
+			$url='template/'.$this->id.'/'.$url;
 		}
 		$request = new Request();
 		$request->method='view';

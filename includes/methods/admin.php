@@ -16,19 +16,34 @@
 
 function method_admin(&$request)
 {
-	global $_PREFS;
+	global $_USER;
 	
-	$version=false;
-	if (isValidPage('global',$request->resource,$version))
+	$resource=&Resource::decodeResource($request->resource);
+
+	if ($resource!==false)
 	{
-		$page = &loadPage('global',$request->resource,$version);
-		if ($page->prefs->getPref("page.editable")===false)
+		if ($_USER->canWrite($resource))
 		{
-			$page->display($request);
+			if ($resource->isPage())
+			{
+				$page = &$resource->getPage();
+				if ($page->prefs->getPref("page.editable")===false)
+				{
+					$page->display($request);
+				}
+				else
+				{
+					$page->displayAdmin($request);
+				}
+			}
+			else
+			{
+				displayError($request);
+			}
 		}
 		else
 		{
-			$page->displayAdmin($request);
+			displayLogin($request);
 		}
 	}
 	else
