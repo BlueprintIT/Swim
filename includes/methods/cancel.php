@@ -15,6 +15,38 @@
 
 function method_cancel(&$request)
 {
+	global $_USER;
+	
+	$resource = Resource::decodeResource($request->resource);
+
+	if ($resource!==false)
+	{
+		if ($_USER->canWrite($resource))
+		{
+			if ($resource->type=='block')
+			{
+				$block=&$resource->getBlock();
+				$temp=getTempVersion($block->getResource());
+				if ($temp!==false)
+				{
+					freeTempVersion($block->getResource());
+				}
+				redirect($request->nested);
+			}
+			else
+			{
+				displayError($request);
+			}
+		}
+		else
+		{
+			displayLogin($request);
+		}
+	}
+	else
+	{
+		displayError($request);
+	}
 }
 
 ?>

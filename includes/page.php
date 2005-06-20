@@ -86,6 +86,10 @@ class Page
 		unlockResource($this->lock);
 	}
 	
+	function saveProperties()
+	{
+	}
+	
 	function setBlock($id,&$block)
 	{
 		$block->setID($id);

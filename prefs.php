@@ -34,6 +34,30 @@ class Preferences
 		$this->overrides=&$overprefs;
 	}
 	
+	function getPrefBranch($branch)
+	{
+		if (!($branch[strlen($branch)-1]=='.'))
+		{
+			$branch.='.';
+		}
+		if (isset($this->parent))
+		{
+			$result=$this->parent->getPrefBranch($branch);
+		}
+		else
+		{
+			$result=array();
+		}
+		foreach ($this->preferences as $name=>$value)
+		{
+			if (substr($name,0,strlen($branch))==$branch)
+			{
+				$result[substr($name,strlen($branch))]=$this->evaluatePref($value);
+			}
+		}
+		return $result;
+	}
+	
 	// Loads preferences. With no arguments it loads all preferences from their default
 	// locations. Otherwise specify the type (numerical) and the file to load from.
 	function loadPreferences($file,$branch = '',$merge = false)
