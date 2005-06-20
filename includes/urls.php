@@ -23,6 +23,7 @@ class Resource
 	var $page;
 	var $block;
 	var $version = false;
+	var $lock;
 	
 	var $_block;
 	var $_page;
@@ -65,6 +66,19 @@ class Resource
 			$res=$this->getTemplate();
 			$res->lockRead();
 		}
+		else
+		{
+			$path=dirname($this->path);
+			if ($path=='.')
+			{
+				$path=$this->dir;
+			}
+			else
+			{
+				$path=$this->dir.'/'.$path;
+			}
+			$this->lock=lockResourceRead($path);
+		}
 	}
 	
 	function lockWrite()
@@ -84,6 +98,19 @@ class Resource
 			$res=$this->getTemplate();
 			$res->lockWrite();
 		}
+		else
+		{
+			$path=dirname($this->path);
+			if ($path=='.')
+			{
+				$path=$this->dir;
+			}
+			else
+			{
+				$path=$this->dir.'/'.$path;
+			}
+			$this->lock=lockResourceWrite($path);
+		}
 	}
 	
 	function unlock()
@@ -102,6 +129,10 @@ class Resource
 		{
 			$res=$this->getTemplate();
 			$res->unlock();
+		}
+		else
+		{
+			unlockResource($this->lock);
 		}
 	}
 	
@@ -261,6 +292,14 @@ class Resource
 			return false;
 		}
 		$result = new Resource();
+		if (($parts[0]=='files')&&(count($parts)>2))
+		{
+			$result->type='file';
+			$result->container=$parts[1];
+			$result->dir=$_PREFS->getPref('storage.files.'.$result->container);
+			$result->path=implode('/',array_slice($parts,2));
+			return $result;
+		}
 		if (($parts[0]=='template')&&(count($parts)>=2))
 		{
 			$log->debug('Template resource');

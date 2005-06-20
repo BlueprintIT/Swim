@@ -16,6 +16,7 @@
 class Template
 {
 	var $dir;
+	var $name;
 	var $prefs;
 	var $parsing = false;
 	var $curPage;
@@ -25,6 +26,7 @@ class Template
 	{
 		global $_PREFS;
 		
+		$this->name=$name;
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
@@ -63,15 +65,68 @@ class Template
 		unlockResource($this->lock);
 	}
 	
-	function generateURL(&$parser,$tag,$attrs,$text)
+	function generateRelativeURL(&$data,$url)
 	{
+		if (isset($data['block']))
+		{
+			$url=$data['request']->resource.'/'.$data['block']->id.'/'.$url;
+		}
+		else
+		{
+			$url='template/'.$this->name.'/'.$url;
+		}
+		$request = new Request();
+		$request->method='view';
+		$request->resource=$url;
+		return $request->encode();
+	}
+	
+	function generateURL(&$data,$url)
+	{
+		if ($url[0]=='/')
+		{
+			return $url;
+		}
+		else
+		{
+			return $this->generateRelativeURL($data,$url);
+		}
+	}
+	
+	function displayElement(&$parser,$tag,$attrs,$text='',$shortallowed=true)
+	{
+		if (!($parser->data['request']->isXML()))
+		{
+			$shortallowed=false;
+		}
+		print('<'.$tag);
+		foreach ($attrs as $name => $value)
+		{
+			print(' '.$name.'="'.$value.'"');
+		}
+		if (($shortallowed)&&(strlen($text)==0))
+		{
+			print(' />');
+		}
+		else
+		{
+			print('>'.$text.'</'.$tag.'>');
+		}
+	}
+	
+	function displayStylesheet(&$parser,$tag,$attrs,$text)
+	{
+		$this->displayElement($parser,'link',array('rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])));
 	}
 	
 	function displayBlock(&$parser,$tag,$attrs,$text)
 	{
 		$page=&$parser->data['page'];
 		$block=$page->getBlock($attrs['id']);
-		return $block->display($parser,$attrs,$text);
+		$parser->data['modified']=max($parser->data['modified'],$block->getModifiedDate());
+		$parser->data['block']=&$block;
+		$result=$block->display($parser,$attrs,$text);
+		unset($parser->data['block']);
 	}
 	
 	function displayVar(&$parser,$tag,$attrs,$text)
@@ -106,9 +161,9 @@ class Template
 		{
 			return $this->displayBlock($parser,$tag,$attrs,$text);
 		}
-		else if ($tag=='url')
+		else if ($tag=='stylesheet')
 		{
-			return $this->generateURL($parser,$tag,$attrs,$text);
+			return $this->displayStylesheet($parser,$tag,$attrs,$text);
 		}
 		else
 		{
@@ -132,16 +187,35 @@ class Template
 			$file=$this->prefs->getPref($htmlpref);
 		}
 		
+		if ($request->isXML())
+		{
+			setContentType('application/xhtml+xml');
+		}
+		else
+		{
+			setContentType('text/html');
+		}
+		
+		$stats=stat($this->dir.'/'.$file);
+		$modified=$stats['mtime'];
+		if (is_readable($this->dir.'/template.conf'))
+		{
+			$stats=stat($this->dir.'/template.conf');
+			$modified=max($modified,$stats['mtime']);
+		}
+		$modified=max($modified,$page->getModifiedDate());
+		
 		// Parse the template and display
 		$parser = new TemplateParser();
-		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode);
+		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode,'modified'=>$modified);
 		$parser->addObserver('block',$this);
 		$parser->addObserver('var',$this);
-		$parser->addObserver('url',$this);
+		$parser->addObserver('stylesheet',$this);
 		
 		$this->lockRead();
 		ob_start();
 		$parser->parseFile($this->dir.'/'.$file);
+		setModifiedDate($parser->data['modified']);
 		ob_end_flush();
 		$this->unlock();
 	}

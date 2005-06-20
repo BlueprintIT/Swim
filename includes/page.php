@@ -22,6 +22,7 @@ class Page
 	var $id;
 	var $lock;
 	var $container;
+	var $modified;
 	
 	function Page($container,$id,$version)
 	{
@@ -77,6 +78,16 @@ class Page
 		$this->blocks[$id]=&$block;
 	}
 	
+	function getModifiedDate()
+	{
+		if (!isset($this->modified))
+		{
+			$stat=stat($this->getDir().'/page.conf');
+			$this->modified=$stat['mtime'];
+		}
+		return $this->modified;
+	}
+		
 	function getBlock($id)
 	{
 		if (!isset($this->blocks[$id]))

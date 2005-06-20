@@ -32,8 +32,7 @@ function determineContentType($file)
 	{
 		return mime_content_type($file);
 	}
-	$parts=explode('/',$file);
-	$filename=$parts[count($parts)-1];
+	$filename=basename($file);
 	$parts=explode('.',$filename);
 	if (count($parts)==1)
 	{

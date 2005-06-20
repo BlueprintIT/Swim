@@ -240,19 +240,18 @@ class User
 		$resource->lockRead();
 		if ($resource->isFile())
 		{
-			$paths=explode('/',$resource->path);
-			$file=$paths[count($paths)-1];
-			$pos=count($paths)-1;
-			while ($pos>0)
+			$path=$resource->path;
+			$file=basename($path);
+			$path=dirname($path);
+			while ($path!='.')
 			{
-				$path=$resource->dir.'/'.implode('/',array_slice($paths,0,$pos));
-				$perm=$this->checkSpecificPermission($permission,$path,$file,false);
+				$perm=$this->checkSpecificPermission($permission,$resource->dir.'/'.$path,$file,false);
 				if ($perm!=PERMISSION_UNKNOWN)
 				{
 					$resource->unlock();
 					return $perm;
 				}
-				$pos--;
+				$path=dirname($path);
 			}
 		}
 		else
@@ -304,18 +303,18 @@ class User
 	function getPermission($permission,&$resource)
 	{
 		$perm=$this->checkPermission($permission,$resource);
-		return $perm == PERMISSION_ALLOWED;
+		return $perm != PERMISSION_DENIED;
 	}
 	
 	function canRead(&$resource)
 	{
-		return true;
+		//return true;
 		return $this->getPermission(PERMISSION_READ,$resource);
 	}
 	
 	function canWrite(&$resource)
 	{
-		return $this->inGroup('admin');
+		//return $this->inGroup('admin');
 		return $this->getPermission(PERMISSION_WRITE,$resource);
 	}
 }

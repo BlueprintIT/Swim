@@ -22,6 +22,7 @@ class Block
 	var $type = 'div';
 	var $id;
 	var $lock;
+	var $modified;
 	
 	function Block($id,$dir)
 	{
@@ -65,6 +66,16 @@ class Block
 	
 	function init()
 	{
+	}
+	
+	function getModifiedDate()
+	{
+		if (!isset($this->modified))
+		{
+			$stat=stat($this->dir.'/block.conf');
+			$this->modified=$stat['mtime'];
+		}
+		return $this->modified;
 	}
 	
 	function displayIntro(&$data,$attrs)
