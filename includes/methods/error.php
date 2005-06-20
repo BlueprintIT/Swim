@@ -18,6 +18,7 @@ function method_error(&$request)
 {
 	global $_PREFS;
 	
+	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
 	print 'Error page';
 	/*
 	$version=false;

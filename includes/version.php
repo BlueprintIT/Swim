@@ -35,6 +35,8 @@ function getTempVersion($dir)
 {
 	global $_USER;
 	
+	$log=LoggerManager::getLogger('swim.version');
+	
 	if (!$_USER->isLoggedIn())
 	{
 		return false;
@@ -44,6 +46,7 @@ function getTempVersion($dir)
 	$temp=$dir.'/temp';
 	if (!is_dir($temp))
 	{
+		$log->info('Created temp version at '.$temp);
 		mkdir($temp);
 	}
 	

@@ -58,25 +58,22 @@ function method_edit(&$request)
 					$container=$block->container;
 				}
 				
-				$block=&loadBlock($container,$block->id,$temp);
-				$block=&$block->getBlockEditor();
-				$page=&loadPage('internal','admin');
-				$page->setBlock('content',$block);
+				$page=&$block->getBlockEditor();
 				$page->display($request);
 			}
 			else
 			{
-				displayError();
+				displayError($request);
 			}
 		}
 		else
 		{
-			displayLogin();
+			displayLogin($request);
 		}
 	}
 	else
 	{
-		displayError();
+		displayError($request);
 	}
 }
 

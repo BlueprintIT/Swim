@@ -24,10 +24,12 @@ class Block
 	var $id;
 	var $lock;
 	var $modified;
+	var $log;
 	
 	function Block()
 	{
 		global $_PREFS;
+		$this->log=LoggerManager::getLogger('swim.block');
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 	}
@@ -40,11 +42,14 @@ class Block
 	function setID($id)
 	{
 		$this->id=$id;
+		unset($this->dir);
+		unset($this->resource);
 	}
 	
 	function setVersion($version)
 	{
 		$this->version=$version;
+		unset($this->dir);
 	}
 	
 	function setContainer($container)
@@ -54,6 +59,8 @@ class Block
 		{
 			$this->prefs->setParent($container->prefs);
 		}
+		unset($this->dir);
+		unset($this->resource);
 	}
 	
 	function getResource()
@@ -68,6 +75,7 @@ class Block
 			{
 				$this->resource=$this->prefs->getPref('storage.blocks.'.$this->container).'/'.$this->id;
 			}
+			$this->log->debug('Resource determined to be '.$this->resource);
 		}
 		return $this->resource;
 	}
@@ -76,15 +84,15 @@ class Block
 	{
 		if (!isset($this->dir))
 		{
-			if (is_object($container))
+			if (is_object($this->container))
 			{
-				$this->dir=$container->getDir().'/blocks/'.$id;
+				$this->dir=$this->container->getDir().'/blocks/'.$this->id;
 			}
 			else
 			{
-				$resource=$this->getResource();
-				$this->dir=getResourceVersion($resource,$this->version);
+				$this->dir=getResourceVersion($this->getResource(),$this->version);
 			}
+			$this->log->debug('Dir determined to be '.$this->dir);
 		}
 		return $this->dir;
 	}
@@ -190,6 +198,7 @@ class Block
 		}
     $text=ob_get_contents();
     ob_end_clean();
+    $this->log->info('Re-parsing content');
     $parser->parseText($text);
 		return true;
 	}

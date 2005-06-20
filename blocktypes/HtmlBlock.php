@@ -22,27 +22,13 @@ class HtmlBlock extends Block
 	
 	function &getBlockEditor()
 	{
-		return new HtmlEditBlock();
+		return loadPage('internal','htmledit');
 	}
 	
 	function displayContent(&$request,&$page,$attrs,$text)
 	{
 		$name=$this->prefs->getPref('block.htmlblock.filename','block.html');
 		readfile($this->getDir().'/'.$name);
-		return true;
-	}
-}
-
-class HtmlEditBlock extends Block
-{
-	function HtmlEditBlock()
-	{
-		$this->Block();
-	}
-
-	function displayContent(&$request,&$page,$attrs,$text)
-	{
-		print 'Block editor';
 		return true;
 	}
 }

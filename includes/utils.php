@@ -26,7 +26,7 @@ function displayLogin(&$request)
 	callMethod($newrequest);
 }
 
-function displayError($request)
+function displayError(&$request)
 {
 	$newrequest = new Request();
 	$newrequest->method='error';
@@ -36,10 +36,10 @@ function displayError($request)
 
 function setModifiedDate($date)
 {
-	header('Cache-Control: public');
-	header('Pragma: ');
+	//header('Cache-Control: public');
+	//header('Pragma: ');
 	header('Last-Modified: '.httpdate($date));
-	header('Expires: '.httpdate(time()+3600));
+	//header('Expires: '.httpdate(time()+3600));
 }
 
 function callMethod(&$request)

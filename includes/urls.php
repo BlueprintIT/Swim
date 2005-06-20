@@ -21,6 +21,7 @@ class Resource
 	var $page;
 	var $block;
 	var $lock;
+	var $filedir;
 	
 	var $_block;
 	var $_page;
@@ -147,6 +148,10 @@ class Resource
 		{
 			return $this->_template->getResource();
 		}
+		if (isset($this->filedir))
+		{
+			return $this->filedir;
+		}
 	}
 	
 	function getDir()
@@ -162,6 +167,10 @@ class Resource
 		if (isset($this->_template))
 		{
 			return $this->_template->getDir();
+		}
+		if (isset($this->filedir))
+		{
+			return $this->filedir;
 		}
 	}
 	
@@ -279,7 +288,7 @@ class Resource
 		if (($parts[0]=='files')&&(count($parts)>2))
 		{
 			$result->type='file';
-			$result->container=$parts[1];
+			$result->filedir=$_PREFS->getPref('storage.files.'.$parts[1]);
 			$result->path=implode('/',array_slice($parts,2));
 			return $result;
 		}

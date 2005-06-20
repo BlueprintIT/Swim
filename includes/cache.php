@@ -20,8 +20,12 @@ function &loadBlock($container,$id,$version=false)
 {
 	global $_PREFS;
 	
+	$log=LoggerManager::getLogger('swim.cache');
+	
+	$log->debug('Loading block');
 	if (is_object($container))
 	{
+		$log->debug('Block is page specific');
 		$blockdir=$container->getDir().'/blocks/'.$id;
 		$version=$container->version;
 	}
@@ -34,6 +38,7 @@ function &loadBlock($container,$id,$version=false)
 		}
 		$blockdir=getResourceVersion($resource,$version);
 	}
+	$log->debug('Loading block from '.$blockdir.' - version '.$version);
 	$lock=lockResourceRead($blockdir);
 
 	$blockprefs = new Preferences();
@@ -56,9 +61,10 @@ function &loadBlock($container,$id,$version=false)
 
 	if (class_exists($class))
 	{
+		$log->debug('Block loaded');
 		$object = new $class();
 		$object->setContainer($container);
-		$object->setID($container);
+		$object->setID($id);
 		$object->setVersion($version);
 		$object->prefs = $blockprefs;
 		$object->blockInit();

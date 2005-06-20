@@ -72,6 +72,16 @@ class Parser
 	  return false;
   }
   
+  // Parses a block of text by splitting at newlines. Mist speed up the regex matching.
+  function parseBlock($text)
+  {
+  	$lines=explode("\n",$text);
+  	foreach ($lines as $line)
+  	{
+  		$this->parseText($line);
+  	}
+  }
+  
   // Parses some text
   function parseText($text)
   {
@@ -81,31 +91,36 @@ class Parser
       // State 0 is where we are scanning for a new start tag. Any text before a new
       // start tag is just outputted into the current tag bugger.
       case 0:
-        $regex='/^(.*?)<(\/('.$validregex.')>|('.$validregex.'))/';
-        if (preg_match($regex,$text,$matches))
+        $regex='/<(\/('.$validregex.')>|('.$validregex.'))/';
+        if (preg_match($regex,$text,$matches,PREG_OFFSET_CAPTURE))
         {
-          $remaining=substr($text,strlen($matches[0]));
-          $this->onText($matches[1]);
-          if (isset($matches[4]))
+          $remaining=substr($text,$matches[0][1]+strlen($matches[0][0]));
+					
+          if ($matches[0][1]>0)
+	          $this->onText(substr($text,0,$matches[0][1]));
+
+          if (isset($matches[3][0]))
           {
-            $tagname=$matches[4];
+            $tagname=$matches[3][0];
             $this->_log->debug('Start tag for '.$tagname);
             if ($this->onStartTag($tagname))
             {
+            	$this->_log->debug('Capturing tag '.$tagname);
               $this->_tagname=$tagname;
               $this->_state=1;
             }
             else
             {
-              $this->onText('<'.$matches[2]);
+            	$this->_log->debug('Ignoring tag '.$tagname);
+              $this->onText('<'.$matches[1][0]);
             }
           }
           else
           {
-            $this->_log->debug('End tag for '.$matches[3]);
-            if (!$this->onEndTag($matches[3]))
+            $this->_log->debug('End tag for '.$matches[2][0]);
+            if (!$this->onEndTag($matches[2][0]))
             {
-              $this->onText('<'.$matches[2]);
+              $this->onText('<'.$matches[1][0]);
             }
           }
           $this->parseText($remaining);
@@ -120,7 +135,7 @@ class Parser
         $text=ltrim($text);
         if (strlen($text)>0)
         {
-          if (substr($text,0,1)=='>')
+          if ($text[0]=='>')
           {
             $this->_log->debug('Found end of start tag, moving to state 0');
             $this->_state=0;

@@ -88,7 +88,6 @@ class Page
 	
 	function setBlock($id,&$block)
 	{
-		$block->setPage($this);
 		$block->setID($id);
 		$this->blocks[$id]=&$block;
 	}
@@ -115,6 +114,7 @@ class Page
 				if ($container=='page')
 				{
 					$container=$this;
+					$version=$this->version;
 				}
 				else
 				{

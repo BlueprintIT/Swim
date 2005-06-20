@@ -23,11 +23,14 @@ class Template
 	var $parsing = false;
 	var $curPage;
 	var $lock;
+	var $log;
 	var $version;
 	
 	function Template($container,$id,$version=false)
 	{
 		global $_PREFS;
+		
+		$this->log=LoggerManager::getLogger('swim.template');
 		
 		$this->container=$container;
 		$this->id=$id;
@@ -105,7 +108,10 @@ class Template
 	{
 		if ($url[0]=='/')
 		{
-			return $url;
+			$request = new Request();
+			$request->method='view';
+			$request->resource=substr($url,1);
+			return $request->encode();
 		}
 		else
 		{
@@ -113,7 +119,7 @@ class Template
 		}
 	}
 	
-	function displayElement(&$parser,$tag,$attrs,$text='',$shortallowed=true)
+	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
 	{
 		if (!($parser->data['request']->isXML()))
 		{
@@ -124,14 +130,40 @@ class Template
 		{
 			print(' '.$name.'="'.$value.'"');
 		}
-		if (($shortallowed)&&(strlen($text)==0))
+		if ((strlen($text)==0)&&($parser->data['request']->isXML()))
 		{
 			print(' />');
 		}
 		else
 		{
-			print('>'.$text.'</'.$tag.'>');
+			print('>'.$text);
+			if ($closetag)
+				print('</'.$tag.'>');
 		}
+	}
+	
+	function displayApplet(&$parser,$tag,$attrs,$text)
+	{
+		$this->log->debug('Displaying applet');
+		$width=$attrs['width'];
+		$height=$attrs['height'];
+		$class=$attrs['class'];
+		$classpath=$attrs['classpath'];
+		$codebase=$this->generateURL($parser,$attrs['codebase']);
+		print('<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="'.$height.'" width="'.$width.'"'."\n\t");
+		print('codebase="http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0">'."\n\t");
+		$this->displayElement($parser,'param',array('name'=>'type','value'=>'application/x-java-applet;version=1.4'),'',false); print("\n\t");
+		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class.'.class'),'',false); print("\n\t");
+		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t");
+		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
+		print($text);
+		print('<comment><object type="application/x-java-applet;version=1.4" height="'.$height.'" width="'.$width.'">'."\n\t\t");
+		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class),'',false); print("\n\t\t");
+		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t\t");
+		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
+		print($text);
+		print('</object></comment>'."\n");
+		print('</object>');
 	}
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
@@ -173,6 +205,7 @@ class Template
 	
 	function observeTag(&$parser,$tag,$attrs,$text)
 	{
+		$this->log->debug('Observed '.$tag);
 		if ($tag=='var')
 		{
 			return $this->displayVar($parser,$tag,$attrs,$text);
@@ -184,6 +217,10 @@ class Template
 		else if ($tag=='stylesheet')
 		{
 			return $this->displayStylesheet($parser,$tag,$attrs,$text);
+		}
+		else if ($tag=='applet')
+		{
+			return $this->displayApplet($parser,$tag,$attrs,$text);
 		}
 		else
 		{
@@ -231,6 +268,7 @@ class Template
 		$parser->addObserver('block',$this);
 		$parser->addObserver('var',$this);
 		$parser->addObserver('stylesheet',$this);
+		$parser->addObserver('applet',$this);
 		
 		$this->lockRead();
 		ob_start();
