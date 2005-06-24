@@ -1,4 +1,4 @@
- <?
+<?
 
 /*
  * Swim
@@ -272,13 +272,13 @@ class MenuBlock extends Block
 	function displayIntro($attrs)
 	{
 		if (isset($attrs['class']))
-			$attrs['class'].=' ';
+			$attrs['class'].=' menu ';
 		else
-			$attrs['class']='';
+			$attrs['class']='menu ';
 			
 		if ($this->rootmenu->orientation=='horizontal')
 		{
-			$attrs['class']='horizmenu';
+			$attrs['class'].='horizmenu';
 		}
 		else
 		{
