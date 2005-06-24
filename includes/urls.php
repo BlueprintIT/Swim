@@ -189,20 +189,20 @@ class Resource
 		return $this->_template;
 	}
 	
-	function decodeTemplateResource($args,&$result,$version=false)
+	function decodeTemplateResource($id,$args,&$result,$version=false)
 	{
 		global $_PREFS;
 		
-		$template=&loadTemplate($args[0],$version);
+		$template=&loadTemplate($id,$version);
 		if ($template!==false)
 		{
 			$result->type='template';
-			$result->template=$args[1];
+			$result->template=$id;
 			$result->_template=&$template;
-			$result->resource=$_PREFS->getPref('storage.templates').'/'.$args[1];
-			if (count($args)>=3)
+			$result->resource=$_PREFS->getPref('storage.templates').'/'.$id;
+			if (count($args)>0)
 			{
-				$result->path=implode('/',array_slice($args,2));
+				$result->path=implode('/',$args);
 			}
 			return true;
 		}
@@ -313,7 +313,7 @@ class Resource
 		if (($parts[0]=='template')&&(count($parts)>=2))
 		{
 			$log->debug('Template resource');
-			if (Resource::decodeTemplateResource($parts,$result,$version))
+			if (Resource::decodeTemplateResource($parts[1],array_slice($parts,2),$result,$version))
 				return $result;
 		}
 		if (($parts[0]=='block')&&(count($parts)>=2))

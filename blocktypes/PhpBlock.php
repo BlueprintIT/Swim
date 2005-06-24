@@ -20,10 +20,12 @@ class PhpBlock extends Block
 		$this->Block();
 	}
 	
-	function displayContent(&$request,&$page,$attrs,$text)
+	function displayContent(&$parser,$attrs,$text)
 	{
 		global $_USER;
 		
+		$request=$parser->data['request'];
+		$prefs=&$this->prefs;
 		$log = &LoggerManager::getLogger('page');
 		$name=$this->prefs->getPref('block.phpblock.filename','block.php');
 		include($this->getDir().'/'.$name);

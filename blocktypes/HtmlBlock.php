@@ -25,7 +25,7 @@ class HtmlBlock extends Block
 		return loadPage('internal','htmledit');
 	}
 	
-	function displayContent(&$request,&$page,$attrs,$text)
+	function displayContent(&$parser,$attrs,$text)
 	{
 		$name=$this->prefs->getPref('block.htmlblock.filename','block.html');
 		readfile($this->getDir().'/'.$name);

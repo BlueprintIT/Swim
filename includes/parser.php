@@ -143,7 +143,7 @@ class Parser
           }
           else if (substr($text,0,2)=='/>')
           {
-            $this->_log->debug('Found end of simple tag, popping and moving to state 0');
+            $this->_log->debug('Found end of simple tag, moving to state 0');
             $this->_state=0;
             $this->onEndTag($this->_tagname);
             $this->parseText(substr($text,2));
@@ -293,14 +293,11 @@ class TemplateParser extends StackedParser
   
   function removeObserver($tag,&$observer)
   {
-  	if (is_array($this->observer[$tag]))
+  	if (is_array($this->observers[$tag]))
   	{
-	  	foreach (array_keys($this->observer[$tag]) as $key)
+	  	foreach (array_keys($this->observers[$tag]) as $key)
 	  	{
-	  		if ($this->observer[$tag][$key]==$observer)
-	  		{
-	  			unset($this->observer[$tag][$key]);
-	  		}
+	  		unset($this->observers[$tag][$key]);
 	  	}
 	  }
   }

@@ -61,43 +61,33 @@ function method_commit(&$request)
 						if (getCurrentVersion($page->getResource())==$page->version)
 							setCurrentVersion($newpage->getResource(),$newv);
 					}
-					$stores=$_PREFS->getPrefBranch('storage.pages');
-					$pages=array();
+
 					$autocommit=$_PREFS->getPref('update.autocommit',false);
-					foreach ($stores as $container => $path)
+					$list=&getAllPages();
+					foreach(array_keys($list) as $pkey)
 					{
-						$dir=opendir($path);
-						while (false !== ($entry=readdir($dir)))
+						$page=&$list[$pkey];
+						$blocks=$page->prefs->getPrefBranch('page.blocks');
+						foreach ($blocks as $key=>$id)
 						{
-							if ($entry[0]!='.')
+							if (substr($key,-3,3)=='.id')
 							{
-								if (isValidPage($container,$entry))
+								$blk=substr($key,0,-3);
+								if (($id==$block->id)&&($page->prefs->getPref('page.blocks.'.$blk.'.container')==$block->container))
 								{
-									$page=&loadPage($container,$entry);
-									$blocks=$page->prefs->getPrefBranch('page.blocks');
-									foreach ($blocks as $key=>$id)
+									if ($page->prefs->getPref('page.blocks.'.$blk.'.version','-1')==$oldversion)
 									{
-										if (substr($key,-3,3)=='.id')
+										if ($autocommit)
 										{
-											$blk=substr($key,0,-3);
-											if (($id==$block->id)&&($page->prefs->getPref('page.blocks.'.$blk.'.container')==$block->container))
-											{
-												if ($page->prefs->getPref('page.blocks.'.$blk.'.version','-1')==$oldversion)
-												{
-													if ($autocommit)
-													{
-														$newv=cloneVersion($page->getResource(),$page->version);
-														$newpage=&loadPage($page->container,$page->id,$newv);
-														$newpage->prefs->setPref('page.blocks.'.$blk.'.version',$newversion);
-														$newpage->savePreferences();
-														setCurrentVersion($newpage->getResource(),$newv);
-													}
-													else
-													{
-														$pages[]=&$page;
-													}
-												}
-											}
+											$newv=cloneVersion($page->getResource(),$page->version);
+											$newpage=&loadPage($page->container,$page->id,$newv);
+											$newpage->prefs->setPref('page.blocks.'.$blk.'.version',$newversion);
+											$newpage->savePreferences();
+											setCurrentVersion($newpage->getResource(),$newv);
+										}
+										else
+										{
+											$pages[]=&$page;
 										}
 									}
 								}

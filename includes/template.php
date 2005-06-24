@@ -121,10 +121,6 @@ class Template
 	
 	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
 	{
-		if (!($parser->data['request']->isXML()))
-		{
-			$shortallowed=false;
-		}
 		print('<'.$tag);
 		foreach ($attrs as $name => $value)
 		{
@@ -157,28 +153,49 @@ class Template
 		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t");
 		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
 		print($text);
-		print('<comment><object type="application/x-java-applet;version=1.4" height="'.$height.'" width="'.$width.'">'."\n\t\t");
+		print('<object type="application/x-java-applet;version=1.4" height="'.$height.'" width="'.$width.'">'."\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class),'',false); print("\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
 		print($text);
-		print('</object></comment>'."\n");
+		print('</object>'."\n");
 		print('</object>');
 	}
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
 	{
-		$this->displayElement($parser,'link',array('rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])));
+		$this->displayElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),false);
+	}
+	
+	function displayScript(&$parser,$tag,$attrs,$text)
+	{
+		if (isset($attrs['src']))
+		{
+			$this->displayElement($parser,'script',array('type'=>'text/javascript','src'=>$this->generateURL($parser->data,$attrs['src'])));
+		}
+		else
+		{
+			$this->displayElement($parser, $tag, $attrs, $text);
+		}
+	}
+	
+	function displayImage(&$parser,$tag,$attrs,$text)
+	{
+		$attrs['src']=$this->generateURL($parser->data,$attrs['src']);
+		$this->displayElement($parser,'img',$attrs,$text,false);
 	}
 	
 	function displayBlock(&$parser,$tag,$attrs,$text)
 	{
 		$page=&$parser->data['page'];
 		$block=$page->getBlock($attrs['id']);
-		$parser->data['modified']=max($parser->data['modified'],$block->getModifiedDate());
-		$parser->data['block']=&$block;
-		$result=$block->display($parser,$attrs,$text);
-		unset($parser->data['block']);
+		if ($block!=null)
+		{
+			$parser->data['modified']=max($parser->data['modified'],$block->getModifiedDate());
+			$parser->data['block']=&$block;
+			$result=$block->display($parser,$attrs,$text);
+			unset($parser->data['block']);
+		}
 	}
 	
 	function displayVar(&$parser,$tag,$attrs,$text)
@@ -218,9 +235,17 @@ class Template
 		{
 			return $this->displayStylesheet($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='script')
+		{
+			return $this->displayScript($parser,$tag,$attrs,$text);
+		}
 		else if ($tag=='applet')
 		{
 			return $this->displayApplet($parser,$tag,$attrs,$text);
+		}
+		else if ($tag=='image')
+		{
+			return $this->displayImage($parser,$tag,$attrs,$text);
 		}
 		else
 		{
@@ -268,7 +293,9 @@ class Template
 		$parser->addObserver('block',$this);
 		$parser->addObserver('var',$this);
 		$parser->addObserver('stylesheet',$this);
+		$parser->addObserver('script',$this);
 		$parser->addObserver('applet',$this);
+		$parser->addObserver('image',$this);
 		
 		$this->lockRead();
 		ob_start();

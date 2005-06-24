@@ -36,6 +36,14 @@ function method_view(&$request)
 					readfile($file);
 					$resource->unlock();
 				}
+				else if (is_readable($file.'.php'))
+				{
+					$resource->lockRead();
+					$stats=stat($file.'.php');
+					setModifiedDate($stats['mtime']);
+					include($file.'.php');
+					$resource->unlock();
+				}
 				else
 				{
 					displayError($request);

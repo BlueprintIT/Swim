@@ -130,19 +130,20 @@ class Block
 		return $this->modified;
 	}
 	
-	function displayIntro(&$data,$attrs)
+	function getType()
 	{
-		$class="block";
-		if ($data['mode']=='admin')
-		{
-			$class.=" blockadmin";
-		}
+		return $this->type;
+	}
+	
+	function displayIntro($attrs)
+	{
+		$class='block';
 		if (isset($attrs['class']))
 		{
 			$class.=' '.$attrs['class'];
 		}
 		$attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
-		print('<'.$this->type.' '.$attrlist.'>');
+		print('<'.$this->getType().' '.$attrlist.'>');
 	}
 	
 	function displayOutro($attrs)
@@ -160,52 +161,48 @@ class Block
 ?><div class="admincontrol"><a href="<?= $editres->encode() ?>">Edit</a></div><?
 	}
 	
-	function displayContent(&$request,&$page,$attrs,$text)
+	function displayContent(&$parser,$attrs,$text)
 	{
 		print($text);
 	}
 	
-	function displayNormal(&$data,$attrs,$text)
-	{
-		$this->displayIntro($data,$attrs);
-		$this->lockRead();
-		$this->displayContent($data['request'],$data['page'],$attrs,$text);
-		$this->unlock();
-		$this->displayOutro($attrs);
-	}
-	
-	function displayAdmin(&$data,$attrs,$text)
-	{
-		$this->displayIntro($data,$attrs);
-		$this->displayAdminControl($data['request']);
-		$this->lockRead();
-		$this->displayContent($data['request'],$data['page'],$attrs,$text);
-		$this->unlock();
-		$this->displayOutro($attrs);
-	}
-	
 	function display(&$parser,$attrs,$text)
 	{
-		ob_start();
 		$request=&$parser->data['request'];
 		$page=&$parser->data['page'];
-		if ($parser->data['mode']=='admin')
+		$this->displayIntro($attrs);
+		if (strlen(trim($text))>0)
 		{
-			$this->displayAdmin($parser->data,$attrs,$text);
+			$parser->addObserver('content',$this);
+			//$parser->pushStack('temp');
+			$parser->parseText($text);
+			//$result=$parser->popStack();
+			$parser->removeObserver('content',$this);
 		}
 		else
 		{
-			$this->displayNormal($parser->data,$attrs,$text);
+			ob_start();
+			$this->displayContent($parser,$attrs,$text);
+	    $text=ob_get_contents();
+	    ob_end_clean();
+	    $this->log->info('Re-parsing content');
+	    $parser->parseText($text);
 		}
-    $text=ob_get_contents();
-    ob_end_clean();
-    $this->log->info('Re-parsing content');
-    $parser->parseText($text);
-		return true;
+		$this->displayOutro($attrs);
 	}
 	
 	function observeTag(&$parser,$tagname,$attrs,$text)
 	{
+		if ($tagname=='content')
+		{
+			ob_start();
+			$this->displayContent($parser,$attrs,$text);
+	    $text=ob_get_contents();
+	    ob_end_clean();
+	    $this->log->info('Re-parsing content');
+	    $parser->parseText($text);
+			return true;
+		}
 		return false;
 	}
 }

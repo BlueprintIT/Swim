@@ -1,0 +1,15 @@
+<menu orientation="horizontal">
+	<item url="" text="COMPANY DETAILS">
+		<menu>
+			<item url="" text="Item 1"/>
+			<item url="" text="Item 2"/>
+			<item url="" text="Item 3"/>
+			<item url="" text="Item 4"/>
+		</menu>
+	</item>
+	<item url="" text="TRAINING SOLUTIONS"/>
+	<item url="" text="CONSULTANCY &amp; SERVICES"/>
+	<item url="" text="NEWS &amp; EVENTS"/>
+	<item url="" text="INFORMATION"/>
+	<item url="" text="RESEARCH"/>
+</menu>

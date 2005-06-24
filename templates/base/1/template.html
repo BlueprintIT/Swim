@@ -1,9 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
 <html>
-<head>
-<title><var name="title"/></title>
-</head>
-<body>
-<p>This is a test template</p>
-<block id="content"/>
-</body>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta http-equiv="Content-Script-Type" content="text/javascript">
+		<stylesheet src="layout/layout.css"/>
+		<stylesheet src="layout/menus.css"/>
+		<stylesheet src="layout/content.css"/>
+		<script src="layout/cbdom.js"/>
+		<script src="layout/bpmm.js"/>
+		<script src="layout/fixie.js"/>
+		<title><var name="title"/></title>
+	</head>
+	<body>
+		<div id="header">
+			<image id="cogs" src="layout/cogs.jpg" alt="Cogs"/>
+			<image id="logo" src="layout/logo.gif" alt="Brass Bullet Ltd."/>
+		</div>
+		<div id="menubar">
+			<div id="spacing">
+				<block id="menu"/>
+			</div>
+		</div>
+		<block id="sidemenu"/>
+		<div id="body">
+			<block id="content"/>
+		<div id="footer">
+			<image id="curve" src="layout/curve.gif" alt="Border curve"/>
+			<image id="wheels" src="layout/wheels.gif" alt="Watching the wheels"/>
+			<p>promoting excellence through the application of best practices</p>
+			<image id="iip" src="layout/iip.gif" alt="Investor in People"/>
+		</div>
+		</div>
+		<script type="text/javascript">checkSizes();</script>
+	</body>
 </html>
