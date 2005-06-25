@@ -325,13 +325,14 @@ class Resource
 			if (Resource::decodeBlockResource('global',array_slice($parts,1),$result,$version))
 				return $result;
 		}
-		$log->debug('Assuming page resource');
-		if (Resource::decodePageResource($parts[0],array_slice($parts,1),$result,$version))
-			return $result;
-			
-		if (Resource::decodePageResource('global',$parts,$result,$version))
-			return $result;
-			
+		if (($parts[0]=='page')&&(count($parts)>=3))
+		{
+			if (Resource::decodePageResource($parts[1],array_slice($parts,2),$result,$version))
+				return $result;
+
+			//if (Resource::decodePageResource('global',$parts,$result,$version))
+			//	return $result;
+		}			
 		return false;
 	}
 }
