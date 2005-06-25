@@ -4,32 +4,28 @@ require('styles.php');
 setContentType('text/javascript');
 
 ?>
-function checkSize(el,delw,delh)
+
+function setBottom(el,value)
 {
 	var element = document.getElementById(el);
 	var posel = new ElementWrapper(element);
-	var docel = new ElementWrapper(document.documentElement);
-	if (delw)
-	{
-		var rldelw=docel.getWidth()-posel.getWidth();
-		if (Math.abs(rldelw-delw)>=5)
-		{
-			posel.setWidth(docel.getWidth()-delw);
-		}
-	}
-	if (delh)
-	{
-		var rldelh=docel.getHeight()-posel.getHeight();
-		if (Math.abs(rldelh-delh)>=5)
-		{
-			posel.setHeight(docel.getHeight()-delh);
-		}
-	}
+	var docel = posel.getContainingBlock();
+	var pos = docel.getTop()+docel.getHeight()-value;
+	posel.setHeight(pos-posel.getTop());
+}
+
+function setRight(el,value)
+{
+	var element = document.getElementById(el);
+	var posel = new ElementWrapper(element);
+	var docel = posel.getContainingBlock();
+	var pos = docel.getLeft()+docel.getWidth()-value;
+	posel.setHeight(pos-posel.getLeft());
 }
 
 function checkSizes(event)
 {
-	checkSize('content',null,<?= $footerheight+$spacing+$headerheight+$spacing+$menuheight+$spacing?>);
+	setBottom('content',<?= $footerheight+$spacing ?>);
 }
 
 //addEvent(window,'load',checkSizes,false);

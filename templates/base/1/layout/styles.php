@@ -6,7 +6,7 @@ $menuheight=20;
 $sidewidth=150;
 $footerheight=100;
 
-$sidetopgap=100;
+$sidetopgap=50;
 
 $defaultfont="'Arial Narrow', Arial, Helvetica, sans-serif";
 $borderfont=$defaultfont;

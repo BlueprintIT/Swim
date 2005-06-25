@@ -55,6 +55,10 @@ ElementWrapper.prototype = {
 			{
 				el=el.parentNode;
 				var wrap = new ElementWrapper(el);
+				if ((el.tagName)&&(el.tagName=='HTML'))
+				{
+					return wrap;
+				}
 				var pos = wrap.getComputedStyle().position;
 				if ((pos=='absolute')||(pos=='relative')||(pos=='fixed'))
 					return wrap;

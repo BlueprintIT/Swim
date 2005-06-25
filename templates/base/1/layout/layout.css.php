@@ -24,11 +24,9 @@ body {
 }
 
 div#header {
-	position: absolute;
 	margin: 0;
 	padding: 0;
-	border-bottom: <?= $spacing ?>px white solid;
-	top: 0;
+	border: 0;
 	height: <?= $headerheight ?>px;
 	width: 100%;
 	background-image: url('banner.jpg');
@@ -47,9 +45,9 @@ img#cogs {
 }
 
 img#logo {
-	position: absolute;
+	position: relative;
 	left: 180px;
-	bottom: 10px;
+	top: 40px;
 	width: 575px;
 	height: 71px;
 	border: 0;
@@ -60,10 +58,8 @@ img#logo {
 div#menubar {
 	margin: 0;
 	padding: 0;
-	position: absolute;
-	top: <?= $headerheight+$spacing ?>px;
+	border-top: <?= $spacing ?>px white solid;
 	border-bottom: <?= $spacing ?>px white solid;
-	left: 0;
 	height: <?= $menuheight ?>px;
 	width: 100%;
 	background-color: #004ef4;
@@ -128,8 +124,6 @@ ul#sidemenu {
 	margin: 0;
 	padding: 0;
 	position: absolute;
-	top: <?= $headerheight+$menuheight+$spacing+$spacing+$sidetopgap ?>px;
-	left: 0;
 	width: <?= $sidewidth ?>px;
 	background: transparent;
 }
@@ -164,7 +158,6 @@ ul#sidemenu a:hover, ul#sidemenu a:visited:hover {
 div#body {
 	padding: 0;
 	margin: 0;
-	padding-top: <?= $headerheight+$menuheight+$spacing+$spacing ?>px;
 	background-image: url('side.gif');
 	background-position: top left;
 	background-repeat: repeat-y;
