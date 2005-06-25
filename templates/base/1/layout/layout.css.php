@@ -123,6 +123,7 @@ div#menubar td a:hover, div#menubar td a:visited:hover {
 ul#sidemenu {
 	margin: 0;
 	padding: 0;
+	padding-top: <?= $sidetopgap ?>px;
 	position: absolute;
 	width: <?= $sidewidth ?>px;
 	background: transparent;
@@ -164,7 +165,8 @@ div#body {
 }
 
 div#content {
-	padding-left: <?= $sidewidth+$spacing+30 ?>px;
+	margin-left: <?= $sidewidth+$spacing ?>px;
+	padding-left: 30px;
 	margin-right: 0px;
 	padding-right: 20px;
 	overflow: auto;

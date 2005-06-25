@@ -5,6 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<meta http-equiv="Content-Script-Type" content="text/javascript">
 		<stylesheet src="template/layout/layout.css"/>
+		<stylesheet src="template/layout/admin.css"/>
 		<stylesheet src="template/layout/menus.css"/>
 		<stylesheet src="template/layout/content.css"/>
 		<script src="template/layout/cbdom.js"/>
@@ -19,12 +20,23 @@
 		</div>
 		<div id="menubar">
 			<div id="spacing">
-				<block id="menu"/>
+				<div id="menuadmin" class="adminpanel">
+					<anchor method="edit" href="page/menu">Edit</anchor>
+				</div>
+				<block id="menu" class="admin"/>
 			</div>
 		</div>
 		<div id="body">
 			<block id="sidemenu"/>
-			<block id="content"/>
+			<div id="sideadmin" class="adminpanel">
+				<anchor method="edit" href="page/sidemenu">Edit</anchor>
+			</div>
+			<block id="content" class="admin">
+				<div id="contentadmin" class="adminpanel">
+					<anchor method="edit" href="page/content">Edit</anchor>
+				</div>
+				<content/>
+			</block>
 		<div id="footer">
 			<image id="curve" src="template/layout/curve.gif" alt="Border curve"/>
 			<image id="wheels" src="template/layout/wheels.gif" alt="Watching the wheels"/>

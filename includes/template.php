@@ -88,34 +88,38 @@ class Template
 		unlockResource($this->lock);
 	}
 	
-	function generateRelativeURL(&$data,$url)
+	function generateRelativeURL(&$data,$url,$method='view')
 	{
-		if (isset($data['block']))
+		if (substr($url,0,6)=='block/')
 		{
-			$url=$data['request']->resource.'/'.$data['block']->id.'/'.$url;
+			$url='page/'.$data['page']->container.'/'.$data['page']->id.'/'.$data['block']->id.substr($url,5);
 		}
-		else
+		else if (substr($url,0,5)=='page/')
 		{
-			$url='template/'.$this->id.'/'.$url;
+			$url='page/'.$data['page']->container.'/'.$data['page']->id.substr($url,4);
+		}
+		else if (substr($url,0,9)=='template/')
+		{
+			$url='template/'.$this->id.substr($url,8);
 		}
 		$request = new Request();
-		$request->method='view';
+		$request->method=$method;
 		$request->resource=$url;
 		return $request->encode();
 	}
 	
-	function generateURL(&$data,$url)
+	function generateURL(&$data,$url,$method='view')
 	{
 		if ($url[0]=='/')
 		{
 			$request = new Request();
-			$request->method='view';
+			$request->method=$method;
 			$request->resource=substr($url,1);
 			return $request->encode();
 		}
 		else
 		{
-			return $this->generateRelativeURL($data,$url);
+			return $this->generateRelativeURL($data,$url,$method);
 		}
 	}
 	
@@ -198,6 +202,21 @@ class Template
 		}
 	}
 	
+	function displayAnchor(&$parser,$tag,$attrs,$text)
+	{
+		if (isset($attrs['method']))
+		{
+			$method=$attrs['method'];
+			unset($attrs['method']);
+		}
+		else
+		{
+			$method='view';
+		}
+		$attrs['href']=$this->generateURL($parser->data,$attrs['href'],$method);
+		$this->displayElement($parser,'a',$attrs,$text);
+	}
+	
 	function displayVar(&$parser,$tag,$attrs,$text)
 	{
 		$name=$attrs['name'];
@@ -246,6 +265,10 @@ class Template
 		else if ($tag=='image')
 		{
 			return $this->displayImage($parser,$tag,$attrs,$text);
+		}
+		else if ($tag=='anchor')
+		{
+			return $this->displayAnchor($parser,$tag,$attrs,$text);
 		}
 		else
 		{
@@ -296,6 +319,7 @@ class Template
 		$parser->addObserver('script',$this);
 		$parser->addObserver('applet',$this);
 		$parser->addObserver('image',$this);
+		$parser->addObserver('anchor',$this);
 		
 		$this->lockRead();
 		ob_start();
