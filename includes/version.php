@@ -35,7 +35,7 @@ function getTempVersion($dir)
 {
 	global $_USER;
 	
-	$log=LoggerManager::getLogger('swim.version');
+	$log=&LoggerManager::getLogger('swim.version');
 	
 	if (!$_USER->isLoggedIn())
 	{
@@ -74,7 +74,7 @@ function getTempVersion($dir)
 
 function recursiveDelete($dir,$ignorelock=false)
 {
-	$log=LoggerManager::getLogger('swim.version');
+	$log=&LoggerManager::getLogger('swim.version');
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
@@ -109,7 +109,7 @@ function recursiveDelete($dir,$ignorelock=false)
 
 function recursiveCopy($dir,$target,$ignorelock=false)
 {
-	$log=LoggerManager::getLogger('swim.version');
+	$log=&LoggerManager::getLogger('swim.version');
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{

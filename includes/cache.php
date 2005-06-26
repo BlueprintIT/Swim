@@ -20,7 +20,7 @@ function &loadBlock($container,$id,$version=false)
 {
 	global $_PREFS;
 	
-	$log=LoggerManager::getLogger('swim.cache');
+	$log=&LoggerManager::getLogger('swim.cache');
 	
 	$log->debug('Loading block');
 	if (is_object($container))

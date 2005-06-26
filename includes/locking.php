@@ -19,6 +19,8 @@ function lockResourceRead($dir,$id=false)
 {
 	global $_LOCKS;
 	
+	$log=&LoggerManager::getLogger('swim.locking');
+
 	if ($id===false)
 	{
 		$id=0;
@@ -28,15 +30,18 @@ function lockResourceRead($dir,$id=false)
 		}
 	}
 	
+	$log->info('Read locking '.$dir.' as '.$id);
 	$lockfile = $dir.'/lock';
 	$file = fopen($lockfile,'a');
 	if (flock($file,LOCK_SH))
 	{
+	  $log->info('Lock complete');
 		$_LOCKS[$id]=&$file;
 		return $id;
 	}
 	else
 	{
+	  $log->warn('Lock failed');
 		return false;
 	}
 }
@@ -45,6 +50,8 @@ function lockResourceWrite($dir,$id=false)
 {
 	global $_LOCKS;
 	
+	$log=&LoggerManager::getLogger('swim.locking');
+
 	if ($id===false)
 	{
 		$id=0;
@@ -54,15 +61,18 @@ function lockResourceWrite($dir,$id=false)
 		}
 	}
 	
+	$log->info('Write locking '.$dir.' as '.$id);
 	$lockfile = $dir.'/lock';
 	$file = fopen($lockfile,'a');
 	if (flock($file,LOCK_EX))
 	{
 		$_LOCKS[$id]=&$file;
+	  $log->info('Lock complete');
 		return $id;
 	}
 	else
 	{
+	  $log->warn('Lock failed');
 		return false;
 	}
 }
@@ -71,8 +81,10 @@ function unlockResource($id)
 {
 	global $_LOCKS;
 	
+	$log=&LoggerManager::getLogger('swim.locking');
 	if (isset($_LOCKS[$id]))
 	{
+	  $log->info('Unlocking '.$id);
 		$lock=$_LOCKS[$id];
 		unset($_LOCKS[$id]);
 		flock($lock,LOCK_UN);
@@ -80,7 +92,6 @@ function unlockResource($id)
 	}
 	else
 	{
-		$log=LoggerManager::getLogger('swim.locking');
 		$log->warn('Attempt to unlock unlocked id '.$id);
 	}
 }

@@ -234,8 +234,9 @@ class Resource
 	
 	function decodePageResource($container,$args,&$result,$version=false)
 	{
-		$log=LoggerManager::getLogger('swim.resource');
+		$log=&LoggerManager::getLogger('swim.resource');
 		$log->debug('Testing container '.$container);
+		$log->debug('Version is '.$version);
 		$log->debug('Argument has '.count($args).' items');
 		if (count($args)>0)
 		{
@@ -274,7 +275,7 @@ class Resource
 	{
 		global $_PREFS;
 		
-		$log=LoggerManager::getLogger('swim.resource');
+		$log=&LoggerManager::getLogger('swim.resource');
 		
 		if (is_object($request))
 		{

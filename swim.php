@@ -16,16 +16,21 @@
 // Load the base includes
 require_once 'base.php';
 
-LoggerManager::setLogLevel('',SWIM_LOG_WARN);
-LoggerManager::setLogLevel('swim.version',SWIM_LOG_INFO);
-#LoggerManager::setLogLevel('swim.template',SWIM_LOG_ALL);
-#LoggerManager::setLogLevel('swim.block',SWIM_LOG_ALL);
-#LoggerManager::setLogLevel('swim.parser',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('',SWIM_LOG_INFO);
+LoggerManager::setLogLevel('swim.method.view',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.cache',SWIM_LOG_WARN);
+LoggerManager::setLogLevel('swim.block',SWIM_LOG_WARN);
+LoggerManager::setLogLevel('swim.page',SWIM_LOG_WARN);
+LoggerManager::setLogLevel('swim.menu',SWIM_LOG_WARN);
+LoggerManager::setLogLevel('swim.parser',SWIM_LOG_WARN);
 
 $log=&LoggerManager::getLogger('swim');
+
+$log->info('Request start');
 
 $request=&Request::decodeCurrentRequest();
 
 callMethod($request);
 
+$log->info('Request end');
 ?>

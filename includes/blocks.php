@@ -29,7 +29,7 @@ class Block
 	function Block()
 	{
 		global $_PREFS;
-		$this->log=LoggerManager::getLogger('swim.block');
+		$this->log=&LoggerManager::getLogger('swim.block');
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 	}

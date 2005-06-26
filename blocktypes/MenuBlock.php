@@ -23,7 +23,7 @@ class MenuItem
 	
 	function MenuItem()
 	{
-		$this->log = LoggerManager::getLogger('swim.menu.item');
+		$this->log = &LoggerManager::getLogger('swim.menu.item');
 	}
 	
 	function display()
@@ -63,7 +63,7 @@ class Menu
 	
 	function Menu()
 	{
-		$this->log = LoggerManager::getLogger('swim.menu.menu');
+		$this->log = &LoggerManager::getLogger('swim.menu.menu');
 	}
 	
 	function displayVerticalTableItems()

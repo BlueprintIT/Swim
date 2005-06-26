@@ -93,13 +93,22 @@ class LogOutput
 
 class FileLogOutput extends LogOutput
 {
-	function FileLogOutput()
+  var $filename;
+  
+	function FileLogOutput($filename)
 	{
 		$this->LogOutput();
+		$this->filename=$filename;
+		$this->pattern="[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
 	{
+	  $file=fopen($this->filename,'a');
+	  flock($file,LOCK_EX);
+	  fwrite($file,$text);
+	  flock($file,LOCK_UN);
+	  fclose($file);
 	}
 }
 
@@ -356,6 +365,7 @@ class LoggerManager
 }
 
 $_LOGMANAGER = new LoggerManager();
+LoggerManager::setLogOutput('',new FileLogOutput('logfile.txt'));
 LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)

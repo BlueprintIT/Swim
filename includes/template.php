@@ -30,7 +30,7 @@ class Template
 	{
 		global $_PREFS;
 		
-		$this->log=LoggerManager::getLogger('swim.template');
+		$this->log=&LoggerManager::getLogger('swim.template');
 		
 		$this->container=$container;
 		$this->id=$id;
