@@ -88,7 +88,7 @@ class Template
 		unlockResource($this->lock);
 	}
 	
-	function generateRelativeURL(&$data,$url,$method='view')
+	function generateRelativeURL(&$data,$url)
 	{
 		if (substr($url,0,6)=='block/')
 		{
@@ -102,25 +102,28 @@ class Template
 		{
 			$url='template/'.$this->id.substr($url,8);
 		}
+		return $url;
+	}
+	
+	function &generateRequest(&$data,$url,$method)
+	{
 		$request = new Request();
 		$request->method=$method;
-		$request->resource=$url;
-		return $request->encode();
+		if ($url[0]=='/')
+		{
+			$request->resource=substr($url,1);
+		}
+		else
+		{
+		  $request->resource=$this->generateRelativeURL($data,$url);
+		}
+		return $request;
 	}
 	
 	function generateURL(&$data,$url,$method='view')
 	{
-		if ($url[0]=='/')
-		{
-			$request = new Request();
-			$request->method=$method;
-			$request->resource=substr($url,1);
-			return $request->encode();
-		}
-		else
-		{
-			return $this->generateRelativeURL($data,$url,$method);
-		}
+	  $request=&$this->generateRequest($data,$url,$method);
+	  return $request->encode();
 	}
 	
 	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
@@ -164,6 +167,23 @@ class Template
 		print($text);
 		print('</object>'."\n");
 		print('</object>');
+	}
+	
+	function displayEditLink(&$parser,$tag,$attrs,$text)
+	{
+		if (isset($attrs['method']))
+		{
+			$method=$attrs['method'];
+			unset($attrs['method']);
+		}
+		else
+		{
+			$method='edit';
+		}
+		$request=&$this->generateRequest($parser->data,$attrs['href'],$method);
+		$request->nested=$parser->data['request'];
+		$attrs['href']=$request->encode();
+		$this->displayElement($parser,'a',$attrs,$text);
 	}
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
@@ -270,6 +290,10 @@ class Template
 		{
 			return $this->displayAnchor($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='editlink')
+		{
+			return $this->displayEditLink($parser,$tag,$attrs,$text);
+		}
 		else
 		{
 			return false;
@@ -320,6 +344,7 @@ class Template
 		$parser->addObserver('applet',$this);
 		$parser->addObserver('image',$this);
 		$parser->addObserver('anchor',$this);
+		$parser->addObserver('editlink',$this);
 		
 		$this->lockRead();
 		ob_start();
