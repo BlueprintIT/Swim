@@ -364,6 +364,7 @@ function encodeQuery($query)
 
 function decodeQuery($query)
 {
+	$result=array();
   parse_str($query,$result);
   return $result;
 }

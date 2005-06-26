@@ -324,13 +324,13 @@ class User
 	function canRead(&$resource)
 	{
 		return true;
-		return $this->getPermission(PERMISSION_READ,$resource);
+		//return $this->getPermission(PERMISSION_READ,$resource);
 	}
 	
 	function canWrite(&$resource)
 	{
 		return $this->inGroup('admin');
-		return $this->getPermission(PERMISSION_WRITE,$resource);
+		//return $this->getPermission(PERMISSION_WRITE,$resource);
 	}
 }
 

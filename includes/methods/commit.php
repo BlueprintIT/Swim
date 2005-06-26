@@ -93,7 +93,6 @@ function method_commit(&$request)
 								}
 							}
 						}
-						closedir($dir);
 					}
 					if (count($pages)>0)
 					{

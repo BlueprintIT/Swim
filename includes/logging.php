@@ -42,6 +42,7 @@ class LogOutput
 	
 	function convertPattern($text,$vars)
 	{
+		$matches=array();
 		$count=preg_match_all('/\$\[([^=#$[\]]+?)\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
 		for($p=$count-1; $p>=0; $p--)
 		{

@@ -77,6 +77,7 @@ class Preferences
       while (!feof($source))
       {
         $line=fgets($source);
+        $matches=array();
         if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
         {
         	if (substr($matches[1],0,strlen($branch))==$branch)
@@ -132,6 +133,7 @@ class Preferences
 	// Evaluates a preference value, resolving references
 	function evaluatePref($text)
 	{
+		$matches=array();
 		$count=preg_match_all('/\$\[([^=#$[\]]+?)\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
 		for($p=$count-1; $p>=0; $p--)
 		{

@@ -92,6 +92,7 @@ class Parser
       // start tag is just outputted into the current tag bugger.
       case 0:
         $regex='/<(\/('.$validregex.')>|('.$validregex.'))/';
+        $matches=array();
         if (preg_match($regex,$text,$matches,PREG_OFFSET_CAPTURE))
         {
           $remaining=substr($text,$matches[0][1]+strlen($matches[0][0]));
@@ -255,7 +256,7 @@ class TagObserver
 
   function observeTag(&$parser,$tagname,$attrs,$content)
   {
-  	return $callback($parser,$tagname,$attrs,$content);
+  	return $this->callback($parser,$tagname,$attrs,$content);
   }
 }
 
@@ -287,7 +288,7 @@ class TemplateParser extends StackedParser
   {
     foreach ($tagnames as $tagname)
     {
-      $this->addObserver($tagname,$function);
+      $this->addObserver($tagname,$observer);
     }
   }
   

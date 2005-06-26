@@ -168,7 +168,7 @@ function &getPages($container)
 	if ($_PREFS->isPref('storage.pages.'.$container))
 	{
 		$dir=$_PREFS->getPref('storage.pages.'.$container);
-		$dir=opendir($path);
+		$dir=opendir($dir);
 		while (false !== ($entry=readdir($dir)))
 		{
 			if ($entry[0]!='.')
