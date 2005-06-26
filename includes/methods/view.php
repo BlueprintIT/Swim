@@ -27,27 +27,51 @@ function method_view(&$request)
 			if ($resource->isFile())
 			{
 				$file=$resource->getDir().'/'.$resource->path;
-				if (is_readable($file))
+				if ($_SERVER['HTTP_METHOD']=='GET')
 				{
-					$resource->lockRead();
-					$stats=stat($file);
-					setModifiedDate($stats['mtime']);
-					setContentType(determineContentType($file));
-					readfile($file);
-					$resource->unlock();
-				}
-				else if (is_readable($file.'.php'))
-				{
-					$resource->lockRead();
-					$stats=stat($file.'.php');
-					setModifiedDate($stats['mtime']);
-					include($file.'.php');
-					$resource->unlock();
-				}
-				else
-				{
-					displayError($request);
-				}
+  				if (is_readable($file))
+  				{
+  					$resource->lockRead();
+  					$stats=stat($file);
+  					setModifiedDate($stats['mtime']);
+  					setContentType(determineContentType($file));
+  					readfile($file);
+  					$resource->unlock();
+  				}
+  				else if (is_readable($file.'.php'))
+  				{
+  					$resource->lockRead();
+  					$stats=stat($file.'.php');
+  					setModifiedDate($stats['mtime']);
+  					include($file.'.php');
+  					$resource->unlock();
+  				}
+  				else
+  				{
+  					displayError($request);
+  				}
+  			}
+  			else if ($_SERVER['HTTP_METHOD']=='PUT')
+  			{
+  			  $resource->lockWrite();
+  			  $out=fopen($file,'wb');
+  			  if ($out!==false)
+  			  {
+  			    $stdin=fopen('php://stdin','rb');
+  			    while (!feof($stdin))
+  			    {
+  			      $data=fread($stdin,1024);
+  			      fwrite($out,$data);
+  			    }
+  			    fclose($out);
+  			    $resource->unlock();
+  			  }
+  			  else
+  			  {
+  			    $resource->unlock();
+  			    displayError($request);
+  			  }
+  			}
 			}
 			else if ($resource->isPage())
 			{
