@@ -74,6 +74,8 @@ function getTempVersion($dir)
 
 function recursiveDelete($dir,$ignorelock=false)
 {
+	global $_PREFS;
+	
 	$log=&LoggerManager::getLogger('swim.version');
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
@@ -109,6 +111,8 @@ function recursiveDelete($dir,$ignorelock=false)
 
 function recursiveCopy($dir,$target,$ignorelock=false)
 {
+	global $_PREFS;
+	
 	$log=&LoggerManager::getLogger('swim.version');
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
@@ -145,6 +149,8 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 // Clears the temporary version lock and wipes the temp contents.
 function freeTempVersion($dir)
 {
+	global $_PREFS;
+	
 	$temp=getTempVersion($dir);
 	if ($temp!==false)
 	{
