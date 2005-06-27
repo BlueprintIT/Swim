@@ -61,7 +61,7 @@ class Container
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getPageResource($id));
+			$version=getCurrentVersion($this->getBlockResource($id));
 		}
 		if (!isset($this->blocks[$id][$version]))
 		{
@@ -77,6 +77,26 @@ class Container
 			}
 		}
 		return $this->blocks[$id][$version];
+	}
+
+	function &getBlocks()
+	{
+		$blocks=array();
+		$dir=$this->dir.'/blocks';
+		$dir=opendir($dir);
+		while (false !== ($entry=readdir($dir)))
+		{
+			if ($entry[0]!='.')
+			{
+				$block=&$this->getBlock($entry);
+				if ($block!==false)
+				{
+					$blocks[]=&$block;
+				}
+			}
+		}
+		closedir($dir);
+		return $blocks;
 	}
 	
 	function getPageResource($id)
@@ -121,6 +141,26 @@ class Container
 		return $this->pages[$id][$version];
 	}
 	
+	function &getPages()
+	{
+		$pages=array();
+		$dir=$this->dir.'/pages';
+		$dir=opendir($dir);
+		while (false !== ($entry=readdir($dir)))
+		{
+			if ($entry[0]!='.')
+			{
+				$page=&$this->getPage($entry);
+				if ($page!==false)
+				{
+					$pages[]=&$page;
+				}
+			}
+		}
+		closedir($dir);
+		return $pages;
+	}
+
 	function getTemplateResource($id)
 	{
 		return $this->dir.'/templates/'.$id;
@@ -155,6 +195,41 @@ class Container
 		}
 		return $this->templates[$id][$version];
 	}
+
+	function &getTemplates()
+	{
+		$templates=array();
+		$dir=$this->dir.'/templates';
+		$dir=opendir($dir);
+		while (false !== ($entry=readdir($dir)))
+		{
+			if ($entry[0]!='.')
+			{
+				$template=&$this->getTemplate($entry);
+				if ($template!==false)
+				{
+					$templates[]=&$template;
+				}
+			}
+		}
+		closedir($dir);
+		return $templates;
+	}
+}
+
+function &getAllContainers()
+{
+	global $_PREFS;
+	
+	$containers=array();
+	$list = $_PREFS->getPrefBranch('container');
+	foreach (array_keys($list) as $text)
+	{
+		list($id,$base)=explode('.',$text,2);
+		if ($base=='basedir')
+			$containers[$id]=&getContainer($id);
+	}
+	return $containers;
 }
 
 ?>

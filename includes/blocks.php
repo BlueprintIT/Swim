@@ -251,4 +251,19 @@ function &loadBlock($blockdir,$container,$id,$version=false)
 	}
 }
 
+function &getAllBlocks()
+{
+	global $_PREFS;
+	
+	$blocks=array();
+	$containers=&getAllContainers();
+	foreach(array_keys($containers) as $id)
+	{
+		$container=&$containers[$id];
+		$newblocks=&$container->getBlocks();
+		$blocks=array_marge($blocks,$newblocks);
+	}
+	return $blocks;
+}
+
 ?>

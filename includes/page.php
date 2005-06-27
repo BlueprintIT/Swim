@@ -156,41 +156,19 @@ class Page
 	}
 }
 
-/*function &getPages($container)
-{
-	global $_PREFS;
-	
-	$pages=array();
-	if ($_PREFS->isPref('storage.pages.'.$container))
-	{
-		$dir=$_PREFS->getPref('storage.pages.'.$container);
-		$dir=opendir($dir);
-		while (false !== ($entry=readdir($dir)))
-		{
-			if ($entry[0]!='.')
-			{
-				$page=&loadPage($container,$entry);
-				if ($page!==null)
-				{
-					$pages[]=&$page;
-				}
-			}
-		}
-	}
-	return $pages;
-}
-
 function &getAllPages()
 {
 	global $_PREFS;
 	
-	$stores=$_PREFS->getPrefBranch('storage.pages');
 	$pages=array();
-	foreach ($stores as $container => $path)
+	$containers=&getAllContainers();
+	foreach(array_keys($containers) as $id)
 	{
-		$pages=array_marge($pages,getPages($container));
+		$container=&$containers[$id];
+		$newpages=&$container->getPages();
+		$pages=array_merge($pages,$newpages);
 	}
 	return $pages;
-}*/
+}
 
 ?>

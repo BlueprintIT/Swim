@@ -30,12 +30,12 @@ function lockResourceRead($dir,$id=false)
 		}
 	}
 	
-	$log->info('Read locking '.$dir.' as '.$id);
+	$log->debug('Read locking '.$dir.' as '.$id);
 	$lockfile = $dir.'/'.$_PREFS->getPref('locking.lockfile');
 	$file = fopen($lockfile,'a');
 	if (flock($file,LOCK_SH))
 	{
-	  $log->info('Lock complete');
+	  $log->debug('Lock complete');
 		$_LOCKS[$id]=&$file;
 		return $id;
 	}
@@ -61,13 +61,13 @@ function lockResourceWrite($dir,$id=false)
 		}
 	}
 	
-	$log->info('Write locking '.$dir.' as '.$id);
+	$log->debug('Write locking '.$dir.' as '.$id);
 	$lockfile = $dir.'/'.$_PREFS->getPref('locking.lockfile');
 	$file = fopen($lockfile,'a');
 	if (flock($file,LOCK_EX))
 	{
 		$_LOCKS[$id]=&$file;
-	  $log->info('Lock complete');
+	  $log->debug('Lock complete');
 		return $id;
 	}
 	else
@@ -84,7 +84,7 @@ function unlockResource($id)
 	$log=&LoggerManager::getLogger('swim.locking');
 	if (isset($_LOCKS[$id]))
 	{
-	  $log->info('Unlocking '.$id);
+	  $log->debug('Unlocking '.$id);
 		$lock=$_LOCKS[$id];
 		unset($_LOCKS[$id]);
 		flock($lock,LOCK_UN);

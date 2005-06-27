@@ -184,7 +184,7 @@ class Template
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
 	{
-		$this->displayElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),false);
+		$this->displayElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),'',false);
 	}
 	
 	function displayScript(&$parser,$tag,$attrs,$text)
@@ -359,6 +359,21 @@ class Template
 	{
 		$this->internalDisplay($request,$page,'normal','template.xmlfile','template.htmlfile');
 	}
+}
+
+function &getAllTemplates()
+{
+	global $_PREFS;
+	
+	$templates=array();
+	$containers=&getAllContainers();
+	foreach(array_keys($containers) as $id)
+	{
+		$container=&$containers[$id];
+		$newtemplates=&$container->getTemplates();
+		$templates=array_merge($templates,$newtemplates);
+	}
+	return $templates;
 }
 
 ?>

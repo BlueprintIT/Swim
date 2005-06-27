@@ -211,10 +211,6 @@ class MenuParser extends StackedParser
  		else if ($tag=='menu')
  		{
   		$this->_log->debug('Adding menu');
- 			if (!isset($this->current))
- 			{
- 				$this->_log->info('Adding a menu with no current item');
- 			}
  			$newmenu = new Menu($this->current);
 			if (isset($this->current))
 			{
