@@ -36,7 +36,7 @@ function method_edit(&$request)
 					displayLocked($request,$block->getResource());
 					return;
 				}
-				if (is_object($block->container))
+				if (is_a($block->container,'Page'))
 				{
 					$blockdir='/blocks/'.$resource->block;
 				}
@@ -47,15 +47,6 @@ function method_edit(&$request)
 				if (!is_readable($block->getResource().'/'.$temp.$blockdir.'/block.conf'))
 				{
 					cloneTemp($block->getResource(),$resource->version);
-				}
-				
-				if (is_object($block->container))
-				{
-					$container=&loadPage($block->container->container,$block->container->id,$temp);
-				}
-				else
-				{
-					$container=$block->container;
 				}
 				
 				$page=&$block->getBlockEditor();

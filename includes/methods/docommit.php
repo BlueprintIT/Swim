@@ -40,9 +40,10 @@ function method_docommit(&$request)
 						{
 							if ($value)
 							{
-								$page=&loadPage($containers[$key],$ids[$key],$versions[$key]);
+								$container=&getContainer($containers[$key]);
+								$page=&$container->getPage($ids[$key],$versions[$key]);
 								$newv=cloneVersion($page->getResource(),$page->version);
-								$newpage=&loadPage($page->container,$page->id,$newv);
+								$newpage=&$container->getPage($page->id,$newv);
 
 								$blocks=$newpage->prefs->getPrefBranch('page.blocks');
 								foreach ($blocks as $key=>$id)
@@ -50,7 +51,7 @@ function method_docommit(&$request)
 									if (substr($key,-3,3)=='.id')
 									{
 										$blk=substr($key,0,-3);
-										if (($id==$block->id)&&($newpage->prefs->getPref('page.blocks.'.$blk.'.container')==$block->container))
+										if (($id==$block->id)&&($newpage->prefs->getPref('page.blocks.'.$blk.'.container')==$block->container->id))
 										{
 											if ($newpage->prefs->getPref('page.blocks.'.$blk.'.version','-1')==$oldversion)
 											{

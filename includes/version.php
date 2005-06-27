@@ -33,7 +33,7 @@ function getCurrentResource($dir)
 // its contents.
 function getTempVersion($dir)
 {
-	global $_USER;
+	global $_USER,$_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.version');
 	
@@ -51,9 +51,9 @@ function getTempVersion($dir)
 	}
 	
 	$lock=lockResourceWrite($temp);
-	if (is_file($temp.'/templock'))
+	if (is_file($temp.'/'.$_PREFS->getPref('locking.templockfile')))
 	{
-		$file=fopen($temp.'/templock','r');
+		$file=fopen($temp.'/'.$_PREFS->getPref('locking.templockfile'),'r');
 		$line=trim(fgets($file));
 		fclose($file);
 		if ($line==$_USER->getUsername())
@@ -63,7 +63,7 @@ function getTempVersion($dir)
 	}
 	else
 	{
-		$file=fopen($temp.'/templock','w');
+		$file=fopen($temp.'/'.$_PREFS->getPref('locking.templockfile'),'w');
 		fwrite($file,$_USER->getUsername());
 		fclose($file);
 		$result='temp';
@@ -82,7 +82,7 @@ function recursiveDelete($dir,$ignorelock=false)
 		{
 			if ($file[0]!='.')
 			{
-				if ((($file=='lock')||($file=='templock'))&&($ignorelock))
+				if ((($file==$_PREFS->getPref('locking.lockfile'))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
 				{
 					$log->debug('Ignoring lock file '.$file);
 					continue;
@@ -117,7 +117,7 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 		{
 			if ($file[0]!='.')
 			{
-				if ((($file=='lock')||($file=='templock'))&&($ignorelock))
+				if ((($file==$_PREFS->getPref('locking.lockfile'))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
 				{
 					$log->debug('Ignoring lock file '.$file);
 					continue;
@@ -150,7 +150,7 @@ function freeTempVersion($dir)
 	{
 		$lock=lockResourceWrite($dir.'/'.$temp);
 		recursiveDelete($dir.'/'.$temp,true);
-		unlink($dir.'/'.$temp.'/templock');
+		unlink($dir.'/'.$temp.'/'.$_PREFS->getPref('locking.templockfile'));
 		unlockResource($lock);
 		return true;
 	}
@@ -163,6 +163,8 @@ function cloneTemp($dir,$version)
 	$next=getTempVersion($dir);
 	if ($next!==false)
 	{
+		$log=&LoggerManager::getLogger('swim.version');
+		$log->debug('Attempt to copy from '.$dir.'/'.$version.' to '.$dir.'/'.$next);
 		$targetlock=lockResourceWrite($dir.'/'.$next);
 		$sourcelock=lockResourceRead($dir.'/'.$version);
 		recursiveCopy($dir.'/'.$version,$dir.'/'.$next,true);

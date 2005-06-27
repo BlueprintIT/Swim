@@ -37,6 +37,11 @@ class Container
 		$this->log->debug('Container '.$id.' is at '.$this->dir);
 	}
 	
+	function getFileDir()
+	{
+		return $this->dir.'/files';
+	}
+	
 	function getBlockResource($id)
 	{
 		return $this->dir.'/blocks/'.$id;

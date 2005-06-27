@@ -17,7 +17,7 @@ $_LOCKS = array();
 
 function lockResourceRead($dir,$id=false)
 {
-	global $_LOCKS;
+	global $_LOCKS,$_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
@@ -31,7 +31,7 @@ function lockResourceRead($dir,$id=false)
 	}
 	
 	$log->info('Read locking '.$dir.' as '.$id);
-	$lockfile = $dir.'/lock';
+	$lockfile = $dir.'/'.$_PREFS->getPref('locking.lockfile');
 	$file = fopen($lockfile,'a');
 	if (flock($file,LOCK_SH))
 	{
@@ -48,7 +48,7 @@ function lockResourceRead($dir,$id=false)
 
 function lockResourceWrite($dir,$id=false)
 {
-	global $_LOCKS;
+	global $_LOCKS,$_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
@@ -62,7 +62,7 @@ function lockResourceWrite($dir,$id=false)
 	}
 	
 	$log->info('Write locking '.$dir.' as '.$id);
-	$lockfile = $dir.'/lock';
+	$lockfile = $dir.'/'.$_PREFS->getPref('locking.lockfile');
 	$file = fopen($lockfile,'a');
 	if (flock($file,LOCK_EX))
 	{

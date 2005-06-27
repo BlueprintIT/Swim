@@ -22,7 +22,9 @@ class HtmlBlock extends Block
 	
 	function &getBlockEditor()
 	{
-		return loadPage('internal','htmledit');
+		$container=&getContainer('internal');
+		$page=&$container->getPage('htmledit');
+		return $page;
 	}
 	
 	function displayContent(&$parser,$attrs,$text)

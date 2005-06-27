@@ -222,9 +222,9 @@ class Resource
 		}
 
 		$result = new Resource();
-		$parts = explode('/',$resource,4);
+		$parts = explode('/',$resource);
 		if (count($parts)<3)
-			return null;
+			return false;
 			
 		list($container,$result->type)=$parts;
 		
@@ -249,12 +249,15 @@ class Resource
 				if ($result->_page==null)
 				{
 					$log->warn('Invalid page');
-					return null;
+					return false;
 				}
+				$result->version=$result->_page->version;
 				if (count($parts)>3)
 				{
+					$log->debug('Testing for block '.$parts[3]);
 					if ($result->_page->isBlock($parts[3]))
 					{
+						$log->debug('Found page block '.$parts[3]);
 						$result->_block=&$result->_page->getBlock($parts[3]);
 						$result->type='block';
 						if (count($parts)>4)
@@ -271,8 +274,9 @@ class Resource
 				if ($result->_template==null)
 				{
 					$log->warn('Invalid template');
-					return null;
+					return false;
 				}
+				$result->version=$result->_template->version;
 			}
 			else if ($result->type=='block')
 			{
@@ -281,12 +285,13 @@ class Resource
 				if ($result->_block==null)
 				{
 					$log->warn('Invalid block');
-					return null;
+					return false;
 				}
+				$result->version=$result->_block->version;
 			}
 			else
 			{
-				return null;
+				return false;
 			}
 		}
 		
