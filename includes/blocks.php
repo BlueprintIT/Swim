@@ -55,7 +55,7 @@ class Block
 	function setContainer($container)
 	{
 		$this->container=$container;
-		if (is_object($container))
+		if (is_a($container,'Page'))
 		{
 			$this->prefs->setParent($container->prefs);
 		}
@@ -67,13 +67,13 @@ class Block
 	{
 		if (!isset($this->resource))
 		{
-			if (is_object($this->container))
+			if (is_a($this->container,'Page'))
 			{
 				$this->resource=$this->container->getResource();
 			}
 			else
 			{
-				$this->resource=$this->prefs->getPref('storage.blocks.'.$this->container).'/'.$this->id;
+				$this->resource=$this->container->getBlockResource($this->id);
 			}
 			$this->log->debug('Resource determined to be '.$this->resource);
 		}
@@ -84,7 +84,7 @@ class Block
 	{
 		if (!isset($this->dir))
 		{
-			if (is_object($this->container))
+			if (is_a($this->container,'Page'))
 			{
 				$this->dir=$this->container->getDir().'/blocks/'.$this->id;
 			}
@@ -204,6 +204,50 @@ class Block
 			return true;
 		}
 		return false;
+	}
+}
+
+function &loadBlock($blockdir,$container,$id,$version=false)
+{
+	global $_PREFS;
+	
+	$log=&LoggerManager::getLogger('swim.block.loader');
+	
+	$lock=lockResourceRead($blockdir);
+
+	$blockprefs = new Preferences();
+	$blockprefs->setParent($_PREFS);
+	if (is_readable($blockdir.'/block.conf'))
+	{
+		$blockprefs->loadPreferences($blockdir.'/block.conf','block');
+	}
+	$class=$blockprefs->getPref('block.class');
+	if ($blockprefs->isPrefSet('block.classfile'))
+	{
+		require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
+	}
+	else if (is_readable($blockdir.'/block.class'))
+	{
+		require_once $blockdir.'/block.class';
+	}
+
+	unlockResource($lock);
+
+	if (class_exists($class))
+	{
+		$log->debug('Block loaded');
+		$object = new $class();
+		$object->prefs = $blockprefs;
+		$object->setContainer($container);
+		$object->setID($id);
+		$object->setVersion($version);
+		$object->blockInit();
+		$object->init();
+		return $object;
+	}
+	else
+	{
+		trigger_error('Invalid block found');
 	}
 }
 

@@ -28,6 +28,7 @@ function method_view(&$request)
       if ($resource->isFile())
 			{
 				$file=$resource->getDir().'/'.$resource->path;
+				$log->debug('Attempt to access file '.$file);
 				if ($_SERVER['REQUEST_METHOD']=='GET')
 				{
   				if (is_readable($file))

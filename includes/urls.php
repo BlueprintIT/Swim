@@ -189,88 +189,6 @@ class Resource
 		return $this->_template;
 	}
 	
-	function decodeTemplateResource($id,$args,&$result,$version=false)
-	{
-		global $_PREFS;
-		
-		$template=&loadTemplate($id,$version);
-		if ($template!==false)
-		{
-			$result->type='template';
-			$result->template=$id;
-			$result->_template=&$template;
-			$result->resource=$_PREFS->getPref('storage.templates').'/'.$id;
-			if (count($args)>0)
-			{
-				$result->path=implode('/',$args);
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	function decodeBlockResource($container,$args,&$result,$version=false)
-	{
-		global $_PREFS;
-		
-		if (($_PREFS->isPrefSet('storage.blocks.'.$container))&&(count($args)>0))
-		{
-			$result->resource=$_PREFS->getPref('storage.blocks.'.$container).'/'.$args[0];
-			$block=&loadBlock($container,$args[0],$version);
-			if ($block!==false)
-			{
-				$result->type='block';
-				$result->block=$args[0];
-				$result->_block=&$block;
-				if (count($args)>1)
-				{
-					$result->path=implode('/',array_slice($args,1));
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	function decodePageResource($container,$args,&$result,$version=false)
-	{
-		$log=&LoggerManager::getLogger('swim.resource');
-		$log->debug('Testing container '.$container);
-		$log->debug('Version is '.$version);
-		$log->debug('Argument has '.count($args).' items');
-		if (count($args)>0)
-		{
-			$page=&loadPage($container,$args[0],$version);
-			if ($page!==false)
-			{
-				$log->debug('Found valid page');
-				$result->_page=&$page;
-				$result->version=$page->version;
-				$result->type='page';
-				$result->page=$args[0];
-				if (count($args)>=2)
-				{
-					$log->debug('Checking for block '.$args[1]);
-					$block=&$result->_page->getBlock($args[1]);
-					if ($block!==null)
-					{
-						$result->type='block';
-						$result->block=$args[1];
-						$result->_block=&$block;
-						if (count($args)>=3)
-						{
-							$result->path=implode('/',array_slice($args,2));
-						}
-						return true;
-					}
-					$result->path=implode('/',array_slice($args,1));
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	function &decodeResource($request)
 	{
 		global $_PREFS;
@@ -297,44 +215,82 @@ class Resource
 		
 		$log->debug('Decoding '.$resource);
 		
-		$parts=explode('/',$resource);
-		if (count($parts)==0)
+		if (strlen($resource)==0)
 		{
 			$log->info('No resource to decode');
 			return false;
 		}
-		$result = new Resource();
-		if (($parts[0]=='files')&&(count($parts)>2))
-		{
-			$result->type='file';
-			$result->filedir=$_PREFS->getPref('storage.files.'.$parts[1]);
-			$result->path=implode('/',array_slice($parts,2));
-			return $result;
-		}
-		if (($parts[0]=='template')&&(count($parts)>=2))
-		{
-			$log->debug('Template resource');
-			if (Resource::decodeTemplateResource($parts[1],array_slice($parts,2),$result,$version))
-				return $result;
-		}
-		if (($parts[0]=='block')&&(count($parts)>=2))
-		{
-			$log->debug('Block resource');
-			if (Resource::decodeBlockResource($parts[1],array_slice($parts,2),$result,$version))
-				return $result;
-				
-			if (Resource::decodeBlockResource('global',array_slice($parts,1),$result,$version))
-				return $result;
-		}
-		if (($parts[0]=='page')&&(count($parts)>=3))
-		{
-			if (Resource::decodePageResource($parts[1],array_slice($parts,2),$result,$version))
-				return $result;
 
-			//if (Resource::decodePageResource('global',$parts,$result,$version))
-			//	return $result;
-		}			
-		return false;
+		$result = new Resource();
+		$parts = explode('/',$resource,4);
+		if (count($parts)<3)
+			return null;
+			
+		list($container,$result->type)=$parts;
+		
+		$container=&getContainer($container);
+
+		if ($result->type=='file')
+		{
+			$log->debug('Found file');
+			$result->filedir=&$container->getFileDir();
+			$result->path=implode('/',array_slice($parts,2));
+		}
+		else
+		{
+			$id=$parts[2];
+			if (count($parts)>3)
+				$result->path=implode('/',array_slice($parts,3));
+
+			if ($result->type=='page')
+			{
+				$log->debug('Found page: '.$id);
+				$result->_page=&$container->getPage($id,$version);
+				if ($result->_page==null)
+				{
+					$log->warn('Invalid page');
+					return null;
+				}
+				if (count($parts)>3)
+				{
+					if ($result->_page->isBlock($parts[3]))
+					{
+						$result->_block=&$result->_page->getBlock($parts[3]);
+						$result->type='block';
+						if (count($parts)>4)
+							$result->path=implode('/',array_slice($parts,4));
+						else
+							unset($this->path);
+					}
+				}
+			}
+			else if ($result->type=='template')
+			{
+				$log->debug('Found template: '.$id);
+				$result->_template=&$container->getTemplate($id,$version);
+				if ($result->_template==null)
+				{
+					$log->warn('Invalid template');
+					return null;
+				}
+			}
+			else if ($result->type=='block')
+			{
+				$log->debug('Found block: '.$id);
+				$result->_block=&$container->getBlock($id,$version);
+				if ($result->_block==null)
+				{
+					$log->warn('Invalid block');
+					return null;
+				}
+			}
+			else
+			{
+				return null;
+			}
+		}
+		
+		return $result;
 	}
 }
 

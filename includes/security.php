@@ -278,7 +278,7 @@ class User
 		if (isset($resource->block))
 		{
 			$block=&$resource->getBlock();
-			if (is_object($block->container))
+			if (is_a($block->container,'Page'))
 			{
 				$path=$block->container->getDir();
 				$perm=$this->checkSpecificPermission($permission,$path,$file,true);

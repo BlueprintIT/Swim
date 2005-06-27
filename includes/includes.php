@@ -18,6 +18,7 @@
 require $_PREFS->getPref('storage.includes').'/locking.php';
 require $_PREFS->getPref('storage.includes').'/logging.php';
 require $_PREFS->getPref('storage.includes').'/security.php';
+require $_PREFS->getPref('storage.includes').'/container.php';
 require $_PREFS->getPref('storage.includes').'/page.php';
 require $_PREFS->getPref('storage.includes').'/template.php';
 require $_PREFS->getPref('storage.includes').'/utils.php';

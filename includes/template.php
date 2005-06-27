@@ -26,22 +26,18 @@ class Template
 	var $log;
 	var $version;
 	
-	function Template($container,$id,$version=false)
+	function Template($container,$id,$version)
 	{
 		global $_PREFS;
 		
 		$this->log=&LoggerManager::getLogger('swim.template');
 		
-		$this->container=$container;
+		$this->container=&$container;
 		$this->id=$id;
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
-		$this->resource=$this->prefs->getPref('storage.templates').'/'.$id;
-		if ($version==false)
-		{
-			$version=getCurrentVersion($this->resource);
-		}
+		$this->resource=$container->getTemplateResource($id);
 		$this->version=$version;
 		$this->dir=getResourceVersion($this->resource,$version);
 		
@@ -92,15 +88,15 @@ class Template
 	{
 		if (substr($url,0,6)=='block/')
 		{
-			$url='page/'.$data['page']->container.'/'.$data['page']->id.'/'.$data['block']->id.substr($url,5);
+			$url=$data['page']->container->id.'/page/'.$data['page']->id.'/'.$data['block']->id.substr($url,5);
 		}
 		else if (substr($url,0,5)=='page/')
 		{
-			$url='page/'.$data['page']->container.'/'.$data['page']->id.substr($url,4);
+			$url=$data['page']->container->id.'/page/'.$data['page']->id.substr($url,4);
 		}
 		else if (substr($url,0,9)=='template/')
 		{
-			$url='template/'.$this->id.substr($url,8);
+			$url=$this->container->id.'/template/'.$this->id.substr($url,8);
 		}
 		return $url;
 	}

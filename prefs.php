@@ -99,7 +99,7 @@ class Preferences
     }
     else
     {
-    	trigger_error('Unable to read file '.$file);
+    	$this->log->warn('Unable to read file '.$file);
     }
 	}
 	

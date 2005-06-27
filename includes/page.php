@@ -15,7 +15,6 @@
 
 class Page
 {
-	var $template;
 	var $prefs;
 	var $blocks;
 	var $version;
@@ -26,21 +25,17 @@ class Page
 	var $container;
 	var $modified;
 	
-	function Page($container,$id,$version=false)
+	function Page($container,$id,$version)
 	{
 		global $_PREFS;
 	
-		$this->container=$container;
+		$this->container=&$container;
 		$this->id=$id;
 		$this->blocks = array();
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
-		$this->resource=$this->prefs->getPref('storage.pages.'.$this->container).'/'.$this->id;
-		if ($version===false)
-		{
-			$version=getCurrentVersion($this->resource);
-		}
+		$this->resource=$container->getPageResource($id);
 		$this->version=$version;
 		$this->dir=getResourceVersion($this->resource,$this->version);
 		
@@ -51,14 +46,14 @@ class Page
 	
 	function display(&$request)
 	{
-		$this->getTemplate();
-		$this->template->display($request,$this);
+		$template=&$this->getTemplate();
+		$template->display($request,$this);
 	}
 	
 	function displayAdmin(&$request)
 	{
-		$this->getTemplate();
-		$this->template->displayAdmin($request,$this);
+		$template=&$this->getTemplate();
+		$template->displayAdmin($request,$this);
 	}
 	
 	function getDir()
@@ -108,8 +103,13 @@ class Page
 		}
 		return $this->modified;
 	}
-		
-	function getBlock($id)
+	
+	function isBlock($id)
+	{
+		return $this->prefs->isPrefSet('page.blocks.'.$id.'.id');
+	}
+	
+	function &getBlock($id)
 	{
 		if (!isset($this->blocks[$id]))
 		{
@@ -120,11 +120,12 @@ class Page
 				$block=$this->prefs->getPref($blockpref.'.id');
 				if ($container=='page')
 				{
-					$container=$this;
 					$version=$this->version;
+					$blockobj = &loadBlock($this->getDir().'/blocks/'.$block,$this,$block,$version);
 				}
 				else
 				{
+					$container=&getContainer($container);
 					if ($this->prefs->isPrefSet($blockpref.'.version'))
 					{
 						$version=$this->prefs->getPref($blockpref.'.version');
@@ -133,10 +134,8 @@ class Page
 					{
 						$version=false;
 					}
+					$blockobj=&$container->getBlock($block,$version);
 				}
-				
-				$blockobj = &loadBlock($container,$block,$version);
-				
 				$this->blocks[$id]=&$blockobj;
 			}
 			else
@@ -149,18 +148,15 @@ class Page
 	
 	function &getTemplate()
 	{
-		if (!isset($this->template))
-		{
-			// Find the page's template or use the default
-			$templ=$this->prefs->getPref('page.template');
-			$this->template=&loadTemplate($templ);
-			$this->prefs->setParent($this->template->prefs);
-		}
-		return $this->template;
+		$templ=$this->prefs->getPref('page.template');
+		list($container,$id)=explode('/',$templ);
+		$cont=&getContainer($container);
+		$template=&$cont->getTemplate($id);
+		return $template;
 	}
 }
 
-function &getPages($container)
+/*function &getPages($container)
 {
 	global $_PREFS;
 	
@@ -195,42 +191,6 @@ function &getAllPages()
 		$pages=array_marge($pages,getPages($container));
 	}
 	return $pages;
-}
-
-function isValidPage($container,$id,$version=false)
-{
-	global $_PREFS;
-	
-	$log=&LoggerManager::getLogger('swim.page');
-	
-	if (!($_PREFS->isPrefSet('storage.pages.'.$container)))
-	{
-		return false;
-	}
-	
-	$basedir=$_PREFS->getPref('storage.pages.'.$container).'/'.$id;
-	$log->debug('Page storage is '.$basedir);
-	if (is_dir($basedir))
-	{
-		if ($version===false)
-		{
-			$version=getCurrentVersion($basedir);
-			$log->debug('Found default version of '.$version);
-		}
-		if ((is_dir($basedir.'/'.$version))&&(is_readable($basedir.'/'.$version.'/page.conf')))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		$log->debug('Invalid storage location');
-		return false;
-	}
-}
+}*/
 
 ?>

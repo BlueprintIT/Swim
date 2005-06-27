@@ -19,9 +19,10 @@ function method_displayLogin(&$request)
 	global $_PREFS;
 	
 	$version=false;
-	if (isValidPage('internal',$_PREFS->getPref('method.login.page'),$version))
+	$container = &getContainer('internal');
+	if ($container->isPage($_PREFS->getPref('method.login.page'),$version))
 	{
-		$page = &loadPage('internal',$_PREFS->getPref('method.login.page'),$version);
+		$page = &$container->getPage($_PREFS->getPref('method.login.page'),$version);
 		$page->display($request);
 	}
 	else
