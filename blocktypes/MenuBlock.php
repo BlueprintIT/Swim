@@ -18,6 +18,7 @@ class MenuItem
 	var $parentMenu;
 	var $submenu;
 	var $url;
+	var $resource;
 	var $text;
 	var $log;
 	
@@ -28,7 +29,25 @@ class MenuItem
 	
 	function display()
 	{
-		print('<a href="'.$this->url.'">'.$this->text.'</a>');
+		if ((isset($this->url))||(isset($this->resource)))
+		{
+			if (isset($this->url))
+			{
+				$url=$this->url;
+			}
+			else if (isset($this->resource))
+			{
+				$request = new Request();
+				$request->resource=$this->resource;
+				$request->method='view';
+				$url=$request->encode();
+			}
+			print('<a href="'.$url.'">'.$this->text.'</a>');
+		}
+		else
+		{
+			print($this->text);
+		}
 		if (isset($this->submenu))
 		{
 			$this->submenu->display(true);
@@ -45,6 +64,10 @@ class MenuItem
 		else if ($name=='url')
 		{
 			$this->url=$value;
+		}
+		else if ($name=='resource')
+		{
+			$this->resource=$value;
 		}
 		else
 		{
@@ -250,11 +273,6 @@ class MenuBlock extends Block
 		$this->Block();
 	}
 	
-	function &getBlockEditor()
-	{
-		return loadPage('internal','menuedit');
-	}
-	
 	function init()
 	{
 		$file=$this->prefs->getPref('block.menublock.filename','block.xml');
@@ -263,6 +281,13 @@ class MenuBlock extends Block
 		$parser->parseFile($this->getDir().'/'.$file);
 		//LoggerManager::setLogLevel('',SWIM_LOG_WARN);
 		$this->rootmenu=&$parser->menu;
+	}
+	
+	function &getBlockEditor()
+	{
+		$container=&getContainer('internal');
+		$page=&$container->getPage('menuedit');
+		return $page;
 	}
 	
 	function displayIntro($attrs)

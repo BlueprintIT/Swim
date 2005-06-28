@@ -1,15 +1,8 @@
 <menu orientation="horizontal">
-	<item url="" text="COMPANY DETAILS">
-		<menu>
-			<item url="" text="Item 1"/>
-			<item url="" text="Item 2"/>
-			<item url="" text="Item 3"/>
-			<item url="" text="Item 4"/>
-		</menu>
-	</item>
-	<item url="" text="TRAINING SOLUTIONS"/>
-	<item url="" text="CONSULTANCY &amp; SERVICES"/>
-	<item url="" text="NEWS &amp; EVENTS"/>
-	<item url="" text="INFORMATION"/>
-	<item url="" text="RESEARCH"/>
+	<item url="http://www.blueprintit.co.uk" text="COMPANY DETAILS"/>
+	<item resource="global/page/default" text="TRAINING SOLUTIONS"/>
+	<item text="CONSULTANCY &amp; SERVICES"/>
+	<item text="NEWS &amp; EVENTS"/>
+	<item text="INFORMATION"/>
+	<item text="RESEARCH"/>
 </menu>

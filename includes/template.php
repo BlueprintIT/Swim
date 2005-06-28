@@ -176,7 +176,17 @@ class Template
 		{
 			$method='edit';
 		}
-		$request=&$this->generateRequest($parser->data,$attrs['href'],$method);
+		$block=&$parser->data['page']->getBlock($attrs['block']);
+		if (is_a($block->container,'Page'))
+		{
+			$resource=$block->container->container->id.'/page/'.$block->container->id.'/'.$block->id;
+		}
+		else
+		{
+			$resource=$block->container->id.'/block/'.$block->id;
+		}
+		unset($attrs['block']);
+		$request=&$this->generateRequest($parser->data,$resource,$method);
 		$request->nested=$parser->data['request'];
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);

@@ -96,6 +96,7 @@ div#menubar td {
 	background-color: <?= $menubackground ?>;
 	color: <?= $bordertextcolor ?>;
 	font-family: <?= $borderfont ?>;
+	font-size: 0.8em;
 }
 
 div#menubar td a, div#menubar td a:visited {
@@ -104,7 +105,6 @@ div#menubar td a, div#menubar td a:visited {
 	margin: 0;
 	height: 100%;
 	width: 100%;
-	font-size: 0.8em;
 	text-decoration: none;
 	color: <?= $bordertextcolor ?>;
 }
@@ -115,7 +115,6 @@ div#menubar td a:hover, div#menubar td a:visited:hover {
 	margin: 0;
 	height: 100%;
 	width: 100%;
-	font-size: 0.8em;
 	text-decoration: none;
 	color: <?= $bordertextcolor ?>;
 }

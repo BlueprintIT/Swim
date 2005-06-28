@@ -17,7 +17,7 @@ function method_docommit(&$request)
 {
 	global $_USER,$_PREFS;
 	
-	$resource = Resource::decodeResource($request);
+	$resource = &Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{

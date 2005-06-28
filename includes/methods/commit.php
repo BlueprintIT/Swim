@@ -21,7 +21,7 @@ function method_commit(&$request)
 {
 	global $_USER,$_PREFS;
 	
-	$resource = Resource::decodeResource($request);
+	$resource = &Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{
@@ -51,9 +51,10 @@ function method_commit(&$request)
 				}
 				else
 				{
-					if (isset($resource->page))
+					$nresource=&Resource::decodeResource($request->nested);
+					if (isset($nresource->page))
 					{
-						$page=&$resource->getPage();
+						$page=&$nresource->getPage();
 						$newv=cloneVersion($page->getResource(),$page->version);
 						$newpage=&$page->container->getPage($page->id,$newv);
 						$newpage->prefs->setPref('page.blocks.'.$resource->block.'.version',$newversion);
