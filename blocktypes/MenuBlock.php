@@ -33,16 +33,12 @@ class MenuItem
 		{
 			if (isset($this->url))
 			{
-				$url=$this->url;
+				print('<a href="'.$this->url.'">'.$this->text.'</a>');
 			}
 			else if (isset($this->resource))
 			{
-				$request = new Request();
-				$request->resource=$this->resource;
-				$request->method='view';
-				$url=$request->encode();
+				print('<anchor href="'.$this->resource.'">'.$this->text.'</anchor>');
 			}
-			print('<a href="'.$url.'">'.$this->text.'</a>');
 		}
 		else
 		{

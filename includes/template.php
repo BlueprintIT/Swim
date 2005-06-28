@@ -59,6 +59,16 @@ class Template
 		$this->unlock();
 	}
 	
+	function isWritable()
+	{
+		return $this->container->isWritable();
+	}
+	
+	function isVisible()
+	{
+		return $this->container->isVisible();
+	}
+	
 	function getDir()
 	{
 		return $this->dir;
@@ -84,9 +94,16 @@ class Template
 		unlockResource($this->lock);
 	}
 	
-	function generateRelativeURL(&$data,$url)
+	function &generateRelativeURL(&$data,$url,$method)
 	{
-		if (substr($url,0,6)=='block/')
+		$request = new Request();
+		$request->method=$method;
+		if (strlen($url)==0)
+		{
+			$url=$data['request']->resource;
+			$request->query=$data['request']->query;
+		}
+		else if (substr($url,0,6)=='block/')
 		{
 			$url=$data['page']->container->id.'/page/'.$data['page']->id.'/'.$data['block']->id.substr($url,5);
 		}
@@ -98,20 +115,21 @@ class Template
 		{
 			$url=$this->container->id.'/template/'.$this->id.substr($url,8);
 		}
-		return $url;
+		$request->resource=$url;
+		return $request;
 	}
 	
 	function &generateRequest(&$data,$url,$method)
 	{
-		$request = new Request();
-		$request->method=$method;
 		if ($url[0]=='/')
 		{
+			$request = new Request();
+			$request->method=$method;
 			$request->resource=substr($url,1);
 		}
 		else
 		{
-		  $request->resource=$this->generateRelativeURL($data,$url);
+		  $request=&$this->generateRelativeURL($data,$url,$method);
 		}
 		return $request;
 	}
@@ -176,17 +194,28 @@ class Template
 		{
 			$method='edit';
 		}
-		$block=&$parser->data['page']->getBlock($attrs['block']);
-		if (is_a($block->container,'Page'))
+		if (isset($attrs['block']))
 		{
-			$resource=$block->container->container->id.'/page/'.$block->container->id.'/'.$block->id;
+			$block=&$parser->data['page']->getBlock($attrs['block']);
+			if (is_a($block->container,'Page'))
+			{
+				$resource=$block->container->container->id.'/page/'.$block->container->id.'/'.$block->id;
+			}
+			else
+			{
+				$resource=$block->container->id.'/block/'.$block->id;
+			}
+			unset($attrs['block']);
+			$request=&$this->generateRequest($parser->data,$resource,$method);
+			$request->query['version']=$block->version;
 		}
 		else
 		{
-			$resource=$block->container->id.'/block/'.$block->id;
+			$page=&$parser->data['page'];
+			$resource=$page->container->id.'/page/'.$page->id;
+			$request=&$this->generateRequest($parser->data,$resource,$method);
+			$request->query['version']=$page->version;
 		}
-		unset($attrs['block']);
-		$request=&$this->generateRequest($parser->data,$resource,$method);
 		$request->nested=$parser->data['request'];
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);
@@ -237,9 +266,14 @@ class Template
 		}
 		else
 		{
-			$method='view';
+			$method=$parser->data['request']->method;
 		}
-		$attrs['href']=$this->generateURL($parser->data,$attrs['href'],$method);
+		$request=&$this->generateRequest($parser->data,$attrs['href'],$method);
+		if (isset($attrs['nest']))
+		{
+			$request->nested=&$parser->data['request'];
+		}
+		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);
 	}
 	

@@ -34,6 +34,16 @@ class Block
 		$this->prefs->setParent($_PREFS);
 	}
 	
+	function isWritable()
+	{
+		return $this->container->isWritable();
+	}
+	
+	function isVisible()
+	{
+		return $this->container->isVisible();
+	}
+	
 	function &getBlockEditor()
 	{
 		return null;

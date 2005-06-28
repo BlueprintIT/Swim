@@ -323,10 +323,51 @@ function encodeQuery($query)
   return substr($result,1);
 }
 
+function extractVariable(&$array,$name,$value)
+{
+	$spos=strpos($name,'[');
+	$epos=strpos($name,']',$spos);
+	if (($spos>=0)&&($epos>0))
+	{
+		$sub=substr($name,0,$spos);
+		$remains=substr($name,$epos+1);
+		$name=substr($name,$spos+1,$epos).$remains;
+		if (strlen($sub)==0)
+		{
+			$next=array();
+			$array[]=&$next;
+		}
+		else if (isset($array[$sub]))
+		{
+			$next=&$array[$sub];
+		}
+		else
+		{
+			$next=array();
+			$array[$sub]=&$next;
+		}
+		extractVariable($next,$name,$value);
+	}
+	else
+	{
+		$array[$name]=$value;
+	}
+}
+
 function decodeQuery($query)
 {
 	$result=array();
-  parse_str($query,$result);
+	$vars=explode('&',$query);
+	foreach ($vars as $var)
+	{
+		$pos=strpos($var,'=');
+		if ($pos>0)
+		{
+			$name=urldecode(substr($var,0,$pos));
+			$value=urldecode(substr($var,$pos+1));
+			extractVariable($result,$name,$value);
+		}
+	}
   return $result;
 }
 
@@ -452,7 +493,7 @@ class Request
 		{
 			$path=$_SERVER['PATH_INFO'];
 		}
-		$query=$_GET;
+		$query=decodeQuery($_SERVER['QUERY_STRING']);
 		if ($_SERVER['REQUEST_METHOD']=='POST')
 		{
 			if (isset($_POST))

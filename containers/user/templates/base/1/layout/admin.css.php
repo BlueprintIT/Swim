@@ -25,3 +25,9 @@ div#menuadmin {
 	top: <?= $headerheight-30 ?>px;
 	right: 0;
 }
+
+div#pageadmin {
+	position: absolute;
+	top: 0;
+	left: 0;
+}

@@ -35,6 +35,20 @@ class Container
 		$this->prefs->setParent($_PREFS);
 		$this->dir=$this->prefs->getPref('container.'.$id.'.basedir');
 		$this->log->debug('Container '.$id.' is at '.$this->dir);
+		if (is_readable($this->dir.'/container.conf'))
+		{
+			$this->prefs->loadPreferences($this->dir.'/container.conf');
+		}
+	}
+	
+	function isVisible()
+	{
+		return $this->prefs->getPref('container.visible',true);
+	}
+	
+	function isWritable()
+	{
+		return $this->prefs->getPref('container.writable',true);
 	}
 	
 	function getFileDir()
@@ -227,7 +241,11 @@ function &getAllContainers()
 	{
 		list($id,$base)=explode('.',$text,2);
 		if ($base=='basedir')
-			$containers[$id]=&getContainer($id);
+		{
+			$container=&getContainer($id);
+			if ($container->isVisible())
+				$containers[$id]=&getContainer($id);
+		}
 	}
 	return $containers;
 }

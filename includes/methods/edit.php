@@ -27,7 +27,7 @@ function method_edit(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->type=='block')
+			if ($resource->isBlock())
 			{
 				$block=&$resource->getBlock();
 				$temp=getTempVersion($block->getResource());
@@ -50,6 +50,12 @@ function method_edit(&$request)
 				}
 				
 				$page=&$block->getBlockEditor();
+				$page->display($request);
+			}
+			else if ($resource->isPage())
+			{
+				$container=&getContainer('internal');
+				$page=&$container->getPage('pageedit');
 				$page->display($request);
 			}
 			else

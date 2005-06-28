@@ -15,33 +15,45 @@
 
 class Page
 {
+	var $container;
+	var $resource;
+	var $dir;
 	var $prefs;
 	var $blocks;
 	var $version;
 	var $id;
 	var $lock;
-	var $resource;
-	var $dir;
 	var $container;
 	var $modified;
 	
-	function Page($container,$id,$version)
+	function Page(&$container,$id,$version)
 	{
 		global $_PREFS;
-	
+
 		$this->container=&$container;
 		$this->id=$id;
+		$this->version=$version;
+	
 		$this->blocks = array();
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
 		$this->resource=$container->getPageResource($id);
-		$this->version=$version;
 		$this->dir=getResourceVersion($this->resource,$this->version);
 		
 		$this->lockRead();
 		$this->prefs->loadPreferences($this->getDir().'/page.conf','page');
 		$this->unlock();
+	}
+	
+	function isWritable()
+	{
+		return $this->container->isWritable();
+	}
+	
+	function isVisible()
+	{
+		return $this->container->isVisible();
 	}
 	
 	function display(&$request)
@@ -107,6 +119,33 @@ class Page
 	function isBlock($id)
 	{
 		return $this->prefs->isPrefSet('page.blocks.'.$id.'.id');
+	}
+	
+	function getBlockUsage(&$block)
+	{
+		$container=$block->container->id;
+		$result=array();
+		$blocks=$this->prefs->getPrefBranch('page.blocks');
+		foreach ($blocks as $key=>$id)
+		{
+			if ((substr($key,-3,3)=='.id')&&($id==$block->id))
+			{
+				$blk=substr($key,0,-3);
+				$cont=$this->prefs->getPref('page.blocks.'.$blk.'.container');
+				if ($cont==$container)
+				{
+					if (($this->prefs->isPrefSet('page.blocks.'.$blk.'.version'))&&($block->version==$this->prefs->getPref('page.blocks.'.$blk.'.version')))
+					{
+						$result[]=$blk;
+					}
+					else if ($block->version==getCurrentVersion($block->getResource()))
+					{
+						$result[]=$blk;
+					}
+				}
+			}
+		}
+		return $result;
 	}
 	
 	function &getBlock($id)

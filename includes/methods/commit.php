@@ -27,7 +27,7 @@ function method_commit(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->type=='block')
+			if ($resource->isBlock())
 			{
 				$block=&$resource->getBlock();
 				$temp=getTempVersion($block->getResource());
@@ -55,12 +55,36 @@ function method_commit(&$request)
 					if (isset($nresource->page))
 					{
 						$page=&$nresource->getPage();
-						$newv=cloneVersion($page->getResource(),$page->version);
-						$newpage=&$page->container->getPage($page->id,$newv);
-						$newpage->prefs->setPref('page.blocks.'.$resource->block.'.version',$newversion);
-						$newpage->savePreferences();
-						if (getCurrentVersion($page->getResource())==$page->version)
-							setCurrentVersion($newpage->getResource(),$newv);
+						$usage=$page->getBlockUsage($block);
+						if (count($usage)>0)
+						{
+							$clone=false;
+							foreach ($usage as $id)
+							{
+								if ($page->prefs->isPrefSet('page.blocks.'.$id.'.version'))
+								{
+									$clone=true;
+									break;
+								}
+							}
+							if ($clone)
+							{
+								$newv=cloneVersion($page->getResource(),$page->version);
+								$newpage=&$page->container->getPage($page->id,$newv);
+
+								foreach ($usage as $id)
+								{
+									if ($newpage->prefs->isPrefSet('page.blocks.'.$id.'.version'))
+									{
+										$newpage->prefs->setPref('page.blocks.'.$id.'.version',$newversion);
+									}
+								}
+
+								$newpage->savePreferences();
+								if (getCurrentVersion($page->getResource())==$page->version)
+									setCurrentVersion($newpage->getResource(),$newv);
+							}
+						}
 					}
 
 					$autocommit=$_PREFS->getPref('update.autocommit',false);
@@ -68,29 +92,41 @@ function method_commit(&$request)
 					foreach(array_keys($list) as $pkey)
 					{
 						$page=&$list[$pkey];
+						$usage=$page->getBlockUsage($block);
+						
 						$blocks=$page->prefs->getPrefBranch('page.blocks');
-						foreach ($blocks as $key=>$id)
+						if (count($usage)>0)
 						{
-							if (substr($key,-3,3)=='.id')
+							$clone=false;
+							foreach ($usage as $id)
 							{
-								$blk=substr($key,0,-3);
-								if (($id==$block->id)&&($page->prefs->getPref('page.blocks.'.$blk.'.container')==$block->container->id))
+								if ($page->prefs->isPrefSet('page.blocks.'.$id.'.version'))
 								{
-									if ($page->prefs->getPref('page.blocks.'.$blk.'.version','-1')==$oldversion)
+									$clone=true;
+									break;
+								}
+							}
+							if ($clone)
+							{
+								if ($autocommit)
+								{
+									$newv=cloneVersion($page->getResource(),$page->version);
+									$newpage=&$page->container->getPage($page->id,$newv);
+
+									foreach ($usage as $id)
 									{
-										if ($autocommit)
+										if ($newpage->prefs->isPrefSet('page.blocks.'.$id.'.version'))
 										{
-											$newv=cloneVersion($page->getResource(),$page->version);
-											$newpage=&$page->container->getPage($page->id,$newv);
-											$newpage->prefs->setPref('page.blocks.'.$blk.'.version',$newversion);
-											$newpage->savePreferences();
-											setCurrentVersion($newpage->getResource(),$newv);
-										}
-										else
-										{
-											$pages[]=&$page;
+											$newpage->prefs->setPref('page.blocks.'.$id.'.version',$newversion);
 										}
 									}
+
+									$newpage->savePreferences();
+									setCurrentVersion($newpage->getResource(),$newv);
+								}
+								else
+								{
+									$pages[]=&$page;
 								}
 							}
 						}
@@ -100,7 +136,7 @@ function method_commit(&$request)
 						$request->query['newversion']=$newversion;
 						$request->query['pages']=&$pages;
 						$internal=&getContainer('internal');
-						$page=&getPage('commit');
+						$page=&$internal->getPage('commit');
 						$page->display($request);
 					}
 					else
@@ -108,6 +144,23 @@ function method_commit(&$request)
 						redirect($request->nested);
 					}
 				}
+			}
+			else if ($resource->isPage())
+			{
+				$page=$resource->getPage();
+				$newv=cloneVersion($page->getResource(),$page->version);
+				$newpage=&$page->container->getPage($page->id,$newv);
+				foreach ($request->query as $name => $value)
+				{
+					if (substr($name,0,5)=='page.')
+					{
+						$newpage->prefs->setPref($name,$value);
+					}
+				}
+				$newpage->savePreferences();
+				if ($page->version==getCurrentVersion($page->getResource()))
+					setCurrentVersion($newpage->getResource(),$newv);
+				redirect($request->nested);
 			}
 			else
 			{
