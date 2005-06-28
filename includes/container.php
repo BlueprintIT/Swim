@@ -18,6 +18,7 @@ class Container
 	var $prefs;
 	var $id;
 	var $dir;
+	var $lock;
 	
 	var $log;
 	
@@ -39,6 +40,21 @@ class Container
 		{
 			$this->prefs->loadPreferences($this->dir.'/container.conf');
 		}
+	}
+	
+	function readLock()
+	{
+		$this->lock=lockResourceRead($this->dir);
+	}
+	
+	function writeLock()
+	{
+		$this->lock=lockResourceWrite($this->dir);
+	}
+	
+	function unlock()
+	{
+		unlockResource($this->lock);
 	}
 	
 	function isVisible()

@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Block editing method
+ * Resource editing method
  *
  * Copyright Blueprint IT Ltd. 2005
  *
@@ -13,6 +13,7 @@
  * $Revision$
  */
 
+// TODO fix this
 function displayLocked(&$request,$resource)
 {
 }

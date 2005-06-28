@@ -5,8 +5,7 @@ setContentType('text/css');
 
 ?>
 div.adminpanel {
-	width: 50px;
-	height: 30px;
+	padding: 5px;
 	background-color: red;
 }
 
