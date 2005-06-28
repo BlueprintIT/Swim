@@ -42,12 +42,12 @@ class Container
 		}
 	}
 	
-	function readLock()
+	function lockRead()
 	{
 		$this->lock=lockResourceRead($this->dir);
 	}
 	
-	function writeLock()
+	function lockWrite()
 	{
 		$this->lock=lockResourceWrite($this->dir);
 	}

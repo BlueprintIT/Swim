@@ -263,7 +263,7 @@ class Resource
 						if (count($parts)>4)
 							$result->path=implode('/',array_slice($parts,4));
 						else
-							unset($this->path);
+							unset($result->path);
 					}
 				}
 			}

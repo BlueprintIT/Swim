@@ -26,13 +26,12 @@ function method_docreate(&$request)
 		if ($type=='page')
 		{
 			$container->lockWrite();
-			$dir=$container->getPageDir();
 			do
 			{
 				$id=rand(10000,99999);
-			} while (is_dir($dir.'/'.$id));
-			$pdir=$dir.'/'.$id;
-			$result=mkdir($pdir);
+			} while (is_dir($container->getPageResource($id)));
+			$presource=$container->getPageResource($id);
+			$result=mkdir($presource);
 			$container->unlock();
 			if ($result)
 			{
@@ -48,14 +47,14 @@ function method_docreate(&$request)
 				$tcontainer=&getContainer($tcontainer);
 				$template=&$tcontainer->getTemplate($template);
 
-				$newv=createNextVersion($pdir);
-				$pdir=getResourceVersion($pdir,$newv);
+				$newv=createNextVersion($presource);
+				$pdir=getResourceVersion($presource,$newv);
 
-				$lock=resourceLockWrite($pdir);
+				$lock=lockResourceWrite($pdir);
 				recursiveCopy($template->dir.'/defaultpage',$pdir,true);
-				resourceUnlock($lock);
+				unlockResource($lock);
 				
-				$newpage=&$container->getPage($id);
+				$newpage=&$container->getPage($id,$newv);
 				
 				foreach ($request->query as $name => $value)
 				{
@@ -68,9 +67,9 @@ function method_docreate(&$request)
 
 				setCurrentVersion($newpage->getResource(),$newpage->version);
 				
-				$request = new Request();
+				$nrequest = new Request();
 				$nrequest->method=$request->nested->method;
-				$nrequest=$container->id.'/page/'.$id;
+				$nrequest->resource=$container->id.'/page/'.$id;
 				redirect($nrequest);
 			}
 			else
