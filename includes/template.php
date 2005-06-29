@@ -174,12 +174,12 @@ class Template
 		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t");
 		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
 		print($text);
-		print('<object type="application/x-java-applet;version=1.4" height="'.$height.'" width="'.$width.'">'."\n\t\t");
+		print('<comment><object type="application/x-java-applet;version=1.4" height="'.$height.'" width="'.$width.'">'."\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class),'',false); print("\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
 		print($text);
-		print('</object>'."\n");
+		print('</object></comment>'."\n");
 		print('</object>');
 	}
 	

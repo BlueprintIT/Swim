@@ -124,6 +124,7 @@ ul#sidemenu {
 	padding: 0;
 	padding-top: <?= $sidetopgap ?>px;
 	position: absolute;
+	left: 0;
 	width: <?= $sidewidth ?>px;
 	background: transparent;
 }
