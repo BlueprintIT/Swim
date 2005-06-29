@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <html>
 	<head>
@@ -9,7 +9,6 @@
 		<stylesheet src="template/layout/content.css"/>
 		<script src="template/layout/cbdom.js"/>
 		<script src="template/layout/bpmm.js"/>
-		<script src="template/layout/fixie.js"/>
 		<title><var name="title"/></title>
 	</head>
 	<body>
@@ -22,16 +21,15 @@
 				<block id="menu"/>
 			</div>
 		</div>
+		<block id="sidemenu"/>
 		<div id="body">
-			<block id="sidemenu"/>
 			<block id="content"/>
-			<div id="footer">
-				<image id="curve" src="template/layout/curve.gif" alt="Border curve"/>
-				<image id="wheels" src="template/layout/wheels.gif" alt="Watching the wheels"/>
-				<p>promoting excellence through the application of best practices</p>
-				<image id="iip" src="template/layout/iip.gif" alt="Investor in People"/>
-			</div>
 		</div>
-		<script type="text/javascript">checkSizes();</script>
+		<div id="footer">
+			<div id="curve"></div>
+			<image id="wheels" src="template/layout/wheels.gif" alt="Watching the wheels"/>
+			<p id="footer">promoting excellence through the application of best practices</p>
+			<image id="iip" src="template/layout/iip.gif" alt="Brass Bullet Ltd. are an Investor in People"/>
+		</div>
 	</body>
 </html>

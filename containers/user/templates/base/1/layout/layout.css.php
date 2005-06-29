@@ -12,10 +12,11 @@ html {
 }
 
 body {
-	height: 100%;
-	width: 100%;
 	margin: 0;
 	padding: 0;
+	padding-top: <?= $headerheight+$spacer+$menuheight ?>px;
+	padding-bottom: <?= $footerheight ?>px;
+	overflow: hidden;
 	font-size: 1em;
 	background-color: white;
 	background-image: url('background.gif');
@@ -27,6 +28,9 @@ div#header {
 	margin: 0;
 	padding: 0;
 	border: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
 	height: <?= $headerheight ?>px;
 	width: 100%;
 	background-image: url('banner.jpg');
@@ -58,6 +62,9 @@ img#logo {
 div#menubar {
 	margin: 0;
 	padding: 0;
+	position: absolute;
+	top: <?= $headerheight+$spacer ?>px;
+	left: 0;
 	border-top: <?= $spacing ?>px white solid;
 	border-bottom: <?= $spacing ?>px white solid;
 	height: <?= $menuheight ?>px;
@@ -159,37 +166,24 @@ ul#sidemenu a:hover, ul#sidemenu a:visited:hover {
 div#body {
 	padding: 0;
 	margin: 0;
-	background-image: url('side.gif');
-	background-position: top left;
-	background-repeat: repeat-y;
+	border-left: <?= $sidewidth ?>px solid <?= $yellowborder ?>;
+	height: 100%;
+	overflow: auto;
 }
 
 div#content {
-	margin-left: <?= $sidewidth+$spacing ?>px;
-	padding-left: 30px;
-	margin-right: 0px;
-	padding-right: 20px;
-	overflow: auto;
+	padding: 10px;
+	margin: 0;
 }
 
 div#footer {
 	margin: 0;
 	padding: 0;
+	bottom: 0;
 	width: 100%;
-	position: relative;
+	position: absolute;
 	height: <?= $footerheight ?>px;
 	background-color: <?= $yellowborder ?>;
-}
-
-img#curve {
-	position: absolute;
-	top: -104px;
-	left: <?= $sidewidth ?>px;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	width: 103px;
-	height: 104px;
 }
 
 img#wheels {
@@ -203,11 +197,23 @@ img#wheels {
 	height: 140px;
 }
 
+div#curve {
+	position: absolute;
+	bottom: <?= $footerheight ?>px;
+	left: <?= $sidewidth ?>px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	width: 103px;
+	height: 104px;
+	background-image: url('curve.gif');
+}
+
 div#footer p {
 	position: absolute;
 	margin: 0;
 	padding: 0;
-	top: 30px;
+	bottom: 30px;
 	left: 190px;
 	letter-spacing: 0.075em;
 	font-family: <?= $borderfont ?>;

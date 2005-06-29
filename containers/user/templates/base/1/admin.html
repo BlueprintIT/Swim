@@ -10,7 +10,6 @@
 		<stylesheet src="template/layout/content.css"/>
 		<script src="template/layout/cbdom.js"/>
 		<script src="template/layout/bpmm.js"/>
-		<script src="template/layout/fixie.js"/>
 		<title><var name="title"/></title>
 	</head>
 	<body>
@@ -19,32 +18,31 @@
 			<div class="adminpanel" id="pageadmin"><anchor method="create" nest="true" href="/global/page">New Page</anchor> <editlink>Edit Page</editlink></div>
 			<image id="logo" src="template/layout/logo.gif" alt="Brass Bullet Ltd."/>
 		</div>
+		<div id="menuadmin" class="adminpanel">
+			<editlink block="menu">Edit</editlink>
+		</div>
 		<div id="menubar">
 			<div id="spacing">
-				<div id="menuadmin" class="adminpanel">
-					<editlink block="menu">Edit</editlink>
-				</div>
 				<block id="menu" class="admin"/>
 			</div>
 		</div>
+		<block id="sidemenu"/>
+		<div id="sideadmin" class="adminpanel">
+			<editlink block="sidemenu">Edit</editlink>
+		</div>
 		<div id="body">
-			<block id="sidemenu"/>
-			<div id="sideadmin" class="adminpanel">
-				<editlink block="sidemenu">Edit</editlink>
-			</div>
 			<block id="content" class="admin">
 				<div id="contentadmin" class="adminpanel">
 					<editlink block="content">Edit</editlink>
 				</div>
 				<content/>
 			</block>
+		</div>
 		<div id="footer">
-			<image id="curve" src="template/layout/curve.gif" alt="Border curve"/>
+			<div id="curve"></div>
 			<image id="wheels" src="template/layout/wheels.gif" alt="Watching the wheels"/>
 			<p>promoting excellence through the application of best practices</p>
 			<image id="iip" src="template/layout/iip.gif" alt="Investor in People"/>
 		</div>
-		</div>
-		<script type="text/javascript">checkSizes();</script>
 	</body>
 </html>
