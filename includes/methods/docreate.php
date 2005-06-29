@@ -22,7 +22,7 @@ function method_docreate(&$request)
 	$container=&getContainer($container);
 	if (($container!==false)&&($container->isWritable()))
 	{
-		// TODO possibly a better security check here
+		// TODO possibly a better security check here Bug 3
 		if ($type=='page')
 		{
 			$container->lockWrite();

@@ -11,7 +11,7 @@ div.adminpanel {
 
 div#contentadmin {
 	position: absolute;
-	right: 0;
+	right: 30px;
 }
 
 div#sideadmin {

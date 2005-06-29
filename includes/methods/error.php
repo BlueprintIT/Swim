@@ -29,7 +29,7 @@ function method_error(&$request)
 	}
 	else
 	{
-		// TODO figure out what to do here
+		// TODO figure out what to do here - Bug 7
 	}*/
 }
 

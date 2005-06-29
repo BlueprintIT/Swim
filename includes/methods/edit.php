@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-// TODO fix this
+// TODO fix this - Bug 8
 function displayLocked(&$request,$resource)
 {
 }
