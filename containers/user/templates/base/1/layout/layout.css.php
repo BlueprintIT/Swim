@@ -14,8 +14,8 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	padding-top: <?= $headerheight+$spacer+$menuheight ?>px;
-	padding-bottom: <?= $footerheight ?>px;
+	padding-top: <?= $headerheight+$spacer+$menuheight+$spacer ?>px;
+	padding-bottom: <?= $footerheight+$spacer ?>px;
 	overflow: hidden;
 	font-size: 1em;
 	background-color: white;
@@ -45,6 +45,7 @@ img#cogs {
 	border: 0;
 	padding: 0;
 	margin: 0;
+	height: <?= $headerheight ?>;
 	border-right: <?= $spacing ?>px white solid;
 }
 
@@ -63,18 +64,15 @@ div#menubar {
 	margin: 0;
 	padding: 0;
 	position: absolute;
-	top: <?= $headerheight+$spacer ?>px;
+	top: <?= $headerheight+$spacer+1 ?>px;
 	left: 0;
-	border-top: <?= $spacing ?>px white solid;
-	border-bottom: <?= $spacing ?>px white solid;
 	height: <?= $menuheight ?>px;
 	width: 100%;
-	background-color: #004ef4;
+	background-color: <?= $yellowborder ?>;
 	z-index: 10;
 }
 
 div#spacing {
-	border-left: <?= $spacing ?>px solid white;
 	margin-left: <?= $sidewidth ?>px;
 	height: 100%;
 }
@@ -97,7 +95,7 @@ div#menubar td {
 	border-top: 0;
 	border-bottom: 0;
 	border-left: 1px white solid;
-	border-right: 1px white solid;
+	border-right: 0;
 	padding: 0;
 	margin: 0;
 	background-color: <?= $menubackground ?>;
@@ -132,6 +130,7 @@ ul#sidemenu {
 	padding-top: <?= $sidetopgap ?>px;
 	position: absolute;
 	left: 0;
+	z-index: 10;
 	width: <?= $sidewidth ?>px;
 	background: transparent;
 }
@@ -172,7 +171,10 @@ div#body {
 }
 
 div#content {
-	padding: 10px;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-left: 30px;
+	padding-bottom: 30px;
 	margin: 0;
 }
 
@@ -213,7 +215,8 @@ div#footer p {
 	position: absolute;
 	margin: 0;
 	padding: 0;
-	bottom: 30px;
+	padding-right: 80px;
+	top: 20px;
 	left: 190px;
 	letter-spacing: 0.075em;
 	font-family: <?= $borderfont ?>;
@@ -228,6 +231,6 @@ img#iip {
 	padding: 0;
 	right: 10px;
 	bottom: 10px;
-	width: 124px;
-	height: 85px;
+	width: 73px;
+	height: 50px;
 }

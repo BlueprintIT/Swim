@@ -4,7 +4,7 @@ $spacing=1;
 $headerheight=127;
 $menuheight=20;
 $sidewidth=150;
-$footerheight=100;
+$footerheight=70;
 
 $sidetopgap=50;
 
