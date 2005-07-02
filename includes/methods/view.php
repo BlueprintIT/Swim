@@ -27,26 +27,13 @@ function method_view(&$request)
 		{
       if ($resource->isFile())
 			{
-				$file=$resource->getDir().'/'.$resource->path;
-				$log->debug('Attempt to access file '.$file);
 				if ($_SERVER['REQUEST_METHOD']=='GET')
 				{
-  				if (is_readable($file))
-  				{
-  					$resource->lockRead();
-  					$stats=stat($file);
-  					setModifiedDate($stats['mtime']);
-  					setContentType(determineContentType($file));
-  					readfile($file);
-  					$resource->unlock();
-  				}
-  				else if (is_readable($file.'.php'))
-  				{
-  					$resource->lockRead();
-  					$stats=stat($file.'.php');
-  					setModifiedDate($stats['mtime']);
-  					include($file.'.php');
-  					$resource->unlock();
+					if ($resource->exists())
+					{
+						setModifiedDate($resource->getModifiedDate());
+						setContentType($resource->getContentType());
+						$resource->outputFile();
   				}
   				else
   				{
@@ -58,8 +45,7 @@ function method_view(&$request)
   			  $in=@fopen('php://input','rb');
   			  if ($in!==false)
   			  {
-    			  $resource->lockWrite();
-    			  $out=@fopen($file,'wb');
+    			  $out=$resource->openFileWrite();
     			  if ($out!==false)
     			  {
       			  while (!feof($in))
@@ -68,8 +54,7 @@ function method_view(&$request)
         			  fwrite($out,$data);
         			}
  
-    			    fclose($out);
-    			    $resource->unlock();
+ 							$resource->closeFile($out);
      			    fclose($in);
             	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
             	print("Resource accepted");
@@ -79,7 +64,6 @@ function method_view(&$request)
     			  {
     			    $log->warn("Couldn't open file for writing.");
     			  }
-   			    $resource->unlock();
    			    fclose($in);
    			  }
    			  else
@@ -95,8 +79,7 @@ function method_view(&$request)
 			}
 			else if ($resource->isPage())
 			{
-				$page = &$resource->getPage();
-				$page->display($request);
+				$resource->display($request);
 			}
 			else
 			{

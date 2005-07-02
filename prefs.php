@@ -61,62 +61,45 @@ class Preferences
 	
 	// Loads preferences. With no arguments it loads all preferences from their default
 	// locations. Otherwise specify the type (numerical) and the file to load from.
-	function loadPreferences($file,$branch = '',$merge = false)
+	function loadPreferences($source,$branch = '',$merge = false)
 	{
-    if (is_readable($file))
-    {
-      $source=fopen($file,'r');
-    	if (!$merge)
-    	{
-	      $this->preferences=array();
-	    }
-	    if (strlen($branch)>0)
-	    {
-	    	$branch.='.';
-	    }
-      while (!feof($source))
-      {
-        $line=fgets($source);
-        $matches=array();
-        if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
-        {
-        	if (substr($matches[1],0,strlen($branch))==$branch)
-        	{
-	          $value=$matches[2];
-	          if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
-	          {
-	            $value=true;
-	          }
-	          else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
-	          {
-	            $value=false;
-	          }
-	          $this->preferences[$matches[1]]=$value;
-	        }
-        }
-	    }
-      fclose($source);
+  	if (!$merge)
+  	{
+      $this->preferences=array();
     }
-    else
+    if (strlen($branch)>0)
     {
-    	$this->log->warn('Unable to read file '.$file);
+    	$branch.='.';
+    }
+    while (!feof($source))
+    {
+      $line=fgets($source);
+      $matches=array();
+      if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
+      {
+      	if (substr($matches[1],0,strlen($branch))==$branch)
+      	{
+          $value=$matches[2];
+          if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
+          {
+            $value=true;
+          }
+          else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
+          {
+            $value=false;
+          }
+          $this->preferences[$matches[1]]=$value;
+        }
+      }
     }
 	}
 	
-	function savePreferences($file)
+	function savePreferences($source)
 	{
-    $source=fopen($file,'w');
-  	if ($source===false)
-  	{
-  		return;
-    }
-    flock($source,LOCK_EX);
     foreach ($this->preferences as $key => $value)
     {
     	fwrite($source,$key.'='.$value."\n");
     }
-    flock($source,LOCK_UN);
-    fclose($source);
 	}
 	
 	function setPref($name,$value)

@@ -13,133 +13,22 @@
  * $Revision$
  */
 
-class Block
+class Block extends Resource
 {
-	var $dir;
-	var $resource;
-	var $prefs;
-	var $version;
-	var $container;
 	var $type = 'div';
-	var $id;
-	var $lock;
-	var $modified;
 	var $log;
 	
-	function Block()
+	function Block(&$container,$id,$version)
 	{
-		global $_PREFS;
+		$this->Resource($container,$id,$version);
 		$this->log=&LoggerManager::getLogger('swim.block');
-		$this->prefs = new Preferences();
-		$this->prefs->setParent($_PREFS);
-	}
-	
-	function isWritable()
-	{
-		return $this->container->isWritable();
-	}
-	
-	function isVisible()
-	{
-		return $this->container->isVisible();
 	}
 	
 	function &getBlockEditor()
 	{
 		return null;
 	}
-	
-	function setID($id)
-	{
-		$this->id=$id;
-		unset($this->dir);
-		unset($this->resource);
-	}
-	
-	function setVersion($version)
-	{
-		$this->version=$version;
-		unset($this->dir);
-	}
-	
-	function setContainer($container)
-	{
-		$this->container=$container;
-		if (is_a($container,'Page'))
-		{
-			$this->prefs->setParent($container->prefs);
-		}
-		unset($this->dir);
-		unset($this->resource);
-	}
-	
-	function getResource()
-	{
-		if (!isset($this->resource))
-		{
-			if (is_a($this->container,'Page'))
-			{
-				$this->resource=$this->container->getResource();
-			}
-			else
-			{
-				$this->resource=$this->container->getBlockResource($this->id);
-			}
-			$this->log->debug('Resource determined to be '.$this->resource);
-		}
-		return $this->resource;
-	}
-	
-	function getDir()
-	{
-		if (!isset($this->dir))
-		{
-			if (is_a($this->container,'Page'))
-			{
-				$this->dir=$this->container->getDir().'/blocks/'.$this->id;
-			}
-			else
-			{
-				$this->dir=getResourceVersion($this->getResource(),$this->version);
-			}
-			$this->log->debug('Dir determined to be '.$this->dir);
-		}
-		return $this->dir;
-	}
-	
-	function init()
-	{
-	}
-	
-	function blockInit()
-	{
-	}
-	
-	function lockRead()
-	{
-		$this->lock=lockResourceRead($this->getDir());
-	}
-	
-	function lockWrite()
-	{
-		$this->lock=lockResourceWrite($this->getDir());
-	}
-	
-	function unlock()
-	{
-		unlockResource($this->lock);
-	}
-	
-	function getModifiedDate()
-	{
-		if (!isset($this->modified))
-		{
-			$stat=stat($this->getDir().'/block.conf');
-			$this->modified=$stat['mtime'];
-		}
-		return $this->modified;
-	}
-	
+
 	function getType()
 	{
 		return $this->type;
@@ -217,19 +106,24 @@ class Block
 	}
 }
 
-function &loadBlock($blockdir,$container,$id,$version=false)
+function &loadBlock(&$container,$id,$version=false)
 {
 	global $_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.block.loader');
 	
+	$blockdir=$container->getBlockDir($id,$version);
+	
 	$lock=lockResourceRead($blockdir);
 
 	$blockprefs = new Preferences();
 	$blockprefs->setParent($_PREFS);
-	if (is_readable($blockdir.'/block.conf'))
+	if (is_readable($blockdir.'/resource.conf'))
 	{
-		$blockprefs->loadPreferences($blockdir.'/block.conf','block');
+		//TODO do a security check
+		$file=fopen($blockdir.'/resource.conf','r');
+		$blockprefs->loadPreferences($file,'block');
+		fclose($file);
 	}
 	$class=$blockprefs->getPref('block.class');
 	if ($blockprefs->isPrefSet('block.classfile'))
@@ -246,13 +140,7 @@ function &loadBlock($blockdir,$container,$id,$version=false)
 	if (class_exists($class))
 	{
 		$log->debug('Block loaded');
-		$object = new $class();
-		$object->prefs = $blockprefs;
-		$object->setContainer($container);
-		$object->setID($id);
-		$object->setVersion($version);
-		$object->blockInit();
-		$object->init();
+		$object = new $class($container,$id,$version);
 		return $object;
 	}
 	else

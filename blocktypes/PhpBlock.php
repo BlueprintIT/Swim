@@ -15,9 +15,9 @@
 
 class PhpBlock extends Block
 {
-	function PhpBlock()
+	function PhpBlock(&$container,$id,$version)
 	{
-		$this->Block();
+		$this->Block($container,$id,$version);
 	}
 	
 	function displayContent(&$parser,$attrs,$text)

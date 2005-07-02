@@ -14,8 +14,8 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	padding-top: <?= $headerheight+$spacer+$menuheight+$spacer ?>px;
-	padding-bottom: <?= $footerheight+$spacer ?>px;
+	padding-top: <?= $headerheight+$spacing+$menuheight ?>px;
+	padding-bottom: <?= $footerheight ?>px;
 	overflow: hidden;
 	font-size: 1em;
 	background-color: white;
@@ -45,6 +45,7 @@ img#cogs {
 	border: 0;
 	padding: 0;
 	margin: 0;
+	width: 150px;
 	height: <?= $headerheight ?>;
 	border-right: <?= $spacing ?>px white solid;
 }
@@ -64,7 +65,7 @@ div#menubar {
 	margin: 0;
 	padding: 0;
 	position: absolute;
-	top: <?= $headerheight+$spacer+1 ?>px;
+	top: <?= $headerheight+$spacing ?>px;
 	left: 0;
 	height: <?= $menuheight ?>px;
 	width: 100%;

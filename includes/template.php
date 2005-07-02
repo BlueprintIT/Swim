@@ -13,85 +13,17 @@
  * $Revision$
  */
 
-class Template
+class Template extends Resource
 {
-	var $dir;
-	var $resource;
-	var $container;
-	var $id;
-	var $prefs;
 	var $parsing = false;
 	var $curPage;
-	var $lock;
 	var $log;
-	var $version;
 	
-	function Template($container,$id,$version)
+	function Template(&$container,$id,$version)
 	{
-		global $_PREFS;
+		$this->Resource($container,$id,$version);
 		
 		$this->log=&LoggerManager::getLogger('swim.template');
-		
-		$this->container=&$container;
-		$this->id=$id;
-		$this->prefs = new Preferences();
-		$this->prefs->setParent($_PREFS);
-		
-		$this->resource=$container->getTemplateResource($id);
-		$this->version=$version;
-		$this->dir=getResourceVersion($this->resource,$version);
-		
-		// If the template doesnt exist then there is a problem
-		if ($this->dir===false)
-		{
-			trigger_error('This website has not been properly configured.');
-			exit;
-		}
-		
-		$this->lockRead();
-		
-		// If the template has prefs then load them
-		if (is_readable($this->dir.'/template.conf'))
-		{
-			$this->prefs->loadPreferences($this->dir.'/template.conf','template');
-		}
-		
-		$this->unlock();
-	}
-	
-	function isWritable()
-	{
-		return $this->container->isWritable();
-	}
-	
-	function isVisible()
-	{
-		return $this->container->isVisible();
-	}
-	
-	function getDir()
-	{
-		return $this->dir;
-	}
-	
-	function getResource()
-	{
-		return $this->resource;
-	}
-	
-	function lockRead()
-	{
-		$this->lock=lockResourceRead($this->dir);
-	}
-	
-	function lockWrite()
-	{
-		$this->lock=lockResourceWrite($this->dir);
-	}
-	
-	function unlock()
-	{
-		unlockResource($this->lock);
 	}
 	
 	function &generateRelativeURL(&$data,$url,$method)

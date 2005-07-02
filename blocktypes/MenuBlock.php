@@ -264,13 +264,10 @@ class MenuBlock extends Block
 {
 	var $rootmenu;
 	
-	function MenuBlock()
+	function MenuBlock(&$container,$id,$version)
 	{
-		$this->Block();
-	}
-	
-	function init()
-	{
+		$this->Block($container,$id,$version);
+
 		$file=$this->prefs->getPref('block.menublock.filename','block.xml');
 		$parser = new MenuParser();
 		//LoggerManager::setLogLevel('',SWIM_LOG_ALL);

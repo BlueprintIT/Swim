@@ -13,47 +13,37 @@
  * $Revision$
  */
 
-class Page
+class Page extends Resource
 {
-	var $container;
-	var $resource;
-	var $dir;
-	var $prefs;
 	var $blocks;
-	var $version;
-	var $id;
-	var $lock;
-	var $container;
-	var $modified;
 	
 	function Page(&$container,$id,$version)
 	{
 		global $_PREFS;
 
+		$this->Resource($container,$id,$version);
 		$this->container=&$container;
 		$this->id=$id;
 		$this->version=$version;
 	
 		$this->blocks = array();
-		$this->prefs = new Preferences();
-		$this->prefs->setParent($_PREFS);
-		
-		$this->resource=$container->getPageResource($id);
-		$this->dir=getResourceVersion($this->resource,$this->version);
-		
-		$this->lockRead();
-		$this->prefs->loadPreferences($this->getDir().'/page.conf','page');
-		$this->unlock();
 	}
 	
-	function isWritable()
+	function getResourceDir(&$resource)
 	{
-		return $this->container->isWritable();
+		if (is_a($resource,'Block'))
+		{
+			return $this->getDir().'/blocks/'.$resource->id;
+		}
+		if (is_a($resource,'File'))
+		{
+			return $this->getDir();
+		}
 	}
 	
-	function isVisible()
+	function getBlockDir($id,$version)
 	{
-		return $this->container->isVisible();
+		return $this->getDir().'/blocks/'.$id;
 	}
 	
 	function display(&$request)
@@ -68,52 +58,17 @@ class Page
 		$template->displayAdmin($request,$this);
 	}
 	
-	function getDir()
-	{
-		return $this->dir;
-	}
-	
-	function getResource()
-	{
-		return $this->resource;
-	}
-	
-	function lockRead()
-	{
-		$this->lock=lockResourceRead($this->getDir());
-	}
-	
-	function lockWrite()
-	{
-		$this->lock=lockResourceWrite($this->getDir());
-	}
-	
-	function unlock()
-	{
-		unlockResource($this->lock);
-	}
-	
 	function savePreferences()
 	{
-		$this->lockWrite();
-		$this->prefs->savePreferences($this->getDir().'/page.conf');
-		$this->unlock();
+		$file=$this->openFileWrite('resource.conf');
+		$this->prefs->savePreferences($file);
+		$this->closeFile($file);
 	}
 	
 	function setBlock($id,&$block)
 	{
 		$block->setID($id);
 		$this->blocks[$id]=&$block;
-	}
-	
-	function getModifiedDate()
-	{
-		if (!isset($this->modified))
-		{
-			$stat=stat($this->getDir().'/page.conf');
-			$this->modified=$stat['mtime'];
-		}
-		return $this->modified;
 	}
 	
 	function isBlock($id)
@@ -160,7 +115,7 @@ class Page
 				if ($container=='page')
 				{
 					$version=$this->version;
-					$blockobj = &loadBlock($this->getDir().'/blocks/'.$block,$this,$block,$version);
+					$blockobj = &loadBlock($this,$block,$version);
 				}
 				else
 				{

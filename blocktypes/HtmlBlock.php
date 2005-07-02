@@ -15,9 +15,9 @@
 
 class HtmlBlock extends Block
 {
-	function HtmlBlock()
+	function HtmlBlock(&$container,$id,$version)
 	{
-		$this->Block();
+		$this->Block($container,$id,$version);
 	}
 	
 	function &getBlockEditor()

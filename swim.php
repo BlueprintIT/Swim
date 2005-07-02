@@ -25,8 +25,8 @@ LoggerManager::setLogLevel('',SWIM_LOG_INFO);
 //LoggerManager::setLogLevel('swim.cache',SWIM_LOG_WARN);
 //LoggerManager::setLogLevel('swim.block',SWIM_LOG_WARN);
 //LoggerManager::setLogLevel('swim.page',SWIM_LOG_WARN);
-//LoggerManager::setLogLevel('swim.menu',SWIM_LOG_WARN);
-//LoggerManager::setLogLevel('swim.parser',SWIM_LOG_WARN);
+//LoggerManager::setLogLevel('swim.resource',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.parser',SWIM_LOG_WARN);
 
 $log=&LoggerManager::getLogger('swim');
 

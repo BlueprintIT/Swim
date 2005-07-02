@@ -13,13 +13,8 @@
  * $Revision$
  */
 
-class Container
+class Container extends Resource
 {
-	var $prefs;
-	var $id;
-	var $dir;
-	var $lock;
-	
 	var $log;
 	
 	var $templates = array();
@@ -36,25 +31,12 @@ class Container
 		$this->prefs->setParent($_PREFS);
 		$this->dir=$this->prefs->getPref('container.'.$id.'.basedir');
 		$this->log->debug('Container '.$id.' is at '.$this->dir);
-		if (is_readable($this->dir.'/container.conf'))
+		if ($this->isFileReadable('resource.conf'))
 		{
-			$this->prefs->loadPreferences($this->dir.'/container.conf');
+			$file=$this->openFileRead('resource.conf');
+			$this->prefs->loadPreferences($file);
+			$this->closeFile($file);
 		}
-	}
-	
-	function lockRead()
-	{
-		$this->lock=lockResourceRead($this->dir);
-	}
-	
-	function lockWrite()
-	{
-		$this->lock=lockResourceWrite($this->dir);
-	}
-	
-	function unlock()
-	{
-		unlockResource($this->lock);
 	}
 	
 	function isVisible()
@@ -67,39 +49,43 @@ class Container
 		return $this->prefs->getPref('container.writable',true);
 	}
 	
-	function getFileDir()
+	function getResourceDir(&$resource)
 	{
-		return $this->dir.'/files';
+		if (is_a($resource,'Page'))
+		{
+			return $this->dir.'/pages/'.$resource->id.'/'.$resource->version;
+		}
+		if (is_a($resource,'Block'))
+		{
+			return $this->getBlockDir($resource->id,$resource->version);
+		}
+		if (is_a($resource,'Template'))
+		{
+			return $this->dir.'/templates/'.$resource->id.'/'.$resource->version;
+		}
+		if (is_a($resource,'File'))
+		{
+			return $this->dir.'/files';
+		}
 	}
 	
-	function getBlockResource($id)
+	function getBlockDir($id,$version)
 	{
-		return $this->dir.'/blocks/'.$id;
-	}
-	
-	function isBlock($id,$version)
-	{
-		$dir=$this->getBlockResource($id);
-		$dir=getResourceVersion($dir,$version);
-		if ((is_dir($dir))&&(is_readable($dir.'/block.conf')))
-			return true;
-		else
-			return false;
+		return $this->getDir().'/blocks/'.$id.'/'.$version;
 	}
 	
 	function &getBlock($id,$version=false)
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getBlockResource($id));
+			$version=getCurrentVersion($this->getDir().'/blocks/'.$id);
 		}
 		if (!isset($this->blocks[$id][$version]))
 		{
-			if ($this->isBlock($id,$version))
+			$block = &loadBlock($this,$id,$version);
+			if ($block->exists())
 			{
-				$dir=$this->getBlockResource($id);
-				$dir=getResourceVersion($dir,$version);
-				$this->blocks[$id][$version]=&loadBlock($dir,$this,$id,$version);
+				$this->blocks[$id][$version]=&$block;
 			}
 			else
 			{
@@ -129,39 +115,18 @@ class Container
 		return $blocks;
 	}
 	
-	function getPageResource($id)
-	{
-		return $this->dir.'/pages/'.$id;
-	}
-	
-	function isPage($id,$version=false)
-	{
-		$dir=$this->getPageResource($id);
-		if ($version===false)
-		{
-			$dir=getCurrentResource($dir);
-		}
-		else
-		{
-			$dir=getResourceVersion($dir,$version);
-		}
-		if ((is_dir($dir))&&(is_readable($dir.'/page.conf')))
-			return true;
-		else
-			return false;
-	}
-	
 	function &getPage($id,$version=false)
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getPageResource($id));
+			$version=getCurrentVersion($this->getDir().'/pages/'.$id);
 		}
 		if (!isset($this->pages[$id][$version]))
 		{
-			if ($this->isPage($id,$version))
+			$page = new Page($this,$id,$version);
+			if ($page->exists())
 			{
-				$this->pages[$id][$version] = new Page($this,$id,$version);
+				$this->pages[$id][$version]=&$page;
 			}
 			else
 			{
@@ -191,32 +156,18 @@ class Container
 		return $pages;
 	}
 
-	function getTemplateResource($id)
-	{
-		return $this->dir.'/templates/'.$id;
-	}
-	
-	function isTemplate($id,$version)
-	{
-		$dir=$this->getTemplateResource($id);
-		$dir=getResourceVersion($dir,$version);
-		if (is_dir($dir))
-			return true;
-		else
-			return false;
-	}
-	
 	function &getTemplate($id,$version=false)
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getTemplateResource($id));
+			$version=getCurrentVersion($this->getDir().'/templates/'.$id);
 		}
 		if (!isset($this->templates[$id][$version]))
 		{
-			if ($this->isTemplate($id,$version))
+			$template = new Template($this,$id,$version);
+			if ($template->exists())
 			{
-				$this->templates[$id][$version] = new Template($this,$id,$version);
+				$this->templates[$id][$version] = &$template;
 			}
 			else
 			{
