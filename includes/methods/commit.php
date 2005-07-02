@@ -29,33 +29,33 @@ function method_commit(&$request)
 		{
 			if ($resource->isBlock())
 			{
-				$block=&$resource->getBlock();
-				$temp=getTempVersion($block->getResource());
+				$oldversion=&$resource;
+				$temp=$resource->getWorkingDir();
 				if ($temp===false)
 				{
 					displayLocked($request,$block->getResource());
 					return;
 				}
-				$newversion=cloneVersion($block->getResource());
-				freeTempVersion($block->getResource());
+				$workingversion=$resource->makeWorkingVersion();
+				$newversion=$working->makeNewVersion();
+				$resource->freeWorkingDir();
 
-				$oldversion=$block->version;
-				if ($oldversion==getCurrentVersion($block->getResource()))
+				if ($oldversion->isCurrentVersion())
 				{
-					setCurrentVersion($block->getResource(),$newversion);
+					$newversion->makeCurrentVersion();
 				}
 
-				if (is_a($block->container,'Page'))
+				if (is_a($oldversion->container,'Page'))
 				{
 					redirect($request->nested);
 				}
 				else
 				{
 					$nresource=&Resource::decodeResource($request->nested);
-					if (isset($nresource->page))
+					if ($nresource->isPage())
 					{
-						$page=&$nresource->getPage();
-						$usage=$page->getBlockUsage($block);
+						$page=&$nresource;
+						$usage=$page->getBlockUsage($oldversion);
 						if (count($usage)>0)
 						{
 							$clone=false;
@@ -69,8 +69,7 @@ function method_commit(&$request)
 							}
 							if ($clone)
 							{
-								$newv=cloneVersion($page->getResource(),$page->version);
-								$newpage=&$page->container->getPage($page->id,$newv);
+								$newpage=&$page->makeNewVersion();
 
 								foreach ($usage as $id)
 								{
@@ -81,8 +80,8 @@ function method_commit(&$request)
 								}
 
 								$newpage->savePreferences();
-								if (getCurrentVersion($page->getResource())==$page->version)
-									setCurrentVersion($newpage->getResource(),$newv);
+								if ($page->isCurrentVersion())
+									$newpage->makeCurrentVersion();
 							}
 						}
 					}
@@ -92,7 +91,7 @@ function method_commit(&$request)
 					foreach(array_keys($list) as $pkey)
 					{
 						$page=&$list[$pkey];
-						$usage=$page->getBlockUsage($block);
+						$usage=$page->getBlockUsage($oldversion);
 						
 						$blocks=$page->prefs->getPrefBranch('page.blocks');
 						if (count($usage)>0)
@@ -110,8 +109,7 @@ function method_commit(&$request)
 							{
 								if ($autocommit)
 								{
-									$newv=cloneVersion($page->getResource(),$page->version);
-									$newpage=&$page->container->getPage($page->id,$newv);
+									$newpage=&$page->makeNewVersion();
 
 									foreach ($usage as $id)
 									{
@@ -122,7 +120,7 @@ function method_commit(&$request)
 									}
 
 									$newpage->savePreferences();
-									setCurrentVersion($newpage->getResource(),$newv);
+									$newpage->makeCurrentVersion();
 								}
 								else
 								{
@@ -147,9 +145,7 @@ function method_commit(&$request)
 			}
 			else if ($resource->isPage())
 			{
-				$page=$resource->getPage();
-				$newv=cloneVersion($page->getResource(),$page->version);
-				$newpage=&$page->container->getPage($page->id,$newv);
+				$newpage=&$resource->makeNewVersion();
 				foreach ($request->query as $name => $value)
 				{
 					if (substr($name,0,5)=='page.')
@@ -158,8 +154,8 @@ function method_commit(&$request)
 					}
 				}
 				$newpage->savePreferences();
-				if ($page->version==getCurrentVersion($page->getResource()))
-					setCurrentVersion($newpage->getResource(),$newv);
+				if ($resource->isCurrentVersion())
+					$newpage->makeCurrentVersion();
 				redirect($request->nested);
 			}
 			else

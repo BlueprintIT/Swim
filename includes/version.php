@@ -13,21 +13,6 @@
  * $Revision$
  */
 
-// Given the root dir of a resource this functon will return the dir of the current version of the resource.
-// The current version is not necessarily the newest version, but usually will be.
-function getCurrentResource($dir)
-{
-	$newest=getCurrentVersion($dir);
-	if ($newest===false)
-	{
-		return false;
-	}
-	else
-	{
-		return $dir.'/'.$newest;
-	}
-}
-
 function recursiveDelete($dir,$ignorelock=false)
 {
 	global $_PREFS;
@@ -100,48 +85,6 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 		}
 		closedir($res);
 	}
-}
-
-function setCurrentVersion($dir,$version)
-{
-	$lock=lockResourceWrite($dir);
-	
-	$vers=fopen($dir.'/version','w');
-	fwrite($vers,$version);
-	fclose($vers);
-	
-	unlockResource($lock);
-}
-
-// Retrieves the latest version of a resource.
-function getCurrentVersion($dir)
-{
-	if (is_readable($dir.'/version'))
-	{
-		$lock=lockResourceRead($dir);
-		
-		$vers=fopen($dir.'/version','r');
-		$version=fgets($vers);
-		fclose($vers);
-		
-		unlockResource($lock);
-	
-		if (is_dir($dir.'/'.$version))
-		{
-			return $version;
-		}
-	}
-	return false;
-}
-
-// Retrieves a particular version of a resource.
-function getResourceVersion($dir,$version)
-{
-	if (is_dir($dir.'/'.$version))
-	{
-		return $dir.'/'.$version;
-	}
-	return false;
 }
 
 ?>

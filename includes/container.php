@@ -200,6 +200,69 @@ class Container extends Resource
 		}
 	}
 	
+	function isCurrentResourceVersion(&$resource)
+	{
+		$current=&$this->getCurrentResourceVersion($resource);
+		return ($current->version==$resource->version);
+	}
+	
+	function makeCurrentResourceVersion(&$resource)
+	{
+		if (is_a($resource,'Page'))
+		{
+			$dir=$this->getDir().'/pages/'.$resource->id;
+		}
+		else if (is_a($resource,'Block'))
+		{
+			$dir=$this->getDir().'/blocks/'.$resource->id;
+		}
+		else if (is_a($resource,'Template'))
+		{
+			$dir=$this->getDir().'/templates/'.$resource->id;
+		}
+
+		$lock=lockResourceWrite($dir);
+		$vers=fopen($dir.'/version','w');
+		fwrite($vers,$resource->version);
+		fclose($vers);
+		unlockResource($lock);
+	}
+	
+	function &getCurrentResourceVersion(&$resource)
+	{
+		if (is_a($resource,'Page'))
+		{
+			$dir=$this->getDir().'/pages/'.$resource->id;
+		}
+		else if (is_a($resource,'Block'))
+		{
+			$dir=$this->getDir().'/blocks/'.$resource->id;
+		}
+		else if (is_a($resource,'Template'))
+		{
+			$dir=$this->getDir().'/templates/'.$resource->id;
+		}
+
+		$lock=lockResourceRead($dir);
+		$vers=fopen($dir.'/version','r');
+		$version=fgets($vers);
+		fclose($vers);
+		unlockResource($lock);
+
+		if (is_a($resource,'Page'))
+		{
+			return $this->getPage($resource->id,$version);
+		}
+		else if (is_a($resource,'Block'))
+		{
+			return $this->getBlock($resource->id,$version);
+		}
+		else if (is_a($resource,'Template'))
+		{
+			return $this->getTemplate($resource->id,$version);
+		}
+	}
+	
 	function isVisible()
 	{
 		return $this->prefs->getPref('container.visible',true);

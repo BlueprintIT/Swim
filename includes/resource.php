@@ -72,6 +72,21 @@ class Resource
 		return $this->modified;
 	}
 	
+	function isCurrentVersion()
+	{
+		return $this->container->isCurrentResourceVersion($this);
+	}
+	
+	function makeCurrentVersion()
+	{
+		return $this->container->makeCurrentResourceVersion($this);
+	}
+	
+	function getCurrentVersion()
+	{
+		return $this->container->getCurrentResourceVersion($this);
+	}
+	
 	function exists()
 	{
 		return is_dir($this->getDir());

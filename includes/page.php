@@ -44,7 +44,7 @@ class Page extends Resource
 	
 	function freeResourceWorkingDir(&$resource)
 	{
-		$this->container->freeResourceWorkingVersion($this);
+		$this->container->freeResourceWorkingDir($this);
 	}
 	
 	function makeNewResourceVersion(&$resource)
@@ -82,6 +82,29 @@ class Page extends Resource
 		if (is_a($resource,'File'))
 		{
 			return $this->getDir();
+		}
+	}
+	
+	function isCurrentResourceVersion(&$resource)
+	{
+		return $this->container->isCurrentResourceVersion($this);
+	}
+	
+	function makeCurrentResourceVersion(&$resource)
+	{
+		$this->container->makeCurrentResourceVersion($this);
+	}
+	
+	function &getCurrentResourceVersion(&$resource)
+	{
+		$page=&$this->container->getCurrentResourceVersion($this);
+		if ($page===false)
+		{
+			return false;
+		}
+		else
+		{
+			return $page->getBlock($resource->id);
 		}
 	}
 	
@@ -137,7 +160,7 @@ class Page extends Resource
 					{
 						$result[]=$blk;
 					}
-					else if ($block->version==getCurrentVersion($block->getResource()))
+					else if ($block->isCurrentVersion())
 					{
 						$result[]=$blk;
 					}
