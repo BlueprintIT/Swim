@@ -163,10 +163,14 @@ function init()
 	global $_PREFS;
 	
 	$default = new Preferences();
-	$default->loadPreferences('default.conf');
+	$file=fopen('default.conf','r');
+	$default->loadPreferences($file);
+	fclose($file);
 	
 	$siteprefs = new Preferences();
-	$siteprefs->loadPreferences('site.conf');
+	$file=fopen('site.conf','r');
+	$siteprefs->loadPreferences($file);
+	fclose($file);
 	$siteprefs->setParent($default);
 	
 	$default->setOverride($siteprefs);

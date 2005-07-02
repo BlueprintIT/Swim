@@ -1,18 +1,17 @@
 <?
 
 $resource = &Resource::decodeResource($request);
-$block=&$resource->getBlock();
 
 $commit = new Request();
 $commit->method='commit';
 $commit->resource=$request->resource;
-$commit->query['version']=$block->version;
+$commit->query['version']=$resource->version;
 $commit->nested=&$request->nested;
 
 $cancel = new Request();
 $cancel->method='cancel';
 $cancel->resource=$request->resource;
-$cancel->query['version']=$block->version;
+$cancel->query['version']=$resource->version;
 $cancel->nested=&$request->nested;
 
 ?>

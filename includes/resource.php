@@ -34,12 +34,32 @@ class Resource
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 		
-		if ($this->isFileReadable('resource.conf'))
+		$file=$this->openFileRead('resource.conf');
+		if ($file!==false)
 		{
-			$file=$this->openFileRead('resource.conf');
 			$this->prefs->loadPreferences($file);
 			$this->closeFile($file);
 		}
+	}
+	
+	function getWorkingDir()
+	{
+		return $this->container->getResourceWorkingDir($this);
+	}
+	
+	function freeWorkingDir()
+	{
+		$this->container->freeResourceWorkingDir($this);
+	}
+	
+	function makeNewVersion()
+	{
+		return $this->container->makeNewResourceVersion($this);
+	}
+	
+	function makeWorkingVersion()
+	{
+		return $this->container->makeResourceWorkingVersion($this);
 	}
 	
 	function getModifiedDate()
@@ -170,7 +190,7 @@ class Resource
 	
 	function openFileRead($filename)
 	{
-		if ($this->isFileReadable($filename))
+		if ($this->fileIsReadable($filename))
 		{
 			$this->lockRead();
 			return fopen($this->getDir().'/'.$filename,'r');
@@ -180,7 +200,7 @@ class Resource
 	
 	function openFileWrite($filename,$append=false)
 	{
-		if ($this->isFileWritable($filename))
+		if ($this->fileIsWritable($filename))
 		{
 			$this->lockWrite();
 			$mode='w';
@@ -343,17 +363,17 @@ class File extends Resource
 
 	function exists()
 	{
-		return (($this->parent->fileExists($this->id))||($this->parent->fileExists($this->id.'.php')));
+		return ((parent::fileExists($this->id))||(parent::fileExists($this->id.'.php')));
 	}
 	
-	function isFileReadable()
+	function fileIsReadable()
 	{
-		return (($this->parent->isFileReadable($this->id))||($this->parent->isFileReadable($this->id.'.php')));
+		return ((parent::fileIsReadable($this->id))||(parent::fileIsReadable($this->id.'.php')));
 	}
 	
-	function isFileWritable()
+	function fileIsWritable()
 	{
-		return $this->parent->isFileWritable($this->id);
+		return parent::fileIsWritable($this->id);
 	}
 
 	function getModifiedDate()
@@ -394,17 +414,12 @@ class File extends Resource
 	
 	function openFileRead()
 	{
-		return $this->parent->openFileRead($this->id);
+		return parent::openFileRead($this->id);
 	}
 	
 	function openFileWrite($append=false)
 	{
-		return $this->parent->openFileWrite($this->id,$append);
-	}
-	
-	function closeFile($file)
-	{
-		$this->parent->closeFile($file);
+		return parent::openFileWrite($this->id,$append);
 	}
 }
 

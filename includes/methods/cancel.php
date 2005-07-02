@@ -23,14 +23,9 @@ function method_cancel(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->type=='block')
+			if ($resource->isBlock())
 			{
-				$block=&$resource->getBlock();
-				$temp=getTempVersion($block->getResource());
-				if ($temp!==false)
-				{
-					freeTempVersion($block->getResource());
-				}
+				$resource->freeWorkingDir();
 				redirect($request->nested);
 			}
 			else

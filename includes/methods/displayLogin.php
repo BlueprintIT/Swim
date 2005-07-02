@@ -20,9 +20,9 @@ function method_displayLogin(&$request)
 	
 	$version=false;
 	$container = &getContainer('internal');
-	if ($container->isPage($_PREFS->getPref('method.login.page'),$version))
+	$page = &$container->getPage($_PREFS->getPref('method.login.page'),$version);
+	if ($page!==false)
 	{
-		$page = &$container->getPage($_PREFS->getPref('method.login.page'),$version);
 		$page->display($request);
 	}
 	else

@@ -26,14 +26,13 @@ function method_admin(&$request)
 		{
 			if ($resource->isPage())
 			{
-				$page = &$resource->getPage();
-				if ($page->prefs->getPref("page.editable")===false)
+				if ($resource->prefs->getPref("page.editable")===false)
 				{
-					$page->display($request);
+					$resource->display($request);
 				}
 				else
 				{
-					$page->displayAdmin($request);
+					$resource->displayAdmin($request);
 				}
 			}
 			else

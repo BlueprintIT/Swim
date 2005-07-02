@@ -31,11 +31,172 @@ class Container extends Resource
 		$this->prefs->setParent($_PREFS);
 		$this->dir=$this->prefs->getPref('container.'.$id.'.basedir');
 		$this->log->debug('Container '.$id.' is at '.$this->dir);
-		if ($this->isFileReadable('resource.conf'))
+		$file=$this->openFileRead('resource.conf');
+		if ($file!==false)
 		{
-			$file=$this->openFileRead('resource.conf');
 			$this->prefs->loadPreferences($file);
 			$this->closeFile($file);
+		}
+	}
+	
+	function getResourceWorkingDir(&$resource)
+	{
+		global $_USER;
+		
+		if (!$_USER->isLoggedIn())
+		{
+			return false;
+		}
+	
+		if (is_a($resource,'Page'))
+		{
+			$dir=$this->getDir().'/pages/'.$resource->id;
+		}
+		else if (is_a($resource,'Block'))
+		{
+			$dir=$this->getDir().'/blocks/'.$resource->id;
+		}
+		else if (is_a($resource,'Template'))
+		{
+			$dir=$this->getDir().'/templates/'.$resource->id;
+		}
+		
+		$result=false;
+		$temp=$dir.'/'.$this->prefs->getPref('version.working');
+		if (!is_dir($temp))
+		{
+			mkdir($temp);
+		}
+		
+		$lock=lockResourceWrite($temp);
+		if (is_file($temp.'/'.$this->prefs->getPref('locking.templockfile')))
+		{
+			$file=fopen($temp.'/'.$this->prefs->getPref('locking.templockfile'),'r');
+			$line=trim(fgets($file));
+			fclose($file);
+			if ($line==$_USER->getUsername())
+			{
+				$result=$temp;
+			}
+		}
+		else
+		{
+			$file=fopen($temp.'/'.$this->prefs->getPref('locking.templockfile'),'w');
+			fwrite($file,$_USER->getUsername());
+			fclose($file);
+			$result=$temp;
+		}
+		unlockResource($lock);
+		return $result;
+	}
+	
+	function freeResourceWorkingDir(&$resource)
+	{
+		$temp=$this->getResourceWorkingDir($resource);
+		if ($temp!==false)
+		{
+			$lock=lockResourceWrite($temp);
+			recursiveDelete($temp,true);
+			unlink($temp.'/'.$this->prefs->getPref('locking.templockfile'));
+			unlockResource($lock);
+			return true;
+		}
+		return false;
+	}
+
+	function &makeNewResourceVersion(&$resource)
+	{
+		if (is_a($resource,'Page'))
+		{
+			$dir=$this->getDir().'/pages/'.$resource->id;
+		}
+		else if (is_a($resource,'Block'))
+		{
+			$dir=$this->getDir().'/blocks/'.$resource->id;
+		}
+		else if (is_a($resource,'Template'))
+		{
+			$dir=$this->getDir().'/templates/'.$resource->id;
+		}
+		
+		$lock=fopen($dir.'/'.$this->prefs->getPref('locking.lockfile'),'a');
+		flock($lock,LOCK_EX);
+		
+		$newest=-1;
+		if ($res=@opendir($dir))
+		{
+			while (($file=readdir($res))!== false)
+			{
+				if (!(substr($file,0,1)=='.'))
+				{
+					if ((is_dir($dir.'/'.$file))&&(is_numeric($file)))
+					{
+						if ($file>$newest)
+						{
+							$newest=$file;
+						}
+					}
+				}
+			}
+			closedir($res);
+		}
+		if ($newest>=0)
+		{
+			$next=$newest+1;
+		}
+		else
+		{
+			$next=1;
+		}
+		
+		mkdir($dir.'/'.$next);
+	
+		flock($lock,LOCK_UN);
+		fclose($lock);
+		
+		$source=$resource->getDir();
+		$target=$dir.'/'.$next;
+		$resource->lockRead();
+		$lock=lockResourceWrite($target);
+		recursiveCopy($source,$target,true);
+		unlockResource($lock);
+		$resource->unlock();
+
+		if (is_a($resource,'Page'))
+		{
+			return $this->getPage($resource->id,$this->prefs->getPref('version.working'));
+		}
+		else if (is_a($resource,'Block'))
+		{
+			return $this->getBlock($resource->id,$this->prefs->getPref('version.working'));
+		}
+		else if (is_a($resource,'Template'))
+		{
+			return $this->getTemplate($resource->id,$this->prefs->getPref('version.working'));
+		}
+	}
+	
+	function &makeResourceWorkingVersion(&$resource)
+	{
+		$source=$resource->getDir();
+		$target=$this->getResourceWorkingDir($resource);
+		$resource->lockRead();
+		$lock=lockResourceWrite($target);
+		recursiveCopy($source,$target,true);
+		unlockResource($lock);
+		$resource->unlock();
+
+		if (is_a($resource,'Page'))
+		{
+			return $this->getPage($resource->id,$this->prefs->getPref('version.working'));
+		}
+		else if (is_a($resource,'Block'))
+		{
+			return $this->getBlock($resource->id,$this->prefs->getPref('version.working'));
+		}
+		else if (is_a($resource,'Template'))
+		{
+			return $this->getTemplate($resource->id,$this->prefs->getPref('version.working'));
 		}
 	}
 	

@@ -46,7 +46,7 @@ function determineContentType($file)
 
 function initContentTypes()
 {
-	global $_TYPEMAP;
+	global $_TYPEMAP,$_PREFS;
 
 	$file=fopen($_PREFS->getPref('storage.basedir').'/mimetypes.conf','r');
 	$_TYPEMAP->loadPreferences($file);

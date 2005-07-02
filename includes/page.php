@@ -29,6 +29,50 @@ class Page extends Resource
 		$this->blocks = array();
 	}
 	
+	function getResourceWorkingDir(&$resource)
+	{
+		$dir=$this->container->getResourceWorkingDir($this);
+		if ($dir===false)
+		{
+			return false;
+		}
+		else
+		{
+			return $dir.'/blocks/'.$resource->id;
+		}
+	}
+	
+	function freeResourceWorkingDir(&$resource)
+	{
+		$this->container->freeResourceWorkingVersion($this);
+	}
+	
+	function makeNewResourceVersion(&$resource)
+	{
+		$page=&$this->container->makeNewResourceVersion($this);
+		if ($page===false)
+		{
+			return false;
+		}
+		else
+		{
+			return $page->getBlock($resource->id);
+		}
+	}
+	
+	function makeResourceWorkingVersion(&$resource)
+	{
+		$page=&$this->container->makeResourceWorkingVersion($this);
+		if ($page===false)
+		{
+			return false;
+		}
+		else
+		{
+			return $page->getBlock($resource->id);
+		}
+	}
+
 	function getResourceDir(&$resource)
 	{
 		if (is_a($resource,'Block'))
