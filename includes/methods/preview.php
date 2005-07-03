@@ -27,7 +27,7 @@ function method_preview(&$request)
 		{
  			if ($resource->isPage())
 			{
-				$page = &$resource->getPage();
+				$page = &$resource;
 				
 				$template=$_PREFS->getPref('method.preview.template');
 				list($container,$template)=explode('/',$template,2);

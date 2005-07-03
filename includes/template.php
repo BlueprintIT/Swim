@@ -302,7 +302,7 @@ class Template extends Resource
 		{
 			header('ETag: '.$etag);
 		}
-		setValidTime(30);
+		setValidTime(10);
 
 		$stats=stat($this->dir.'/'.$file);
 		$modified=$stats['mtime'];

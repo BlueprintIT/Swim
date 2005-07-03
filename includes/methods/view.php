@@ -33,7 +33,7 @@ function method_view(&$request)
 					{
 						setModifiedDate($resource->getModifiedDate());
 						setContentType($resource->getContentType());
-						setValidTime(30);
+						setValidTime(10);
 						$etag=$resource->getETag();
 						if ($etag!==false)
 						{
