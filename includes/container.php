@@ -40,6 +40,11 @@ class Container extends Resource
 		}
 	}
 	
+	function getETag()
+	{
+		return $this->id;
+	}
+	
 	function getCurrentVersion($dir)
 	{
 		if ($this->isWritable())

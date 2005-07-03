@@ -33,6 +33,12 @@ function method_view(&$request)
 					{
 						setModifiedDate($resource->getModifiedDate());
 						setContentType($resource->getContentType());
+						setValidTime(30);
+						$etag=$resource->getETag();
+						if ($etag!==false)
+						{
+							header('ETag: '.$etag);
+						}
 						$resource->outputFile();
   				}
   				else

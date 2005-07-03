@@ -297,6 +297,13 @@ class Template extends Resource
 			setContentType('text/html');
 		}
 		
+		$etag=$page->getETag();
+		if ($etag!==false)
+		{
+			header('ETag: '.$etag);
+		}
+		setValidTime(30);
+
 		$stats=stat($this->dir.'/'.$file);
 		$modified=$stats['mtime'];
 		if (is_readable($this->dir.'/template.conf'))

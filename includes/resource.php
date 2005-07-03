@@ -160,6 +160,11 @@ class Resource
 		return $this->container->makeResourceWorkingVersion($this);
 	}
 	
+	function getETag()
+	{
+		return $this->container->getETag().'/'.get_class($this).'/'.$this->id.':'.$this->version;
+	}
+	
 	function getModifiedDate()
 	{
 		if (!isset($this->modified))
@@ -487,6 +492,11 @@ class File extends Resource
 		$this->prefs->setParent($_PREFS);
 	}
 
+	function getETag()
+	{
+		return $this->parent->getETag().':'.$this->id;
+	}
+	
 	function exists()
 	{
 		return ((parent::fileExists($this->id))||(parent::fileExists($this->id.'.php')));

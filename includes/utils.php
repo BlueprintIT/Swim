@@ -108,12 +108,16 @@ function displayError(&$request)
 	callMethod($newrequest);
 }
 
+function setValidTime($minutes)
+{
+	header('Cache-Control: max-age='.($minutes*60).', public');
+	header('Pragma: cache');
+	header('Expires: '.httpdate(time()+($minutes*60)));
+}
+
 function setModifiedDate($date)
 {
-	//header('Cache-Control: public');
-	//header('Pragma: ');
 	header('Last-Modified: '.httpdate($date));
-	//header('Expires: '.httpdate(time()+3600));
 }
 
 function callMethod(&$request)
