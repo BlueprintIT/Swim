@@ -30,20 +30,17 @@ function method_edit(&$request)
 		{
 			if ($resource->isBlock())
 			{
-				$temp=$resource->getWorkingDir();
-				if ($temp===false)
-				{
-					displayLocked($request,$resource->getResource());
-					return;
-				}
-
-				if (!is_readable($temp.'/block.conf'))
+				$details=$resource->getWorkingDetails();
+				if ($details->isMine())
 				{
 					$working=$resource->makeWorkingVersion();
+					$page=&$working->getBlockEditor();
+					$page->display($request);
 				}
-				
-				$page=&$resource->getBlockEditor();
-				$page->display($request);
+				else
+				{
+					displayLocked($request,$resource->getResource());
+				}
 			}
 			else if ($resource->isPage())
 			{

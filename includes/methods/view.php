@@ -42,18 +42,23 @@ function method_view(&$request)
   			}
   			else if ($_SERVER['REQUEST_METHOD']=='PUT')
   			{
+  				$log->debug('Preparing to write file');
   			  $in=@fopen('php://input','rb');
   			  if ($in!==false)
   			  {
+  					$log->debug('Opened input');
     			  $out=$resource->openFileWrite();
     			  if ($out!==false)
     			  {
+  						$log->debug('Opened output');
       			  while (!feof($in))
       			  {
       			    $data=fread($in,1024);
         			  fwrite($out,$data);
+      			  	$log->debug('Read '.$data);
         			}
  
+  						$log->debug('Closing files');
  							$resource->closeFile($out);
      			    fclose($in);
             	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");

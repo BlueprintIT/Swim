@@ -20,6 +20,7 @@ class Container extends Resource
 	var $templates = array();
 	var $pages = array();
 	var $blocks = array();
+	var $working = array();
 	
 	function Container($id)
 	{
@@ -54,73 +55,37 @@ class Container extends Resource
 		{
 			unlockResource($lock);
 		}
+		
+		return $version;
 	}
 	
-	function getResourceWorkingDir(&$resource)
+	function &getResourceWorkingDetails(&$resource)
 	{
 		global $_USER;
 		
-		if (!$_USER->isLoggedIn())
-		{
-			return false;
-		}
-	
 		if (is_a($resource,'Page'))
 		{
+			$type='page';
 			$dir=$this->getDir().'/pages/'.$resource->id;
 		}
 		else if (is_a($resource,'Block'))
 		{
+			$type='block';
 			$dir=$this->getDir().'/blocks/'.$resource->id;
 		}
 		else if (is_a($resource,'Template'))
 		{
+			$type='template';
 			$dir=$this->getDir().'/templates/'.$resource->id;
 		}
 		
-		$result=false;
-		$temp=$dir.'/'.$this->prefs->getPref('version.working');
-		if (!is_dir($temp))
+		if (!isset($this->working[$type][$resource->id]))
 		{
-			mkdir($temp);
+			$this->working[$type][$resource->id] = new WorkingDetails($this,$resource->id,$this->prefs->getPref('version.working'),$dir.'/'.$this->prefs->getPref('version.working'));
 		}
-		
-		$lock=lockResourceWrite($temp);
-		if (is_file($temp.'/'.$this->prefs->getPref('locking.templockfile')))
-		{
-			$file=fopen($temp.'/'.$this->prefs->getPref('locking.templockfile'),'r');
-			$line=trim(fgets($file));
-			fclose($file);
-			if ($line==$_USER->getUsername())
-			{
-				$result=$temp;
-			}
-		}
-		else
-		{
-			$file=fopen($temp.'/'.$this->prefs->getPref('locking.templockfile'),'w');
-			fwrite($file,$_USER->getUsername());
-			fclose($file);
-			$result=$temp;
-		}
-		unlockResource($lock);
-		return $result;
+		return $this->working[$type][$resource->id];
 	}
 	
-	function freeResourceWorkingDir(&$resource)
-	{
-		$temp=$this->getResourceWorkingDir($resource);
-		if ($temp!==false)
-		{
-			$lock=lockResourceWrite($temp);
-			recursiveDelete($temp,true);
-			unlink($temp.'/'.$this->prefs->getPref('locking.templockfile'));
-			unlockResource($lock);
-			return true;
-		}
-		return false;
-	}
-
 	function &makeNewResourceVersion(&$resource)
 	{
 		if (is_a($resource,'Page'))
@@ -181,39 +146,42 @@ class Container extends Resource
 
 		if (is_a($resource,'Page'))
 		{
-			return $this->getPage($resource->id,$this->prefs->getPref('version.working'));
+			return $this->getPage($resource->id,$next);
 		}
 		else if (is_a($resource,'Block'))
 		{
-			return $this->getBlock($resource->id,$this->prefs->getPref('version.working'));
+			return $this->getBlock($resource->id,$next);
 		}
 		else if (is_a($resource,'Template'))
 		{
-			return $this->getTemplate($resource->id,$this->prefs->getPref('version.working'));
+			return $this->getTemplate($resource->id,$next);
 		}
 	}
 	
 	function &makeResourceWorkingVersion(&$resource)
 	{
 		$source=$resource->getDir();
-		$target=$this->getResourceWorkingDir($resource);
-		$resource->lockRead();
-		$lock=lockResourceWrite($target);
-		recursiveCopy($source,$target,true);
-		unlockResource($lock);
-		$resource->unlock();
+		$details=&$this->getResourceWorkingDetails($resource);
+		if ($details->isNew())
+		{
+			$resource->lockRead();
+			$lock=lockResourceWrite($details->getDir());
+			recursiveCopy($source,$details->getDir(),true);
+			unlockResource($lock);
+			$resource->unlock();
+		}
 
 		if (is_a($resource,'Page'))
 		{
-			return $this->getPage($resource->id,$this->prefs->getPref('version.working'));
+			return $this->getPage($resource->id,$details->version);
 		}
 		else if (is_a($resource,'Block'))
 		{
-			return $this->getBlock($resource->id,$this->prefs->getPref('version.working'));
+			return $this->getBlock($resource->id,$details->version);
 		}
 		else if (is_a($resource,'Template'))
 		{
-			return $this->getTemplate($resource->id,$this->prefs->getPref('version.working'));
+			return $this->getTemplate($resource->id,$details->version);
 		}
 	}
 	
@@ -319,6 +287,7 @@ class Container extends Resource
 	
 	function &getBlock($id,$version=false)
 	{
+		$this->log->debug('Getting block '.$id.' '.$version);
 		if ($version===false)
 		{
 			$version=$this->getCurrentVersion($this->getDir().'/blocks/'.$id);
@@ -326,12 +295,13 @@ class Container extends Resource
 		if (!isset($this->blocks[$id][$version]))
 		{
 			$block = &loadBlock($this,$id,$version);
-			if ($block->exists())
+			if (($block!==false)&&($block->exists()))
 			{
 				$this->blocks[$id][$version]=&$block;
 			}
 			else
 			{
+				$this->log->debug('Failed');
 				$this->blocks[$id][$version]=false;
 			}
 		}

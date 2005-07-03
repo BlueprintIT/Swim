@@ -7,6 +7,107 @@
  * $Revision$
  */
 
+class WorkingDetails
+{
+	var $user;
+	var $date;
+	var $version;
+	var $dir;
+	var $id;
+	var $blank;
+	var $container;
+	
+	function WorkingDetails(&$container,$id,$version,$dir)
+	{
+		global $_USER;
+		
+		$this->id=$id;
+		$this->container=&$container;
+		$this->version=$version;
+		$this->dir=$dir;
+		$this->user=&$_USER;
+		$this->blank=true;
+		
+		if (!is_dir($dir))
+		{
+			mkdir($dir);
+		}
+		
+		$this->loadDetails();
+	}
+	
+	function isMine()
+	{
+		global $_USER;
+		
+		return $_USER->getUsername()==$this->user->getUsername();
+	}
+	
+	function getDir()
+	{
+		return $this->dir;
+	}
+	
+	function isNew()
+	{
+		return $this->blank;
+	}
+	
+	function free()
+	{
+		global $_PREFS;
+		
+		$lock=lockResourceWrite($this->dir);
+		recursiveDelete($this->dir,true);
+		unlink($this->dir.'/'.$_PREFS->getPref('locking.templockfile'));
+		unlockResource($lock);
+		return true;
+	}
+	
+	function loadDetails()
+	{
+		global $_PREFS;
+		
+		$lock=lockResourceWrite($this->dir);
+		if (is_readable($this->dir.'/'.$_PREFS->getPref('locking.templockfile')))
+		{
+			$this->blank=false;
+			$file=fopen($this->dir.'/'.$_PREFS->getPref('locking.templockfile'),'r');
+			$line=trim(fgets($file));
+			$user=new User($line);
+			if ($user->userExists())
+			{
+				$this->user=&$user;
+			}
+			$this->date=trim(fgets($file));
+			fclose($file);
+		}
+		else
+		{
+			$this->internalSave();
+		}
+		unlockResource($lock);
+	}
+	
+	function internalSave()
+	{
+		global $_PREFS;
+		
+		$this->date=time();
+		$file=fopen($this->dir.'/'.$_PREFS->getPref('locking.templockfile'),'w');
+		fwrite($file,$this->user->getUsername()."\n");
+		fwrite($file,$this->date."\n");
+		fclose($file);
+	}
+	
+	function saveDetails()
+	{
+		$lock=lockResourceWrite($this->dir);
+		$this->internalSave();
+		unlockResource($lock);
+	}
+}
+
 class Resource
 {
 	var $container;
@@ -14,8 +115,9 @@ class Resource
 	var $version;
 	var $prefs;
 	var $modified;
+	var $log;
 	
-	var $readlock;
+	var $readLock;
 	var $writeLock;
 	var $lockCount=0;
 	
@@ -25,6 +127,7 @@ class Resource
 	{
 		global $_PREFS;
 		
+		$this->log=&LoggerManager::getLogger('swim.resource.'.get_class($this));
 		$this->id=$id;
 		$this->version=$version;
 		$this->container=&$container;
@@ -42,14 +145,9 @@ class Resource
 		}
 	}
 	
-	function getWorkingDir()
+	function &getWorkingDetails()
 	{
-		return $this->container->getResourceWorkingDir($this);
-	}
-	
-	function freeWorkingDir()
-	{
-		$this->container->freeResourceWorkingDir($this);
+		return $this->container->getResourceWorkingDetails($this);
 	}
 	
 	function makeNewVersion()
@@ -129,28 +227,31 @@ class Resource
 
 	function lockRead()
 	{
-		if ((!isset($this->readLock))&&($this->isWritable()))
+		$this->log->debug('lockRead');
+		if (($this->isWritable())&&(!isset($this->readLock))&&(!isset($this->writeLock)))
 		{
-			$this->readlock=lockResourceRead($this->dir);
+			$this->log->debug('Making read lock');
+			$this->readLock=lockResourceRead($this->dir);
 		}
 		$this->lockCount++;
 	}
 	
 	function lockWrite()
 	{
+		$this->log->debug('lockWrite');
 		if ($this->isWritable())
 		{
 			if (isset($this->readLock))
 			{
 				$this->log->warn('Write locking read locked template '.$this->id);
 				unlockResource($this->readLock);
-				$this->writelock=lockResourceWrite($this->dir);
-				$this->lockCount++;
+				unset($this->readLock);
 			}
-			else if (!isset($this->writeLock))
+			
+			if (!isset($this->writeLock))
 			{
+				$this->log->debug('Making write lock');
 				$this->writelock=lockResourceWrite($this->dir);
-				$this->lockCount++;
 			}
 		}
 		$this->lockCount++;
@@ -158,6 +259,7 @@ class Resource
 	
 	function unlock()
 	{
+		$this->log->debug('unlock');
 		if ($this->lockCount>0)
 		{
 			$this->lockCount--;
@@ -208,13 +310,19 @@ class Resource
 		if ($this->fileIsReadable($filename))
 		{
 			$this->lockRead();
-			return fopen($this->getDir().'/'.$filename,'r');
+			$file=fopen($this->getDir().'/'.$filename,'r');
+			if ($file===false)
+			{
+				$this->unlock();
+			}
+			return $file;
 		}
 		return false;
 	}
 	
 	function openFileWrite($filename,$append=false)
 	{
+		$this->log->debug('openFileWrite');
 		if ($this->fileIsWritable($filename))
 		{
 			$this->lockWrite();
@@ -359,6 +467,7 @@ class File extends Resource
 	{
 		global $_PREFS;
 
+		$this->log=&LoggerManager::getLogger('swim.resource.'.get_class($this));
 		$this->parent=$parent;
 		if (is_a($parent,'Container'))
 		{
@@ -434,6 +543,7 @@ class File extends Resource
 	
 	function openFileWrite($append=false)
 	{
+		$this->log->debug('Squiggle');
 		return parent::openFileWrite($this->id,$append);
 	}
 }

@@ -29,22 +29,9 @@ class Page extends Resource
 		$this->blocks = array();
 	}
 	
-	function getResourceWorkingDir(&$resource)
+	function &getResourceWorkingDetails(&$resource)
 	{
-		$dir=$this->container->getResourceWorkingDir($this);
-		if ($dir===false)
-		{
-			return false;
-		}
-		else
-		{
-			return $dir.'/blocks/'.$resource->id;
-		}
-	}
-	
-	function freeResourceWorkingDir(&$resource)
-	{
-		$this->container->freeResourceWorkingDir($this);
+		return $this->container->getResourceWorkingDetails($this);
 	}
 	
 	function makeNewResourceVersion(&$resource)

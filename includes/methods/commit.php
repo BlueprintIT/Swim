@@ -30,86 +30,44 @@ function method_commit(&$request)
 			if ($resource->isBlock())
 			{
 				$oldversion=&$resource;
-				$temp=$resource->getWorkingDir();
-				if ($temp===false)
+				$details=$resource->getWorkingDetails();
+				if ($details->isMine())
 				{
-					displayLocked($request,$block->getResource());
-					return;
-				}
-				$workingversion=$resource->makeWorkingVersion();
-				$newversion=$working->makeNewVersion();
-				$resource->freeWorkingDir();
-
-				if ($oldversion->isCurrentVersion())
-				{
-					$newversion->makeCurrentVersion();
-				}
-
-				if (is_a($oldversion->container,'Page'))
-				{
-					redirect($request->nested);
-				}
-				else
-				{
-					$nresource=&Resource::decodeResource($request->nested);
-					if ($nresource->isPage())
+					$workingversion=$resource->makeWorkingVersion();
+					$newversion=$workingversion->makeNewVersion();
+					$details->free();
+	
+					if ($oldversion->isCurrentVersion())
 					{
-						$page=&$nresource;
-						$usage=$page->getBlockUsage($oldversion);
-						if (count($usage)>0)
+						$newversion->makeCurrentVersion();
+					}
+	
+					if (is_a($oldversion->container,'Page'))
+					{
+						redirect($request->nested);
+					}
+					else
+					{
+						$nresource=&Resource::decodeResource($request->nested);
+						if ($nresource->isPage())
 						{
-							$clone=false;
-							foreach ($usage as $id)
+							$page=&$nresource;
+							$usage=$page->getBlockUsage($oldversion);
+							if (count($usage)>0)
 							{
-								if ($page->prefs->isPrefSet('page.blocks.'.$id.'.version'))
-								{
-									$clone=true;
-									break;
-								}
-							}
-							if ($clone)
-							{
-								$newpage=&$page->makeNewVersion();
-
+								$clone=false;
 								foreach ($usage as $id)
 								{
-									if ($newpage->prefs->isPrefSet('page.blocks.'.$id.'.version'))
+									if ($page->prefs->isPrefSet('page.blocks.'.$id.'.version'))
 									{
-										$newpage->prefs->setPref('page.blocks.'.$id.'.version',$newversion);
+										$clone=true;
+										break;
 									}
 								}
-
-								$newpage->savePreferences();
-								if ($page->isCurrentVersion())
-									$newpage->makeCurrentVersion();
-							}
-						}
-					}
-
-					$autocommit=$_PREFS->getPref('update.autocommit',false);
-					$list=&getAllPages();
-					foreach(array_keys($list) as $pkey)
-					{
-						$page=&$list[$pkey];
-						$usage=$page->getBlockUsage($oldversion);
-						
-						if (count($usage)>0)
-						{
-							$clone=false;
-							foreach ($usage as $id)
-							{
-								if ($page->prefs->isPrefSet('page.blocks.'.$id.'.version'))
-								{
-									$clone=true;
-									break;
-								}
-							}
-							if ($clone)
-							{
-								if ($autocommit)
+								if ($clone)
 								{
 									$newpage=&$page->makeNewVersion();
-
+	
 									foreach ($usage as $id)
 									{
 										if ($newpage->prefs->isPrefSet('page.blocks.'.$id.'.version'))
@@ -117,29 +75,73 @@ function method_commit(&$request)
 											$newpage->prefs->setPref('page.blocks.'.$id.'.version',$newversion);
 										}
 									}
-
+	
 									$newpage->savePreferences();
-									$newpage->makeCurrentVersion();
-								}
-								else
-								{
-									$pages[]=&$page;
+									if ($page->isCurrentVersion())
+										$newpage->makeCurrentVersion();
 								}
 							}
 						}
+	
+						$autocommit=$_PREFS->getPref('update.autocommit',false);
+						$list=&getAllPages();
+						foreach(array_keys($list) as $pkey)
+						{
+							$page=&$list[$pkey];
+							$usage=$page->getBlockUsage($oldversion);
+							
+							if (count($usage)>0)
+							{
+								$clone=false;
+								foreach ($usage as $id)
+								{
+									if ($page->prefs->isPrefSet('page.blocks.'.$id.'.version'))
+									{
+										$clone=true;
+										break;
+									}
+								}
+								if ($clone)
+								{
+									if ($autocommit)
+									{
+										$newpage=&$page->makeNewVersion();
+	
+										foreach ($usage as $id)
+										{
+											if ($newpage->prefs->isPrefSet('page.blocks.'.$id.'.version'))
+											{
+												$newpage->prefs->setPref('page.blocks.'.$id.'.version',$newversion);
+											}
+										}
+	
+										$newpage->savePreferences();
+										$newpage->makeCurrentVersion();
+									}
+									else
+									{
+										$pages[]=&$page;
+									}
+								}
+							}
+						}
+						if (count($pages)>0)
+						{
+							$request->query['newversion']=$newversion->version;
+							$request->query['pages']=&$pages;
+							$internal=&getContainer('internal');
+							$page=&$internal->getPage('commit');
+							$page->display($request);
+						}
+						else
+						{
+							redirect($request->nested);
+						}
 					}
-					if (count($pages)>0)
-					{
-						$request->query['newversion']=$newversion->version;
-						$request->query['pages']=&$pages;
-						$internal=&getContainer('internal');
-						$page=&$internal->getPage('commit');
-						$page->display($request);
-					}
-					else
-					{
-						redirect($request->nested);
-					}
+				}
+				else
+				{
+					displayLocked($request,$block->getResource());
 				}
 			}
 			else if ($resource->isPage())

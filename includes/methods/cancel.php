@@ -25,7 +25,11 @@ function method_cancel(&$request)
 		{
 			if ($resource->isBlock())
 			{
-				$resource->freeWorkingDir();
+				$details=&$resource->getWorkingDetails();
+				if ($details->isMine())
+				{
+					$details->free();
+				}
 				redirect($request->nested);
 			}
 			else

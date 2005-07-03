@@ -1,7 +1,6 @@
 <?
 
-$resource = &Resource::decodeResource($request);
-$block=&$resource->getBlock();
+$block = &Resource::decodeResource($request);
 
 $commit = new Request();
 $commit->method='commit';
