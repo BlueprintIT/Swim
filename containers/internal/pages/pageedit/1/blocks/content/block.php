@@ -4,8 +4,7 @@ $commit = new Request();
 
 if ($request->method=='edit')
 {
-	$resource = &Resource::decodeResource($request);
-	$page=&$resource->getPage();
+	$page = &Resource::decodeResource($request);
 	$pageprefs = &$page->prefs;
 	$commit->query['version']=$page->version;
 	$commit->method='commit';
@@ -21,7 +20,6 @@ else
 $commit->resource=$request->resource;
 $commit->nested=&$request->nested;
 
-if ($page!==false)
 
 ?>
 <form action="<?= $commit->encodePath() ?>" method="GET">

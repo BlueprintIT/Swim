@@ -93,7 +93,6 @@ function method_commit(&$request)
 						$page=&$list[$pkey];
 						$usage=$page->getBlockUsage($oldversion);
 						
-						$blocks=$page->prefs->getPrefBranch('page.blocks');
 						if (count($usage)>0)
 						{
 							$clone=false;
@@ -131,7 +130,7 @@ function method_commit(&$request)
 					}
 					if (count($pages)>0)
 					{
-						$request->query['newversion']=$newversion;
+						$request->query['newversion']=$newversion->version;
 						$request->query['pages']=&$pages;
 						$internal=&getContainer('internal');
 						$page=&$internal->getPage('commit');

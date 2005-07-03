@@ -39,6 +39,23 @@ class Container extends Resource
 		}
 	}
 	
+	function getCurrentVersion($dir)
+	{
+		if ($this->isWritable())
+		{
+			$lock=lockResourceRead($dir);
+		}
+
+		$vers=fopen($dir.'/version','r');
+		$version=fgets($vers);
+		fclose($vers);
+
+		if ($this->isWritable())
+		{
+			unlockResource($lock);
+		}
+	}
+	
 	function getResourceWorkingDir(&$resource)
 	{
 		global $_USER;
@@ -221,11 +238,17 @@ class Container extends Resource
 			$dir=$this->getDir().'/templates/'.$resource->id;
 		}
 
-		$lock=lockResourceWrite($dir);
+		if ($this->isWritable())
+		{
+			$lock=lockResourceWrite($dir);
+		}
 		$vers=fopen($dir.'/version','w');
 		fwrite($vers,$resource->version);
 		fclose($vers);
-		unlockResource($lock);
+		if ($this->isWritable())
+		{
+			unlockResource($lock);
+		}
 	}
 	
 	function &getCurrentResourceVersion(&$resource)
@@ -243,11 +266,7 @@ class Container extends Resource
 			$dir=$this->getDir().'/templates/'.$resource->id;
 		}
 
-		$lock=lockResourceRead($dir);
-		$vers=fopen($dir.'/version','r');
-		$version=fgets($vers);
-		fclose($vers);
-		unlockResource($lock);
+		$version=$this->getCurrentVersion($dir);
 
 		if (is_a($resource,'Page'))
 		{
@@ -302,7 +321,7 @@ class Container extends Resource
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getDir().'/blocks/'.$id);
+			$version=$this->getCurrentVersion($this->getDir().'/blocks/'.$id);
 		}
 		if (!isset($this->blocks[$id][$version]))
 		{
@@ -343,7 +362,7 @@ class Container extends Resource
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getDir().'/pages/'.$id);
+			$version=$this->getCurrentVersion($this->getDir().'/pages/'.$id);
 		}
 		if (!isset($this->pages[$id][$version]))
 		{
@@ -384,7 +403,7 @@ class Container extends Resource
 	{
 		if ($version===false)
 		{
-			$version=getCurrentVersion($this->getDir().'/templates/'.$id);
+			$version=$this->getCurrentVersion($this->getDir().'/templates/'.$id);
 		}
 		if (!isset($this->templates[$id][$version]))
 		{
@@ -439,6 +458,26 @@ function &getAllContainers()
 		}
 	}
 	return $containers;
+}
+
+$_CONTAINERS = array();
+
+function &getContainer($id)
+{
+	global $_CONTAINERS,$_PREFS;
+	
+	if (!isset($_CONTAINERS[$id]))
+	{
+		if ($_PREFS->isPrefSet('container.'.$id.'.basedir'))
+		{
+			$_CONTAINERS[$id] = new Container($id);
+		}
+		else
+		{
+			$_CONTAINERS[$id]=null;
+		}
+	}
+	return $_CONTAINERS[$id];
 }
 
 ?>

@@ -23,9 +23,9 @@ function method_docommit(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->type=='block')
+			if ($resource->isBlock())
 			{
-				$block=&$resource->getBlock();
+				$block=&$resource;
 				$oldversion=$block->version;
 				$newversion=$request->query['newversion'];
 				if (isset($request->query['commit']))
@@ -42,27 +42,23 @@ function method_docommit(&$request)
 							{
 								$container=&getContainer($containers[$key]);
 								$page=&$container->getPage($ids[$key],$versions[$key]);
-								$newv=cloneVersion($page->getResource(),$page->version);
-								$newpage=&$container->getPage($page->id,$newv);
+								$newpage=&$page->makeNewVersion();
 
-								$blocks=$newpage->prefs->getPrefBranch('page.blocks');
-								foreach ($blocks as $key=>$id)
+								$usage=$newpage->getBlockUsage($oldversion);
+								
+								if (count($usage)>0)
 								{
-									if (substr($key,-3,3)=='.id')
+									foreach ($usage as $id)
 									{
-										$blk=substr($key,0,-3);
-										if (($id==$block->id)&&($newpage->prefs->getPref('page.blocks.'.$blk.'.container')==$block->container->id))
+										if ($newpage->prefs->isPrefSet('page.blocks.'.$id.'.version'))
 										{
-											if ($newpage->prefs->getPref('page.blocks.'.$blk.'.version','-1')==$oldversion)
-											{
-												$newpage->prefs->setPref('page.blocks.'.$blk.'.version',$newversion);
-											}
+											$newpage->prefs->setPref('page.blocks.'.$id.'.version',$newversion);
 										}
 									}
 								}
 
 								$newpage->savePreferences();
-								setCurrentVersion($newpage->getResource(),$newv);
+								$newpage->makeCurrentVersion();
 							}
 						}
 					}

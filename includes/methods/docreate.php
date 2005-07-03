@@ -47,8 +47,9 @@ function method_docreate(&$request)
 				$tcontainer=&getContainer($tcontainer);
 				$template=&$tcontainer->getTemplate($template);
 
-				$newv=createNextVersion($presource);
-				$pdir=getResourceVersion($presource,$newv);
+				$newv='1';
+				$pdir=$presource.'/'.$newv;
+				mkdir($pdir);
 
 				$lock=lockResourceWrite($pdir);
 				recursiveCopy($template->dir.'/defaultpage',$pdir,true);
@@ -64,8 +65,7 @@ function method_docreate(&$request)
 					}
 				}
 				$newpage->savePreferences();
-
-				setCurrentVersion($newpage->getResource(),$newpage->version);
+				$newpage->makeCurrentVersion();
 				
 				$nrequest = new Request();
 				$nrequest->method=$request->nested->method;

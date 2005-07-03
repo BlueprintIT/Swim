@@ -21,8 +21,7 @@ $cancel->nested=&$request->nested;
  <param name="swim.base" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $prefs->getPref('url.pagegen') ?>">
  <param name="style" value="/global/template/base/layout/content.css">
  <param name="html" value="<?= $request->resource.'/block.html' ?>">
+ <param name="commit" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $commit->encode() ?>">
+ <param name="cancel" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $cancel->encode() ?>">
 </applet>
 </div>
-<p>Once you have finished editing you must click save in the editor, then click commit below.</p>
-<div style="float: right"><a href="<?= $commit->encode() ?>">Commit</a></div>
-<div style="float: left"><a href="<?= $cancel->encode() ?>">Cancel</a></div>
