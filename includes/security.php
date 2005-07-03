@@ -16,6 +16,7 @@
 define('PERMISSION_UNKNOWN',0);
 define('PERMISSION_ALLOWED',1);
 define('PERMISSION_DENIED',-1);
+define('PERMISSION_DEFAULT',PERMISSION_ALLOWED);
 
 define('PERMISSION_READ',0);
 define('PERMISSION_WRITE',1);
@@ -190,6 +191,23 @@ class User
 				$lck=lockResourceRead($dir);
 			}
 			$access=fopen($dir.'/access','r');
+			$line=explode(':',trim(fgets($access)));
+			
+			if ($line[$permission]=='INHERIT')
+			{
+			}
+			else if ($line[$permission]=='DEFAULT')
+			{
+				$perm=PERMISSION_DEFAULT;
+			}
+			else if ($line[$permission]=='ALLOW')
+			{
+				$perm=PERMISSION_ALLOWED;
+			}
+			else if ($line[$permission]=='DENY')
+			{
+				$perm=PERMISSION_DENIED;
+			}
 			$line=fgets($access);
 			while ($line!==false)
 			{
@@ -199,26 +217,26 @@ class User
 				if (($files[0]!='/')||($files[strlen($files)-1]!='/'))
 				{
 					$files=preg_quote($files,'/');
-					$files='/'.preg_replace(array('/\\*/','/\\?/'),array('.*','.'),$files).'/';
+					$files='/'.preg_replace(array('/\\\\\*/','/\\\\\?/'),array('.*','.'),$files).'/';
 				}
 				if (preg_match($files,$file))
 				{
+					$this->log->debug('Matched file to '.$line);
 					$denymatch=$parts[($permission*2)+2];
 					if (strlen($denymatch)>0)
 					{
+						$this->log->debug('Deny match is '.$denymatch);
 						if ($this->inAnyGroup(explode(',',$denymatch)))
 							return PERMISSION_DENIED;
 					}
-					if ($perm==PERMISSION_UNKNOWN)
+					$allowmatch=$parts[($permission*2)+1];
+					if (strlen($allowmatch)>0)
 					{
-						$allowmatch=$parts[($permission*2)+1];
-						if (strlen($allowmatch)>0)
+						$this->log->debug('Allow match is '.$allowmatch);
+						if ($this->inAnyGroup(explode(',',$allowmatch)))
 						{
-							if ($this->inAnyGroup(explode(',',$allowmatch)))
-							{
-								$perm=PERMISSION_DENIED;
-								break;
-							}
+							$perm=PERMISSION_ALLOWED;
+							break;
 						}
 					}
 				}
@@ -240,97 +258,61 @@ class User
 		$resource->lockRead();
 		if ($resource->isFile())
 		{
-			$path=$resource->path;
-			$file=basename($path);
-			$path=dirname($path);
-			while ($path!='.')
+			$file=basename($resource->id);
+			$dir=dirname($resource->id);
+			while ($dir!='.')
 			{
-				$perm=$this->checkSpecificPermission($permission,$resource->getDir().'/'.$path,$file,false);
+				$perm=$this->checkSpecificPermission($permission,$resource->getDir().'/'.$dir,$file,false);
 				if ($perm!=PERMISSION_UNKNOWN)
-				{
-					$resource->unlock();
 					return $perm;
-				}
-				$path=dirname($path);
+
+				$dir=dirname($dir);
 			}
 		}
 		else
 		{
-			$file=$resource->type.'.conf';
+			$file='resource.conf';
 		}
 		
-		$path=$resource->getDir();
-		$perm=$this->checkSpecificPermission($permission,$path,$file,false);
+		$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,false);
+		if ($perm!=PERMISSION_UNKNOWN)
+			return $perm;
+		
 		$resource->unlock();
+		
+		$container=&$resource->container;
+		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,true);
 		if ($perm!=PERMISSION_UNKNOWN)
-		{
 			return $perm;
+		
+		if (is_a($container,'Page'))
+		{
+			$container=&$container->container;
+			$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,true);
+			if ($perm!=PERMISSION_UNKNOWN)
+				return $perm;
 		}
 		
-		$path=$resource->getResource();
-		$perm=$this->checkSpecificPermission($permission,$path,$file,false);
-		$resource->unlock();
-		if ($perm!=PERMISSION_UNKNOWN)
-		{
-			return $perm;
-		}
-		
-		if (isset($resource->block))
-		{
-			$block=&$resource->getBlock();
-			if (is_a($block->container,'Page'))
-			{
-				$path=$block->container->getDir();
-				$perm=$this->checkSpecificPermission($permission,$path,$file,true);
-				if ($perm!=PERMISSION_UNKNOWN)
-				{
-					return $perm;
-				}
-				
-				$page=&$resource->getPage();
-				$path='storage.pages.'.$page->container;
-			}
-			else
-			{
-				$path='storage.blocks.'.$resource->container;
-			}
-		}
-		else if (isset($resource->template))
-		{
-			$path='storage.templates';
-		}
-		else if (isset($resource->page))
-		{
-			$path='storage.pages.'.$resource->container;
-		}
-
-		$path=$_PREFS->getPref($path);
-		$perm=$this->checkSpecificPermission($permission,$path,$file,true);
-		if ($perm!=PERMISSION_UNKNOWN)
-		{
-			return $perm;
-		}
-
-		$path=$_PREFS->getPref('storage.basedir');
-		return $this->checkSpecificPermission($permission,$path,$file,true);
+		return $this->checkSpecificPermission($permission,$_PREFS->getPref('storage.basedir'),$file,true);
 	}
 	
 	function getPermission($permission,&$resource)
 	{
 		$perm=$this->checkPermission($permission,$resource);
-		return $perm != PERMISSION_DENIED;
+		if ($perm==PERMISSION_UNKNOWN)
+			$perm=PERMISSION_DEFAULT;
+		$this->log->debug('Permission for '.$permission.' is '.$perm);
+		return $perm;
 	}
 	
 	function canRead(&$resource)
 	{
-		return true;
-		//return $this->getPermission(PERMISSION_READ,$resource);
+		return $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
 	}
 	
 	function canWrite(&$resource)
 	{
-		return $this->inGroup('admin');
-		//return $this->getPermission(PERMISSION_WRITE,$resource);
+		return $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
 	}
 }
 

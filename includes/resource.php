@@ -293,16 +293,18 @@ class Resource
 	
 	function fileIsWritable($filename)
 	{
+		global $_USER;
 		if ($this->isWritable())
 		{
-			return is_writable($this->getDir().'/'.$filename);
+			return ((is_writable($this->getDir().'/'.$filename))&&($_USER->canWrite($this)));
 		}
 		return false;
 	}
 	
 	function fileIsReadable($filename)
 	{
-		return is_readable($this->getDir().'/'.$filename);
+		global $_USER;
+		return ((is_readable($this->getDir().'/'.$filename))&&($_USER->canRead($this)));
 	}
 	
 	function openFileRead($filename)
