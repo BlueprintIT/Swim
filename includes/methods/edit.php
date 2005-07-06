@@ -39,7 +39,7 @@ function method_edit(&$request)
 				}
 				else
 				{
-					displayLocked($request,$resource->getResource());
+					displayLocked($request,$resource);
 				}
 			}
 			else if ($resource->isPage())

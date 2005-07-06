@@ -10,16 +10,24 @@
 		<stylesheet src="template/layout/content.css"/>
 		<script src="template/layout/cbdom.js"/>
 		<script src="template/layout/bpmm.js"/>
+		<script src="template/layout/admin.js"/>
 		<title><var name="title"/></title>
 	</head>
 	<body>
 		<div id="header">
 			<image id="cogs" src="template/layout/cogs.jpg" alt="Cogs"/>
-			<div class="adminpanel" id="pageadmin"><anchor method="create" nest="true" href="/global/page">New Page</anchor> <editlink>Edit Page</editlink></div>
+			<div class="adminpanel" id="pageadmin">
+				<p style="margin: 0; padding: 5px;"><anchor method="create" nest="true" href="/global/page"><image class="icon" src="template/layout/new.gif"/>New Page</anchor></p>
+				<p style="margin: 0; padding: 5px;"><editlink><image class="icon" src="template/layout/edit.gif"/>Edit Page</editlink></p>
+			</div>
 			<image id="logo" src="template/layout/logo.gif" alt="Brass Bullet Ltd."/>
-		</div>
-		<div id="menuadmin" class="adminpanel">
-			<editlink block="menu">Edit</editlink>
+			<div id="swim">
+				<p style="text-align: center">Brass Bullet Ltd. website content management system provided by</p>
+				<p style="text-align: center"><image src="template/layout/swimlogo.gif"/> by <image src="template/layout/bpitlogo.gif"/></p>
+			</div>
+			<div id="menuadmin" class="adminpanel">
+				<editlink block="menu" onmouseover="highlight('spacing')" onmouseout="unhighlight('spacing')"><image class="icon" src="template/layout/edit.gif"/>Edit</editlink>
+			</div>
 		</div>
 		<div id="menubar">
 			<div id="spacing">
@@ -28,13 +36,13 @@
 		</div>
 		<block id="sidemenu"/>
 		<div id="sideadmin" class="adminpanel">
-			<editlink block="sidemenu">Edit</editlink>
+			<editlink block="sidemenu" onmouseover="highlight('sidemenu')" onmouseout="unhighlight('sidemenu')"><image class="icon" src="template/layout/edit.gif"/>Edit</editlink>
+		</div>
+		<div id="contentadmin" class="adminpanel">
+			<editlink block="content" onmouseover="highlight('content')" onmouseout="unhighlight('content')"><image class="icon" src="template/layout/edit.gif"/>Edit</editlink>
 		</div>
 		<div id="body">
 			<block id="content" class="admin">
-				<div id="contentadmin" class="adminpanel">
-					<editlink block="content">Edit</editlink>
-				</div>
 				<content/>
 			</block>
 		</div>

@@ -38,6 +38,26 @@ div#header {
 	background-repeat: repeat-x;
 }
 
+div#swim {
+	position: absolute;
+	top: 0;
+	border: 2px solid blue;
+	left: 25%;
+	width: 50%;
+	background: white;
+	opacity: 0.9;
+}
+
+div#swim p {
+	color: blue;
+	padding: 0;
+	margin: 0;
+}
+
+div#swim img {
+	vertical-align: middle;
+}
+
 img#cogs {
 	position: absolute;
 	top: 0;
@@ -128,11 +148,11 @@ div#menubar td a:hover, div#menubar td a:visited:hover {
 ul#sidemenu {
 	margin: 0;
 	padding: 0;
-	padding-top: <?= $sidetopgap ?>px;
+	padding-top: <?= $sidetopgap+2 ?>px;
 	position: absolute;
-	left: 0;
+	left: 2;
 	z-index: 10;
-	width: <?= $sidewidth ?>px;
+	width: <?= $sidewidth-2 ?>px;
 	background: transparent;
 }
 
