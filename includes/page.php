@@ -197,8 +197,16 @@ class Page extends Resource
 	function &getTemplate()
 	{
 		$templ=$this->prefs->getPref('page.template');
-		list($container,$id)=explode('/',$templ);
-		$cont=&getContainer($container);
+		if (strpos($templ,'/')!==false)
+		{
+			list($container,$id)=explode('/',$templ);
+			$cont=&getContainer($container);
+		}
+		else
+		{
+			$cont=&$this->container;
+			$id=$templ;
+		}
 		$template=&$cont->getTemplate($id);
 		return $template;
 	}
