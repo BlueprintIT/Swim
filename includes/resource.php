@@ -160,6 +160,11 @@ class Resource
 		return $this->container->makeResourceWorkingVersion($this);
 	}
 	
+	function &getVersions()
+	{
+		return $this->container->getResourceVersions($this);
+	}
+	
 	function getETag()
 	{
 		return $this->container->getETag().'/'.get_class($this).'/'.$this->id.':'.$this->version;

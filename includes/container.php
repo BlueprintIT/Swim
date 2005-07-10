@@ -64,6 +64,52 @@ class Container extends Resource
 		return $version;
 	}
 	
+	function &getResourceVersions(&$resource)
+	{
+		$versions=array();
+
+		if (is_a($resource,'Page'))
+		{
+			$dir=$this->getDir().'/pages/'.$resource->id;
+		}
+		else if (is_a($resource,'Block'))
+		{
+			$dir=$this->getDir().'/blocks/'.$resource->id;
+		}
+		else if (is_a($resource,'Template'))
+		{
+			$dir=$this->getDir().'/templates/'.$resource->id;
+		}
+
+		if ($res=@opendir($dir))
+		{
+			while (($file=readdir($res))!== false)
+			{
+				if (!(substr($file,0,1)=='.'))
+				{
+					if ((is_dir($dir.'/'.$file))&&(is_numeric($file)))
+					{
+						if (is_a($resource,'Page'))
+						{
+							$versions[$file] = $this->getPage($resource->id,$file);
+						}
+						else if (is_a($resource,'Block'))
+						{
+							$versions[$file] = $this->getBlock($resource->id,$file);
+						}
+						else if (is_a($resource,'Template'))
+						{
+							$versions[$file] = $this->getTemplate($resource->id,$file);
+						}
+					}
+				}
+			}
+			closedir($res);
+		}
+		
+		return $versions;
+	}
+	
 	function &getResourceWorkingDetails(&$resource)
 	{
 		global $_USER;
