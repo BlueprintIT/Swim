@@ -27,7 +27,7 @@ function method_displayLogin(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

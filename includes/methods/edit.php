@@ -50,7 +50,7 @@ function method_edit(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'You can only edit pages and blocks.');
 			}
 		}
 		else
@@ -60,7 +60,7 @@ function method_edit(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

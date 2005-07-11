@@ -43,7 +43,7 @@ function method_view(&$request)
   				}
   				else
   				{
-  					displayError($request);
+  					displayNotFound($request);
   				}
   			}
   			else if ($_SERVER['REQUEST_METHOD']=='PUT')
@@ -80,12 +80,12 @@ function method_view(&$request)
    			  else
    			  {
    			    $log->warn('Unable to open standard input');
-   			    displayError($request);
+   			    displayServerError($request);
    			  }
   			}
   			else
   			{
-  			  displayError($request);
+  			  displayServerError($request);
   			}
 			}
 			else if ($resource->isPage())
@@ -94,7 +94,7 @@ function method_view(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'You can only view pages or files.');
 			}
 		}
 		else
@@ -104,7 +104,7 @@ function method_view(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

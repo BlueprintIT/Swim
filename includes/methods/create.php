@@ -20,23 +20,30 @@ function method_create(&$request)
 	list($container,$type)=explode('/',$request->resource);
 	
 	$container=&getContainer($container);
-	if (($container!==false)&&($container->isWritable()))
+	if ($container!==false)
 	{
-		// TODO possibly a better security check here
-		if ($type=='page')
+		if ($container->isWritable())
 		{
-			$container=&getContainer('internal');
-			$page=&$container->getPage('pageedit');
-			$page->display($request);
+			// TODO possibly a better security check here
+			if ($type=='page')
+			{
+				$container=&getContainer('internal');
+				$page=&$container->getPage('pageedit');
+				$page->display($request);
+			}
+			else
+			{
+				displayGeneralError($request,'You can only create pages.');
+			}
 		}
 		else
 		{
-			displayError();
+			displayLogin($request);
 		}
 	}
 	else
 	{
-		displayError();
+		displayNotFound($request);
 	}
 }
 

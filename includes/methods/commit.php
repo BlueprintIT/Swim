@@ -161,7 +161,7 @@ function method_commit(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'Only blocks and pages can be committed.');
 			}
 		}
 		else
@@ -171,7 +171,7 @@ function method_commit(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

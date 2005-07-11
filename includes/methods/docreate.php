@@ -20,47 +20,54 @@ function method_docreate(&$request)
 	list($container,$type)=explode('/',$request->resource);
 	
 	$container=&getContainer($container);
-	if (($container!==false)&&($container->isWritable()))
+	if ($container!==false)
 	{
-		// TODO possibly a better security check here Bug 3
-		if ($type=='page')
+		if ($container->isWritable())
 		{
-			if (isset($request->query['page.template']))
+			// TODO possibly a better security check here Bug 3
+			if ($type=='page')
 			{
-				$template=$request->query['page.template'];
-				list($tcontainer,$template)=explode('/',$template);
-				$tcontainer=&getContainer($tcontainer);
-				$template=&$tcontainer->getTemplate($template);
+				if (isset($request->query['page.template']))
+				{
+					$template=$request->query['page.template'];
+					list($tcontainer,$template)=explode('/',$template);
+					$tcontainer=&getContainer($tcontainer);
+					$template=&$tcontainer->getTemplate($template);
+				}
+				else
+				{
+					$template=false;
+				}
+	
+				$newpage=&$container->createPage($template);
+					
+				foreach ($request->query as $name => $value)
+				{
+					if (substr($name,0,5)=='page.')
+					{
+						$newpage->prefs->setPref($name,$value);
+					}
+				}
+				$newpage->savePreferences();
+				
+				$nrequest = new Request();
+				$nrequest->method=$request->nested->method;
+				$nrequest->resource=$container->id.'/page/'.$newpage->id;
+				redirect($nrequest);
 			}
 			else
 			{
-				$template=false;
+				displayGeneralError($request,'Can only create a page.');
 			}
-
-			$newpage=&$container->createPage($template);
-				
-			foreach ($request->query as $name => $value)
-			{
-				if (substr($name,0,5)=='page.')
-				{
-					$newpage->prefs->setPref($name,$value);
-				}
-			}
-			$newpage->savePreferences();
-			
-			$nrequest = new Request();
-			$nrequest->method=$request->nested->method;
-			$nrequest->resource=$container->id.'/page/'.$newpage->id;
-			redirect($nrequest);
 		}
 		else
 		{
-			displayError();
+			displayLogin($request);
 		}
 	}
 	else
 	{
-		displayError();
+		displayNotFound($request);
 	}
 }
 

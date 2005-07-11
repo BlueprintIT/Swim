@@ -67,7 +67,7 @@ function method_docommit(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'docommit expects a block.');
 			}
 		}
 		else
@@ -77,7 +77,7 @@ function method_docommit(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

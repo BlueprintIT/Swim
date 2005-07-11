@@ -100,12 +100,50 @@ function displayLogin(&$request)
 	callMethod($newrequest);
 }
 
-function displayError(&$request)
+function displayGeneralError(&$request,$message)
 {
-	$newrequest = new Request();
-	$newrequest->method='error';
-	$newrequest->nested=&$request;
-	callMethod($newrequest);
+	global $_PREFS;
+	$container = &getContainer('internal');
+	$page = &$container->getPage($_PREFS->getPref('errors.general.page'));
+	$request->query['message']=$message;
+	if ($page!==false)
+	{
+		$page->display($request);
+	}
+	else
+	{
+		// TODO What to do here?
+	}
+}
+
+function displayNotFound(&$request)
+{
+	global $_PREFS;
+	$container = &getContainer('internal');
+	$page = &$container->getPage($_PREFS->getPref('errors.notfound.page'));
+	if ($page!==false)
+	{
+		$page->display($request);
+	}
+	else
+	{
+		// TODO What to do here?
+	}
+}
+
+function displayServerError(&$request)
+{
+	global $_PREFS;
+	$container = &getContainer('internal');
+	$page = &$container->getPage($_PREFS->getPref('errors.server.page'));
+	if ($page!==false)
+	{
+		$page->display($request);
+	}
+	else
+	{
+		// TODO What to do here?
+	}
 }
 
 function setValidTime($minutes)

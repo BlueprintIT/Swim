@@ -37,7 +37,7 @@ function method_admin(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'You can only administrate pages.');
 			}
 		}
 		else
@@ -47,7 +47,7 @@ function method_admin(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

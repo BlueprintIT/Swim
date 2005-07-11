@@ -32,12 +32,27 @@ class Container extends Resource
 		$this->prefs->setParent($_PREFS);
 		$this->dir=$this->prefs->getPref('container.'.$id.'.basedir');
 		$this->log->debug('Container '.$id.' is at '.$this->dir);
-		$file=$this->openFileRead('resource.conf');
-		if ($file!==false)
+		if (is_readable($this->getDir().'/resource.conf'))
 		{
-			$this->prefs->loadPreferences($file);
-			$this->closeFile($file);
+			$file=fopen($this->getDir().'/resource.conf','r');
+			if ($file!==false)
+			{
+				$this->prefs->loadPreferences($file);
+				fclose($file);
+			}
 		}
+		if ($id=='internal')
+			$this->log->info('Container '.$id.' writable: '.$this->isWritable());
+	}
+	
+	function fileIsWritable($filename)
+	{
+		return false;
+	}
+	
+	function fileIsReadable($filename)
+	{
+		return (is_readable($this->getDir().'/'.$filename));
 	}
 	
 	function getETag()

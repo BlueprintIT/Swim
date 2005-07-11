@@ -34,7 +34,7 @@ function method_cancel(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'You cannot cancel anything other than a block edit.');
 			}
 		}
 		else
@@ -44,7 +44,7 @@ function method_cancel(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

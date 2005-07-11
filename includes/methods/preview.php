@@ -37,7 +37,7 @@ function method_preview(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'You can only preview pages.');
 			}
 		}
 		else
@@ -47,7 +47,7 @@ function method_preview(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

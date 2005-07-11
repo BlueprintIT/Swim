@@ -297,13 +297,6 @@ class Template extends Resource
 			setContentType('text/html');
 		}
 		
-		$etag=$page->getETag();
-		if ($etag!==false)
-		{
-			header('ETag: '.$etag);
-		}
-		setValidTime(10);
-
 		$stats=stat($this->dir.'/'.$file);
 		$modified=$stats['mtime'];
 		if (is_readable($this->dir.'/template.conf'))
@@ -340,6 +333,13 @@ class Template extends Resource
 	
 	function display(&$request,&$page)
 	{
+		$etag=$page->getETag();
+		if ($etag!==false)
+		{
+			header('ETag: '.$etag);
+		}
+		setValidTime(10);
+		
 		$this->internalDisplay($request,$page,'normal','template.xmlfile','template.htmlfile');
 	}
 }

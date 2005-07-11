@@ -33,7 +33,7 @@ function method_revert(&$request)
 			}
 			else
 			{
-				displayError($request);
+				displayGeneralError($request,'You can only revert blocks or pages.');
 			}
 		}
 		else
@@ -43,7 +43,7 @@ function method_revert(&$request)
 	}
 	else
 	{
-		displayError($request);
+		displayNotFound($request);
 	}
 }
 

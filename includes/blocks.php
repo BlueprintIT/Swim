@@ -84,7 +84,7 @@ class Block extends Resource
 			$this->displayContent($parser,$attrs,$text);
 	    $text=ob_get_contents();
 	    ob_end_clean();
-	    $this->log->info('Re-parsing content');
+	    $this->log->debug('Re-parsing content');
 	    $parser->parseText($text);
 		}
 		$this->displayOutro($attrs);
@@ -98,7 +98,7 @@ class Block extends Resource
 			$this->displayContent($parser,$attrs,$text);
 	    $text=ob_get_contents();
 	    ob_end_clean();
-	    $this->log->info('Re-parsing content');
+	    $this->log->debug('Re-parsing content');
 	    $parser->parseText($text);
 			return true;
 		}
@@ -114,13 +114,13 @@ function &loadBlock(&$container,$id,$version=false)
 	
 	$blockdir=$container->getBlockDir($id,$version);
 	
-	$lock=lockResourceRead($blockdir);
+	if ($container->isWritable())
+		$lock=lockResourceRead($blockdir);
 
 	$blockprefs = new Preferences();
 	$blockprefs->setParent($_PREFS);
 	if (is_readable($blockdir.'/resource.conf'))
 	{
-		//TODO do a security check
 		$file=fopen($blockdir.'/resource.conf','r');
 		$blockprefs->loadPreferences($file,'block');
 		fclose($file);
@@ -135,7 +135,8 @@ function &loadBlock(&$container,$id,$version=false)
 		require_once $blockdir.'/block.class';
 	}
 
-	unlockResource($lock);
+	if ($container->isWritable())
+		unlockResource($lock);
 
 	if (class_exists($class))
 	{

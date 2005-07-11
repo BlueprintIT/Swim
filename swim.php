@@ -21,7 +21,7 @@ require_once $_PREFS->getPref('storage.includes').'/includes.php';
 require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
 
 LoggerManager::setLogLevel('',SWIM_LOG_INFO);
-LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
+//LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.locking',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.method.view',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.cache',SWIM_LOG_WARN);
