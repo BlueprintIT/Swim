@@ -166,7 +166,7 @@ function method_commit(&$request)
 		}
 		else
 		{
-			displayLogin($request);
+			displayAdminLogin($request);
 		}
 	}
 	else

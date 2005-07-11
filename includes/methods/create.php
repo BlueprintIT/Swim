@@ -38,7 +38,7 @@ function method_create(&$request)
 		}
 		else
 		{
-			displayLogin($request);
+			displayAdminLogin($request);
 		}
 	}
 	else

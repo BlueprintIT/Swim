@@ -38,7 +38,7 @@ function method_revert(&$request)
 		}
 		else
 		{
-			displayLogin($request);
+			displayAdminLogin($request);
 		}
 	}
 	else

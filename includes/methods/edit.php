@@ -55,7 +55,7 @@ function method_edit(&$request)
 		}
 		else
 		{
-			displayLogin($request);
+			displayAdminLogin($request);
 		}
 	}
 	else

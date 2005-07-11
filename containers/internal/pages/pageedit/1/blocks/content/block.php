@@ -31,11 +31,24 @@ $commit->nested=&$request->nested;
 <?= $commit->getFormVars() ?>
 <table>
 <tr>
-	<td>Title:</td>
-	<td><input type="input" name="page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
+	<td style="vertical-align: top">Title:</td>
+	<td style="vertical-align: top"><input type="input" name="page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
+	<td style="vertical-align: top">The page title is displayed in the browser title bar.</td>
 </tr>
 <tr>
-	<td colspan="2"><input type="submit" value="Save"></td>
+	<td style="vertical-align: top">Description:</td>
+	<td style="vertical-align: top"><textarea name="page.variables.description" cols="40" rows="5"><?= $pageprefs->getPref('page.variables.description','') ?></textarea></td>
+	<td style="vertical-align: top">The page description is displayed by many search engines. If left blank search engines will normally display the first
+	 few paragraphs of the page instead.</td> 
+</tr>
+<tr>
+	<td style="vertical-align: top">Keywords:</td>
+	<td style="vertical-align: top"><input type="input" name="page.variables.keywords" value="<?= $pageprefs->getPref('page.variables.keywords','') ?>"></td>
+	<td style="vertical-align: top">Search engines may use these keywords when indexing this page. Many of the more popular search engines
+	 generally don't place very much weight on this.</td>
+</tr>
+<tr>
+	<td colspan="3"><input type="submit" value="Save"></td>
 </tr>
 </table>
 </form>

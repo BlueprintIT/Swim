@@ -92,11 +92,17 @@ function httpdate($date)
 	return gmdate("D, j M Y G:i:s",$date).' GMT';
 }
 
-function displayLogin(&$request)
+function displayAdminLogin(&$request)
+{
+	displayLogin($request,'You must log in to administer this website.');
+}
+
+function displayLogin(&$request,$message)
 {
 	$newrequest = new Request();
 	$newrequest->method='displayLogin';
 	$newrequest->nested=&$request;
+	$newrequest->query['message']=$message;
 	callMethod($newrequest);
 }
 

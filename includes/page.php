@@ -125,9 +125,16 @@ class Page extends Resource
 		$this->blocks[$id]=&$block;
 	}
 	
-	function isBlock($id)
+	function isBlock($id=false)
 	{
-		return $this->prefs->isPrefSet('page.blocks.'.$id.'.id');
+		if ($id===false)
+		{
+			return false;
+		}
+		else
+		{
+			return $this->prefs->isPrefSet('page.blocks.'.$id.'.id');
+		}
 	}
 	
 	function getBlockUsage(&$block)

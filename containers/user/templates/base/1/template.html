@@ -4,7 +4,9 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<meta http-equiv="Content-Script-Type" content="text/javascript">
-		<stylesheet src="template/layout/layout.css"/>
+		<if hasVar="keywords"><meta name="keywords" content="<var name="keywords"/>">
+		</if><if hasVar="description"><meta name="description" content="<var name="description"/>">
+		</if><stylesheet src="template/layout/layout.css"/>
 		<stylesheet src="template/layout/menus.css"/>
 		<stylesheet src="template/layout/content.css"/>
 		<script src="template/layout/cbdom.js"/>

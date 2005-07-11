@@ -209,6 +209,32 @@ class Template extends Resource
 		$this->displayElement($parser,'a',$attrs,$text);
 	}
 	
+	function displayIf(&$parser,$tag,$attrs,$text)
+	{
+		$name=$attrs['hasVar'];
+		if (isset($attrs['namespace']))
+		{
+			$name=$attrs['namespace'].'.'.$name;
+		}
+		else
+		{
+			if (strpos($name,'.')===false)
+			{
+				$name='page.variables.'.$name;
+			}
+		}
+		$page=&$parser->data['page'];
+		if ($page->prefs->isPrefSet($name))
+		{
+			$value=$page->prefs->getPref($name);
+			if (strlen($value)>0)
+			{
+				print($text);
+			}
+		}
+		return true;
+	}
+	
 	function displayVar(&$parser,$tag,$attrs,$text)
 	{
 		$name=$attrs['name'];
@@ -266,6 +292,10 @@ class Template extends Resource
 		{
 			return $this->displayEditLink($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='if')
+		{
+			return $this->displayIf($parser,$tag,$attrs,$text);
+		}
 		else
 		{
 			return false;
@@ -317,6 +347,7 @@ class Template extends Resource
 		$parser->addObserver('image',$this);
 		$parser->addObserver('anchor',$this);
 		$parser->addObserver('editlink',$this);
+		$parser->addObserver('if',$this);
 		
 		$this->lockRead();
 		ob_start();

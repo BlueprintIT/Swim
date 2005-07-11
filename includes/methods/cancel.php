@@ -39,7 +39,7 @@ function method_cancel(&$request)
 		}
 		else
 		{
-			displayLogin($request);
+			displayAdminLogin($request);
 		}
 	}
 	else

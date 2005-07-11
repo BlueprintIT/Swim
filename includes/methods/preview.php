@@ -42,7 +42,7 @@ function method_preview(&$request)
 		}
 		else
 		{
-			displayLogin($request);
+			displayLogin($request,'You must log in to view this page.');
 		}
 	}
 	else

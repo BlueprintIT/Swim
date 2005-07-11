@@ -24,7 +24,7 @@ function method_login(&$request)
 	}
 	else
 	{
-		displayLogin($request->nested);
+		displayLogin($request->nested,$request->query['message']);
 	}
 }
 
