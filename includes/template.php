@@ -290,6 +290,12 @@ class Template extends Resource
 		if (isset($attrs['nest']))
 		{
 			$request->nested=&$parser->data['request'];
+			unset($attrs['nest']);
+		}
+		if (isset($attrs['template']))
+		{
+			$request->query['template']=$attrs['template'];
+			unset($attrs['template']);
 		}
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);

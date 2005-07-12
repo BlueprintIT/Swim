@@ -191,6 +191,18 @@ div#body {
 	overflow: auto;
 }
 
+div#print {
+	padding-right: 2px;
+	padding-top: 2px;
+	float: right;
+}
+
+div#print img#printicon {
+	width: 30px;
+	height: 26px;
+	border: 0px none;
+}
+
 div#content {
 	padding-top: 10px;
 	padding-right: 10px;
