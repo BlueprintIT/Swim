@@ -174,8 +174,15 @@ class Resource
 	{
 		if (!isset($this->modified))
 		{
-			$stat=stat($this->getDir().'/resource.conf');
-			$this->modified=$stat['mtime'];
+			if (is_readable($this->getDir().'/resource.conf'))
+			{
+				$stat=stat($this->getDir().'/resource.conf');
+				$this->modified=$stat['mtime'];
+			}
+			else
+			{
+				$this->modified=0;
+			}
 		}
 		return $this->modified;
 	}

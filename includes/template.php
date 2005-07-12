@@ -26,6 +26,50 @@ class Template extends Resource
 		$this->log=&LoggerManager::getLogger('swim.template');
 	}
 	
+	function getFileModifiedDate($file)
+	{
+		$f=$this->prefs->getPref($file);
+		if (is_readable($f))
+		{
+			$stats=stat($this->dir.'/'.$f);
+			return $stats['mtime'];
+		}
+		return false;
+	}
+	
+	function getModifiedDate()
+	{
+		if (isset($this->modified))
+		{
+			return $this->modified;
+		}
+		
+		$modified=Resource::getModifiedDate();
+		
+		$stat=$this->getFileModifiedDate('template.file.html');
+		if ($stat!==false)
+		{
+			$modified=max($modified,$stat);
+		}
+		$stat=$this->getFileModifiedDate('template.file.xml');
+		if ($stat!==false)
+		{
+			$modified=max($modified,$stat);
+		}
+		$stat=$this->getFileModifiedDate('template.admin.html');
+		if ($stat!==false)
+		{
+			$modified=max($modified,$stat);
+		}
+		$stat=$this->getFileModifiedDate('template.admin.xml');
+		if ($stat!==false)
+		{
+			$modified=max($modified,$stat);
+		}
+		$this->modified=$modified;
+		return $modified;
+	}
+	
 	function &generateRelativeURL(&$data,$url,$method)
 	{
 		$request = new Request();
@@ -38,14 +82,17 @@ class Template extends Resource
 		else if (substr($url,0,6)=='block/')
 		{
 			$url=$data['page']->container->id.'/page/'.$data['page']->id.'/'.$data['block']->id.substr($url,5);
+			//$request->query['version']=$data['block']->version;
 		}
 		else if (substr($url,0,5)=='page/')
 		{
 			$url=$data['page']->container->id.'/page/'.$data['page']->id.substr($url,4);
+			//$request->query['version']=$data['page']->version;
 		}
 		else if (substr($url,0,9)=='template/')
 		{
 			$url=$this->container->id.'/template/'.$this->id.substr($url,8);
+			//$request->query['version']=$this->version;
 		}
 		$request->resource=$url;
 		return $request;
@@ -182,7 +229,6 @@ class Template extends Resource
 		$block=$page->getBlock($attrs['id']);
 		if ($block!=null)
 		{
-			$parser->data['modified']=max($parser->data['modified'],$block->getModifiedDate());
 			$parser->data['block']=&$block;
 			$result=$block->display($parser,$attrs,$text);
 			unset($parser->data['block']);
@@ -326,19 +372,10 @@ class Template extends Resource
 		{
 			setContentType('text/html');
 		}
-		
-		$stats=stat($this->dir.'/'.$file);
-		$modified=$stats['mtime'];
-		if (is_readable($this->dir.'/template.conf'))
-		{
-			$stats=stat($this->dir.'/template.conf');
-			$modified=max($modified,$stats['mtime']);
-		}
-		$modified=max($modified,$page->getModifiedDate());
-		
+						
 		// Parse the template and display
 		$parser = new TemplateParser();
-		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode,'modified'=>$modified);
+		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode);
 		$parser->addObserver('block',$this);
 		$parser->addObserver('var',$this);
 		$parser->addObserver('stylesheet',$this);
@@ -352,14 +389,13 @@ class Template extends Resource
 		$this->lockRead();
 		ob_start();
 		$parser->parseFile($this->dir.'/'.$file);
-		setModifiedDate($parser->data['modified']);
 		ob_end_flush();
 		$this->unlock();
 	}
 	
 	function displayAdmin(&$request,&$page)
 	{
-		$this->internalDisplay($request,$page,'admin','template.adminxml','template.adminhtml');
+		$this->internalDisplay($request,$page,'admin','template.admin.xml','template.admin.html');
 	}
 	
 	function display(&$request,&$page)
@@ -369,9 +405,8 @@ class Template extends Resource
 		{
 			header('ETag: '.$etag);
 		}
-		setValidTime(10);
 		
-		$this->internalDisplay($request,$page,'normal','template.xmlfile','template.htmlfile');
+		$this->internalDisplay($request,$page,'normal','template.file.xml','template.file.html');
 	}
 }
 

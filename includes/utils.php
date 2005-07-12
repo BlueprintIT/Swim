@@ -152,6 +152,12 @@ function displayServerError(&$request)
 	}
 }
 
+function setDefaultCache()
+{
+	header('Cache-Control: must-revalidate');
+	header('Pragma:');
+}
+
 function setValidTime($minutes)
 {
 	header('Cache-Control: max-age='.($minutes*60).', public');
@@ -159,9 +165,42 @@ function setValidTime($minutes)
 	header('Expires: '.httpdate(time()+($minutes*60)));
 }
 
-function setModifiedDate($date)
+function setCacheInfo($date,$etag=false)
 {
+	$log=&LoggerManager::getLogger('swim.cache');
+	$cached=false;
+	if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))||(isset($_SERVER['HTTP_IF_NONE_MATCH'])))
+	{
+		$log->debug('Found a cache check header');
+		$cached=true;
+		if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
+		{
+			$log->debug('Checking etag');
+			if ($etag!=$_SERVER['HTTP_IF_NONE_MATCH'])
+			{
+				$log->debug('ETag differs');
+				$cached=false;
+			}
+		}
+		if (($cached)&&(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])))
+		{
+			$log->debug('Checking modification date');
+			$checkdate=strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			if ($checkdate!=$date)
+			{
+				$log->debug('Date differs');
+				$cached=false;
+			}
+		}
+		if ($cached)
+		{
+			$log->debug('Resource is cached');
+			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
+			exit;
+		}
+	}
 	header('Last-Modified: '.httpdate($date));
+	header('ETag: '.$etag);
 }
 
 function callMethod(&$request)

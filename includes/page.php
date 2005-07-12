@@ -29,6 +29,30 @@ class Page extends Resource
 		$this->blocks = array();
 	}
 	
+	function getTotalModifiedDate()
+	{
+		$modified=$this->getModifiedDate();
+		$template=&$this->getTemplate();
+		$modified=max($modified,$template->getModifiedDate());
+
+		$blocks=$this->prefs->getPrefBranch('page.blocks');
+		foreach ($blocks as $key=>$id)
+		{
+			if (substr($key,-3,3)=='.id')
+			{
+				$blk=substr($key,0,-3);
+				$cont=$this->prefs->getPref('page.blocks.'.$blk.'.container');
+				if ($cont!='page')
+				{
+					$block=&$this->getBlock($blk);
+					$modified=max($modified,$block->getModifiedDate());
+				}
+			}
+		}
+
+		return $modified;
+	}
+	
 	function &getResourceWorkingDetails(&$resource)
 	{
 		return $this->container->getResourceWorkingDetails($this);

@@ -59,7 +59,7 @@ class Parser
   // Parses a whole file in one call
   function parseFile($filename)
   {
-    $this->_log->info('Parsing file '.$filename);
+    $this->_log->debug('Parsing file '.$filename);
     if (($source=fopen($filename,'r'))!==false)
     {
 	    while (!feof($source))

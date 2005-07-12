@@ -31,14 +31,16 @@ function method_view(&$request)
 				{
 					if ($resource->exists())
 					{
-						setModifiedDate($resource->getModifiedDate());
-						setContentType($resource->getContentType());
-						setValidTime(10);
-						$etag=$resource->getETag();
-						if ($etag!==false)
+						if ((isset($request->query['version']))&&($request->query['version']!='temp'))
 						{
-							header('ETag: '.$etag);
+							setValidTime(60);
 						}
+						else
+						{
+							setDefaultCache();
+						}
+						setCacheInfo($resource->getModifiedDate(),$resource->getETag());
+						setContentType($resource->getContentType());
 						$resource->outputFile();
   				}
   				else
@@ -90,6 +92,15 @@ function method_view(&$request)
 			}
 			else if ($resource->isPage())
 			{
+				if ((isset($request->query['version']))&&($request->query['version']!='temp'))
+				{
+					setValidTime(60);
+				}
+				else
+				{
+					setDefaultCache();
+				}
+				setCacheInfo($resource->getTotalModifiedDate(),$resource->getETag());
 				$resource->display($request);
 			}
 			else

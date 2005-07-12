@@ -32,12 +32,12 @@ LoggerManager::setLogLevel('',SWIM_LOG_INFO);
 
 $log=&LoggerManager::getLogger('swim');
 
-$log->info('Request start');
+$log->debug('Request start');
 
 $request=&Request::decodeCurrentRequest();
 
 callMethod($request);
 
-$log->info('Request end');
+$log->debug('Request end');
 
 ?>
