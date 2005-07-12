@@ -40,8 +40,18 @@ function method_view(&$request)
 							setDefaultCache();
 						}
 						setCacheInfo($resource->getModifiedDate(),$resource->getETag());
-						setContentType($resource->getContentType());
-						$resource->outputFile();
+						$type=$resource->getContentType();
+						setContentType($type);
+						if ($type=='text/css')
+						{
+							include 'csshandler.php';
+							$handlerf = new CSSHandlerFactory();
+							$handlerf->output($resource);
+						}
+						else
+						{
+							$resource->outputFile();
+						}
   				}
   				else
   				{
@@ -101,6 +111,20 @@ function method_view(&$request)
 					setDefaultCache();
 				}
 				setCacheInfo($resource->getTotalModifiedDate(),$resource->getETag());
+				if (isset($request->query['template']))
+				{
+					list($cont,$templ)=explode('/',$request->query['template']);
+					$container=&getContainer($cont);
+					if ($container!==false)
+					{
+						$template=&$container->getTemplate($templ);
+						if ($template!==false)
+						{
+							$template->display($request,$resource);
+							return;
+						}
+					}
+				}
 				$resource->display($request);
 			}
 			else

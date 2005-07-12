@@ -119,6 +119,46 @@ class Template extends Resource
 	  return $request->encode();
 	}
 	
+	function displayDate(&$parser,$tag,$attrs,$text)
+	{
+		if (isset($attrs['source']))
+		{
+			if ($attrs['source']=='block')
+			{
+				$time=$data['block']->getModifiedDate();
+			}
+			else if ($attrs['source']=='template')
+			{
+				$time=$this->getModifiedDate();
+			}
+			else if ($attrs['source']=='page')
+			{
+				$time=$data['page']->getModifiedDate();
+			}
+			else if ($attrs['source']=='resource')
+			{
+				$time=$data['page']->getTotalModifiedDate();
+			}
+		}
+		else
+		{
+			$time=time();
+		}
+		if (isset($attrs['format']))
+		{
+			$format=$attrs['format'];
+		}
+		else if ($tag=='date')
+		{
+			$format='l jS F Y';
+		}
+		else if ($tag=='time')
+		{
+			$format='g:ia (T)';
+		}
+		print(date($format,$time));
+	}
+	
 	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
 	{
 		print('<'.$tag);
@@ -342,6 +382,10 @@ class Template extends Resource
 		{
 			return $this->displayIf($parser,$tag,$attrs,$text);
 		}
+		else if (($tag=='date')||($tag=='time'))
+		{
+			return $this->displayDate($parser,$tag,$attrs,$text);
+		}
 		else
 		{
 			return false;
@@ -385,6 +429,8 @@ class Template extends Resource
 		$parser->addObserver('anchor',$this);
 		$parser->addObserver('editlink',$this);
 		$parser->addObserver('if',$this);
+		$parser->addObserver('date',$this);
+		$parser->addObserver('time',$this);
 		
 		$this->lockRead();
 		ob_start();
@@ -400,12 +446,6 @@ class Template extends Resource
 	
 	function display(&$request,&$page)
 	{
-		$etag=$page->getETag();
-		if ($etag!==false)
-		{
-			header('ETag: '.$etag);
-		}
-		
 		$this->internalDisplay($request,$page,'normal','template.file.xml','template.file.html');
 	}
 }

@@ -1,0 +1,38 @@
+html {
+}
+
+body {
+}
+
+div#header {
+	position: relative;
+	background-image: viewurl('global/template/base/layout/banner.jpg');
+	background-position: top left;
+	background-repeat: repeat-x;
+	height: 127px;
+	width: 100%;
+}
+
+img#logo {
+	position: absolute;
+	bottom: 30px;
+	left: 30px;
+}
+
+div#footer {
+	position: relative;
+	text-align: right;
+	height: 140px;
+}
+
+div#footer p {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+img#wheels {
+	height: 140px;
+	width: 145px;
+	float: left;
+}
