@@ -41,8 +41,6 @@ class Container extends Resource
 				fclose($file);
 			}
 		}
-		if ($id=='internal')
-			$this->log->info('Container '.$id.' writable: '.$this->isWritable());
 	}
 	
 	function fileIsWritable($filename)
