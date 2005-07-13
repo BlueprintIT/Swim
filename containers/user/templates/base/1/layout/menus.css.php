@@ -21,10 +21,14 @@ div.popoutright, div.popoutdown {
 
 td.menuitem {
 	background-color: <?= $menubackground ?>;
+	padding-left: 18px !important;
+	background-position: 0px 5px;
 }
 
 td.menufocus {
 	background-color: <?= $menuhighlight ?> !important;
+	background-repeat: no-repeat;
+	background-image: url('bullet.gif') !important;
 }
 
 ul.menupopup {
@@ -35,10 +39,15 @@ ul.menupopup {
 ul.menupopup li.menuitem {
 	display: block;
 	padding: 2px !important;
+	padding-left: 18px !important;
 	margin: 0 !important;
 	border: 1px black solid;
+	background-position: 0px 45% !important;
+	background-image: none !important;
 }
 
 ul.menupopup li.menufocus {
 	background-color: <?= $menuhighlight ?>;
+	background-repeat: no-repeat;
+	background-image: url('bullet.gif') !important;
 }
