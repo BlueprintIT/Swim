@@ -34,8 +34,8 @@ ul.menupopup {
 
 ul.menupopup li.menuitem {
 	display: block;
-	padding: 2px;
-	margin: 0;
+	padding: 2px !important;
+	margin: 0 !important;
 	border: 1px black solid;
 }
 
