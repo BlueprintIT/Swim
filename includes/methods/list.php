@@ -41,7 +41,7 @@ function method_list(&$request)
 			$item=&$set[$k];
 			print("\t\t<page id=\"".$item->id."\"");
 			print(" version=\"".$item->version."\"");
-			print(" title=\"".$item->prefs->getPref('page.variables.title')."\"");
+			print(" title=\"".htmlspecialchars($item->prefs->getPref('page.variables.title'))."\"");
 			print(">\n");
 			print("\t\t</page>\n");
 		}
