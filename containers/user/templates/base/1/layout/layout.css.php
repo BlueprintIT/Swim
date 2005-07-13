@@ -145,6 +145,15 @@ div#menubar td a:hover, div#menubar td a:visited:hover {
 	color: <?= $bordertextcolor ?>;
 }
 
+h1#sidetitle {
+	font-size: 1em;
+	font-weight: normal;
+	padding-left: 5px;
+	width: <?= $sidewidth-2 ?>px;
+	background: transparent;
+	position: absolute;
+}
+
 ul#sidemenu {
 	margin: 0;
 	padding: 0;
