@@ -221,15 +221,10 @@ div#footer {
 	background-color: <?= $yellowborder ?>;
 }
 
-img#wheels {
-	position: absolute;
-	margin: 0;
-	border: 0;
-	padding: 0;
-	left: 20px;
-	bottom: 20px;
-	width: 145px;
-	height: 140px;
+div#base {
+	margin-left: 190px;
+	padding-top: 5px;
+	padding-right: 5px;
 }
 
 div#curve {
@@ -244,26 +239,48 @@ div#curve {
 	background-image: url('curve.gif');
 }
 
-div#footer p {
-	position: absolute;
+p#mission {
 	margin: 0;
 	padding: 0;
-	padding-right: 80px;
-	top: 20px;
-	left: 190px;
 	letter-spacing: 0.075em;
 	font-family: <?= $borderfont ?>;
 	color: <?= $bordertextcolor ?>;
 	font-size: 1.2em;
 }
 
+p#copyright {
+	padding: 0;
+	padding-top: 5px;
+	margin: 0;
+	color: <?= $bordertextcolor ?>;
+}
+
+p#copyright a, p#copyright a:visited {
+	color: blue;
+}
+
+p#copyright a:hover, p#copyright a:visited:hover {
+	color: blue;
+}
+
 img#iip {
-	position: absolute;
+	float: right;
 	margin: 0;
 	border: 0;
 	padding: 0;
-	right: 10px;
-	bottom: 10px;
 	width: 73px;
 	height: 50px;
+}
+
+img#wheels {
+	position: absolute;
+	bottom: 5px;
+	left: 10px;
+	margin: 0;
+	border: 0;
+	padding: 0;
+	left: 20px;
+	bottom: 20px;
+	width: 145px;
+	height: 140px;
 }

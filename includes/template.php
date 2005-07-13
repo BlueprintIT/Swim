@@ -28,10 +28,10 @@ class Template extends Resource
 	
 	function getFileModifiedDate($file)
 	{
-		$f=$this->prefs->getPref($file);
+		$f=$this->getDir().'/'.$this->prefs->getPref($file);
 		if (is_readable($f))
 		{
-			$stats=stat($this->dir.'/'.$f);
+			$stats=stat($f);
 			return $stats['mtime'];
 		}
 		return false;
@@ -100,7 +100,13 @@ class Template extends Resource
 	
 	function &generateRequest(&$data,$url,$method)
 	{
-		if ($url[0]=='/')
+		if (strlen($url)==0)
+		{
+			$request = new Request();
+			$request->method='view';
+			$request->resource=$data['request']->resource;
+		}
+		else if ($url[0]=='/')
 		{
 			$request = new Request();
 			$request->method=$method;

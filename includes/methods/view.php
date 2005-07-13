@@ -102,15 +102,9 @@ function method_view(&$request)
 			}
 			else if ($resource->isPage())
 			{
-				if ((isset($request->query['version']))&&($request->query['version']!='temp'))
-				{
-					setValidTime(60);
-				}
-				else
-				{
-					setDefaultCache();
-				}
-				setCacheInfo($resource->getTotalModifiedDate(),$resource->getETag());
+				$template=false;
+				setDefaultCache();
+				$modified=$resource->getTotalModifiedDate();
 				if (isset($request->query['template']))
 				{
 					list($cont,$templ)=explode('/',$request->query['template']);
@@ -120,12 +114,16 @@ function method_view(&$request)
 						$template=&$container->getTemplate($templ);
 						if ($template!==false)
 						{
-							$template->display($request,$resource);
-							return;
+							$modified=max($modified,$template->getModifiedDate());
 						}
 					}
 				}
-				$resource->display($request);
+				if ($template===false)
+				{
+					$template=&$resource->getTemplate();
+				}
+				setCacheInfo($modified,$resource->getETag());
+				$template->display($request,$resource);
 			}
 			else
 			{
