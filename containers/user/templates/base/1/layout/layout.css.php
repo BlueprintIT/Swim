@@ -121,6 +121,7 @@ div#menubar td {
 	margin: 0;
 	background-color: <?= $menubackground ?>;
 	color: <?= $bordertextcolor ?>;
+	font-weight: bold;
 	font-family: <?= $borderfont ?>;
 	font-size: 0.8em;
 }
@@ -147,7 +148,7 @@ div#menubar td a:hover, div#menubar td a:visited:hover {
 
 h1#sidetitle {
 	font-size: 1em;
-	font-weight: normal;
+	font-weight: bold;
 	padding-left: 5px;
 	width: <?= $sidewidth-2 ?>px;
 	background: transparent;
@@ -232,7 +233,7 @@ div#footer {
 
 div#base {
 	margin-left: 190px;
-	padding-top: 5px;
+	padding-top: 10px;
 	padding-right: 5px;
 }
 
@@ -249,6 +250,7 @@ div#curve {
 }
 
 p#mission {
+	font-weight: bold;
 	margin: 0;
 	padding: 0;
 	letter-spacing: 0.075em;
@@ -258,6 +260,7 @@ p#mission {
 }
 
 p#copyright {
+	font-size: 0.8em;
 	padding: 0;
 	padding-top: 5px;
 	margin: 0;
@@ -265,11 +268,11 @@ p#copyright {
 }
 
 p#copyright a, p#copyright a:visited {
-	color: blue;
+	color: <?= $bordertextcolor ?>;
 }
 
 p#copyright a:hover, p#copyright a:visited:hover {
-	color: blue;
+	color: <?= $bordertextcolor ?>;
 }
 
 img#iip {
