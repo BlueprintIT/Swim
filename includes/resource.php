@@ -313,7 +313,7 @@ class Resource
 		global $_USER;
 		if ($this->isWritable())
 		{
-			return ((is_writable($this->getDir().'/'.$filename))&&($_USER->canWrite($this)));
+			return (((!is_file($this->getDir().'/'.$filename))||(is_writable($this->getDir().'/'.$filename)))&&($_USER->canWrite($this)));
 		}
 		return false;
 	}
@@ -332,9 +332,14 @@ class Resource
 			$file=fopen($this->getDir().'/'.$filename,'r');
 			if ($file===false)
 			{
+				$this->log->warn('Failed to open '.$filename);
 				$this->unlock();
 			}
 			return $file;
+		}
+		else
+		{
+			$this->log->warn('Could not open '.$filename.' for reading');
 		}
 		return false;
 	}
@@ -353,9 +358,14 @@ class Resource
 			$file=fopen($this->getDir().'/'.$filename,$mode);
 			if ($file===false)
 			{
+				$this->log->warn('Failed to open '.$filename);
 				$this->unlock();
 			}
 			return $file;
+		}
+		else
+		{
+			$this->log->warn('Could not open '.$filename.' for writing');
 		}
 		return false;
 	}
@@ -490,20 +500,31 @@ class File extends Resource
 		$this->parent=$parent;
 		if (is_a($parent,'Container'))
 		{
+			$this->version='noversion';
 			$this->container=$parent;
 			$this->dir=$this->container->getResourceDir($this);
 		}
 		else
 		{
+			$this->version=$parent->version;
 			$this->container=$parent->container;
 			$this->dir=$this->parent->getDir($this);
 		}
 		$this->id=$path;
-		$this->version='noversion';
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
 	}
 
+	function delete()
+	{
+		if ($this->fileIsWritable())
+		{
+			$this->parent->lockWrite();
+			unlink($this->getDir().'/'.$this->id);
+			$this->parent->unlock();
+		}
+	}
+	
 	function getETag()
 	{
 		return $this->parent->getETag().':'.$this->id;
@@ -565,9 +586,37 @@ class File extends Resource
 		return parent::openFileRead($this->id);
 	}
 	
+	function makeDir($dir)
+	{
+		if (is_dir($dir))
+		{
+			return;
+		}
+		$base=dirname($dir);
+		if (is_dir($base))
+		{
+			mkdir($dir);
+			return;
+		}
+		else
+		{
+			$this->makeDir($base);
+		}
+	}
+	
 	function openFileWrite($append=false)
 	{
-		$this->log->debug('Squiggle');
+		$dir=dirname($this->id);
+		if ($dir=='.')
+		{
+			$dir=$this->getDir();
+		}
+		else
+		{
+			$dir=$this->getDir().'/'.$dir;
+		}
+		$this->makeDir($dir);
+
 		return parent::openFileWrite($this->id,$append);
 	}
 }

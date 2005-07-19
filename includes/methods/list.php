@@ -13,18 +13,12 @@
  * $Revision$
  */
 
-function method_list(&$request)
+function listContainer(&$container,$type=false)
 {
-	$log=&LoggerManager::getLogger('swim.method.list');
+	print("\t<container id=\"".$container->id."\">\n");
 	
-	setContentType('text/xml');
-	print ("<site>\n");
-	$containers=&getAllContainers();
-	foreach (array_keys($containers) as $id)
+	if (($type==false)||($type=="template"))
 	{
-		print("\t<container id=\"".$id."\">\n");
-		$container=&$containers[$id];
-		
 		$set=&$container->getTemplates();
 		foreach (array_keys($set) as $k)
 		{
@@ -34,7 +28,10 @@ function method_list(&$request)
 			print(">\n");
 			print("\t\t</template>\n");
 		}
-		
+	}
+	
+	if (($type==false)||($type=="page"))
+	{
 		$set=&$container->getPages();
 		foreach (array_keys($set) as $k)
 		{
@@ -45,7 +42,10 @@ function method_list(&$request)
 			print(">\n");
 			print("\t\t</page>\n");
 		}
-		
+	}
+	
+	if (($type==false)||($type=="block"))
+	{
 		$set=&$container->getBlocks();
 		foreach (array_keys($set) as $k)
 		{
@@ -56,9 +56,115 @@ function method_list(&$request)
 			print(">\n");
 			print("\t\t</block>\n");
 		}
-		print("\t</container>\n");
 	}
-	print ("</site>\n");
+	print("\t</container>\n");
+}
+
+function listDir($path,$name)
+{
+	global $_PREFS;
+	$lockfile=$_PREFS->getPref('locking.lockfile');
+	$templockfile=$_PREFS->getPref('locking.templockfile');
+	$log=&LoggerManager::getLogger('swim.method.list');
+	print('<dir');
+	print(' name="'.$name.'"');
+	print('>');
+	$dir=opendir($path);
+	if ($dir!==false)
+	{
+		while (($file = readdir($dir)) !== false)
+		{
+			if (($file[0]!='.')&&($file!=$lockfile)&&($file!=$templockfile))
+			{
+				if (is_dir($path.'/'.$file))
+				{
+					listDir($path.'/'.$file,$file);
+				}
+				else
+				{
+					listFile($path.'/'.$file,$file);
+				}
+			}
+		}
+		closedir($dir);
+	}
+	else
+	{
+		$log->warn('Could not open directory '.$path);
+	}
+	print('</dir>');
+}
+
+function listFile($path,$name)
+{
+	$log=&LoggerManager::getLogger('swim.method.list');
+	print('<file');
+	print(' name="'.$name.'"');
+	if (is_readable($path))
+	{
+		print(' exists="true"');
+		$stats=stat($path);
+		print(' size="'.$stats['size'].'"');
+		print(' modified="'.$stats['mtime'].'"');
+		print(' created="'.$stats['ctime'].'"');
+	}
+	else
+	{
+		print(' exists="false"');
+	}
+	print('/>');
+}
+
+function method_list(&$request)
+{
+	$log=&LoggerManager::getLogger('swim.method.list');
+	
+	setContentType('text/xml');
+	if (strlen($request->resource)>0)
+	{
+		$paths = explode('/',$request->resource);
+		$container=&getContainer($paths[0]);
+		if (count($paths)==1)
+		{
+			listContainer($container);
+		}
+		else if (count($paths)==2)
+		{
+			listContainer($container,$paths[1]);
+		}
+		else
+		{
+			$resource = &Resource::decodeResource($request);
+			if ($resource->isFile())
+			{
+				$path=$resource->getDir().'/'.$resource->id;
+			}
+			else
+			{
+				$path=$resource->getDir();
+			}
+			$name=basename($path);
+			if (is_dir($path))
+			{
+				listDir($path,$name);
+			}
+			else
+			{
+				listFile($path,$name);
+			}
+		}
+	}
+	else
+	{
+		print ("<site>\n");
+		$containers=&getAllContainers();
+		foreach (array_keys($containers) as $id)
+		{
+			$container=&$containers[$id];
+			listContainer($container);
+		}
+		print ("</site>\n");
+	}
 }
 
 ?>

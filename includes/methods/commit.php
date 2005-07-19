@@ -85,6 +85,7 @@ function method_commit(&$request)
 	
 						$autocommit=$_PREFS->getPref('update.autocommit',false);
 						$list=&getAllPages();
+						$pages=array();
 						foreach(array_keys($list) as $pkey)
 						{
 							$page=&$list[$pkey];
