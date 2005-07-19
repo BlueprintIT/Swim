@@ -300,6 +300,10 @@ class TemplateParser extends StackedParser
 	  	{
 	  		unset($this->observers[$tag][$key]);
 	  	}
+	  	if (count($this->observers[$tag])==0)
+	  	{
+	  		unset($this->observers[$tag]);
+	  	}
 	  }
   }
   

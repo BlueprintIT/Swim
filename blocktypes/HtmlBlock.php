@@ -33,6 +33,46 @@ class HtmlBlock extends Block
 		readfile($this->getDir().'/'.$name);
 		return true;
 	}
+	
+	function display(&$parser,$attrs,$text)
+	{
+		$parser->addObserver('a',$this);
+		Block::display($parser,$attrs,$text);
+		$parser->removeObserver('a',$this);
+	}
+
+	function observeTag(&$parser,$tagname,$attrs,$text)
+	{
+		if ($tagname=='a')
+		{
+			$this->log->debug('Observing a link');
+			$link=$attrs['href'];
+			if (substr($link,0,12)=='attachments/')
+			{
+				$this->log->debug('Attachment link');
+				$data=&$parser->data;
+				$attrs['href']=$data['page']->container->id.'/page/'.$data['page']->id.'/'.$data['block']->id.'/'.$link;
+			}
+			else if (strpos($link,'://')!==false)
+			{
+				$this->log->debug('External link');
+			}
+			else
+			{
+				$this->log->debug('Internal link');
+				$request = new Request();
+				$request->method='view';
+				$request->resource=$link;
+				$attrs['href']=$request->encode();
+			}
+			Template::displayElement($parser,$tagname,$attrs,$text);
+			return true;
+		}
+		else
+		{
+			return Block::observeTag($parser,$tagname,$attrs,$text);
+		}
+	}
 }
 
 ?>

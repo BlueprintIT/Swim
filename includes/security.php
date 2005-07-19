@@ -307,12 +307,12 @@ class User
 	
 	function canRead(&$resource)
 	{
-		return $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
+		return true;//$this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
 	}
 	
 	function canWrite(&$resource)
 	{
-		return $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
+		return true;//$this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
 	}
 }
 

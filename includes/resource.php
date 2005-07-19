@@ -339,7 +339,7 @@ class Resource
 		}
 		else
 		{
-			$this->log->warn('Could not open '.$filename.' for reading');
+			//$this->log->warn('Could not open '.$filename.' for reading');
 		}
 		return false;
 	}
