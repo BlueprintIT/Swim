@@ -191,7 +191,6 @@ class Resource
 	{
 		if (!isset($this->working))
 		{
-			$this->log->info('Creating new working details');
 			$this->working=&$this->container->getResourceWorkingDetails($this);
 		}
 		return $this->working;

@@ -67,7 +67,7 @@ img#cogs {
 	padding: 0;
 	margin: 0;
 	width: 150px;
-	height: <?= $headerheight ?>;
+	height: <?= $headerheight ?>px;
 	border-right: <?= $spacing ?>px white solid;
 }
 
@@ -161,7 +161,7 @@ ul#sidemenu {
 	margin-top: <?= $sidetopgap+2 ?>px;
 	padding: 0;
 	position: absolute;
-	left: 2;
+	left: 2px;
 	z-index: 10;
 	width: <?= $sidewidth-2 ?>px;
 	background: <?= $yellowborder ?>;

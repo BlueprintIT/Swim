@@ -224,12 +224,10 @@ class Container extends Resource
 	
 	function &makeResourceWorkingVersion(&$resource)
 	{
-		$this->log->info('Making working version for '.$resource->id);
 		$source=$resource->getDir();
 		$details=&$resource->getWorkingDetails();
 		if ($details->isNew())
 		{
-			$this->log->info('New version');
 			$resource->lockRead();
 			$lock=lockResourceWrite($details->getDir());
 			recursiveCopy($source,$details->getDir(),true);
