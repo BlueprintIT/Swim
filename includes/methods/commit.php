@@ -142,7 +142,7 @@ function method_commit(&$request)
 				}
 				else
 				{
-					displayLocked($request,$block->getResource());
+					displayLocked($request,$resource);
 				}
 			}
 			else if ($resource->isPage())

@@ -36,6 +36,7 @@ div#header {
 	background-image: url('banner.jpg');
 	background-position: top left;
 	background-repeat: repeat-x;
+	z-index: 10;
 }
 
 div#swim {
@@ -157,13 +158,13 @@ h1#sidetitle {
 
 ul#sidemenu {
 	margin: 0;
+	margin-top: <?= $sidetopgap+2 ?>px;
 	padding: 0;
-	padding-top: <?= $sidetopgap+2 ?>px;
 	position: absolute;
 	left: 2;
 	z-index: 10;
 	width: <?= $sidewidth-2 ?>px;
-	background: transparent;
+	background: <?= $yellowborder ?>;
 }
 
 ul#sidemenu li {

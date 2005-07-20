@@ -60,40 +60,59 @@ function method_view(&$request)
   			}
   			else if ($_SERVER['REQUEST_METHOD']=='PUT')
   			{
-  				$log->debug('Preparing to write file');
-  			  $in=@fopen('php://input','rb');
-  			  if ($in!==false)
-  			  {
-  					$log->debug('Opened input');
-    			  $out=$resource->openFileWrite();
-    			  if ($out!==false)
-    			  {
-  						$log->debug('Opened output');
-      			  while (!feof($in))
-      			  {
-      			    $data=fread($in,1024);
-        			  fwrite($out,$data);
-      			  	$log->debug('Read '.$data);
-        			}
- 
-  						$log->debug('Closing files');
- 							$resource->closeFile($out);
-     			    fclose($in);
-            	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
-            	print("Resource accepted");
-            	return;
-    			  }
-    			  else
-    			  {
-    			    $log->warn("Couldn't open file for writing.");
-    			  }
-   			    fclose($in);
-   			  }
-   			  else
-   			  {
-   			    $log->warn('Unable to open standard input');
-   			    displayServerError($request);
-   			  }
+  				if ($resource->version=='temp')
+  				{
+						$details=$resource->getWorkingDetails();
+						if ($details->isMine())
+						{
+		  				$log->debug('Preparing to write file');
+		  			  $in=@fopen('php://input','rb');
+		  			  if ($in!==false)
+		  			  {
+		  					$log->debug('Opened input');
+		    			  $out=$resource->openFileWrite();
+		    			  if ($out!==false)
+		    			  {
+		  						$log->debug('Opened output');
+		      			  while (!feof($in))
+		      			  {
+		      			    $data=fread($in,1024);
+		        			  fwrite($out,$data);
+		      			  	$log->debug('Read '.$data);
+		        			}
+		 
+		  						$log->debug('Closing files');
+		 							$resource->closeFile($out);
+		     			    fclose($in);
+		            	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
+		            	print("Resource accepted");
+		            	return;
+		    			  }
+		    			  else
+		    			  {
+		    			    $log->warn("Couldn't open file for writing.");
+		    			  }
+		   			    fclose($in);
+		   			  }
+		   			  else
+		   			  {
+		   			    $log->warn('Unable to open standard input');
+		   			    displayServerError($request);
+		   			  }
+						}
+						else
+						{
+							header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
+							print("Someone else has locked this resource.");
+							return;
+						}
+  				}
+  				else
+  				{
+						header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
+						print("You only have access to edit working versions.");
+						return;
+  				}
   			}
   			else
   			{
