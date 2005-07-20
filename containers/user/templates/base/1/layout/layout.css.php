@@ -14,7 +14,7 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	padding-top: <?= $headerheight+$spacing+$menuheight ?>px;
+	padding-top: <?= $headerheight+$spacing ?>px;
 	padding-bottom: <?= $footerheight ?>px;
 	overflow: hidden;
 	font-size: 1em;
@@ -74,7 +74,7 @@ img#cogs {
 img#logo {
 	position: relative;
 	left: 180px;
-	top: 40px;
+	top: 30px;
 	width: 575px;
 	height: 71px;
 	border: 0;
@@ -86,11 +86,10 @@ div#menubar {
 	margin: 0;
 	padding: 0;
 	position: absolute;
-	top: <?= $headerheight+$spacing ?>px;
+	top: <?= $headerheight-$menuheight ?>px;
 	left: 0;
 	height: <?= $menuheight ?>px;
 	width: 100%;
-	background-color: <?= $yellowborder ?>;
 	z-index: 10;
 }
 
@@ -102,6 +101,7 @@ div#spacing {
 div#menubar table {
 	margin: 0;
 	border: 0;
+	border-top: 1px white solid;
 	padding: 0;
 	width: 100%;
 	height: 100%;
