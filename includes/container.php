@@ -43,6 +43,11 @@ class Container extends Resource
 		}
 	}
 	
+	function getPath()
+	{
+		return $this->id;
+	}
+	
 	function fileIsWritable($filename)
 	{
 		return false;
@@ -51,11 +56,6 @@ class Container extends Resource
 	function fileIsReadable($filename)
 	{
 		return (is_readable($this->getDir().'/'.$filename));
-	}
-	
-	function getETag()
-	{
-		return $this->id;
 	}
 	
 	function getCurrentVersion($dir)
@@ -224,10 +224,12 @@ class Container extends Resource
 	
 	function &makeResourceWorkingVersion(&$resource)
 	{
+		$this->log->info('Making working version for '.$resource->id);
 		$source=$resource->getDir();
-		$details=&$this->getResourceWorkingDetails($resource);
+		$details=&$resource->getWorkingDetails();
 		if ($details->isNew())
 		{
+			$this->log->info('New version');
 			$resource->lockRead();
 			$lock=lockResourceWrite($details->getDir());
 			recursiveCopy($source,$details->getDir(),true);

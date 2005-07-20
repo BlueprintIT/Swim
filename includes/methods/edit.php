@@ -13,15 +13,12 @@
  * $Revision$
  */
 
-// TODO fix this - Bug 8
-function displayLocked(&$request,$resource)
-{
-}
-
 function method_edit(&$request)
 {
 	global $_USER;
 	
+	$log=&LoggerManager::getLogger('swim.method.edit');
+	$log->info('New edit method');
 	$resource = &Resource::decodeResource($request);
 
 	if ($resource!==false)
@@ -30,16 +27,29 @@ function method_edit(&$request)
 		{
 			if ($resource->isBlock())
 			{
-				$details=$resource->getWorkingDetails();
+				$details=&$resource->getWorkingDetails();
+				
+				if ((!$details->isMine())&&(isset($request->query['forcelock'])))
+				{
+					if ($request->query['forcelock']=='continue')
+					{
+						$details->takeOver();
+					}
+					else if ($request->query['forcelock']=='discard')
+					{
+						$details->takeOverClean();
+					}
+				}
+				
 				if ($details->isMine())
 				{
-					$working=$resource->makeWorkingVersion();
+					$working=&$resource->makeWorkingVersion();
 					$page=&$working->getBlockEditor();
 					$page->display($request);
 				}
 				else
 				{
-					displayLocked($request,$resource);
+					displayLocked($request,$details,$resource);
 				}
 			}
 			else if ($resource->isPage())

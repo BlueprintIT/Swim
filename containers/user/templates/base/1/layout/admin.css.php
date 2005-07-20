@@ -15,7 +15,7 @@ div.adminpanel {
 }
 
 ul#sidemenu.highlight {
-	padding-top: <?= $sidetopgap ?>px;
+	margin-top: <?= $sidetopgap ?>px;
 	left: 0;
 	width: <?= $sidewidth ?>px;
 }
@@ -53,7 +53,7 @@ div#sideadmin {
 
 div#menuadmin {
 	position: absolute;
-	bottom: 0px;
+	bottom: <?= $menuheight ?>px;
 	right: 0;
 }
 

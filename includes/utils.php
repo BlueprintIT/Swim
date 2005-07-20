@@ -92,6 +92,23 @@ function httpdate($date)
 	return gmdate("D, j M Y G:i:s",$date).' GMT';
 }
 
+function formatdate($date)
+{
+	return date('g:ia d/m/Y',$date);
+}
+
+function displayLocked(&$request,&$details,$resource)
+{
+	$request->data['details']=&$details;
+	$request->data['resource']=&$resource;
+	$container = &getContainer('internal');
+	$page=&$container->getPage('locked');
+	if ($page!==false)
+	{
+		$page->display($request);
+	}
+}
+
 function displayAdminLogin(&$request)
 {
 	displayLogin($request,'You must log in to administer this website.');

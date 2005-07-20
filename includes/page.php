@@ -29,6 +29,11 @@ class Page extends Resource
 		$this->blocks = array();
 	}
 	
+	function getPath()
+	{
+		return Resource::getPath().'/page/'.$this->id;
+	}
+	
 	function getTotalModifiedDate()
 	{
 		$modified=$this->getModifiedDate();
@@ -55,12 +60,12 @@ class Page extends Resource
 	
 	function &getResourceWorkingDetails(&$resource)
 	{
-		return $this->container->getResourceWorkingDetails($this);
+		return $this->getWorkingDetails();
 	}
 	
 	function makeNewResourceVersion(&$resource)
 	{
-		$page=&$this->container->makeNewResourceVersion($this);
+		$page=&$this->makeNewVersion($this);
 		if ($page===false)
 		{
 			return false;
@@ -73,7 +78,7 @@ class Page extends Resource
 	
 	function makeResourceWorkingVersion(&$resource)
 	{
-		$page=&$this->container->makeResourceWorkingVersion($this);
+		$page=&$this->makeWorkingVersion();
 		if ($page===false)
 		{
 			return false;
@@ -98,17 +103,17 @@ class Page extends Resource
 	
 	function isCurrentResourceVersion(&$resource)
 	{
-		return $this->container->isCurrentResourceVersion($this);
+		return $this->isCurrentVersion();
 	}
 	
 	function makeCurrentResourceVersion(&$resource)
 	{
-		$this->container->makeCurrentResourceVersion($this);
+		$this->makeCurrentVersion();
 	}
 	
 	function &getCurrentResourceVersion(&$resource)
 	{
-		$page=&$this->container->getCurrentResourceVersion($this);
+		$page=&$this->getCurrentVersion();
 		if ($page===false)
 		{
 			return false;

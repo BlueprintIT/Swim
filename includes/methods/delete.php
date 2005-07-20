@@ -29,11 +29,12 @@ function method_delete(&$request)
 			{
 				if ($resource->version=="temp")
 				{
-					$details=$resource->getWorkingDetails();
+					$details=&$resource->getWorkingDetails();
 					if ($details->isMine())
 					{
 						$log->warn('Deleting file');
 						$resource->delete();
+						$details->saveDetails();
 						if ($_SERVER['REQUEST_METHOD']=='DELETE')
 						{
 		        	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
@@ -47,7 +48,7 @@ function method_delete(&$request)
 					}
 					else
 					{
-						displayLocked($request,$resource);
+						displayLocked($request,$details,$resource);
 					}
 				}
 				else

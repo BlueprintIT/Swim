@@ -4,14 +4,14 @@ $newrequest = new Request();
 $newrequest->method='docommit';
 $newrequest->resource=$request->resource;
 $newrequest->query['version']=$request->query['version'];
-$newrequest->query['newversion']=$request->query['newversion'];
+$newrequest->query['newversion']=$request->data['newversion'];
 $newrequest->nested=&$request->nested;
 
 ?>
 <form action="<?= $newrequest->encodePath() ?>" method="get">
 <?= $newrequest->getFormVars() ?>
 <?
-$pages=&$request->query['pages'];
+$pages=&$request->data['pages'];
 foreach (array_keys($pages) as $key)
 {
 	$page=&$pages[$key];

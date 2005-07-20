@@ -26,6 +26,11 @@ class Template extends Resource
 		$this->log=&LoggerManager::getLogger('swim.template');
 	}
 	
+	function getPath()
+	{
+		return Resource::getPath().'/template/'.$this->id;
+	}
+	
 	function getFileModifiedDate($file)
 	{
 		$f=$this->getDir().'/'.$this->prefs->getPref($file);
@@ -86,12 +91,12 @@ class Template extends Resource
 		}
 		else if (substr($url,0,5)=='page/')
 		{
-			$url=$data['page']->container->id.'/page/'.$data['page']->id.substr($url,4);
+			$url=$data['page']->getPath().substr($url,4);
 			//$request->query['version']=$data['page']->version;
 		}
 		else if (substr($url,0,9)=='template/')
 		{
-			$url=$this->container->id.'/template/'.$this->id.substr($url,8);
+			$url=$this->getPath().substr($url,8);
 			//$request->query['version']=$this->version;
 		}
 		$request->resource=$url;

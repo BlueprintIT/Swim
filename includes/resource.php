@@ -16,6 +16,7 @@ class WorkingDetails
 	var $id;
 	var $blank;
 	var $container;
+	var $log;
 	
 	function WorkingDetails(&$container,$id,$version,$dir)
 	{
@@ -27,6 +28,7 @@ class WorkingDetails
 		$this->dir=$dir;
 		$this->user=&$_USER;
 		$this->blank=true;
+		$this->log=&LoggerManager::getLogger('swim.working');
 		
 		if (!is_dir($dir))
 		{
@@ -53,12 +55,46 @@ class WorkingDetails
 		return $this->blank;
 	}
 	
+	function internalClean()
+	{
+		recursiveDelete($this->dir,true);
+		$this->blank=true;
+	}
+	
+	function clean()
+	{
+		$lock=lockResourceWrite($this->dir);
+		$this->internalClean();
+		unlockResource($lock);
+	}
+	
+	function takeOver()
+	{
+		global $_USER;
+		
+		$lock=lockResourceWrite($this->dir);
+		$this->user=&$_USER;
+		$this->internalSave();
+		unlockResource($lock);
+	}
+	
+	function takeOverClean()
+	{
+		global $_USER;
+		
+		$lock=lockResourceWrite($this->dir);
+		$this->user=&$_USER;
+		$this->internalClean();
+		$this->internalSave();
+		unlockResource($lock);
+	}
+	
 	function free()
 	{
 		global $_PREFS;
 		
 		$lock=lockResourceWrite($this->dir);
-		recursiveDelete($this->dir,true);
+		$this->internalClean();
 		unlink($this->dir.'/'.$_PREFS->getPref('locking.templockfile'));
 		unlockResource($lock);
 		return true;
@@ -116,6 +152,7 @@ class Resource
 	var $prefs;
 	var $modified;
 	var $log;
+	var $working;
 	
 	var $readLock;
 	var $writeLock;
@@ -145,9 +182,19 @@ class Resource
 		}
 	}
 	
+	function getPath()
+	{
+		return $this->container->id;
+	}
+	
 	function &getWorkingDetails()
 	{
-		return $this->container->getResourceWorkingDetails($this);
+		if (!isset($this->working))
+		{
+			$this->log->info('Creating new working details');
+			$this->working=&$this->container->getResourceWorkingDetails($this);
+		}
+		return $this->working;
 	}
 	
 	function makeNewVersion()
@@ -167,7 +214,7 @@ class Resource
 	
 	function getETag()
 	{
-		return $this->container->getETag().'/'.get_class($this).'/'.$this->id.':'.$this->version;
+		return $this->getPath().':'.$this->version;
 	}
 	
 	function getModifiedDate()
@@ -525,9 +572,9 @@ class File extends Resource
 		}
 	}
 	
-	function getETag()
+	function getPath()
 	{
-		return $this->parent->getETag().':'.$this->id;
+		return $this->parent->getPath().'/'.$this->id;
 	}
 	
 	function exists()

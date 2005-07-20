@@ -13,10 +13,6 @@
  * $Revision$
  */
 
-function displayLocked(&$request,$resource)
-{
-}
-
 function method_commit(&$request)
 {
 	global $_USER,$_PREFS;
@@ -30,7 +26,20 @@ function method_commit(&$request)
 			if ($resource->isBlock())
 			{
 				$oldversion=&$resource;
-				$details=$resource->getWorkingDetails();
+				$details=&$resource->getWorkingDetails();
+
+				if ((!$details->isMine())&&(isset($request->query['forcelock'])))
+				{
+					if ($request->query['forcelock']=='continue')
+					{
+						$details->takeOver();
+					}
+					else if ($request->query['forcelock']=='discard')
+					{
+						$details->takeOverClean();
+					}
+				}
+				
 				if ($details->isMine())
 				{
 					$workingversion=$resource->makeWorkingVersion();
@@ -128,8 +137,8 @@ function method_commit(&$request)
 						}
 						if (count($pages)>0)
 						{
-							$request->query['newversion']=$newversion->version;
-							$request->query['pages']=&$pages;
+							$request->data['newversion']=$newversion->version;
+							$request->data['pages']=&$pages;
 							$internal=&getContainer('internal');
 							$page=&$internal->getPage('commit');
 							$page->display($request);
@@ -142,7 +151,7 @@ function method_commit(&$request)
 				}
 				else
 				{
-					displayLocked($request,$resource);
+					displayLocked($request,$details,$resource);
 				}
 			}
 			else if ($resource->isPage())

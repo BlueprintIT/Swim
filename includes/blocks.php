@@ -24,6 +24,18 @@ class Block extends Resource
 		$this->log=&LoggerManager::getLogger('swim.block');
 	}
 	
+	function getPath()
+	{
+		if (is_a($this->container,'Page'))
+		{
+			return $this->container->getPath().'/'.$this->id;
+		}
+		else
+		{
+			return Resource::getPath().'/block/'.$this->id;
+		}
+	}
+	
 	function &getBlockEditor()
 	{
 		return null;

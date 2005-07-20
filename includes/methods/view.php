@@ -62,7 +62,7 @@ function method_view(&$request)
   			{
   				if ($resource->version=='temp')
   				{
-						$details=$resource->getWorkingDetails();
+						$details=&$resource->getWorkingDetails();
 						if ($details->isMine())
 						{
 		  				$log->debug('Preparing to write file');
@@ -84,6 +84,7 @@ function method_view(&$request)
 		  						$log->debug('Closing files');
 		 							$resource->closeFile($out);
 		     			    fclose($in);
+		     			    $details->saveDetails();
 		            	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
 		            	print("Resource accepted");
 		            	return;

@@ -101,6 +101,7 @@ class Request
 	var $log;
 	var $nested;
 	var $xml;
+	var $data = array();
 	
 	function Request()
 	{

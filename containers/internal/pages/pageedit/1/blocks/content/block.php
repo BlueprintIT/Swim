@@ -1,10 +1,5 @@
 <?
 
-function format($date)
-{
-	return date('g:ia d/m/Y',$date);
-}
-
 $commit = new Request();
 
 if ($request->method=='edit')
@@ -78,7 +73,7 @@ $commit->nested=&$request->nested;
 			if (!$pagev->isCurrentVersion())
 			{
 ?>
-			<option value="<?= $version ?>"><?= $version ?> created at <?= format($pagev->getModifiedDate()) ?></option>
+			<option value="<?= $version ?>"><?= $version ?> created at <?= formatdate($pagev->getModifiedDate()) ?></option>
 <?
 			}
 		}
