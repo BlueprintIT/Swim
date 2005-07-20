@@ -34,8 +34,8 @@ div#header {
 	height: <?= $headerheight ?>px;
 	width: 100%;
 	background-image: url('banner.jpg');
-	background-position: top left;
-	background-repeat: repeat-x;
+	background-position: <?= $sidewidth+$spacer ?>px 0;
+	background-repeat: no-repeat;
 	z-index: 10;
 }
 
