@@ -42,4 +42,6 @@ p {
 	margin-right: 0;
 	padding: 0;
 	text-align: justify;
+	font-size: 11pt;
+	font-family: <?= $paragraphfont ?>;
 }
