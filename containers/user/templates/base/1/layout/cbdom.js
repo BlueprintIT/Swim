@@ -10,14 +10,14 @@ ElementWrapper.prototype = {
 	
 	addClass: function(cls)
 	{
-		var newclass = cls;
+		var newclass = '';
 		var classes = this.element.className.split(' ');
 		for (var k in classes)
 		{
 			if (classes[k]!=cls)
-				newclass+=' '+classes[k];
+				newclass+=classes[k]+' ';
 		}
-		this.element.className=newclass;
+		this.element.className=newclass+cls;
 	},
 	
 	removeClass: function(cls)
@@ -31,7 +31,7 @@ ElementWrapper.prototype = {
 				if (classes[k]!=cls)
 					newclass+=' '+classes[k];
 			}
-			this.element.className=newclass.substring(0,newclass.length);
+			this.element.className=newclass.substring(1,newclass.length);
 		}
 	},
 	
@@ -349,7 +349,7 @@ DOMEventWrapper.prototype = {
 	// Standard event properties
 	type: null,
 	target: null,
-	currentTarget: null,   // Set to the same as target since Microsoft does not provide this
+	currentTarget: null,   // Set to null since Microsoft does not provide this
 	eventPhase: null,      // Unable to find
 	bubbled: null,
 	cancelable: true,

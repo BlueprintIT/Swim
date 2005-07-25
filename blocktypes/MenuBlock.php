@@ -79,6 +79,7 @@ class Menu
 	var $type;
 	var $items = array();
 	var $log;
+	var $level;
 	
 	function Menu()
 	{
@@ -104,7 +105,7 @@ class Menu
 		foreach (array_keys($this->items) as $k)
 		{
 			$item=&$this->items[$k];
-			print('<td class="menuitem">'."\n");
+			print('<td class="menuitem level'.$this->level.'">'."\n");
 			$item->display();
 			print('</td>'."\n");
 		}
@@ -116,7 +117,7 @@ class Menu
 		foreach (array_keys($this->items) as $k)
 		{
 			$item=&$this->items[$k];
-			print('<li class="menuitem">'."\n");
+			print('<li class="menuitem level'.$this->level.'">'."\n");
 			$item->display();
 			print('</li>'."\n");
 		}
@@ -230,14 +231,16 @@ class MenuParser extends StackedParser
  		else if ($tag=='menu')
  		{
   		$this->_log->debug('Adding menu');
- 			$newmenu = new Menu($this->current);
+ 			$newmenu = new Menu();
 			if (isset($this->current))
 			{
 				$newmenu->parentItem=&$this->current;
+				$newmenu->level=$this->current->parentMenu->level+1;
 				$this->current->submenu=&$newmenu;
 			}
 			else
 			{
+				$newmenu->level=1;
  				$this->menu=&$newmenu;
 			}
  			$this->current=&$newmenu;

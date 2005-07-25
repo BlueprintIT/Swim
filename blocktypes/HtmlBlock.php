@@ -34,13 +34,16 @@ class HtmlBlock extends Block
 		return true;
 	}
 	
-	function display(&$parser,$attrs,$text)
+	function registerObservers(&$parser)
 	{
 		$parser->addObserver('a',$this);
-		Block::display($parser,$attrs,$text);
+	}
+	
+	function unregisterObservers(&$parser)
+	{
 		$parser->removeObserver('a',$this);
 	}
-
+	
 	function observeTag(&$parser,$tagname,$attrs,$text)
 	{
 		if ($tagname=='a')

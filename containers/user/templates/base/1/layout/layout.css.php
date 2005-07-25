@@ -30,6 +30,7 @@ div#searchbox {
 	right: 5px;
 	padding: 0;
 	margin: 0;
+	height: 50px;
 }
 
 div#header {
@@ -175,7 +176,7 @@ ul#sidemenu {
 	background: <?= $yellowborder ?>;
 }
 
-ul#sidemenu li {
+ul#sidemenu li.level1 {
 	display: block;
 	padding-left: 20px;
 	padding-bottom: 10px;
@@ -189,14 +190,12 @@ ul#sidemenu li {
 }
 
 ul#sidemenu a, ul#sidemenu a:visited {
-	display: block;
 	width: auto;
 	text-decoration: none;
 	color: <?= $bordertextcolor ?>;
 }
 
 ul#sidemenu a:hover, ul#sidemenu a:visited:hover {
-	display: block;
 	width: auto;
 	text-decoration: none;
 	color: <?= $bordertextcolor ?>;
@@ -220,6 +219,45 @@ div#print img#printicon {
 	width: 30px;
 	height: 26px;
 	border: 0px none;
+}
+
+div#highlight {
+	margin-top: 20px;
+	margin-left: 20px;
+	float: right;
+	width: 300px;
+}
+
+div#highlight p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+div#highlightMain {
+	padding: 10px;
+	margin-top: 20px;
+	margin-left: 20px;
+	background-color: <?= $menuhighlight ?>;
+}
+
+div#highlightTitle {
+	float: left;
+	padding: 10px;
+	margin-bottom: 20px;
+	background-color: <?= $yellowborder ?>;
+	width: 250px;
+}
+
+div#highlightTitle p {
+	text-align: center;
+	font-size: 1.3em;
+	color: <?= $bordertextcolor ?>;
+}
+
+div#highlightMain p {
+	color: <?= $bordertextcolor ?>;
+	font-size: 1.1em;
+	text-align: left;
 }
 
 div#content {
@@ -253,9 +291,10 @@ div#curve {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	width: 103px;
+	width: 102px;
 	height: 104px;
 	background-image: url('curve.gif');
+	background-color: transparent;
 }
 
 p#mission {

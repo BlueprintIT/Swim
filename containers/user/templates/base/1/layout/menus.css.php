@@ -36,6 +36,22 @@ ul.menupopup {
 	border: black 1px solid;
 }
 
+li.level1.menuitem {
+	white-space: normal;
+}
+
+li.level2 {
+	white-space: nowrap !important;
+}
+
+ul#sidemenu li.level1.menufocus a, ul#sidemenu li.level1.menufocus a:visited, ul#sidemenu li.level1.menufocus a:hover, ul#sidemenu li.level1.menufocus a:visited:hover {
+	color: <?= $menuhighlight ?>;
+}
+
+ul#sidemenu li.level2 a, ul#sidemenu li.level2 a:visited {
+	color: <?= $bordertextcolor ?> !important;
+}
+
 ul.menupopup li.menuitem {
 	display: block;
 	padding: 2px !important;

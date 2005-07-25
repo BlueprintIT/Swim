@@ -86,7 +86,7 @@ class Template extends Resource
 		}
 		else if (substr($url,0,6)=='block/')
 		{
-			$url=$data['page']->container->id.'/page/'.$data['page']->id.'/'.$data['block']->id.substr($url,5);
+			$url=$data['block']->getPath().substr($url,5);
 			//$request->query['version']=$data['block']->version;
 		}
 		else if (substr($url,0,5)=='page/')
@@ -314,26 +314,39 @@ class Template extends Resource
 	
 	function displayIf(&$parser,$tag,$attrs,$text)
 	{
-		$name=$attrs['hasVar'];
-		if (isset($attrs['namespace']))
+		$result=false;
+		if (isset($attrs['hasVar']))
 		{
-			$name=$attrs['namespace'].'.'.$name;
-		}
-		else
-		{
-			if (strpos($name,'.')===false)
+			$name=$attrs['hasVar'];
+			if (isset($attrs['namespace']))
 			{
-				$name='page.variables.'.$name;
+				$name=$attrs['namespace'].'.'.$name;
+			}
+			else
+			{
+				if (strpos($name,'.')===false)
+				{
+					$name='page.variables.'.$name;
+				}
+			}
+			$page=&$parser->data['page'];
+			if ($page->prefs->isPrefSet($name))
+			{
+				$value=$page->prefs->getPref($name);
+				$result=strlen($value)>0;
 			}
 		}
-		$page=&$parser->data['page'];
-		if ($page->prefs->isPrefSet($name))
+		else if (isset($attrs['hasBlock']))
 		{
-			$value=$page->prefs->getPref($name);
-			if (strlen($value)>0)
+			$block=&$parser->data['page']->getBlock($attrs['hasBlock']);
+			if ($block!==false)
 			{
-				print($text);
+				$result=true;
 			}
+		}
+		if ($result)
+		{
+			print($text);
 		}
 		return true;
 	}

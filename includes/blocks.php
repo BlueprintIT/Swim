@@ -77,6 +77,14 @@ class Block extends Resource
 		print($text);
 	}
 	
+	function registerObservers(&$parser)
+	{
+	}
+	
+	function unregisterObservers(&$parser)
+	{
+	}
+	
 	function display(&$parser,$attrs,$text)
 	{
 		$request=&$parser->data['request'];
@@ -97,7 +105,9 @@ class Block extends Resource
 	    $text=ob_get_contents();
 	    ob_end_clean();
 	    $this->log->debug('Re-parsing content');
+	    $this->registerObservers($parser);
 	    $parser->parseText($text);
+	    $this->unregisterObservers($parser);
 		}
 		$this->displayOutro($attrs);
 	}

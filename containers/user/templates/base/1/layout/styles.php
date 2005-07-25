@@ -10,7 +10,7 @@ $sidetopgap=50;
 
 $defaultfont="'Arial Narrow', Arial, Helvetica, sans-serif";
 $borderfont=$defaultfont;
-$yellowborder='#ffc03e';
+$yellowborder='#ffd84f';
 $bordertextcolor='#366aa6';
 $menubackground='#ffe991';
 $menuhighlight='#00e0ff';
