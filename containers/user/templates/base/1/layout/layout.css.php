@@ -24,6 +24,14 @@ body {
 	background-repeat: no-repeat;
 }
 
+div#searchbox {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+	padding: 0;
+	margin: 0;
+}
+
 div#header {
 	margin: 0;
 	padding: 0;
