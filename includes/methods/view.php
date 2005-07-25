@@ -23,11 +23,11 @@ function method_view(&$request)
 
 	if ($resource!==false)
 	{
-		if ($_USER->canRead($resource))
+    if ($resource->isFile())
 		{
-      if ($resource->isFile())
+			if ($_SERVER['REQUEST_METHOD']=='GET')
 			{
-				if ($_SERVER['REQUEST_METHOD']=='GET')
+				if ($_USER->canRead($resource))
 				{
 					if ($resource->exists())
 					{
@@ -52,16 +52,23 @@ function method_view(&$request)
 						{
 							$resource->outputFile();
 						}
-  				}
-  				else
-  				{
-  					displayNotFound($request);
-  				}
-  			}
-  			else if ($_SERVER['REQUEST_METHOD']=='PUT')
-  			{
-  				if ($resource->version=='temp')
-  				{
+					}
+					else
+					{
+						displayNotFound($request);
+					}
+				}
+				else
+				{
+					displayLogin($request,'You must log in to view this resource.');
+				}
+			}
+			else if ($_SERVER['REQUEST_METHOD']=='PUT')
+			{
+				if ($_USER->canWrite($resource))
+				{
+					if ($resource->version=='temp')
+					{
 						$details=&$resource->getWorkingDetails();
 						if ($details->isMine())
 						{
@@ -107,20 +114,27 @@ function method_view(&$request)
 							print("Someone else has locked this resource.");
 							return;
 						}
-  				}
-  				else
-  				{
+					}
+					else
+					{
 						header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
 						print("You only have access to edit working versions.");
 						return;
-  				}
-  			}
-  			else
-  			{
-  			  displayServerError($request);
-  			}
+					}
+				}
+				else
+				{
+					displayLogin($request,'You must log in to write to this resource.');
+				}
 			}
-			else if ($resource->isPage())
+			else
+			{
+			  displayServerError($request);
+			}
+		}
+		else if ($resource->isPage())
+		{
+			if ($_USER->canRead($resource))
 			{
 				$template=false;
 				setDefaultCache();
@@ -147,12 +161,12 @@ function method_view(&$request)
 			}
 			else
 			{
-				displayGeneralError($request,'You can only view pages or files.');
+				displayLogin($request,'You must log in to view this resource.');
 			}
 		}
 		else
 		{
-			displayLogin($request,'You must log in to view this resource.');
+			displayGeneralError($request,'You can only view pages or files.');
 		}
 	}
 	else

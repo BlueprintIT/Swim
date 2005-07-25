@@ -23,6 +23,7 @@ function method_displayLogin(&$request)
 	$page = &$container->getPage($_PREFS->getPref('method.login.page'),$version);
 	if ($page!==false)
 	{
+		header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
 		$page->display($request);
 	}
 	else

@@ -10,6 +10,28 @@ div.adminpanel {
 	background-color: white;
 }
 
+img#csslogo {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	position: absolute;
+	top: <?= $headerheight-$menuheight-40 ?>px;
+	right: 75px;
+	width: 88px;
+	height: 31px;
+}
+
+img#htmllogo {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	position: absolute;
+	top: <?= $headerheight-$menuheight-40 ?>px;
+	right: 170px;
+	width: 88px;
+	height: 31px;
+}
+
 *.highlight {
 	border: 2px blue solid !important;
 }

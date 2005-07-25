@@ -71,28 +71,6 @@ img#cogs {
 	border-right: <?= $spacing ?>px white solid;
 }
 
-img#csslogo {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	position: absolute;
-	top: <?= $headerheight-$menuheight-40 ?>px;
-	right: 5px;
-	width: 88px;
-	height: 31px;
-}
-
-img#htmllogo {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	position: absolute;
-	top: <?= $headerheight-$menuheight-40 ?>px;
-	right: 100px;
-	width: 88px;
-	height: 31px;
-}
-
 img#logo {
 	position: relative;
 	left: 180px;

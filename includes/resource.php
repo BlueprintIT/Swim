@@ -351,6 +351,7 @@ class Resource
 	
 	function fileExists($filename)
 	{
+		$this->log->debug('Testing for existance of '.$this->getDir().'/'.$filename);
 		return is_file($this->getDir().'/'.$filename);
 	}
 	
@@ -455,6 +456,12 @@ class Resource
 		}
 
 		$parts = explode('/',$resource);
+		if (($parts[0]=='version')&&(count($parts)>=5))
+		{
+			$version=$parts[1];
+			$parts=array_slice($parts,2);
+		}
+		
 		if (count($parts)<3)
 			return false;
 			
@@ -490,6 +497,7 @@ class Resource
 						if (count($parts)>4)
 						{
 							$result = new File($result,implode('/',array_slice($parts,4)));
+							$log->debug('Found file in block: '.$result->id);
 						}
 					}
 				}
