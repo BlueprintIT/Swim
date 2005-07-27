@@ -7,7 +7,7 @@ setContentType('text/css');
 
 body {
 	font-family: <?= $defaultfont ?>;
-	font-size: 12pt;
+	font-size: 1em;
 	font-weight: normal;
 }
 
@@ -42,6 +42,6 @@ p {
 	margin-right: 0;
 	padding: 0;
 	text-align: justify;
-	font-size: 11pt;
+	font-size: 1em;
 	font-family: <?= $paragraphfont ?>;
 }

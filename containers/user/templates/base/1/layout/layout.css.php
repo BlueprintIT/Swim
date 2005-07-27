@@ -17,7 +17,6 @@ body {
 	padding-top: <?= $headerheight+$spacing ?>px;
 	padding-bottom: <?= $footerheight ?>px;
 	overflow: hidden;
-	font-size: 1em;
 	background-color: <?= $pagebackground ?>;
 	background-image: url('background.gif');
 	background-position: top left;
@@ -157,12 +156,12 @@ div#menubar td a:hover, div#menubar td a:visited:hover {
 }
 
 h1#sidetitle {
-	font-size: 1em;
 	font-weight: bold;
 	padding-left: 5px;
 	width: <?= $sidewidth-2 ?>px;
 	background: transparent;
 	position: absolute;
+	font-size: 1.2em;
 }
 
 ul#sidemenu {
