@@ -12,14 +12,13 @@
 		<script src="template/layout/cbdom.js"/>
 		<script src="template/layout/bpmm.js"/>
 		<script src="template/layout/print.js"/>
-		<script src="template/layout/imagehover.js"/>
 		<title><var name="title"/></title>
 	</head>
 	<body>
 		<div id="header">
 			<image id="cogs" src="template/layout/cogs.jpg" alt="Cogs"/>
 			<anchor href="/"><image id="logo" src="template/layout/logo.gif" alt="Brass Bullet Ltd."/></anchor>
-			<div id="searchbox">
+			<!--<div id="searchbox">
 				<form method="GET" action="http://www.google.com/custom">
 					<input type="hidden" name="cof" value="S:http://www.blueprintit.co.uk;AH:center;BIMG:http://www.blueprintit.co.uk/testbed/swim.php/view/global/template/base/layout/background.gif;AWFID:2631239e0750e52c;">
 					<input type="hidden" name="domains" value="brass-bullet.co.uk">
@@ -30,7 +29,7 @@
 					<input TYPE="text" name="q" size="31" maxlength="255" value="">
 					<input type="submit" name="sa" VALUE="Search">
 				</form>
-			</div>
+			</div>-->
 		</div>
 		<div id="menubar">
 			<div id="spacing">
@@ -40,21 +39,18 @@
 		<h1 id="sidetitle"><var name="title"/></h1>
 		<block id="sidemenu"/>
 		<div id="body">
-			<div id="print">
-				<anchor id="printlink" onmouseover="mouseOverPrint();" onmouseout="mouseOutPrint();" onclick="return mouseClickPrint();"
-				 href="" target="_blank" template="global/print" title="View in printable form"><image alt="View printable form" id="printicon" src="template/layout/print.jpg"/></anchor>
-			</div>
 			<div id="highlight">
 				<block id="highlightTitle"/>
 				<block id="highlightMain"/>
 			</div>
 			<block id="content"/>
+			<p id="printLink"><anchor href="" target="_blank" template="global/print">view printable version</anchor></p>
 		</div>
 		<div id="footer">
 			<div id="curve"></div>
 			<div id="base">
 				<image id="iip" src="/global/template/base/layout/iip.gif" alt="Brass Bullet Ltd. are an Investor in People"/>
-				<p id="mission">promoting excellence through the application of engineering best practice</p>
+				<p id="mission">&#145;promoting excellence through the application of engineering best practice&#146;</p>
 				<p id="copyright">&copy; Brass Bullet Ltd. Developed by <a target="_blank" href="http://www.blueprintit.co.uk">Blueprint IT Ltd</a>.</p>
 			</div>
 		</div>

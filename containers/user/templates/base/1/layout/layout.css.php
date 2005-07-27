@@ -221,6 +221,11 @@ div#print img#printicon {
 	border: 0px none;
 }
 
+p#printLink {
+	text-align: center;
+	font-size: 0.8em;
+}
+
 div#highlight {
 	margin-top: 20px;
 	margin-left: 20px;
@@ -250,9 +255,8 @@ div#highlightTitle {
 
 div#highlightTitle p {
 	text-align: center;
-	font-weight: bold;
 	font-size: 1.2em;
-	font-family: <?= $titlefont ?>;
+	font-family: <?= $paragraphfont ?>;
 	color: <?= $bordertextcolor ?>;
 }
 
@@ -299,9 +303,9 @@ div#curve {
 }
 
 p#mission {
-	font-weight: bold;
 	margin: 0;
 	padding: 0;
+	font-style: italic;
 	letter-spacing: 0.075em;
 	font-family: <?= $borderfont ?>;
 	color: <?= $bordertextcolor ?>;
@@ -309,7 +313,7 @@ p#mission {
 }
 
 p#copyright {
-	font-size: 0.8em;
+	font-size: 0.7em;
 	padding: 0;
 	padding-top: 5px;
 	margin: 0;
