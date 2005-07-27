@@ -144,7 +144,15 @@ menuManager = {
 			menuManager.mouseOut(sources);
 			menuManager.mouseOver(dests);
 			
+			if (menuManager.selected)
+			{
+				menuManager.selected.unfocusCurrent();
+			}
 			menuManager.selected=newitem;
+			if (menuManager.selected)
+			{
+				menuManager.selected.focusCurrent();
+			}
 		}
 	},
 	
@@ -559,6 +567,16 @@ MenuItem.prototype = {
 	submenu: null,
 	pos: null,
 	focusElement: null,
+	
+	focusCurrent: function()
+	{
+		this.posel.addClass('currentfocus');
+	},
+	
+	unfocusCurrent: function()
+	{
+		this.posel.removeClass('currentfocus');
+	},
 	
 	focus: function()
 	{

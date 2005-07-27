@@ -20,7 +20,7 @@ h1 {
 	margin-right: 0;
 	padding: 0;
 	text-align: left;
-	color: <?= $bordertextcolor ?>;
+	color: <?= $h1color ?>;
 }
 
 h2 {
@@ -32,7 +32,7 @@ h2 {
 	margin-right: 0;
 	padding: 0;
 	text-align: left;
-	color: <?= $yellowborder ?>;
+	color: <?= $h2color ?>;
 }
 
 p {

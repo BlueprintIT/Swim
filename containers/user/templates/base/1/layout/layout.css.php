@@ -18,7 +18,7 @@ body {
 	padding-bottom: <?= $footerheight ?>px;
 	overflow: hidden;
 	font-size: 1em;
-	background-color: white;
+	background-color: <?= $pagebackground ?>;
 	background-image: url('background.gif');
 	background-position: top left;
 	background-repeat: no-repeat;
@@ -242,7 +242,7 @@ div#highlightMain {
 	padding: 10px;
 	margin-top: 20px;
 	margin-left: 20px;
-	background-color: <?= $menuhighlight ?>;
+	background-color: <?= $highlightMain ?>;
 }
 
 div#highlightTitle {

@@ -11,9 +11,19 @@ $sidetopgap=50;
 $defaultfont="'Arial Narrow', Arial, Helvetica, sans-serif";
 $paragraphfont="Arial, Helvetics, sans-serif";
 $borderfont=$defaultfont;
-$yellowborder='#ffd84f';
+
+$yellowborder='rgb(234,180,16)';
 $bordertextcolor='#366aa6';
-$menubackground='#ffe991';
-$menuhighlight='#00e0ff';
+
+$pagebackground='rgb(246,250,254)';
+
+$menubackground='rgb(253,223,101)';
+$menuhighlight='rgb(87,155,231)';
+
+$highlightMain='rgb(87,155,231)';
+$highlightTitle=$yellowborder;
+
+$h1color=$bordertextcolor;
+$h2color=$yellowborder;
 
 ?>

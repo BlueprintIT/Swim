@@ -15,6 +15,10 @@ setContentType('text/css');
 	white-space: nowrap;
 }
 
+*.currentfocus, *.currentfocus a, *.currentfocus a:hover, *.currentfocus a:visited, *.currentfocus a:visited:hover {
+	color: <?= $menuhighlight ?> !important;
+}
+
 div.popoutright, div.popoutdown {
 	display: none;
 }
@@ -26,7 +30,6 @@ td.menuitem {
 }
 
 td.menufocus {
-	background-color: <?= $menuhighlight ?> !important;
 	background-repeat: no-repeat;
 	background-image: url('bullet.gif') !important;
 }
@@ -44,14 +47,6 @@ li.level2 {
 	white-space: nowrap !important;
 }
 
-ul#sidemenu li.level1.menufocus a, ul#sidemenu li.level1.menufocus a:visited, ul#sidemenu li.level1.menufocus a:hover, ul#sidemenu li.level1.menufocus a:visited:hover {
-	color: <?= $menuhighlight ?>;
-}
-
-ul#sidemenu li.level2 a, ul#sidemenu li.level2 a:visited {
-	color: <?= $bordertextcolor ?> !important;
-}
-
 ul.menupopup li.menuitem {
 	display: block;
 	padding: 2px !important;
@@ -63,7 +58,6 @@ ul.menupopup li.menuitem {
 }
 
 ul.menupopup li.menufocus {
-	background-color: <?= $menuhighlight ?>;
 	background-repeat: no-repeat;
 	background-image: url('bullet.gif') !important;
 }
