@@ -87,17 +87,27 @@ class Template extends Resource
 		else if (substr($url,0,6)=='block/')
 		{
 			$url=$data['block']->getPath().substr($url,5);
-			//$request->query['version']=$data['block']->version;
+			$request->query['version']=$data['block']->version;
 		}
 		else if (substr($url,0,5)=='page/')
 		{
 			$url=$data['page']->getPath().substr($url,4);
-			//$request->query['version']=$data['page']->version;
+			$request->query['version']=$data['page']->version;
 		}
 		else if (substr($url,0,9)=='template/')
 		{
 			$url=$this->getPath().substr($url,8);
-			//$request->query['version']=$this->version;
+			$request->query['version']=$this->version;
+		}
+		else if (isset($data['block']))
+		{
+			$url=$data['block']->getPath().'/'.$url;
+			$request->query['version']=$data['block']->version;
+		}
+		else
+		{
+			$url=$this->getPath().'/'.$url;
+			$request->query['version']=$this->version;
 		}
 		$request->resource=$url;
 		return $request;
@@ -400,6 +410,10 @@ class Template extends Resource
 		{
 			return $this->displayImage($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='img')
+		{
+			return $this->displayImage($parser,$tag,$attrs,$text);
+		}
 		else if ($tag=='anchor')
 		{
 			return $this->displayAnchor($parser,$tag,$attrs,$text);
@@ -449,6 +463,7 @@ class Template extends Resource
 						
 		// Parse the template and display
 		$parser = new TemplateParser();
+		$parser->addEmptyTag("img");
 		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode);
 		$parser->addObserver('block',$this);
 		$parser->addObserver('var',$this);
@@ -456,6 +471,7 @@ class Template extends Resource
 		$parser->addObserver('script',$this);
 		$parser->addObserver('applet',$this);
 		$parser->addObserver('image',$this);
+		$parser->addObserver('img',$this);
 		$parser->addObserver('anchor',$this);
 		$parser->addObserver('editlink',$this);
 		$parser->addObserver('if',$this);

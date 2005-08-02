@@ -40,6 +40,11 @@ class Parser
   {
   }
   
+  // Called when a start tag has been completely parsed.
+  function onStartTagComplete($tag)
+  {
+  }
+  
   // Called when an attribute is found in a start tag
   function onAttribute($name,$value)
   {
@@ -140,6 +145,7 @@ class Parser
           {
             $this->_log->debug('Found end of start tag, moving to state 0');
             $this->_state=0;
+            $this->onStartTagComplete($this->_tagname);
             $this->parseText(substr($text,1));
           }
           else if (substr($text,0,2)=='/>')
@@ -188,14 +194,30 @@ class StackedParser extends Parser
 {
   var $_tagstack;
   var $_current;
+  var $_emptytags;
   
   function StackedParser()
   {
     $this->Parser();
     $this->_tagstack=array();
+    $this->_emptytags=array();
     $this->_current='';
   }
 
+	function addEmptyTag($tag)
+	{
+		$this->_emptytags[]=$tag;
+	}
+	
+  // If the tag is one that is deemed always empty then we make it so.
+  function onStartTagComplete($tag)
+  {
+  	if (in_array($tag,$this->_emptytags))
+  	{
+  		$this->onEndTag($tag);
+  	}
+  }
+  
   // Adds the given attribute to the current tag on the stack.
   function onAttribute($name,$value)
   {
