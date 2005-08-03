@@ -31,9 +31,24 @@ class Page extends Resource
 	
 	function getPath()
 	{
-		return Resource::getPath().'/page/'.$this->id;
+		return $this->container->getPath().'/page/'.$this->id;
 	}
 	
+	function &decodeRelativeResource($parts)
+	{
+		if ((count($parts)>1)&&($parts[0]=='block'))
+		{
+			$this->log->debug('Testing for block '.$parts[1]);
+			if ($this->isBlock($parts[1]))
+			{
+				$this->log->debug('Found page block '.$parts[1]);
+				$result=&$this->getBlock($parts[1]);
+				return $result->decodeRelativeResource(array_slice($parts,2));
+			}
+		}
+		return Resource::decodeRelativeResource($parts);
+	}
+
 	function getTotalModifiedDate()
 	{
 		$modified=$this->getModifiedDate();

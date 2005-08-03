@@ -182,11 +182,6 @@ class Resource
 		}
 	}
 	
-	function getPath()
-	{
-		return $this->container->id;
-	}
-	
 	function &getWorkingDetails()
 	{
 		if (!isset($this->working))
@@ -423,6 +418,19 @@ class Resource
 		$this->unlock();
 	}
 
+	function &decodeRelativeResource($parts)
+	{
+		if ((count($parts)>1)&&($parts[0]=='file'))
+		{
+			$path=implode('/',array_slice($parts,1));
+			return new File($this,$path);
+		}
+		else
+		{
+			return $this;
+		}
+	}
+	
 	function &decodeResource($request)
 	{
 		global $_PREFS;
@@ -464,87 +472,16 @@ class Resource
 		
 		if (count($parts)<3)
 			return false;
-			
-		list($container,$type)=$parts;
 		
-		$container=&getContainer($container);
+		$container=&getContainer($parts[0]);
 
-		if ($type=='file')
-		{
-			$log->debug('Found file');
-			$result = new File($container,implode('/',array_slice($parts,2)));
-		}
-		else
-		{
-			$id=$parts[2];
-
-			if ($type=='page')
-			{
-				$log->debug('Found page: '.$id);
-				$result=&$container->getPage($id,$version);
-				if ($result==null)
-				{
-					$log->warn('Invalid page');
-					return false;
-				}
-				if (count($parts)>3)
-				{
-					$log->debug('Testing for block '.$parts[3]);
-					if ($result->isBlock($parts[3]))
-					{
-						$log->debug('Found page block '.$parts[3]);
-						$result=&$result->getBlock($parts[3]);
-						if (count($parts)>4)
-						{
-							$result = new File($result,implode('/',array_slice($parts,4)));
-							$log->debug('Found file in block: '.$result->id);
-						}
-					}
-				}
-			}
-			else if ($type=='template')
-			{
-				$log->debug('Found template: '.$id);
-				$result=&$container->getTemplate($id,$version);
-				if ($result==null)
-				{
-					$log->warn('Invalid template');
-					return false;
-				}
-				if (count($parts)>3)
-				{
-					$path=implode('/',array_slice($parts,3));
-					$result = new File($result,$path);
-				}
-			}
-			else if ($type=='block')
-			{
-				$log->debug('Found block: '.$id);
-				$result=&$container->getBlock($id,$version);
-				if ($result==null)
-				{
-					$log->warn('Invalid block');
-					return false;
-				}
-				if (count($parts)>3)
-				{
-					$path=implode('/',array_slice($parts,3));
-					$result = new File($result,$path);
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		return $result;
+		return $container->decodeRelativeResource(array_slice($parts,1),$version);
 	}
 }
 
 class File extends Resource
 {
-	var $parent;
+	var $path;
 	
 	function File($parent,$path)
 	{
@@ -581,7 +518,7 @@ class File extends Resource
 	
 	function getPath()
 	{
-		return $this->parent->getPath().'/'.$this->id;
+		return $this->parent->getPath().'/file/'.$this->id;
 	}
 	
 	function exists()

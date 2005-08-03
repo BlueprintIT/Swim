@@ -26,14 +26,7 @@ class Block extends Resource
 	
 	function getPath()
 	{
-		if (is_a($this->container,'Page'))
-		{
-			return $this->container->getPath().'/'.$this->id;
-		}
-		else
-		{
-			return Resource::getPath().'/block/'.$this->id;
-		}
+		return $this->container->getPath().'/block/'.$this->id;
 	}
 	
 	function &getBlockEditor()

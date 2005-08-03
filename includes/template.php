@@ -28,7 +28,7 @@ class Template extends Resource
 	
 	function getPath()
 	{
-		return Resource::getPath().'/template/'.$this->id;
+		return $this->container->getPath().'/template/'.$this->id;
 	}
 	
 	function getFileModifiedDate($file)
@@ -101,12 +101,12 @@ class Template extends Resource
 		}
 		else if (isset($data['block']))
 		{
-			$url=$data['block']->getPath().'/'.$url;
+			$url=$data['block']->getPath().'/file/'.$url;
 			$request->query['version']=$data['block']->version;
 		}
 		else
 		{
-			$url=$this->getPath().'/'.$url;
+			$url=$this->getPath().'/file/'.$url;
 			$request->query['version']=$this->version;
 		}
 		$request->resource=$url;
