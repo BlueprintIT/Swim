@@ -225,38 +225,30 @@ class Template extends Resource
 	
 	function displayEditLink(&$parser,$tag,$attrs,$text)
 	{
+		$request = new Request();
+		$request->nested=&$parser->data['request'];
 		if (isset($attrs['method']))
 		{
-			$method=$attrs['method'];
+			$request->method=$attrs['method'];
 			unset($attrs['method']);
 		}
 		else
 		{
-			$method='edit';
+			$request->method='edit';
 		}
 		if (isset($attrs['block']))
 		{
 			$block=&$parser->data['page']->getBlock($attrs['block']);
-			if (is_a($block->container,'Page'))
-			{
-				$resource=$block->container->container->id.'/page/'.$block->container->id.'/'.$block->id;
-			}
-			else
-			{
-				$resource=$block->container->id.'/block/'.$block->id;
-			}
+			$request->resource=$block->getPath();
 			unset($attrs['block']);
-			$request=&$this->generateRequest($parser->data,$resource,$method);
 			$request->query['version']=$block->version;
 		}
 		else
 		{
 			$page=&$parser->data['page'];
-			$resource=$page->container->id.'/page/'.$page->id;
-			$request=&$this->generateRequest($parser->data,$resource,$method);
+			$request->resource=$page->getPath();
 			$request->query['version']=$page->version;
 		}
-		$request->nested=$parser->data['request'];
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);
 	}
