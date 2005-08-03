@@ -59,8 +59,6 @@ class Preferences
 		return $result;
 	}
 	
-	// Loads preferences. With no arguments it loads all preferences from their default
-	// locations. Otherwise specify the type (numerical) and the file to load from.
 	function loadPreferences($source,$branch = '',$merge = false)
 	{
   	if (!$merge)

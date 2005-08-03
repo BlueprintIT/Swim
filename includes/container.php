@@ -392,33 +392,28 @@ class Container extends Resource
 		return $blocks;
 	}
 	
-	function &createPage(&$template, $id=false)
+	function &createPage(&$layout, $id=false)
 	{
+		$this->lockWrite();
 		if ($id===false)
 		{
-			$this->lockWrite();
 			do
 			{
 				$id=rand(10000,99999);
 			} while (is_dir($this->getDir().'/pages/'.$id));
-			mkdir($this->getDir().'/pages/'.$id);
-			$version=1;
-			$pdir=$this->getDir().'/pages/'.$id.'/'.$version;
-			mkdir($pdir);
-			$this->unlock();
 		}
-		if ($template===false)
+		mkdir($this->getDir().'/pages/'.$id);
+		$version=1;
+		$pdir=$this->getDir().'/pages/'.$id.'/'.$version;
+		mkdir($pdir);
+		$this->unlock();
+		if ($layout===false)
 		{
-			list($tcontainer,$template)=explode('/',$this->prefs->getPref('page.template'));
-			$tcontainer=&getContainer($tcontainer);
-			$template=&$tcontainer->getTemplate($template);
+			$layout=&getLayout($this->prefs->getPref('layouts.default'));
 		}
-		if (is_dir($template->dir.'/defaultpage'))
-		{
-			$lock=lockResourceWrite($pdir);
-			recursiveCopy($template->dir.'/defaultpage',$pdir,true);
-			unlockResource($lock);
-		}
+		$lock=lockResourceWrite($pdir);
+		recursiveCopy($layout->getDir(),$pdir,true);
+		unlockResource($lock);
 
 		$newpage=&$this->getPage($id,$version);
 		$newpage->makeCurrentVersion();

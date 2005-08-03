@@ -27,19 +27,16 @@ function method_docreate(&$request)
 			// TODO possibly a better security check here Bug 3
 			if ($type=='page')
 			{
-				if (isset($request->query['page.template']))
+				if (isset($request->query['layout']))
 				{
-					$template=$request->query['page.template'];
-					list($tcontainer,$template)=explode('/',$template);
-					$tcontainer=&getContainer($tcontainer);
-					$template=&$tcontainer->getTemplate($template);
+					$layout=&getLayout($request->query['layout']);
 				}
 				else
 				{
-					$template=false;
+					$layout=false;
 				}
 	
-				$newpage=&$container->createPage($template);
+				$newpage=&$container->createPage($layout);
 					
 				foreach ($request->query as $name => $value)
 				{

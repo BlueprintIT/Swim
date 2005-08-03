@@ -30,11 +30,36 @@ $commit->nested=&$request->nested;
 	<td style="vertical-align: top"><input type="input" name="page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
 	<td style="vertical-align: top">The page title is displayed in the browser title bar.</td>
 </tr>
+<?
+	if ($page===false)
+	{
+		$layouts=&getAllLayouts();
+		if (count($layouts)>0)
+		{
+?>
+<tr>
+	<td style="vertical-align: top">Layout:</td>
+	<td style="vertical-align: top"><select name="layout">
+<?
+			foreach ($layouts as $id => $layout)
+			{
+?>
+	<option value="<?= $layout->id ?>"><?= $layout->name ?></option>
+<?
+			}
+?>
+	</select></td>
+	<td style="vertical-align: top">The page layout.</td>
+</tr>
+<?
+		}
+	}
+?>
 <tr>
 	<td style="vertical-align: top">Description:</td>
 	<td style="vertical-align: top"><textarea name="page.variables.description" cols="40" rows="5"><?= $pageprefs->getPref('page.variables.description','') ?></textarea></td>
 	<td style="vertical-align: top">The page description is displayed by many search engines. If left blank search engines will normally display the first
-	 few paragraphs of the page instead.</td> 
+	 paragraph of the page instead.</td> 
 </tr>
 <tr>
 	<td style="vertical-align: top">Keywords:</td>
@@ -88,5 +113,8 @@ $commit->nested=&$request->nested;
 </form>
 <?
 		}
+	}
+	else
+	{
 	}
 ?>
