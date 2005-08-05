@@ -37,7 +37,7 @@ class MenuItem
 			}
 			else if (isset($this->resource))
 			{
-				print('<anchor href="'.$this->resource.'">'.$this->text.'</anchor>');
+				print('<anchor href="/'.$this->resource.'">'.$this->text.'</anchor>');
 			}
 		}
 		else
