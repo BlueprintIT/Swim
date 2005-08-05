@@ -24,11 +24,6 @@ class Block extends Resource
 		$this->log=&LoggerManager::getLogger('swim.block');
 	}
 	
-	function getPath()
-	{
-		return $this->container->getPath().'/block/'.$this->id;
-	}
-	
 	function &getBlockEditor()
 	{
 		return null;
@@ -121,47 +116,53 @@ class Block extends Resource
 	}
 }
 
-function &loadBlock(&$container,$id,$version=false)
+function &loadBlock($blockdir,&$container,$id,$version=false)
 {
 	global $_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.block.loader');
 	
-	$blockdir=$container->getBlockDir($id,$version);
+	if (is_dir($blockdir))
+	{
+		if ($container->isWritable())
+			$lock=lockResourceRead($blockdir);
 	
-	if ($container->isWritable())
-		$lock=lockResourceRead($blockdir);
-
-	$blockprefs = new Preferences();
-	$blockprefs->setParent($_PREFS);
-	if (is_readable($blockdir.'/resource.conf'))
-	{
-		$file=fopen($blockdir.'/resource.conf','r');
-		$blockprefs->loadPreferences($file,'block');
-		fclose($file);
-	}
-	$class=$blockprefs->getPref('block.class');
-	if ($blockprefs->isPrefSet('block.classfile'))
-	{
-		require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
-	}
-	else if (is_readable($blockdir.'/block.class'))
-	{
-		require_once $blockdir.'/block.class';
-	}
-
-	if ($container->isWritable())
-		unlockResource($lock);
-
-	if (class_exists($class))
-	{
-		$log->debug('Block loaded');
-		$object = new $class($container,$id,$version);
-		return $object;
+		$blockprefs = new Preferences();
+		$blockprefs->setParent($_PREFS);
+		if (is_readable($blockdir.'/resource.conf'))
+		{
+			$file=fopen($blockdir.'/resource.conf','r');
+			$blockprefs->loadPreferences($file,'block');
+			fclose($file);
+		}
+		$class=$blockprefs->getPref('block.class');
+		if ($blockprefs->isPrefSet('block.classfile'))
+		{
+			require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
+		}
+		else if (is_readable($blockdir.'/block.class'))
+		{
+			require_once $blockdir.'/block.class';
+		}
+	
+		if ($container->isWritable())
+			unlockResource($lock);
+	
+		if (class_exists($class))
+		{
+			$log->debug('Block loaded');
+			$object = new $class($container,$id,$version);
+			return $object;
+		}
+		else
+		{
+			trigger_error('Invalid block found');
+		}
 	}
 	else
 	{
-		trigger_error('Invalid block found');
+		$log->warn('Passed invalid block dir '.$blockdir);
+		return false;
 	}
 }
 
@@ -174,7 +175,7 @@ function &getAllBlocks()
 	foreach(array_keys($containers) as $id)
 	{
 		$container=&$containers[$id];
-		$newblocks=&$container->getBlocks();
+		$newblocks=&$container->getResources('block');
 		$blocks=array_marge($blocks,$newblocks);
 	}
 	return $blocks;

@@ -72,7 +72,7 @@ function method_view(&$request)
 						$details=&$resource->getWorkingDetails();
 						if ($details->isMine())
 						{
-		  				$log->debug('Preparing to write file');
+		  				$log->debug('Preparing to write file '.$resource->getDir().'/'.$resource->id);
 		  			  $in=@fopen('php://input','rb');
 		  			  if ($in!==false)
 		  			  {
@@ -90,8 +90,11 @@ function method_view(&$request)
 		 
 		  						$log->debug('Closing files');
 		 							$resource->closeFile($out);
+		 							$log->debug('Resource closed');
 		     			    fclose($in);
+		 							$log->debug('Input closed');
 		     			    $details->saveDetails();
+		 							$log->debug('Details saved');
 		            	header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
 		            	print("Resource accepted");
 		            	return;
@@ -154,7 +157,7 @@ function method_view(&$request)
 				}
 				if ($template===false)
 				{
-					$template=&$resource->getTemplate();
+					$template=&$resource->getReferencedTemplate();
 				}
 				setCacheInfo($modified,$resource->getETag());
 				$template->display($request,$resource);

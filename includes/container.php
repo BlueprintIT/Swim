@@ -43,48 +43,9 @@ class Container extends Resource
 		}
 	}
 	
-	function &decodeRelativeResource($parts,$version)
+	function getDir()
 	{
-		if (count($parts)>=2)
-		{
-			$type=$parts[0];
-			$id=$parts[1];
-
-			if ($type=='page')
-			{
-				$this->log->debug('Found page: '.$id);
-				$result=&$this->getPage($id,$version);
-				if ($result==null)
-				{
-					$this->log->warn('Invalid page');
-					return false;
-				}
-				return $result->decodeRelativeResource(array_slice($parts,2));
-			}
-			else if ($type=='template')
-			{
-				$this->log->debug('Found template: '.$id);
-				$result=&$this->getTemplate($id,$version);
-				if ($result==null)
-				{
-					$this->log->warn('Invalid template');
-					return false;
-				}
-				return $result->decodeRelativeResource(array_slice($parts,2));
-			}
-			else if ($type=='block')
-			{
-				$this->log->debug('Found block: '.$id);
-				$result=&$this->getBlock($id,$version);
-				if ($result==null)
-				{
-					$this->log->warn('Invalid block');
-					return false;
-				}
-				return $result->decodeRelativeResource(array_slice($parts,2));
-			}
-		}
-		return Resource::decodeRelativeResource($parts);
+		return $this->dir;
 	}
 	
 	function getPath()
@@ -123,21 +84,13 @@ class Container extends Resource
 	
 	function getResourceBaseDir(&$resource)
 	{
-		if (is_a($resource,'Page'))
-		{
-			return $this->getDir().'/pages/'.$resource->id;
-		}
-		else if (is_a($resource,'Block'))
-		{
-			return $this->getDir().'/blocks/'.$resource->id;
-		}
-		else if (is_a($resource,'Template'))
-		{
-			return $this->getDir().'/templates/'.$resource->id;
-		}
-		else if (is_a($resource,'File'))
+		if (is_a($resource,'File'))
 		{
 			return $this->getDir().'/files';
+		}
+		else
+		{
+			return $this->getDir().'/'.$resource->getTypeName().'s/'.$resource->id;
 		}
 	}
 	
@@ -354,52 +307,33 @@ class Container extends Resource
 		}
 	}
 	
-	function getBlockDir($id,$version)
+	function &loadBlock($id,$version = false)
 	{
-		return $this->getDir().'/blocks/'.$id.'/'.$version;
+		$block = &loadBlock($this->getDir().'/blocks/'.$id.'/'.$version,$this,$id,$version);
+		if (($block!==false)&&($block->exists()))
+		{
+			return $block;
+		}
+		return false;
 	}
 	
-	function &getBlock($id,$version=false)
+	function hasResource($type,$id,$version = false)
 	{
-		$this->log->debug('Getting block '.$id.' '.$version);
-		if ($version===false)
+		$ext=$id;
+		if ($version!==false)
 		{
-			$version=$this->getCurrentVersion($this->getDir().'/blocks/'.$id);
+			$ext=$id.'/'.$version;
 		}
-		if (!isset($this->blocks[$id][$version]))
-		{
-			$block = &loadBlock($this,$id,$version);
-			if (($block!==false)&&($block->exists()))
-			{
-				$this->blocks[$id][$version]=&$block;
-			}
-			else
-			{
-				$this->log->debug('Failed');
-				$this->blocks[$id][$version]=false;
-			}
-		}
-		return $this->blocks[$id][$version];
+		return is_dir($this->getDir().'/'.$type.'s/'.$ext);
 	}
-
-	function &getBlocks()
+	
+	function &getResource($type,$id,$version = false)
 	{
-		$blocks=array();
-		$dir=$this->dir.'/blocks';
-		$dir=opendir($dir);
-		while (false !== ($entry=readdir($dir)))
+		if (($type!='file')&&($version===false))
 		{
-			if ($entry[0]!='.')
-			{
-				$block=&$this->getBlock($entry);
-				if ($block!==false)
-				{
-					$blocks[]=&$block;
-				}
-			}
+			$version=$this->getCurrentVersion($this->getDir().'/'.$type.'s/'.$id);
 		}
-		closedir($dir);
-		return $blocks;
+		return parent::getResource($type,$id,$version);
 	}
 	
 	function &createPage(&$layout, $id=false)
@@ -429,88 +363,6 @@ class Container extends Resource
 		$newpage->makeCurrentVersion();
 
 		return $newpage;
-	}
-	
-	function &getPage($id,$version=false)
-	{
-		if ($version===false)
-		{
-			$version=$this->getCurrentVersion($this->getDir().'/pages/'.$id);
-		}
-		if (!isset($this->pages[$id][$version]))
-		{
-			$page = new Page($this,$id,$version);
-			if ($page->exists())
-			{
-				$this->pages[$id][$version]=&$page;
-			}
-			else
-			{
-				$this->pages[$id][$version]=false;
-			}
-		}
-		return $this->pages[$id][$version];
-	}
-	
-	function &getPages()
-	{
-		$pages=array();
-		$dir=$this->dir.'/pages';
-		$dir=opendir($dir);
-		while (false !== ($entry=readdir($dir)))
-		{
-			if ($entry[0]!='.')
-			{
-				$page=&$this->getPage($entry);
-				if ($page!==false)
-				{
-					$pages[]=&$page;
-				}
-			}
-		}
-		closedir($dir);
-		return $pages;
-	}
-
-	function &getTemplate($id,$version=false)
-	{
-		if ($version===false)
-		{
-			$version=$this->getCurrentVersion($this->getDir().'/templates/'.$id);
-		}
-		if (!isset($this->templates[$id][$version]))
-		{
-			$template = new Template($this,$id,$version);
-			if ($template->exists())
-			{
-				$this->templates[$id][$version] = &$template;
-			}
-			else
-			{
-				$this->templates[$id][$version]=false;
-			}
-		}
-		return $this->templates[$id][$version];
-	}
-
-	function &getTemplates()
-	{
-		$templates=array();
-		$dir=$this->dir.'/templates';
-		$dir=opendir($dir);
-		while (false !== ($entry=readdir($dir)))
-		{
-			if ($entry[0]!='.')
-			{
-				$template=&$this->getTemplate($entry);
-				if ($template!==false)
-				{
-					$templates[]=&$template;
-				}
-			}
-		}
-		closedir($dir);
-		return $templates;
 	}
 }
 

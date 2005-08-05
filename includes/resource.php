@@ -147,6 +147,7 @@ class WorkingDetails
 class Resource
 {
 	var $container;
+	var $parent;
 	var $id;
 	var $version;
 	var $prefs;
@@ -154,6 +155,8 @@ class Resource
 	var $log;
 	var $working;
 	
+	var $resources = array();
+
 	var $readLock;
 	var $writeLock;
 	var $lockCount=0;
@@ -166,49 +169,259 @@ class Resource
 		
 		$this->log=&LoggerManager::getLogger('swim.resource.'.get_class($this));
 		$this->id=$id;
-		$this->version=$version;
-		$this->container=&$container;
-
-		$this->dir=$this->container->getResourceDir($this);
+		
+		if (is_a($container,"Container"))
+		{
+			$this->container=&$container;
+			$this->version=$version;
+			$this->dir=$this->container->getResourceDir($this);
+		}
+		else
+		{
+			$this->parent=&$container;
+			$this->version=$this->parent->version;
+			$this->container=&$container->container;
+			if (is_a($this,'File'))
+			{
+				$this->dir=$this->parent->getDir();
+			}
+			else
+			{
+				$this->dir=$this->parent->getDir().'/'.$this->getTypeName().'s/'.$this->id;
+			}
+		}
 
 		$this->prefs = new Preferences();
-		$this->prefs->setParent($_PREFS);
-		
-		$file=$this->openFileRead('resource.conf');
-		if ($file!==false)
+		$this->prefs->setParent($container->prefs);
+		if (!is_a($this,'File'))
 		{
-			$this->prefs->loadPreferences($file);
-			$this->closeFile($file);
+			$file=$this->openFileRead('resource.conf');
+			if ($file!==false)
+			{
+				$this->prefs->loadPreferences($file);
+				$this->closeFile($file);
+			}
 		}
 	}
 	
+	function getTypeName()
+	{
+		if (is_a($this,'Page'))
+		{
+			return 'page';
+		}
+		if (is_a($this,'Template'))
+		{
+			return 'template';
+		}
+		if (is_a($this,'File'))
+		{
+			return 'file';
+		}
+		if (is_a($this,'Block'))
+		{
+			return 'block';
+		}
+	}
+	
+	function &loadBlock($id,$version = false)
+	{
+		$block = &loadBlock($this->getDir().'/blocks/'.$id,$this,$id,$version);
+		if (($block!==false)&&($block->exists()))
+		{
+			return $block;
+		}
+		return false;
+	}
+	
+	function &loadTemplate($id,$version = false)
+	{
+		$template = new Template($this,$id,$version);
+		if ($template->exists())
+		{
+			return $template;
+		}
+		return false;
+	}
+	
+	function &loadPage($id,$version = false)
+	{
+		$page = new Page($this,$id,$version);
+		if ($page->exists())
+		{
+			return $page;
+		}
+		return false;
+	}
+	
+	function &loadFile($id,$version = false)
+	{
+		return new File($this,$id,$version);
+	}
+	
+	function &getBlock($id,$version = false)
+	{
+		return $this->getResource('block',$id,$version);
+	}
+	
+	function &getTemplate($id,$version = false)
+	{
+		return $this->getResource('template',$id,$version);
+	}
+	
+	function &getPage($id,$version = false)
+	{
+		return $this->getResource('page',$id,$version);
+	}
+	
+	function &getFile($id)
+	{
+		return $this->getResource('file',$id);
+	}
+	
+	function hasResource($type,$id,$version = false)
+	{
+		return is_dir($this->getDir().'/'.$type.'s/'.$id);
+	}
+	
+	function &getResource($type,$id,$version = false)
+	{
+		$path=$type.'/'.$id.':'.$version;
+		if (!isset($this->resources[$path]))
+		{
+			if ($type=='block')
+			{
+				$resource=&$this->loadBlock($id,$version);
+			}
+			else if ($type=='template')
+			{
+				$resource=&$this->loadTemplate($id,$version);
+			}
+			else if ($type=='page')
+			{
+				$resource=&$this->loadPage($id,$version);
+			}
+			else if ($type=='file')
+			{
+				$resource=&$this->loadFile($id,$version);
+			}
+			else
+			{
+				return false;
+			}
+			$this->resources[$path]=&$resource;
+		}
+		return $this->resources[$path];
+	}
+	
+	function &getResources($type)
+	{
+		$resources=array();
+		$dir=$this->getDir().'/'.$type.'s';
+		$dir=opendir($dir);
+		while (false !== ($entry=readdir($dir)))
+		{
+			if ($entry[0]!='.')
+			{
+				$resource=&$this->getResource($type,$entry);
+				if ($resource!==false)
+				{
+					$resources[]=&$resource;
+				}
+			}
+		}
+		closedir($dir);
+		return $resources;
+	}
+
 	function &getWorkingDetails()
 	{
 		if (!isset($this->working))
 		{
-			$this->working=&$this->container->getResourceWorkingDetails($this);
+			if (isset($this->parent))
+			{
+				$this->working=&$this->parent->getWorkingDetails();
+			}
+			else
+			{
+				$this->working=&$this->container->getResourceWorkingDetails($this);
+			}
 		}
 		return $this->working;
 	}
 	
-	function makeNewVersion()
+	function &makeNewVersion()
 	{
-		return $this->container->makeNewResourceVersion($this);
+		if (isset($this->parent))
+		{
+			$parentv=&$this->parent->makeNewVersion();
+			return $parentv->getResource($this->getTypeName(),$this->id);
+		}
+		else
+		{
+			return $this->container->makeNewResourceVersion($this);
+		}
 	}
 	
-	function makeWorkingVersion()
+	function &makeWorkingVersion()
 	{
-		return $this->container->makeResourceWorkingVersion($this);
+		if (isset($this->parent))
+		{
+			$parentv=&$this->parent->makeWorkingVersion();
+			return $parentv->getResource($this->getTypeName(),$this->id);
+		}
+		else
+		{
+			return $this->container->makeResourceWorkingVersion($this);
+		}
 	}
 	
 	function &getVersions()
 	{
-		return $this->container->getResourceVersions($this);
+		if (isset($this->parent))
+		{
+			return $this->parent->getVersions();
+		}
+		else
+		{
+			return $this->container->getResourceVersions($this);
+		}
 	}
 	
-	function getETag()
+	function isCurrentVersion()
 	{
-		return $this->getPath().':'.$this->version;
+		if (isset($this->parent))
+		{
+			return $this->parent->isCurrentVersion();
+		}
+		else
+		{
+			return $this->container->isCurrentResourceVersion($this);
+		}
+	}
+	
+	function makeCurrentVersion()
+	{
+		if (isset($this->parent))
+		{
+			$this->parent->makeCurrentVersion();
+		}
+		else
+		{
+			$this->container->makeCurrentResourceVersion($this);
+		}
+	}
+	
+	function &getCurrentVersion()
+	{
+		if (isset($this->parent))
+		{
+			return $this->parent->getCurrentVersion();
+		}
+		else
+		{
+			return $this->container->getCurrentResourceVersion($this);
+		}
 	}
 	
 	function getModifiedDate()
@@ -228,24 +441,27 @@ class Resource
 		return $this->modified;
 	}
 	
-	function isCurrentVersion()
-	{
-		return $this->container->isCurrentResourceVersion($this);
-	}
-	
-	function makeCurrentVersion()
-	{
-		return $this->container->makeCurrentResourceVersion($this);
-	}
-	
-	function getCurrentVersion()
-	{
-		return $this->container->getCurrentResourceVersion($this);
-	}
-	
 	function exists()
 	{
 		return is_dir($this->getDir());
+	}
+	
+	function getPath()
+	{
+		if (isset($this->parent))
+		{
+			$path=$this->parent->getPath();
+		}
+		else
+		{
+			$path=$this->container->getPath();
+		}
+		return $path.'/'.$this->getTypeName().'/'.$this->id;
+	}
+	
+	function getETag()
+	{
+		return $this->getPath().':'.$this->version;
 	}
 	
 	function getDir()
@@ -285,18 +501,19 @@ class Resource
 
 	function lockRead()
 	{
-		$this->log->debug('lockRead');
+		$this->log->debug('lockRead - '.$this->id);
 		if (($this->isWritable())&&(!isset($this->readLock))&&(!isset($this->writeLock)))
 		{
 			$this->log->debug('Making read lock');
-			$this->readLock=lockResourceRead($this->dir);
+			$this->readLock=lockResourceRead($this->getDir());
+			$this->log->debug('Locked as '.$this->readLock);
 		}
 		$this->lockCount++;
 	}
 	
 	function lockWrite()
 	{
-		$this->log->debug('lockWrite');
+		$this->log->debug('lockWrite - '.$this->id);
 		if ($this->isWritable())
 		{
 			if (isset($this->readLock))
@@ -304,20 +521,30 @@ class Resource
 				$this->log->warn('Write locking read locked template '.$this->id);
 				unlockResource($this->readLock);
 				unset($this->readLock);
+				
+				if (isset($this->writeLock))
+				{
+					$this->log->error('Both read and write lock were applied');
+				}
 			}
 			
 			if (!isset($this->writeLock))
 			{
 				$this->log->debug('Making write lock');
-				$this->writelock=lockResourceWrite($this->dir);
+				$this->writeLock=lockResourceWrite($this->getDir());
+				$this->log->debug('Locked as '.$this->writeLock);
 			}
+		}
+		else
+		{
+			$this->log->warn('Obtained a write lock on a read only resource');
 		}
 		$this->lockCount++;
 	}
 	
 	function unlock()
 	{
-		$this->log->debug('unlock');
+		$this->log->debug('unlock - '.$this->id);
 		if ($this->lockCount>0)
 		{
 			$this->lockCount--;
@@ -327,20 +554,30 @@ class Resource
 				{
 					if (isset($this->writeLock))
 					{
+						$this->log->debug('Unlocking write lock');
 						unlockResource($this->writeLock);
 						unset($this->writeLock);
 					}
 					else if (isset($this->readLock))
 					{
+						$this->log->debug('Unlocking read lock');
 						unlockResource($this->readLock);
 						unset($this->readLock);
 					}
+					else
+					{
+						$this->log->error('Unlocking but there is no lock');
+					}
 				}
+			}
+			else
+			{
+				$this->log->debug($this->lockCount.' locks left in play.');
 			}
 		}
 		else
 		{
-			$this->log->warn('Cannot unlock template '.$this->id.' since it is not locked');
+			$this->log->warn('Cannot unlock resource '.$this->id.' since it is not locked');
 		}
 	}
 	
@@ -418,17 +655,28 @@ class Resource
 		$this->unlock();
 	}
 
-	function &decodeRelativeResource($parts)
+	function &decodeRelativeResource($parts,$version=false)
 	{
-		if ((count($parts)>1)&&($parts[0]=='file'))
+		if (count($parts)>=2)
 		{
-			$path=implode('/',array_slice($parts,1));
-			return new File($this,$path);
+			$type=$parts[0];
+			$id=$parts[1];
+
+			if ($type=='file')
+			{
+				$path=implode('/',array_slice($parts,1));
+				return $this->getFile($path);
+			}
+			else
+			{
+				$resource=&$this->getResource($type,$id,$version);
+				if ($resource!==false)
+				{
+					return $resource->decodeRelativeResource(array_slice($parts,2));
+				}
+			}
 		}
-		else
-		{
-			return $this;
-		}
+		return $this;
 	}
 	
 	function &decodeResource($request)
@@ -464,13 +712,13 @@ class Resource
 		}
 
 		$parts = explode('/',$resource);
-		if (($parts[0]=='version')&&(count($parts)>=5))
+		if (($parts[0]=='version')&&(count($parts)>=2))
 		{
 			$version=$parts[1];
 			$parts=array_slice($parts,2);
 		}
 		
-		if (count($parts)<3)
+		if (count($parts)<=1)
 			return false;
 		
 		$container=&getContainer($parts[0]);
@@ -481,31 +729,6 @@ class Resource
 
 class File extends Resource
 {
-	var $path;
-	
-	function File($parent,$path)
-	{
-		global $_PREFS;
-
-		$this->log=&LoggerManager::getLogger('swim.resource.'.get_class($this));
-		$this->parent=$parent;
-		if (is_a($parent,'Container'))
-		{
-			$this->version='noversion';
-			$this->container=$parent;
-			$this->dir=$this->container->getResourceDir($this);
-		}
-		else
-		{
-			$this->version=$parent->version;
-			$this->container=$parent->container;
-			$this->dir=$this->parent->getDir($this);
-		}
-		$this->id=$path;
-		$this->prefs = new Preferences();
-		$this->prefs->setParent($_PREFS);
-	}
-
 	function delete()
 	{
 		if ($this->fileIsWritable())
@@ -514,11 +737,6 @@ class File extends Resource
 			unlink($this->getDir().'/'.$this->id);
 			$this->parent->unlock();
 		}
-	}
-	
-	function getPath()
-	{
-		return $this->parent->getPath().'/file/'.$this->id;
 	}
 	
 	function exists()
@@ -560,7 +778,14 @@ class File extends Resource
 	
 	function outputFile()
 	{
-		$this->parent->lockRead();
+		if (isset($this->parent))
+		{
+			$this->parent->lockRead();
+		}
+		else
+		{
+			$this->container->lockRead();
+		}
 		if (is_file($this->getDir().'/'.$this->id))
 		{
 			readfile($this->getDir().'/'.$this->id);
@@ -569,7 +794,14 @@ class File extends Resource
 		{
 			include($this->getDir().'/'.$this->id.'.php');
 		}
-		$this->parent->unlock();
+		if (isset($this->parent))
+		{
+			$this->parent->unlock();
+		}
+		else
+		{
+			$this->container->unlock();
+		}
 	}
 	
 	function openFileRead()

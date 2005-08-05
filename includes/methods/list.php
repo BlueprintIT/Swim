@@ -19,7 +19,7 @@ function listContainer(&$container,$type=false)
 	
 	if (($type==false)||($type=="template"))
 	{
-		$set=&$container->getTemplates();
+		$set=&$container->getResources('template');
 		foreach (array_keys($set) as $k)
 		{
 			$item=&$set[$k];
@@ -32,7 +32,7 @@ function listContainer(&$container,$type=false)
 	
 	if (($type==false)||($type=="page"))
 	{
-		$set=&$container->getPages();
+		$set=&$container->getResources('page');
 		foreach (array_keys($set) as $k)
 		{
 			$item=&$set[$k];
@@ -46,7 +46,7 @@ function listContainer(&$container,$type=false)
 	
 	if (($type==false)||($type=="block"))
 	{
-		$set=&$container->getBlocks();
+		$set=&$container->getResources('block');
 		foreach (array_keys($set) as $k)
 		{
 			$item=&$set[$k];

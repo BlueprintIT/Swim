@@ -15,44 +15,12 @@
 
 class Page extends Resource
 {
-	var $blocks;
+	var $blocks = array();
 	
-	function Page(&$container,$id,$version)
-	{
-		global $_PREFS;
-
-		$this->Resource($container,$id,$version);
-		$this->container=&$container;
-		$this->id=$id;
-		$this->version=$version;
-	
-		$this->blocks = array();
-	}
-	
-	function getPath()
-	{
-		return $this->container->getPath().'/page/'.$this->id;
-	}
-	
-	function &decodeRelativeResource($parts)
-	{
-		if ((count($parts)>1)&&($parts[0]=='block'))
-		{
-			$this->log->debug('Testing for block '.$parts[1]);
-			if ($this->isBlock($parts[1]))
-			{
-				$this->log->debug('Found page block '.$parts[1]);
-				$result=&$this->getBlock($parts[1]);
-				return $result->decodeRelativeResource(array_slice($parts,2));
-			}
-		}
-		return Resource::decodeRelativeResource($parts);
-	}
-
 	function getTotalModifiedDate()
 	{
 		$modified=$this->getModifiedDate();
-		$template=&$this->getTemplate();
+		$template=&$this->getReferencedTemplate();
 		$modified=max($modified,$template->getModifiedDate());
 
 		$blocks=$this->prefs->getPrefBranch('page.blocks');
@@ -64,7 +32,7 @@ class Page extends Resource
 				$cont=$this->prefs->getPref('page.blocks.'.$blk.'.container');
 				if ($cont!='page')
 				{
-					$block=&$this->getBlock($blk);
+					$block=&$this->getReferencedBlock($blk);
 					$modified=max($modified,$block->getModifiedDate());
 				}
 			}
@@ -73,86 +41,15 @@ class Page extends Resource
 		return $modified;
 	}
 	
-	function &getResourceWorkingDetails(&$resource)
-	{
-		return $this->getWorkingDetails();
-	}
-	
-	function makeNewResourceVersion(&$resource)
-	{
-		$page=&$this->makeNewVersion($this);
-		if ($page===false)
-		{
-			return false;
-		}
-		else
-		{
-			return $page->getBlock($resource->id);
-		}
-	}
-	
-	function makeResourceWorkingVersion(&$resource)
-	{
-		$page=&$this->makeWorkingVersion();
-		if ($page===false)
-		{
-			return false;
-		}
-		else
-		{
-			return $page->getBlock($resource->id);
-		}
-	}
-
-	function getResourceDir(&$resource)
-	{
-		if (is_a($resource,'Block'))
-		{
-			return $this->getDir().'/blocks/'.$resource->id;
-		}
-		if (is_a($resource,'File'))
-		{
-			return $this->getDir();
-		}
-	}
-	
-	function isCurrentResourceVersion(&$resource)
-	{
-		return $this->isCurrentVersion();
-	}
-	
-	function makeCurrentResourceVersion(&$resource)
-	{
-		$this->makeCurrentVersion();
-	}
-	
-	function &getCurrentResourceVersion(&$resource)
-	{
-		$page=&$this->getCurrentVersion();
-		if ($page===false)
-		{
-			return false;
-		}
-		else
-		{
-			return $page->getBlock($resource->id);
-		}
-	}
-	
-	function getBlockDir($id,$version)
-	{
-		return $this->getDir().'/blocks/'.$id;
-	}
-	
 	function display(&$request)
 	{
-		$template=&$this->getTemplate();
+		$template=&$this->getReferencedTemplate();
 		$template->display($request,$this);
 	}
 	
 	function displayAdmin(&$request)
 	{
-		$template=&$this->getTemplate();
+		$template=&$this->getReferencedTemplate();
 		$template->displayAdmin($request,$this);
 	}
 	
@@ -163,13 +60,7 @@ class Page extends Resource
 		$this->closeFile($file);
 	}
 	
-	function setBlock($id,&$block)
-	{
-		$block->setID($id);
-		$this->blocks[$id]=&$block;
-	}
-	
-	function isBlock($id=false)
+	function isReferencedBlock($id=false)
 	{
 		if ($id===false)
 		{
@@ -177,12 +68,17 @@ class Page extends Resource
 		}
 		else
 		{
-			return $this->prefs->isPrefSet('page.blocks.'.$id.'.id');
+			$block=&$this->getReferencedBlock($id);
+			return $block!==false;
 		}
 	}
 	
-	function getBlockUsage(&$block)
+	function &getReferencedBlockUsage(&$block)
 	{
+		if (isset($block->parent))
+		{
+			return array();
+		}
 		$container=$block->container->id;
 		$result=array();
 		$blocks=$this->prefs->getPrefBranch('page.blocks');
@@ -208,7 +104,7 @@ class Page extends Resource
 		return $result;
 	}
 	
-	function &getBlock($id)
+	function &getReferencedBlock($id)
 	{
 		if (!isset($this->blocks[$id]))
 		{
@@ -219,8 +115,7 @@ class Page extends Resource
 				$block=$this->prefs->getPref($blockpref.'.id');
 				if ($container=='page')
 				{
-					$version=$this->version;
-					$blockobj = &loadBlock($this,$block,$version);
+					$blockobj = &$this->getBlock($block);
 				}
 				else
 				{
@@ -237,6 +132,18 @@ class Page extends Resource
 				}
 				$this->blocks[$id]=&$blockobj;
 			}
+			else if ($this->hasResource('block',$id))
+			{
+				$block=&$this->getBlock($id);
+				if ($block!==false)
+				{
+					$this->blocks[$id]=&$block;
+				}
+				else
+				{
+					$this->blocks[$id]=null;
+				}
+			}
 			else
 			{
 				$this->blocks[$id]=null;
@@ -245,7 +152,7 @@ class Page extends Resource
 		return $this->blocks[$id];
 	}
 	
-	function &getTemplate()
+	function &getReferencedTemplate()
 	{
 		$templ=$this->prefs->getPref('page.template');
 		if (strpos($templ,'/')!==false)
@@ -272,7 +179,7 @@ function &getAllPages()
 	foreach(array_keys($containers) as $id)
 	{
 		$container=&$containers[$id];
-		$newpages=&$container->getPages();
+		$newpages=&$container->getResources('page');
 		$pages=array_merge($pages,$newpages);
 	}
 	return $pages;

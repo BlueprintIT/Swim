@@ -61,7 +61,7 @@ function method_commit(&$request)
 						if ($nresource->isPage())
 						{
 							$page=&$nresource;
-							$usage=$page->getBlockUsage($oldversion);
+							$usage=$page->getReferencedBlockUsage($oldversion);
 							if (count($usage)>0)
 							{
 								$clone=false;
@@ -98,7 +98,7 @@ function method_commit(&$request)
 						foreach(array_keys($list) as $pkey)
 						{
 							$page=&$list[$pkey];
-							$usage=$page->getBlockUsage($oldversion);
+							$usage=$page->getReferencedBlockUsage($oldversion);
 							
 							if (count($usage)>0)
 							{

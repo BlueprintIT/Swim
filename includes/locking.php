@@ -23,7 +23,7 @@ function lockResourceRead($dir,$id=false)
 
 	if ($id===false)
 	{
-		$id=0;
+		$id=1;
 		while (isset($_LOCKS[$id]))
 		{
 			$id++;

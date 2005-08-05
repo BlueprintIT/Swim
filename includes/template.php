@@ -49,7 +49,7 @@ class Template extends Resource
 			return $this->modified;
 		}
 		
-		$modified=Resource::getModifiedDate();
+		$modified=parent::getModifiedDate();
 		
 		$stat=$this->getFileModifiedDate('template.file.html');
 		if ($stat!==false)
@@ -92,7 +92,7 @@ class Template extends Resource
 		else if (substr($url,0,5)=='page/')
 		{
 			$url=$data['page']->getPath().substr($url,4);
-			$request->query['version']=$data['page']->version;
+			//$request->query['version']=$data['page']->version;
 		}
 		else if (substr($url,0,9)=='template/')
 		{
@@ -238,7 +238,7 @@ class Template extends Resource
 		}
 		if (isset($attrs['block']))
 		{
-			$block=&$parser->data['page']->getBlock($attrs['block']);
+			$block=&$parser->data['page']->getReferencedBlock($attrs['block']);
 			$request->resource=$block->getPath();
 			unset($attrs['block']);
 			$request->query['version']=$block->version;
@@ -279,7 +279,7 @@ class Template extends Resource
 	function displayBlock(&$parser,$tag,$attrs,$text)
 	{
 		$page=&$parser->data['page'];
-		$block=$page->getBlock($attrs['id']);
+		$block=$page->getReferencedBlock($attrs['id']);
 		if ($block!=null)
 		{
 			$parser->data['block']=&$block;
@@ -497,7 +497,7 @@ function &getAllTemplates()
 	foreach(array_keys($containers) as $id)
 	{
 		$container=&$containers[$id];
-		$newtemplates=&$container->getTemplates();
+		$newtemplates=&$container->getResources('template');
 		$templates=array_merge($templates,$newtemplates);
 	}
 	return $templates;

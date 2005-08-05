@@ -44,7 +44,7 @@ function method_docommit(&$request)
 								$page=&$container->getPage($ids[$key],$versions[$key]);
 								$newpage=&$page->makeNewVersion();
 
-								$usage=$newpage->getBlockUsage($oldversion);
+								$usage=$newpage->getReferencedBlockUsage($oldversion);
 								
 								if (count($usage)>0)
 								{
