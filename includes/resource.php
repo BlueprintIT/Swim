@@ -192,7 +192,7 @@ class Resource
 		}
 
 		$this->prefs = new Preferences();
-		$this->prefs->setParent($container->prefs);
+		$this->prefs->setParent($this->container->prefs);
 		if (!is_a($this,'File'))
 		{
 			$file=$this->openFileRead('resource.conf');

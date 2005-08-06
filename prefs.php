@@ -17,12 +17,10 @@ class Preferences
 {
 	var $preferences = array();
 	var $parent;
-	var $overrides;
-	var $log;
+	var $delegate;
 	
 	function Preferences()
 	{
-		$this->overrides=&$this;
 	}
 	
 	function setParent(&$parprefs)
@@ -30,9 +28,9 @@ class Preferences
 		$this->parent=&$parprefs;
 	}
 	
-	function setOverride(&$overprefs)
+	function setDelegate(&$overprefs)
 	{
-		$this->overrides=&$overprefs;
+		$this->delegate=&$overprefs;
 	}
 	
 	function getPrefBranch($branch)
@@ -111,6 +109,18 @@ class Preferences
 	  $this->preferences=array();
 	}
 	
+	function getDelegatedPref($pref,$default)
+	{
+		if (isset($this->delegate))
+		{
+			return $this->delegate->getPref($pref,$default);
+		}
+		else
+		{
+			return $this->getPref($pref,$default);
+		}
+	}
+	
 	// Evaluates a preference value, resolving references
 	function evaluatePref($text)
 	{
@@ -121,7 +131,7 @@ class Preferences
 			$pref=$matches[1][$p][0];
 			$offset=$matches[0][$p][1];
 			$length=strlen($matches[0][$p][0]);
-			$replacement=$this->overrides->getPref($pref,$pref);
+			$replacement=$this->getDelegatedPref($pref,$pref);
 			$text=substr_replace($text,$replacement,$offset,$length);
 		}
 		return $text;
@@ -138,7 +148,10 @@ class Preferences
     {
     	return $this->parent->getPref($pref,$default);
     }
-	  return $default;
+    else
+    {
+		  return $default;
+    }
 	}
 	
 	// Checks if a preference is defined
@@ -171,7 +184,7 @@ function init()
 	fclose($file);
 	$siteprefs->setParent($default);
 	
-	$default->setOverride($siteprefs);
+	$default->setDelegate($siteprefs);
 
 	$_PREFS = new Preferences();
 	$_PREFS->setParent($siteprefs);
