@@ -225,46 +225,6 @@ p#printLink {
 	font-size: 0.8em;
 }
 
-div#highlight {
-	margin-top: 20px;
-	margin-left: 20px;
-	float: right;
-	width: 300px;
-	border: 2px solid white;
-}
-
-div#highlight p {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-}
-
-div#highlightMain {
-	padding: 10px;
-	margin-top: 20px;
-	margin-left: 20px;
-	background-color: <?= $highlightMain ?>;
-}
-
-div#highlightTitle {
-	float: left;
-	padding: 10px;
-	margin-bottom: 20px;
-	background-color: <?= $yellowborder ?>;
-	width: 250px;
-}
-
-div#highlightTitle p {
-	text-align: center;
-	font-size: 1.2em;
-	font-family: <?= $paragraphfont ?>;
-	color: <?= $bordertextcolor ?>;
-}
-
-div#highlightMain p {
-	color: <?= $bordertextcolor ?>;
-	text-align: left;
-}
-
 div#content {
 	padding-top: 10px;
 	padding-right: 10px;
