@@ -15,7 +15,7 @@ setContentType('text/css');
 	white-space: nowrap;
 }
 
-*.currentfocus, *.currentfocus a, *.currentfocus a:hover, *.currentfocus a:visited, *.currentfocus a:visited:hover {
+a.itemfocus, a.itemfocus:hover, a.itemfocus:visited, a.itemfocus:visited:hover {
 	color: <?= $menuhighlight ?> !important;
 }
 

@@ -61,11 +61,23 @@ class Block extends Resource
 		print('</'.$this->type.'>');
 	}
 	
+	function canEdit(&$request,&$data,$attrs)
+	{
+		return true;
+	}
+	
 	function displayAdminPanel(&$request,&$data,$attrs)
 	{
 ?>
 	<div id="<?= $data['blockid'] ?>admin" class="adminpanel">
+<?
+		if ($this->canEdit($request,$data,$attrs))
+		{
+?>
 		<editlink block="<?= $data['blockid'] ?>"><image class="icon" src="/global/template/base/file/layout/edit.gif"/>Edit</editlink>
+<?
+		}
+?>
 	</div>
 <?
 	}

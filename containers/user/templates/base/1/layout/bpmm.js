@@ -379,7 +379,7 @@ menuManager = {
 		}
 		else if ((element.tagName=='A')&&(parentitem))
 		{
-			parentitem.focusElement=element;
+			parentitem.setFocusElement(element);
 		}
 		var child = element.firstChild;
 		while (child)
@@ -567,25 +567,40 @@ MenuItem.prototype = {
 	submenu: null,
 	pos: null,
 	focusElement: null,
+	focusEl: null,
+	
+	setFocusElement: function(el)
+	{
+		this.focusElement=el;
+		this.focusEl = new ElementWrapper(el);
+	},
 	
 	focusCurrent: function()
 	{
-		this.posel.addClass('currentfocus');
+		if (this.parentMenu.parentItem)
+			this.posel.addClass('currentfocus');
+		if (this.focusEl)
+			this.focusEl.addClass('itemfocus');
 	},
 	
 	unfocusCurrent: function()
 	{
-		this.posel.removeClass('currentfocus');
+		if (this.parentMenu.parentItem)
+			this.posel.removeClass('currentfocus');
+		if (this.focusEl)
+			this.focusEl.removeClass('itemfocus');
 	},
 	
 	focus: function()
 	{
-		this.posel.addClass('menufocus');
+		if (this.parentMenu.parentItem)
+			this.posel.addClass('menufocus');
 	},
 	
 	unfocus: function()
 	{
-		this.posel.removeClass('menufocus');
+		if (this.parentMenu.parentItem)
+			this.posel.removeClass('menufocus');
 	},
 	
 	keyPress: function(code)

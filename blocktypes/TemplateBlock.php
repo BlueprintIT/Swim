@@ -28,6 +28,11 @@ class TemplateBlock extends Block
 		return $page;
 	}
 	
+	function canEdit(&$request,&$data,$attrs)
+	{
+		return false;
+	}
+	
 	function displayContent(&$parser,$attrs,$text)
 	{
 		$name=$this->prefs->getPref('block.templateblock.'.$this->getFormat().'.template',$this->prefs->getPref('block.templateblock.template'));

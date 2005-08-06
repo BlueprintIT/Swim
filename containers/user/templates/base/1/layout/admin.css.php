@@ -67,6 +67,9 @@ img.icon {
 	padding-right: 5px;
 }
 
+div.fileadmin {
+}
+
 div#contentadmin {
 	position: absolute;
 	left: <?= $sidewidth+10 ?>px;
