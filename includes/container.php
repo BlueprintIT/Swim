@@ -21,6 +21,8 @@ class Container extends Resource
 	var $pages = array();
 	var $blocks = array();
 	var $working = array();
+	var $writable;
+	var $visible;
 	
 	function Container($id)
 	{
@@ -41,6 +43,8 @@ class Container extends Resource
 				fclose($file);
 			}
 		}
+		$this->writable=$this->prefs->getPref('container.writable',true);
+		$this->visible=$this->prefs->getPref('container.visible',true);
 	}
 	
 	function getDir()
@@ -287,12 +291,12 @@ class Container extends Resource
 	
 	function isVisible()
 	{
-		return $this->prefs->getPref('container.visible',true);
+		return $this->visible;
 	}
 	
 	function isWritable()
 	{
-		return $this->prefs->getPref('container.writable',true);
+		return $this->writable;
 	}
 	
 	function getResourceDir(&$resource)
@@ -329,7 +333,7 @@ class Container extends Resource
 	
 	function &getResource($type,$id,$version = false)
 	{
-		if (($type!='file')&&($version===false))
+		if (($version===false)&&(($type=='block')||($type=='page')||($type=='template')))
 		{
 			$version=$this->getCurrentVersion($this->getDir().'/'.$type.'s/'.$id);
 		}

@@ -1,9 +1,4 @@
-<?
-
-require('styles.php');
-setContentType('text/css');
-
-?>
+#include global/file/styles/styles.css
 div.adminpanel {
 	padding: 5px;
 	border: 2px blue solid;
@@ -16,7 +11,7 @@ img#csslogo {
 	padding: 0;
 	border: 0;
 	position: absolute;
-	top: <?= $headerheight-$menuheight-40 ?>px;
+	top: -swim-calc(headerheight-menuheight-40)px;
 	right: 75px;
 	width: 88px;
 	height: 31px;
@@ -27,7 +22,7 @@ img#htmllogo {
 	padding: 0;
 	border: 0;
 	position: absolute;
-	top: <?= $headerheight-$menuheight-40 ?>px;
+	top: -swim-calc(headerheight-menuheight-40)px;
 	right: 170px;
 	width: 88px;
 	height: 31px;
@@ -42,9 +37,9 @@ table.highlight td {
 }
 
 ul#sidemenu.highlight {
-	margin-top: <?= $sidetopgap ?>px;
+	margin-top: sidetopgappx;
 	left: 0;
-	width: <?= $sidewidth ?>px;
+	width: sidewidthpx;
 }
 
 div#content.highlight {
@@ -72,7 +67,7 @@ div.fileadmin {
 
 div#contentadmin {
 	position: absolute;
-	left: <?= $sidewidth+10 ?>px;
+	left: -swim-calc(sidewidth+10)px;
 }
 
 div#highlightadmin {
@@ -87,7 +82,7 @@ div#sidemenuadmin {
 
 div#menuadmin {
 	position: absolute;
-	bottom: <?= $menuheight ?>;
+	bottom: menuheight;
 }
 
 div#pageadmin {

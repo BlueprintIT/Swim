@@ -1,16 +1,4 @@
-<?
-
-require('styles.php');
-setContentType('text/css');
-
-?>
-
-body {
-	font-family: <?= $defaultfont ?>;
-	font-size: 1em;
-	font-weight: normal;
-}
-
+#include global/file/styles/styles.css
 h1 {
 	font-size: 1.5em;
 	font-weight: bold;
@@ -20,7 +8,7 @@ h1 {
 	margin-right: 0;
 	padding: 0;
 	text-align: left;
-	color: <?= $h1color ?>;
+	color: h1color;
 }
 
 h2 {
@@ -32,16 +20,16 @@ h2 {
 	margin-right: 0;
 	padding: 0;
 	text-align: left;
-	color: <?= $h2color ?>;
+	color: h2color;
 }
 
 p {
-  margin-top: 1em;
-  margin-bottom: 1em;
+	margin-top: 1em;
+	margin-bottom: 1em;
 	margin-left: 0;
 	margin-right: 0;
 	padding: 0;
 	text-align: justify;
 	font-size: 1em;
-	font-family: <?= $paragraphfont ?>;
+	font-family: paragraphfont;
 }

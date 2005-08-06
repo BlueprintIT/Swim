@@ -80,7 +80,7 @@ class TemplateBlock extends Block
 				$request->resource=$link;
 				$attrs['href']=$request->encode();
 			}
-			Template::displayElement($parser,$tagname,$attrs,$text);
+			print(Template::buildElement($parser,$tagname,$attrs,$text));
 			return true;
 		}
 		else if ($tagname=='section')
@@ -91,7 +91,7 @@ class TemplateBlock extends Block
 			{
 ?>
 <div class="adminpanel fileadmin">
-	<editlink block="<?= $data['blockid'] ?>" file="<?= $attrs['src'] ?>"><image class="icon" src="/global/template/base/file/layout/edit.gif"/>Edit</editlink>
+	<editlink block="<?= $data['blockid'] ?>" file="<?= $attrs['src'] ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</editlink>
 </div>
 <?
 			}

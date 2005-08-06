@@ -1,9 +1,4 @@
-<?
-
-require('styles.php');
-setContentType('text/css');
-
-?>
+#include global/file/styles/styles.css
 *.menupopup {
 	display: none;
 	position: absolute;
@@ -16,7 +11,7 @@ setContentType('text/css');
 }
 
 a.itemfocus, a.itemfocus:hover, a.itemfocus:visited, a.itemfocus:visited:hover {
-	color: <?= $menuhighlight ?> !important;
+	color: menuhighlight !important;
 }
 
 div.popoutright, div.popoutdown {
@@ -24,27 +19,19 @@ div.popoutright, div.popoutdown {
 }
 
 td.menuitem {
-	background-color: <?= $menubackground ?>;
+	background-color: menubackground;
 	padding-left: 18px !important;
 	background-position: 0px 5px;
 }
 
 td.menufocus {
 	background-repeat: no-repeat;
-	background-image: url('bullet.gif') !important;
+	background-image: -swim-url('global/file/images/bullet.gif') !important;
 }
 
 ul.menupopup {
-	background-color: <?= $menubackground ?>;
+	background-color: menubackground;
 	border: black 1px solid;
-}
-
-li.level1.menuitem {
-	white-space: normal;
-}
-
-li.level2 {
-	white-space: nowrap !important;
 }
 
 ul.menupopup li.menuitem {
@@ -59,5 +46,5 @@ ul.menupopup li.menuitem {
 
 ul.menupopup li.menufocus {
 	background-repeat: no-repeat;
-	background-image: url('bullet.gif') !important;
+	background-image: -swim-url('global/file/images/bullet.gif') !important;
 }

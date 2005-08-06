@@ -1,0 +1,33 @@
+#include global/file/styles/styles.css
+
+ul#sidemenu {
+	width: -swim-calc(sidewidth-2)px;
+	background: yellowborder;
+}
+
+ul#sidemenu li.level1 {
+	display: block;
+	padding-left: 20px;
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+	width: auto;
+	font-family: borderfont;
+	color: bordertextcolor;
+	background-image: -swim-url('global/file/images/sidemenuline.gif');
+	background-position: bottom right;
+	background-repeat: no-repeat;
+	white-space: normal !important;
+}
+
+ul#sidemenu a, ul#sidemenu a:visited {
+	width: auto;
+	text-decoration: none;
+	color: bordertextcolor;
+}
+
+ul#sidemenu a:hover, ul#sidemenu a:visited:hover {
+	width: auto;
+	text-decoration: none;
+	color: bordertextcolor;
+}
+

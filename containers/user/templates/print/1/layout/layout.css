@@ -6,7 +6,7 @@ body {
 
 div#header {
 	position: relative;
-	background-image: viewurl('global/template/base/file/layout/banner.jpg');
+	background-image: -swim-url('global/file/images/banner.jpg');
 	background-position: top left;
 	background-repeat: repeat-x;
 	height: 127px;

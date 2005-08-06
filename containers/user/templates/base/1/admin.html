@@ -4,34 +4,30 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<meta http-equiv="Content-Script-Type" content="text/javascript">
-		<stylesheet src="template/file/layout/layout.css"/>
-		<stylesheet src="template/file/layout/admin.css"/>
-		<stylesheet src="template/file/layout/menus.css"/>
-		<stylesheet src="template/file/layout/content.css"/>
-		<script src="template/file/layout/cbdom.js"/>
-		<script src="template/file/layout/bpmm.js"/>
-		<script src="template/file/layout/admin.js"/>
+		<stylesheet src="/global/file/styles/layout.css"/>
+		<stylesheet src="layout/admin.css"/>
+		<script src="/global/file/scripts/cbdom.js"/>
+		<script src="/global/file/scripts/bpmm.js"/>
+		<script src="layout/admin.js"/>
 		<title><var name="title"/></title>
 	</head>
 	<body>
 		<div id="header">
-			<image id="cogs" src="template/file/layout/cogs.jpg" alt="Cogs"/>
-			<image id="csslogo" src="template/file/layout/css.gif" alt="This site uses valid CSS"/>
-			<image id="htmllogo" src="template/file/layout/html401.gif" alt="This site uses valid HTML 4.01"/>
+			<image id="cogs" src="/global/file/images/cogs.jpg" alt="Cogs"/>
+			<image id="csslogo" src="/global/file/images/css.gif" alt="This site uses valid CSS"/>
+			<image id="htmllogo" src="/global/file/images/html401.gif" alt="This site uses valid HTML 4.01"/>
 			<div class="adminpanel" id="pageadmin">
-				<p style="margin: 0; padding: 5px;"><anchor method="create" nest="true" href="/global/page"><image class="icon" src="template/file/layout/new.gif"/>New Page</anchor></p>
-				<p style="margin: 0; padding: 5px;"><editlink><image class="icon" src="template/file/layout/edit.gif"/>Edit Page</editlink></p>
+				<p style="margin: 0; padding: 5px;"><anchor method="create" nest="true" href="/global/page"><image class="icon" src="/global/file/images/new.gif"/>New Page</anchor></p>
+				<p style="margin: 0; padding: 5px;"><editlink><image class="icon" src="/global/file/images/edit.gif"/>Edit Page</editlink></p>
 			</div>
-			<image id="logo" src="template/file/layout/logo.gif" alt="Brass Bullet Ltd."/>
+			<image id="logo" src="/global/file/images/logo.gif" alt="Brass Bullet Ltd."/>
 			<div id="swim">
 				<p style="text-align: center">Brass Bullet Ltd. website content management system provided by</p>
-				<p style="text-align: center"><image src="template/file/layout/swimlogo.gif"/> by <image src="template/file/layout/bpitlogo.gif"/></p>
+				<p style="text-align: center"><image src="/global/file/images/swimlogo.gif"/> by <image src="/global/file/images/bpitlogo.gif"/></p>
 			</div>
 		</div>
 		<div id="menubar">
-			<div id="spacing">
-				<block id="menu" class="admin"/>
-			</div>
+			<block id="menu" class="admin"/>
 		</div>
 		<block id="sidemenu"/>
 		<div id="body">
@@ -43,11 +39,11 @@
 		<div id="footer">
 			<div id="curve"></div>
 			<div id="base">
-				<image id="iip" src="template/file/layout/iip.gif" alt="Brass Bullet Ltd. are an Investor in People"/>
+				<image id="iip" src="/global/file/images/iip.gif" alt="Brass Bullet Ltd. are an Investor in People"/>
 				<p id="mission">&#145;promoting excellence through the application of engineering best practice&#146;</p>
 				<p id="copyright">&copy; Brass Bullet Ltd. Developed by <a target="_blank" href="http://www.blueprintit.co.uk">Blueprint IT Ltd</a>.</p>
 			</div>
 		</div>
-		<image id="wheels" src="template/file/layout/wheels.gif" alt="Watching the wheels"/>
+		<image id="wheels" src="/global/file/images/wheels.gif" alt="Watching the wheels"/>
 	</body>
 </html>

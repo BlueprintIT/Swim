@@ -15,34 +15,126 @@
 
 class CSSHandler
 {
-	var $resource;
+	var $defines = array();
+	var $base;
 	
 	function CSSHandler(&$resource)
 	{
-		$this->resource=&$resource;
+		$this->base=&$resource;
+	}
+	
+	function processInclude($content)
+	{
+		$content=trim($content);
+		$resource=&Resource::decodeResource($content);
+		if (($resource!==false)&&($resource->exists()))
+		{
+			$this->parse($resource);
+		}
+		else
+		{
+			print("/* WARNING could not include ".$content." */\n");
+		}
+	}
+	
+	function processDefine($content)
+	{
+		$content=trim($content);
+		list($text,$def)=explode(' ',$content,2);
+		$this->defines[$text]=$def;
+	}
+	
+	function evaluateCalc($content)
+	{
+		return eval('return '.$content.';');
+	}
+	
+	function evaluateUrl($content)
+	{
+		$content=substr($content,1,strlen($content)-2);
+		$request = new Request();
+		$request->method='view';
+		$request->resource=$content;
+		return "url('".$request->encode()."')";
+	}
+	
+	function applyDefines($line)
+	{
+		$changed=true;
+		while ($changed)
+		{
+			$changed=false;
+			foreach ($this->defines as $text => $value)
+			{
+				$pos=strpos($line,$text);
+				if ($pos!==false)
+				{
+					$line=substr($line,0,$pos).$value.substr($line,$pos+strlen($text));
+					$changed=true;
+				}
+			}
+		}
+		return $line;
 	}
 	
 	function outputLine($line)
 	{
-		$pos=strpos($line,"viewurl('");
-		while ($pos!==false)
+		if (strlen($line)==0)
 		{
-			$epos=strpos($line,"')",$pos);
-			$start=substr($line,0,$pos)."url('";
-			$end=substr($line,$epos);
-			$request = new Request();
-			$request->method='view';
-			$request->resource=substr($line,$pos+9,($epos-$pos)-9);
-			$line=$start.$request->encode().$end;
-			$pos=strpos($line,'viewurl(');
+			print "";
 		}
-		print($line);
+		else if ($line[0]=='#')
+		{
+			$type=substr($line,1,strpos($line,' ')-1);
+			$content=substr($line,2+strlen($type));
+			if ($type=='define')
+			{
+				$this->processDefine($content);
+			}
+			else if ($type=='include')
+			{
+				$this->processInclude($content);
+			}
+		}
+		else
+		{
+			$line=$this->applyDefines($line);
+			$pos=strpos($line,"-swim-");
+			while ($pos!==false)
+			{
+				$start=substr($line,0,$pos);
+				$spos=strpos($line,"(",$pos);
+				$epos=strpos($line,")",$spos);
+				$type=substr($line,$pos+6,$spos-($pos+6));
+				$content=substr($line,$spos+1,$epos-($spos+1));
+				$end=substr($line,$epos+1);
+				
+				if ($type=='url')
+				{
+					$result=$this->evaluateUrl($content);
+				}
+				else if ($type=='calc')
+				{
+					$result=$this->evaluateCalc($content);
+				}
+				if (isset($result))
+				{
+					$line=$start.$result.$end;
+				}
+				else
+				{
+					$pos+=1;
+				}
+				$pos=strpos($line,'-swim-',$pos);
+			}
+			print($line);
+		}
 	}
 	
-	function output()
+	function parse(&$resource)
 	{
 		ob_start();
-		$this->resource->outputFile();
+		$resource->outputFile();
 		$css=ob_get_contents();
 		ob_end_clean();
 		$lines=explode("\n",$css);
@@ -50,6 +142,11 @@ class CSSHandler
 		{
 			$this->outputLine($line);
 		}
+	}
+	
+	function output()
+	{
+		$this->parse($this->base);
 	}
 }
 

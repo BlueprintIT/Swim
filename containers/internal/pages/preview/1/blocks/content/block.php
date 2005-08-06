@@ -7,7 +7,14 @@ if ($resource->isPage())
 }
 if ($resource->isBlock())
 {
-	$resource->display($parser,$attrs,$text);
+	$id='content';
+	if ($resource->prefs->isPrefSet('block.format'))
+	{
+		$id=$resource->prefs->getPref('block.format');
+	}
+?>
+<block id="<?= $id ?>" src="<?= $resource->getPath() ?>"/>
+<?
 }
 
 ?>

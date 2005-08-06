@@ -181,23 +181,30 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
+	function buildElement(&$parser,$tag,$attrs,$text='',$closetag=true)
 	{
-		print('<'.$tag);
+		$result='<'.$tag;
 		foreach ($attrs as $name => $value)
 		{
-			print(' '.$name.'="'.$value.'"');
+			$result.=' '.$name.'="'.$value.'"';
 		}
 		if ((strlen($text)==0)&&($parser->data['request']->isXML()))
 		{
-			print(' />');
+			$result.=' />';
 		}
 		else
 		{
-			print('>'.$text);
+			$result.='>'.$text;
 			if ($closetag)
-				print('</'.$tag.'>');
+				$result.='</'.$tag.'>';
 		}
+		return $result;
+	}
+	
+	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
+	{
+		$element=$this->buildElement($parser,$tag,$attrs,$text,$closetag);
+		print($element);
 	}
 	
 	function displayApplet(&$parser,$tag,$attrs,$text)
@@ -266,7 +273,8 @@ class Template extends Resource
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
 	{
-		$this->displayElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),'',false);
+		$link=$this->buildElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),'',false);
+		$parser->data['head'].=$link."\n";
 		return true;
 	}
 	
@@ -274,7 +282,8 @@ class Template extends Resource
 	{
 		if (isset($attrs['src']))
 		{
-			$this->displayElement($parser,'script',array('type'=>'text/javascript','src'=>$this->generateURL($parser->data,$attrs['src'])));
+			$script=$this->buildElement($parser,'script',array('type'=>'text/javascript','src'=>$this->generateURL($parser->data,$attrs['src'])));
+			$parser->data['head'].=$script."\n";
 		}
 		else
 		{
@@ -292,14 +301,22 @@ class Template extends Resource
 	
 	function displayBlock(&$parser,$tag,$attrs,$text)
 	{
-		$page=&$parser->data['page'];
-		$block=$page->getReferencedBlock($attrs['id']);
+		if (isset($attrs['src']))
+		{
+			$block=&Resource::decodeResource($attrs['src']);
+		}
+		else if (isset($attrs['id']))
+		{
+			$page=&$parser->data['page'];
+			$block=$page->getReferencedBlock($attrs['id']);
+		}
 		if ($block!==false)
 		{
-			$parser->data['block']=&$block;
 			$parser->data['blockid']=$attrs['id'];
+			$parser->data['block']=&$block;
 			$result=$block->display($parser,$attrs,$text);
 			unset($parser->data['block']);
+			unset($parser->data['blockid']);
 		}
 		return true;
 	}
@@ -414,6 +431,19 @@ class Template extends Resource
 		{
 			return $this->displayVar($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='head')
+		{
+			$parser->data['head'].=$text;
+		}
+		else if ($tag=='html')
+		{
+			print("<html>\n");
+			print("<head>\n");
+			print($parser->data['head']);
+			print("</head>\n");
+			print($text);
+			print("</html>\n");
+		}
 		else if ($tag=='block')
 		{
 			return $this->displayBlock($parser,$tag,$attrs,$text);
@@ -494,7 +524,9 @@ class Template extends Resource
 		// Parse the template and display
 		$parser = new TemplateParser();
 		$parser->addEmptyTag("img");
-		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode);
+		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode,'head'=>'');
+		$parser->addObserver('head',$this);
+		$parser->addObserver('html',$this);
 		$parser->addObserver('block',$this);
 		$parser->addObserver('var',$this);
 		$parser->addObserver('stylesheet',$this);

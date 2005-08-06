@@ -47,6 +47,14 @@ class Block extends Resource
 	
 	function displayIntro($attrs)
 	{
+		if ($this->prefs->isPrefSet('block.stylesheets'))
+		{
+			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
+			foreach ($styles as $style)
+			{
+				print('<stylesheet src="/'.$style.'"/>');
+			}
+		}		
 		$class='block';
 		if (isset($attrs['class']))
 		{
@@ -74,7 +82,7 @@ class Block extends Resource
 		if ($this->canEdit($request,$data,$attrs))
 		{
 ?>
-		<editlink block="<?= $data['blockid'] ?>"><image class="icon" src="/global/template/base/file/layout/edit.gif"/>Edit</editlink>
+		<editlink block="<?= $data['blockid'] ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</editlink>
 <?
 		}
 ?>
@@ -214,7 +222,7 @@ function &getAllBlocks()
 	{
 		$container=&$containers[$id];
 		$newblocks=&$container->getResources('block');
-		$blocks=array_marge($blocks,$newblocks);
+		$blocks=array_merge($blocks,$newblocks);
 	}
 	return $blocks;
 }

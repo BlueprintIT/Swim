@@ -69,7 +69,7 @@ class HtmlBlock extends Block
 				$request->resource=$link;
 				$attrs['href']=$request->encode();
 			}
-			Template::displayElement($parser,$tagname,$attrs,$text);
+			print(Template::buildElement($parser,$tagname,$attrs,$text));
 			return true;
 		}
 		else
