@@ -27,17 +27,17 @@ function method_preview(&$request)
 		{
  			if ($resource->isPage())
 			{
-				$page = &$resource;
-				
-				$template=$_PREFS->getPref('method.preview.template');
-				list($container,$template)=explode('/',$template,2);
-				$container=&getContainer($container);
-				$template=&$container->getTemplate($template);
-				$template->display($request,$page);
+				$resource=$resource->getReferencedBlock('content');
+			}
+			if ($resource->isBlock())
+			{
+				$page = &Resource::decodeResource($_PREFS->getPref('method.preview.page'));
+				$page->setReferencedBlock('content',$resource);
+				$page->display($request);
 			}
 			else
 			{
-				displayGeneralError($request,'You can only preview pages.');
+				displayGeneralError($request,'You can only preview pages or blocks.');
 			}
 		}
 		else

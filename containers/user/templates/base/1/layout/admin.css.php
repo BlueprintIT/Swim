@@ -8,6 +8,7 @@ div.adminpanel {
 	padding: 5px;
 	border: 2px blue solid;
 	background-color: white;
+	z-index: 20;
 }
 
 img#csslogo {

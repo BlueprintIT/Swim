@@ -76,6 +76,11 @@ class Page extends Resource
 		}
 	}
 	
+	function setReferencedBlock($id,&$block)
+	{
+		$this->blocks[$id]=&$block;
+	}
+	
 	function &getReferencedBlockUsage(&$block)
 	{
 		if (isset($block->parent))
@@ -157,18 +162,7 @@ class Page extends Resource
 	
 	function &getReferencedTemplate()
 	{
-		$templ=$this->prefs->getPref('page.template');
-		if (strpos($templ,'/')!==false)
-		{
-			list($container,$id)=explode('/',$templ);
-			$cont=&getContainer($container);
-		}
-		else
-		{
-			$cont=&$this->container;
-			$id=$templ;
-		}
-		$template=&$cont->getTemplate($id);
+		$template=&Resource::decodeResource($this->prefs->getPref('page.template'));
 		return $template;
 	}
 }
