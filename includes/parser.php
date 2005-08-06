@@ -77,6 +77,27 @@ class Parser
 	  return false;
   }
   
+  // Starts capturing output
+  function startBuffer()
+  {
+  	ob_start();
+  }
+  
+  // Ends output capture and parses text if requested otherwise just outputs
+  function endBuffer($parse=true)
+  {
+  	$text=ob_get_contents();
+  	ob_end_clean();
+  	if ($parse)
+  	{
+	  	$this->parseBlock($text);
+  	}
+  	else
+  	{
+  		$this->onText($text);
+  	}
+  }
+  
   // Parses a block of text by splitting at newlines. Mist speed up the regex matching.
   function parseBlock($text)
   {

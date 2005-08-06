@@ -68,6 +68,11 @@ img.icon {
 
 div#contentadmin {
 	position: absolute;
+	left: <?= $sidewidth+10 ?>px;
+}
+
+div#highlightadmin {
+	position: absolute;
 	right: 30px;
 }
 

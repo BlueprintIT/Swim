@@ -248,6 +248,10 @@ class Template extends Resource
 			$request->resource=$block->getPath();
 			unset($attrs['block']);
 			$request->query['version']=$block->version;
+			if (isset($attrs['file']))
+			{
+				$request->query['file']=$attrs['file'];
+			}
 		}
 		else
 		{

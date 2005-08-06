@@ -230,6 +230,7 @@ div#highlight {
 	margin-left: 20px;
 	float: right;
 	width: 300px;
+	border: 2px solid transparent;
 }
 
 div#highlight p {

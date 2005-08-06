@@ -42,11 +42,13 @@ class TemplateBlock extends Block
 	function registerObservers(&$parser)
 	{
 		$parser->addObserver('a',$this);
+		$parser->addObserver('section',$this);
 	}
 	
 	function unregisterObservers(&$parser)
 	{
 		$parser->removeObserver('a',$this);
+		$parser->removeObserver('section',$this);
 	}
 	
 	function observeTag(&$parser,$tagname,$attrs,$text)
@@ -74,6 +76,22 @@ class TemplateBlock extends Block
 				$attrs['href']=$request->encode();
 			}
 			Template::displayElement($parser,$tagname,$attrs,$text);
+			return true;
+		}
+		else if ($tagname=='section')
+		{
+			$data=&$parser->data;
+			$parser->startBuffer();
+			if ($data['request']->method=='admin')
+			{
+?>
+<div class="adminpanel fileadmin">
+	<editlink block="<?= $data['blockid'] ?>" file="<?= $attrs['src'] ?>"><image class="icon" src="/global/template/base/file/layout/edit.gif"/>Edit</editlink>
+</div>
+<?
+			}
+?><file src="<?= $attrs['src'] ?>"/><?
+			$parser->endBuffer();
 			return true;
 		}
 		else
