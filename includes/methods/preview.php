@@ -19,26 +19,13 @@ function method_preview(&$request)
 	global $_USER,$_PREFS;
 	
 	$resource=&Resource::decodeResource($request);
-	$log=&LoggerManager::getLogger("swim.method.view");
 
 	if ($resource!==false)
 	{
 		if ($_USER->canRead($resource))
 		{
- 			if ($resource->isPage())
-			{
-				$resource=$resource->getReferencedBlock('content');
-			}
-			if ($resource->isBlock())
-			{
-				$page = &Resource::decodeResource($_PREFS->getPref('method.preview.page'));
-				$page->setReferencedBlock('content',$resource);
-				$page->display($request);
-			}
-			else
-			{
-				displayGeneralError($request,'You can only preview pages or blocks.');
-			}
+			$page = &Resource::decodeResource($_PREFS->getPref('method.preview.page'));
+			$page->display($request);
 		}
 		else
 		{
