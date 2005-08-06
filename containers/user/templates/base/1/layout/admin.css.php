@@ -36,6 +36,10 @@ img#htmllogo {
 	border: 2px blue solid !important;
 }
 
+table.highlight td {
+	border: 2px blue solid !important;
+}
+
 ul#sidemenu.highlight {
 	margin-top: <?= $sidetopgap ?>px;
 	left: 0;
@@ -67,16 +71,14 @@ div#contentadmin {
 	right: 30px;
 }
 
-div#sideadmin {
+div#sidemenuadmin {
 	position: absolute;
-	left: 0;
 	z-index: 20;
 }
 
 div#menuadmin {
 	position: absolute;
-	bottom: <?= $menuheight ?>px;
-	right: 0;
+	bottom: <?= $menuheight ?>;
 }
 
 div#pageadmin {

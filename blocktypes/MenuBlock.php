@@ -279,7 +279,7 @@ class MenuBlock extends Block
 		$this->rootmenu=&$parser->menu;
 	}
 	
-	function &getBlockEditor()
+	function &getBlockEditor(&$request)
 	{
 		$container=&getContainer('internal');
 		$page=&$container->getPage('menuedit');

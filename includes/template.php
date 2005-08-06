@@ -178,6 +178,7 @@ class Template extends Resource
 			$format='g:ia (T)';
 		}
 		print(date($format,$time));
+		return true;
 	}
 	
 	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
@@ -221,6 +222,7 @@ class Template extends Resource
 		print($text);
 		print('</object></comment>'."\n");
 		print('</object>');
+		return true;
 	}
 	
 	function displayEditLink(&$parser,$tag,$attrs,$text)
@@ -239,6 +241,10 @@ class Template extends Resource
 		if (isset($attrs['block']))
 		{
 			$block=&$parser->data['page']->getReferencedBlock($attrs['block']);
+			if ($block===false)
+			{
+				return true;
+			}
 			$request->resource=$block->getPath();
 			unset($attrs['block']);
 			$request->query['version']=$block->version;
@@ -251,11 +257,13 @@ class Template extends Resource
 		}
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);
+		return true;
 	}
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
 	{
 		$this->displayElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),'',false);
+		return true;
 	}
 	
 	function displayScript(&$parser,$tag,$attrs,$text)
@@ -268,24 +276,43 @@ class Template extends Resource
 		{
 			$this->displayElement($parser, $tag, $attrs, $text);
 		}
+		return true;
 	}
 	
 	function displayImage(&$parser,$tag,$attrs,$text)
 	{
 		$attrs['src']=$this->generateURL($parser->data,$attrs['src']);
 		$this->displayElement($parser,'img',$attrs,$text,false);
+		return true;
 	}
 	
 	function displayBlock(&$parser,$tag,$attrs,$text)
 	{
 		$page=&$parser->data['page'];
 		$block=$page->getReferencedBlock($attrs['id']);
-		if ($block!=null)
+		if ($block!==false)
 		{
 			$parser->data['block']=&$block;
+			$parser->data['blockid']=$attrs['id'];
 			$result=$block->display($parser,$attrs,$text);
 			unset($parser->data['block']);
 		}
+		return true;
+	}
+	
+	function displayFile(&$parser,$tag,$attrs,$text)
+	{
+		$request=&$this->generateRequest($parser->data,$attrs['src'],"view");
+		$resource=&Resource::decodeResource($request);
+		if ($resource->isFile())
+		{
+			ob_start();
+			$resource->outputFile();
+	    $text=ob_get_contents();
+	    ob_end_clean();
+	    $parser->parseText($text);
+		}
+		return true;
 	}
 	
 	function displayAnchor(&$parser,$tag,$attrs,$text)
@@ -312,6 +339,7 @@ class Template extends Resource
 		}
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);
+		return true;
 	}
 	
 	function displayIf(&$parser,$tag,$attrs,$text)
@@ -414,6 +442,10 @@ class Template extends Resource
 		{
 			return $this->displayEditLink($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='file')
+		{
+			return $this->displayFile($parser,$tag,$attrs,$text);
+		}
 		else if ($tag=='if')
 		{
 			return $this->displayIf($parser,$tag,$attrs,$text);
@@ -428,8 +460,10 @@ class Template extends Resource
 		}
 	}
 	
-	function internalDisplay(&$request,&$page,$mode,$xmlpref,$htmlpref)
+	function internalDisplay(&$request,&$page,$mode)
 	{
+		$xmlpref='template.'.$mode.'.xml';
+		$htmlpref='template.'.$mode.'.html';
 		if ($request->isXML())
 		{
 			$file=$this->prefs->getPref($xmlpref);
@@ -469,6 +503,7 @@ class Template extends Resource
 		$parser->addObserver('if',$this);
 		$parser->addObserver('date',$this);
 		$parser->addObserver('time',$this);
+		$parser->addObserver('file',$this);
 		
 		$this->lockRead();
 		ob_start();
@@ -479,12 +514,12 @@ class Template extends Resource
 	
 	function displayAdmin(&$request,&$page)
 	{
-		$this->internalDisplay($request,$page,'admin','template.admin.xml','template.admin.html');
+		$this->internalDisplay($request,$page,'admin');
 	}
 	
 	function display(&$request,&$page)
 	{
-		$this->internalDisplay($request,$page,'normal','template.file.xml','template.file.html');
+		$this->internalDisplay($request,$page,'normal');
 	}
 }
 

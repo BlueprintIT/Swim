@@ -33,7 +33,10 @@ class Page extends Resource
 				if ($cont!='page')
 				{
 					$block=&$this->getReferencedBlock($blk);
-					$modified=max($modified,$block->getModifiedDate());
+					if ($block!==false)
+					{
+						$modified=max($modified,$block->getModifiedDate());
+					}
 				}
 			}
 		}
@@ -141,12 +144,12 @@ class Page extends Resource
 				}
 				else
 				{
-					$this->blocks[$id]=null;
+					$this->blocks[$id]=false;
 				}
 			}
 			else
 			{
-				$this->blocks[$id]=null;
+				$this->blocks[$id]=false;
 			}
 		}
 		return $this->blocks[$id];

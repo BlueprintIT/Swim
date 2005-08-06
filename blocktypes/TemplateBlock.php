@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Defines a block that just displays html source.
+ * Defines a block that displays templated source.
  *
  * Copyright Blueprint IT Ltd. 2005
  *
@@ -13,16 +13,16 @@
  * $Revision$
  */
 
-class HtmlBlock extends Block
+class TemplateBlock extends Block
 {
-	function HtmlBlock(&$container,$id,$version)
+	function TemplateBlock(&$container,$id,$version)
 	{
 		$this->Block($container,$id,$version);
 	}
 	
 	function &getBlockEditor(&$request)
 	{
-		$request->data['file']=$this->prefs->getPref('block.htmlblock.filename','block.html');
+		$request->data['file']=$request->query['file'];
 		$container=&getContainer('internal');
 		$page=&$container->getPage('htmledit');
 		return $page;
@@ -30,8 +30,12 @@ class HtmlBlock extends Block
 	
 	function displayContent(&$parser,$attrs,$text)
 	{
-		$name=$this->prefs->getPref('block.htmlblock.filename','block.html');
-		readfile($this->getDir().'/'.$name);
+		$name=$this->prefs->getPref('block.templateblock.'.$this->getFormat().'.template',$this->prefs->getPref('block.templateblock.template'));
+		$resource = &Resource::decodeResource($name);
+		if ($resource->isFile())
+		{
+			$resource->outputFile();
+		}
 		return true;
 	}
 	

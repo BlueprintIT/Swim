@@ -20,7 +20,7 @@ $cancel->nested=&$request->nested;
  codebase="/internal/file/webedit" classpath="webedit.jar,log4j-1.2.9.jar,jdom.jar,swixml.jar,swim.jar">
  <param name="swim.base" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $prefs->getPref('url.pagegen') ?>">
  <param name="style" value="global/template/base/file/layout/content.css">
- <param name="html" value="block.html">
+ <param name="html" value="<?= $request->data['file'] ?>">
  <param name="resource" value="<?= $resource->getPath() ?>">
  <param name="commit" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $commit->encode() ?>">
  <param name="cancel" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $cancel->encode() ?>">

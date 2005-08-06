@@ -70,6 +70,7 @@ function method_view(&$request)
 					if ($resource->version=='temp')
 					{
 						$details=&$resource->getWorkingDetails();
+
 						if ($details->isMine())
 						{
 		  				$log->debug('Preparing to write file '.$resource->getDir().'/'.$resource->id);
@@ -113,7 +114,7 @@ function method_view(&$request)
 						}
 						else
 						{
-							header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
+							header($_SERVER["SERVER_PROTOCOL"]." 409 Conflict");
 							print("Someone else has locked this resource.");
 							return;
 						}

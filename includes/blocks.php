@@ -17,6 +17,7 @@ class Block extends Resource
 {
 	var $type = 'div';
 	var $log;
+	var $format;
 	
 	function Block(&$container,$id,$version)
 	{
@@ -24,11 +25,21 @@ class Block extends Resource
 		$this->log=&LoggerManager::getLogger('swim.block');
 	}
 	
-	function &getBlockEditor()
+	function &getBlockEditor(&$request)
 	{
 		return null;
 	}
 
+	function setFormat($form)
+	{
+		$this->prefs->setPref('block.format',$form);
+	}
+	
+	function getFormat()
+	{
+		return $this->prefs->getPref('block.format');
+	}
+	
 	function getType()
 	{
 		return $this->type;
@@ -50,14 +61,13 @@ class Block extends Resource
 		print('</'.$this->type.'>');
 	}
 	
-	function displayAdminControl(&$request)
+	function displayAdminPanel(&$request,&$data,$attrs)
 	{
-		$editres = new Request();
-		$editres->method='edit';
-		$editres->resource=$request->resource.'/'.$this->id;
-		$editres->query['version']=$this->version;
-		$editres->nested=&$request;
-?><div class="admincontrol"><a href="<?= $editres->encode() ?>">Edit</a></div><?
+?>
+	<div id="<?= $data['blockid'] ?>admin" class="adminpanel">
+		<editlink block="<?= $data['blockid'] ?>"><image class="icon" src="/global/template/base/file/layout/edit.gif"/>Edit</editlink>
+	</div>
+<?
 	}
 	
 	function displayContent(&$parser,$attrs,$text)
@@ -77,7 +87,7 @@ class Block extends Resource
 	{
 		$request=&$parser->data['request'];
 		$page=&$parser->data['page'];
-		$this->displayIntro($attrs);
+		$parser->data['blockattrs']=&$attrs;
 		if (strlen(trim($text))>0)
 		{
 			$parser->addObserver('content',$this);
@@ -89,7 +99,13 @@ class Block extends Resource
 		else
 		{
 			ob_start();
+			if (($request->method=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
+			{
+				$this->displayAdminPanel($request,$parser->data,$attrs);
+			}
+			$this->displayIntro($attrs);
 			$this->displayContent($parser,$attrs,$text);
+			$this->displayOutro($attrs);
 	    $text=ob_get_contents();
 	    ob_end_clean();
 	    $this->log->debug('Re-parsing content');
@@ -97,7 +113,7 @@ class Block extends Resource
 	    $parser->parseText($text);
 	    $this->unregisterObservers($parser);
 		}
-		$this->displayOutro($attrs);
+		unset($parser->data['blockattrs']);
 	}
 	
 	function observeTag(&$parser,$tagname,$attrs,$text)
@@ -105,11 +121,20 @@ class Block extends Resource
 		if ($tagname=='content')
 		{
 			ob_start();
+			$request=&$parser->data['request'];
+			if (($request->method=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
+			{
+				$this->displayAdminPanel($request,$parser->data,$parser->data['blockattrs']);
+			}
+			$this->displayIntro($parser->data['blockattrs']);
 			$this->displayContent($parser,$attrs,$text);
+			$this->displayOutro($attrs);
 	    $text=ob_get_contents();
 	    ob_end_clean();
 	    $this->log->debug('Re-parsing content');
+	    $this->registerObservers($parser);
 	    $parser->parseText($text);
+	    $this->unregisterObservers($parser);
 			return true;
 		}
 		return false;
@@ -156,7 +181,8 @@ function &loadBlock($blockdir,&$container,$id,$version=false)
 		}
 		else
 		{
-			trigger_error('Invalid block found');
+			trigger_error('Invalid block found at '.$blockdir);
+			return false;
 		}
 	}
 	else

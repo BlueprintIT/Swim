@@ -157,7 +157,7 @@ class Request
 		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
 		if (isset($this->nested))
 		{
-			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->encodeAsQuery());
+			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->makeAllVars());
 		}
 		return $newquery;
 	}

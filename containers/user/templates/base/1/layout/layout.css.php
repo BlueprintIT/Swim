@@ -44,7 +44,6 @@ div#header {
 	background-image: url('banner.jpg');
 	background-position: <?= $sidewidth+$spacing ?>px 0;
 	background-repeat: repeat-x;
-	z-index: 10;
 }
 
 div#swim {
@@ -98,7 +97,7 @@ div#menubar {
 	left: 0;
 	height: <?= $menuheight ?>px;
 	width: 100%;
-	z-index: 10;
+	z-index: 5;
 }
 
 div#spacing {
@@ -114,6 +113,7 @@ div#menubar table {
 	width: 100%;
 	height: 100%;
 	border-collapse: collapse;
+	z-index: 10;
 }
 
 div#menubar tr {

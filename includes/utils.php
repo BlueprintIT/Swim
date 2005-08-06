@@ -99,6 +99,7 @@ function formatdate($date)
 
 function displayLocked(&$request,&$details,$resource)
 {
+	header($_SERVER["SERVER_PROTOCOL"]." 409 Conflict");
 	$request->data['details']=&$details;
 	$request->data['resource']=&$resource;
 	$container = &getContainer('internal');

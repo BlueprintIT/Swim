@@ -18,7 +18,6 @@ function method_edit(&$request)
 	global $_USER;
 	
 	$log=&LoggerManager::getLogger('swim.method.edit');
-	$log->info('New edit method');
 	$resource = &Resource::decodeResource($request);
 
 	if ($resource!==false)
@@ -44,7 +43,7 @@ function method_edit(&$request)
 				if ($details->isMine())
 				{
 					$working=&$resource->makeWorkingVersion();
-					$page=&$working->getBlockEditor();
+					$page=&$working->getBlockEditor($request);
 					$page->display($request);
 				}
 				else
