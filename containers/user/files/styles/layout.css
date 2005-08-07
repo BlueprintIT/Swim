@@ -9,7 +9,7 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	padding-top: -swim-calc(headerheight+spacing)px;
+	padding-top: -swim-calc(headerheight+SPACING)px;
 	padding-bottom: footerheightpx;
 	overflow: hidden;
 	background-color: pagebackground;
@@ -37,7 +37,7 @@ div#header {
 	height: headerheightpx;
 	width: 100%;
 	background-image: -swim-url('global/file/images/banner.jpg');
-	background-position: -swim-calc(sidewidth+spacing)px 0;
+	background-position: -swim-calc(sidewidth+SPACING)px 0;
 	background-repeat: repeat-x;
 }
 
@@ -70,7 +70,7 @@ img#cogs {
 	margin: 0;
 	width: 150px;
 	height: headerheightpx;
-	border-right: spacingpx white solid;
+	border-right: SPACINGpx white solid;
 }
 
 img#logo {
@@ -92,11 +92,6 @@ div#menubar {
 	top: -swim-calc(headerheight-menuheight)px;
 	left: 0;
 	height: menuheightpx;
-}
-
-div#spacing {
-	margin-left: sidewidthpx;
-	height: 100%;
 }
 
 *#menu {

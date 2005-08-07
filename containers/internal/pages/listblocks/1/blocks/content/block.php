@@ -14,28 +14,44 @@
 	}
 	$blocks=array();
 	$allblocks=&getAllBlocks();
+	$current=$page->getReferencedBlock($request->query['reference']);
 	foreach(array_keys($allblocks) as $id)
 	{
 		$block=&$allblocks[$id];
 		$title=$block->prefs->getPref('block.title');
-		if ((isset($format))&&($format!=$block->prefs->getPref('block.format')))
-			continue;
+		//if ((isset($format))&&($format!=$block->prefs->getPref('block.format')))
+			//continue;
 		$blocks[$title]=&$block;
 	}
 	ksort($blocks);
 ?>
 <script>
+var blockurl=[];
+<?
+	$pos=0;
+	foreach(array_keys($blocks) as $title)
+	{
+		$block=&$blocks[$title];
+		$req = new Request();
+		$req->method='preview';
+		$req->resource=$block->getPath();
+		print('blockurl['.$pos.']="'.$req->encode().'";'."\n");
+		$pos++;
+	}
+?>
 function displaypreview()
 {
 	var block = document.getElementById("block");
 	var preview = document.getElementById("preview");
-	preview.src='/Swim/swim.php/preview/'+block.value;
+	preview.src=blockurl[block.selectedIndex];
 }
 
 function blockselect()
 {
 	displaypreview();
 }
+
+addEvent(window,"load",displaypreview,false);
 
 </script>
 <form action="<?= $setblock->encodePath() ?>" method="POST">
@@ -55,7 +71,12 @@ function blockselect()
 		$block=&$blocks[$title];
 		$form=$block->prefs->getPref('block.format');
 ?>
-				<option value="<?= $block->getPath() ?>"><?= $title ?> (<?= $form ?>)</option>
+				<option value="<?= $block->getPath() ?>"<?
+		if ($block->getPath()==$current->getPath())
+		{
+			print(' selected="selected"');
+		}
+?>><?= $title ?> (<?= $form ?>)</option>
 <?
 	}
 ?>
