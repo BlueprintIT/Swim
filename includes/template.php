@@ -118,7 +118,7 @@ class Template extends Resource
 		if (strlen($url)==0)
 		{
 			$request = new Request();
-			$request->method='view';
+			$request->method=$method;
 			$request->resource=$data['request']->resource;
 		}
 		else if ($url[0]=='/')
@@ -317,6 +317,31 @@ class Template extends Resource
 			$result=$block->display($parser,$attrs,$text);
 			unset($parser->data['block']);
 			unset($parser->data['blockid']);
+		}
+		else if ($parser->data['mode']=='admin')
+		{
+			$parser->startBuffer();
+?>
+	<div id="<?= $attrs['id'] ?>admin" class="adminpanel">
+<?
+		if ($parser->data['page']->canChangeReferencedBlock($attrs['id']))
+		{
+			if ((!isset($attrs['canchange']))||($attrs['canchange']=='true'))
+			{
+				$format='';
+				if (isset($attrs['format']))
+				{
+					$format=' query:format="'.$attrs['format'].'"';
+				}
+?>
+		<anchor query:reference="<?= $attrs['id'] ?>"<?= $format ?> method="change" nest="true" href="/internal/page/listblocks"><image class="icon" src="/global/file/images/edit.gif"/>Select</anchor>
+<?
+			}
+		}
+?>
+	</div>
+<?
+			$parser->endBuffer();
 		}
 		return true;
 	}

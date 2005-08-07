@@ -762,7 +762,7 @@ class Resource
 		
 		if (strlen($resource)==0)
 		{
-			$log->info('No resource to decode');
+			$log->warn('No resource to decode');
 			return false;
 		}
 
@@ -773,7 +773,7 @@ class Resource
 			$parts=array_slice($parts,2);
 		}
 		
-		$log->info('Creating resource version '.$version);
+		$log->debug('Creating resource version '.$version);
 		
 		if (count($parts)<=1)
 			return false;

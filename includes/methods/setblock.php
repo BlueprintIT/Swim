@@ -23,9 +23,18 @@ function method_setblock(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			$block=&Resource::decodeResource($request->query['block']);
-			if (($resource->isPage())&&($block->isBlock()))
+			if ($resource->isPage())
 			{
+				$block=false;
+				if ((isset($request->query['block']))&&(strlen($request->query['block'])>0))
+				{
+					$block=&Resource::decodeResource($request->query['block']);
+					if (($block===false)||(!$block->isBlock()))
+					{
+						displayGeneralError($request,"Invalid arguments");
+						return;
+					}
+				}
 				$newpage=&$resource->makeNewVersion();
 				$newpage->setReferencedBlock($request->query['reference'],$block);
 				$newpage->savePreferences();

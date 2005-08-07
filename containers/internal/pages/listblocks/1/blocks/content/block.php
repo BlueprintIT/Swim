@@ -19,8 +19,8 @@
 	{
 		$block=&$allblocks[$id];
 		$title=$block->prefs->getPref('block.title');
-		//if ((isset($format))&&($format!=$block->prefs->getPref('block.format')))
-			//continue;
+		if ((isset($format))&&($format!=$block->prefs->getPref('block.format')))
+			continue;
 		$blocks[$title]=&$block;
 	}
 	ksort($blocks);
@@ -43,7 +43,14 @@ function displaypreview()
 {
 	var block = document.getElementById("block");
 	var preview = document.getElementById("preview");
-	preview.src=blockurl[block.selectedIndex];
+	if (block.selectedIndex>=0)
+	{
+		preview.src=blockurl[block.selectedIndex];
+	}
+	else
+	{
+		preview.src="";
+	}
 }
 
 function blockselect()
@@ -72,7 +79,7 @@ addEvent(window,"load",displaypreview,false);
 		$form=$block->prefs->getPref('block.format');
 ?>
 				<option value="<?= $block->getPath() ?>"<?
-		if ($block->getPath()==$current->getPath())
+		if (($current!==false)&&($block->getPath()==$current->getPath()))
 		{
 			print(' selected="selected"');
 		}

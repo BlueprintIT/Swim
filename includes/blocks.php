@@ -81,14 +81,18 @@ class Block extends Resource
 <?
 		if ($data['page']->canChangeReferencedBlock($data['blockid']))
 		{
-			$format='';
-			if (isset($attrs['format']))
+			if ((!isset($attrs['canchange']))||($attrs['canchange']=='true'))
 			{
-				$format=' query:format="'.$attrs['format'].'"';
-			}
+				$format='';
+				if (isset($attrs['format']))
+				{
+					$format=' query:format="'.$attrs['format'].'"';
+				}
 ?>
 		<anchor query:reference="<?= $data['blockid'] ?>"<?= $format ?> method="change" nest="true" href="/internal/page/listblocks"><image class="icon" src="/global/file/images/edit.gif"/>Select</anchor>
+		<anchor query:reference="<?= $data['blockid'] ?>" query:block="" method="setblock" nest="true" href=""><image class="icon" src="/global/file/images/edit.gif"/>Clear</anchor>
 <?
+			}
 		}
 		if ($this->canEdit($request,$data,$attrs))
 		{
@@ -130,7 +134,7 @@ class Block extends Resource
 		else
 		{
 			ob_start();
-			if (($request->method=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
+			if (($parser->data['mode']=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
 			{
 				$this->displayAdminPanel($request,$parser->data,$attrs);
 			}
@@ -153,7 +157,7 @@ class Block extends Resource
 		{
 			ob_start();
 			$request=&$parser->data['request'];
-			if (($request->method=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
+			if (($parser->data['mode']=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
 			{
 				$this->displayAdminPanel($request,$parser->data,$parser->data['blockattrs']);
 			}

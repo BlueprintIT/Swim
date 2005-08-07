@@ -71,24 +71,33 @@ class Page extends Resource
 	
 	function setReferencedBlock($id,&$block)
 	{
-		$this->blocks[$id]=&$block;
-		if ($id==$block->id)
+		if ($block===false)
 		{
-			if ((isset($block->parent))&&($block->parent->getPath()==$this->getPath()))
-			{
-				$this->prefs->unsetPref('page.blocks.'.$id.'.resource');
-				$this->prefs->unsetPref('page.blocks.'.$id.'.version');
-				return;
-			}
-		}
-		$this->prefs->setPref('page.blocks.'.$id.'.resource',$block->getPath());
-		if ($block->isCurrentVersion())
-		{
+			$this->prefs->unsetPref('page.blocks.'.$id.'.resource');
 			$this->prefs->unsetPref('page.blocks.'.$id.'.version');
+			unset($this->blocks[$id]);
 		}
 		else
 		{
-			$this->prefs->setPref('page.blocks.'.$id.'.version',$block->version);
+			$this->blocks[$id]=&$block;
+			if ($id==$block->id)
+			{
+				if ((isset($block->parent))&&($block->parent->getPath()==$this->getPath()))
+				{
+					$this->prefs->unsetPref('page.blocks.'.$id.'.resource');
+					$this->prefs->unsetPref('page.blocks.'.$id.'.version');
+					return;
+				}
+			}
+			$this->prefs->setPref('page.blocks.'.$id.'.resource',$block->getPath());
+			if ($block->isCurrentVersion())
+			{
+				$this->prefs->unsetPref('page.blocks.'.$id.'.version');
+			}
+			else
+			{
+				$this->prefs->setPref('page.blocks.'.$id.'.version',$block->version);
+			}
 		}
 	}
 	
