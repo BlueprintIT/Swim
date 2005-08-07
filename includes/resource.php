@@ -206,6 +206,7 @@ class Resource
 	
 	function savePreferences()
 	{
+		$this->prefs->setPref('resource.modified',time());
 		$file=$this->openFileWrite('resource.conf');
 		$this->prefs->savePreferences($file);
 		$this->closeFile($file);
@@ -414,12 +415,14 @@ class Resource
 		if (isset($this->parent))
 		{
 			$parentv=&$this->parent->makeNewVersion();
-			return $parentv->getResource($this->getTypeName(),$this->id);
+			$newv=&$parentv->getResource($this->getTypeName(),$this->id);
 		}
 		else
 		{
-			return $this->container->makeNewResourceVersion($this);
+			$newv=&$this->container->makeNewResourceVersion($this);
 		}
+		$newv->savePreferences();
+		return $newv;
 	}
 	
 	function &makeWorkingVersion()
@@ -487,6 +490,11 @@ class Resource
 	{
 		if (!isset($this->modified))
 		{
+			if ($this->prefs->preferences['resource.modified'])
+			{
+				$this->modified=$this->prefs->preferences['resource.modified'];
+			}
+			
 			if (is_readable($this->getDir().'/resource.conf'))
 			{
 				$stat=stat($this->getDir().'/resource.conf');

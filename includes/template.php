@@ -15,8 +15,6 @@
 
 class Template extends Resource
 {
-	var $parsing = false;
-	var $curPage;
 	var $log;
 	
 	function Template(&$container,$id,$version)
