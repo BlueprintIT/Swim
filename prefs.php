@@ -98,6 +98,11 @@ class Preferences
     }
 	}
 	
+	function unsetPref($name)
+	{
+		unset($this->preferences[$name]);
+	}
+	
 	function setPref($name,$value)
 	{
 		$this->preferences[$name]=$value;

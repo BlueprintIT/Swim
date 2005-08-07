@@ -204,6 +204,13 @@ class Resource
 		}
 	}
 	
+	function savePreferences()
+	{
+		$file=$this->openFileWrite('resource.conf');
+		$this->prefs->savePreferences($file);
+		$this->closeFile($file);
+	}
+	
 	function getTypeName()
 	{
 		if (is_a($this,'Page'))
@@ -279,6 +286,58 @@ class Resource
 		return $this->getResource('file',$id);
 	}
 	
+	function createNewResource($type, $id=false)
+	{
+		$this->lockWrite();
+		$rdir=$this->getDir().'/'.$type.'s/';
+		if ($id===false)
+		{
+			$id=rand(10000,99999);
+		}
+		while (is_dir($rdir.$id))
+		{
+			$id=rand(10000,99999);
+		}
+		$rdir=$rdir.$id;
+		mkdir($rdir);
+		$this->unlock();
+		return array($id,$rdir);
+	}
+	
+	function &createResource($type,&$layout,$id=false)
+	{
+		list($id,$pdir)=$this->createNewResource($type,$id);
+		if ($layout===false)
+		{
+			$layout=&getLayout($this->prefs->getPref('layouts.default'));
+		}
+		if (is_object($layout))
+		{
+			$layoutdir=$layout->getDir();
+		}
+		else
+		{
+			$layoutdir=$this->prefs->getPref('storage.layouts').'/'.$layout;
+		}
+		$lock=lockResourceWrite($pdir);
+		recursiveCopy($layoutdir,$pdir,true);
+		unlockResource($lock);
+
+		$newresource=&$this->getResource($type,$id);
+
+		return $newresource;
+	}
+	
+	function &createPage(&$layout, $id=false)
+	{
+		return $this->createResource('page',$layout,$id);
+	}
+	
+	function &createBlock(&$layout, $id=false)
+	{
+		return $this->createResource('block',$layout,$id);
+	}
+
 	function hasResource($type,$id,$version = false)
 	{
 		return is_dir($this->getDir().'/'.$type.'s/'.$id);
@@ -679,7 +738,7 @@ class Resource
 		return $this;
 	}
 	
-	function &decodeResource($request)
+	function &decodeResource($request,$version=false)
 	{
 		global $_PREFS;
 		
@@ -688,19 +747,15 @@ class Resource
 		if (is_object($request))
 		{
 			$resource=$request->resource;
-			if (isset($request->query['version']))
+			
+			if (($version!==false)&&(isset($request->query['version'])))
 			{
 				$version=$request->query['version'];
-			}
-			else
-			{
-				$version=false;
 			}
 		}
 		else
 		{
 			$resource=$request;
-			$version=false;
 		}
 		
 		$log->debug('Decoding '.$resource);

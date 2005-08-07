@@ -56,13 +56,6 @@ class Page extends Resource
 		$template->displayAdmin($request,$this);
 	}
 	
-	function savePreferences()
-	{
-		$file=$this->openFileWrite('resource.conf');
-		$this->prefs->savePreferences($file);
-		$this->closeFile($file);
-	}
-	
 	function isReferencedBlock($id=false)
 	{
 		if ($id===false)
@@ -79,6 +72,44 @@ class Page extends Resource
 	function setReferencedBlock($id,&$block)
 	{
 		$this->blocks[$id]=&$block;
+		if ($id==$block->id)
+		{
+			if ((isset($block->parent))&&($block->parent->getPath()==$this->getPath()))
+			{
+				$this->prefs->unsetPref('page.blocks.'.$id.'.resource');
+				$this->prefs->unsetPref('page.blocks.'.$id.'.version');
+				return;
+			}
+		}
+		$this->prefs->setPref('page.blocks.'.$id.'.resource',$block->getPath());
+		if ($block->isCurrentVersion())
+		{
+			$this->prefs->unsetPref('page.blocks.'.$id.'.version');
+		}
+		else
+		{
+			$this->prefs->setPref('page.blocks.'.$id.'.version',$block->version);
+		}
+	}
+	
+	function canChangeReferencedBlock($id)
+	{
+		$block=&$this->getReferencedBlock($id);
+		if ($block!==false)
+		{
+			if (isset($block->parent))
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
 	
 	function &getReferencedBlockUsage(&$block)
@@ -89,23 +120,20 @@ class Page extends Resource
 		}
 		$container=$block->container->id;
 		$result=array();
+		$path=$block->getPath();
 		$blocks=$this->prefs->getPrefBranch('page.blocks');
 		foreach ($blocks as $key=>$id)
 		{
-			if ((substr($key,-3,3)=='.id')&&($id==$block->id))
+			if ((substr($key,-9,9)=='.resource')&&($id==$path))
 			{
-				$blk=substr($key,0,-3);
-				$cont=$this->prefs->getPref('page.blocks.'.$blk.'.container');
-				if ($cont==$container)
+				$blk=substr($key,0,-9);
+				if (($this->prefs->isPrefSet('page.blocks.'.$blk.'.version'))&&($block->version==$this->prefs->getPref('page.blocks.'.$blk.'.version')))
 				{
-					if (($this->prefs->isPrefSet('page.blocks.'.$blk.'.version'))&&($block->version==$this->prefs->getPref('page.blocks.'.$blk.'.version')))
-					{
-						$result[]=$blk;
-					}
-					else if ($block->isCurrentVersion())
-					{
-						$result[]=$blk;
-					}
+					$result[]=$blk;
+				}
+				else if ($block->isCurrentVersion())
+				{
+					$result[]=$blk;
 				}
 			}
 		}
@@ -117,28 +145,18 @@ class Page extends Resource
 		if (!isset($this->blocks[$id]))
 		{
 			$blockpref='page.blocks.'.$id;
-			if ($this->prefs->isPrefSet($blockpref.'.id'))
+			if ($this->prefs->isPrefSet($blockpref.'.resource'))
 			{
-				$container=$this->prefs->getPref($blockpref.'.container');
-				$block=$this->prefs->getPref($blockpref.'.id');
-				if ($container=='page')
+				if ($this->prefs->isPrefSet($blockpref.'.version'))
 				{
-					$blockobj = &$this->getBlock($block);
+					$version=$this->prefs->getPref($blockpref.'.version');
 				}
 				else
 				{
-					$container=&getContainer($container);
-					if ($this->prefs->isPrefSet($blockpref.'.version'))
-					{
-						$version=$this->prefs->getPref($blockpref.'.version');
-					}
-					else
-					{
-						$version=false;
-					}
-					$blockobj=&$container->getBlock($block,$version);
+					$version=false;
 				}
-				$this->blocks[$id]=&$blockobj;
+				$block=&Resource::decodeResource($this->prefs->getPref($blockpref.'.resource'),$version);
+				$this->blocks[$id]=&$block;
 			}
 			else if ($this->hasResource('block',$id))
 			{

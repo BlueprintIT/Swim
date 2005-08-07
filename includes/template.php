@@ -358,6 +358,15 @@ class Template extends Resource
 			$request->query['template']=$attrs['template'];
 			unset($attrs['template']);
 		}
+		foreach ($attrs as $id => $value)
+		{
+			if (substr($id,0,6)=='query:')
+			{
+				$id=substr($id,6);
+				$request->query[$id]=$value;
+				unset($attrs[$id]);
+			}
+		}
 		$attrs['href']=$request->encode();
 		$this->displayElement($parser,'a',$attrs,$text);
 		return true;

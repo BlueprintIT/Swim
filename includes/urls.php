@@ -211,7 +211,19 @@ class Request
 		$query=decodeQuery($_SERVER['QUERY_STRING']);
 		if ($_SERVER['REQUEST_METHOD']=='POST')
 		{
-			if (isset($_POST))
+		  $in=@fopen('php://input','rb');
+		  if ($in!==false)
+		  {
+		  	$line='';
+			  while (!feof($in))
+			  {
+			    $data=fread($in,1024);
+				  $line.=$data;
+				}
+		  	fclose($in);
+		  	$query=array_merge($query,decodeQuery($line));
+		  }
+		  else if (isset($_POST))
 			{
 				$query=array_merge($query,$_POST);
 			}

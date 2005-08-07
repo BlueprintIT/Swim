@@ -111,7 +111,7 @@ class Parser
   // Parses some text
   function parseText($text)
   {
-    $validregex='[A-Za-z0-9]+';
+    $validregex='[A-Za-z0-9:]+';
     switch($this->_state)
     {
       // State 0 is where we are scanning for a new start tag. Any text before a new

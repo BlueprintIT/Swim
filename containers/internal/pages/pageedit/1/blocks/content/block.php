@@ -22,7 +22,7 @@ $commit->nested=&$request->nested;
 
 
 ?>
-<form action="<?= $commit->encodePath() ?>" method="GET">
+<form action="<?= $commit->encodePath() ?>" method="POST">
 <?= $commit->getFormVars() ?>
 <table>
 <tr>
@@ -84,7 +84,7 @@ $commit->nested=&$request->nested;
 			$revert->nested=&$request->nested;
 ?>
 <hr>
-<form action="<?= $revert->encodePath() ?>" method="GET">
+<form action="<?= $revert->encodePath() ?>" method="POST">
 <?= $revert->getFormVars() ?>
 <table>
 <tr>

@@ -17,6 +17,8 @@ function method_docreate(&$request)
 {
 	global $_USER,$_PREFS;
 	
+	$log=&LoggerManager::getLogger('swim.method.docreate');
+	
 	list($container,$type)=explode('/',$request->resource);
 	
 	$container=&getContainer($container);
@@ -42,6 +44,7 @@ function method_docreate(&$request)
 				{
 					if (substr($name,0,5)=='page.')
 					{
+						$log->debug('Setting pref '.$name.' -> '.$value);
 						$newpage->prefs->setPref($name,$value);
 					}
 				}
@@ -52,9 +55,26 @@ function method_docreate(&$request)
 				$nrequest->resource=$container->id.'/page/'.$newpage->id;
 				redirect($nrequest);
 			}
+			else if ($type=='block')
+			{
+				$newblock=&$container->createBlock($request->query['layout']);
+					
+				foreach ($request->query as $name => $value)
+				{
+					$log->debug('Checking pref '.$name);
+					if (substr($name,0,6)=='block.')
+					{
+						$log->debug('Setting pref '.$name.' -> '.$value);
+						$newblock->prefs->setPref($name,$value);
+					}
+				}
+				$newblock->savePreferences();
+				
+				redirect($request->nested);
+			}
 			else
 			{
-				displayGeneralError($request,'Can only create a page.');
+				displayGeneralError($request,'Can only create pages or blocks.');
 			}
 		}
 		else

@@ -339,34 +339,19 @@ class Container extends Resource
 		}
 		return parent::getResource($type,$id,$version);
 	}
-	
-	function &createPage(&$layout, $id=false)
+
+	function createNewResource($type, $id=false)
 	{
 		$this->lockWrite();
-		if ($id===false)
-		{
-			do
-			{
-				$id=rand(10000,99999);
-			} while (is_dir($this->getDir().'/pages/'.$id));
-		}
-		mkdir($this->getDir().'/pages/'.$id);
+		list($id,$rdir)=parent::createNewResource($type,$id);
 		$version=1;
-		$pdir=$this->getDir().'/pages/'.$id.'/'.$version;
+		$pdir=$rdir.'/'.$version;
+		$vers=fopen($rdir.'/version','w');
+		fwrite($vers,$version);
+		fclose($vers);
 		mkdir($pdir);
 		$this->unlock();
-		if ($layout===false)
-		{
-			$layout=&getLayout($this->prefs->getPref('layouts.default'));
-		}
-		$lock=lockResourceWrite($pdir);
-		recursiveCopy($layout->getDir(),$pdir,true);
-		unlockResource($lock);
-
-		$newpage=&$this->getPage($id,$version);
-		$newpage->makeCurrentVersion();
-
-		return $newpage;
+		return array($id,$pdir);
 	}
 }
 

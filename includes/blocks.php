@@ -79,6 +79,17 @@ class Block extends Resource
 ?>
 	<div id="<?= $data['blockid'] ?>admin" class="adminpanel">
 <?
+		if ($data['page']->canChangeReferencedBlock($data['blockid']))
+		{
+			$format='';
+			if (isset($attrs['format']))
+			{
+				$format=' query:format="'.$attrs['format'].'"';
+			}
+?>
+		<anchor query:reference="<?= $data['blockid'] ?>"<?= $format ?> method="change" nest="true" href="/internal/page/listblocks"><image class="icon" src="/global/file/images/edit.gif"/>Select</anchor>
+<?
+		}
 		if ($this->canEdit($request,$data,$attrs))
 		{
 ?>
