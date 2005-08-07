@@ -281,7 +281,7 @@ class Resource
 		return $this->getResource('page',$id,$version);
 	}
 	
-	function &getFile($id)
+	function &getFile($id,$version = false)
 	{
 		return $this->getResource('file',$id);
 	}
@@ -724,7 +724,7 @@ class Resource
 			if ($type=='file')
 			{
 				$path=implode('/',array_slice($parts,1));
-				return $this->getFile($path);
+				return $this->getFile($path,$version);
 			}
 			else
 			{
@@ -748,7 +748,7 @@ class Resource
 		{
 			$resource=$request->resource;
 			
-			if (($version!==false)&&(isset($request->query['version'])))
+			if (($version===false)&&(isset($request->query['version'])))
 			{
 				$version=$request->query['version'];
 			}
@@ -772,6 +772,8 @@ class Resource
 			$version=$parts[1];
 			$parts=array_slice($parts,2);
 		}
+		
+		$log->info('Creating resource version '.$version);
 		
 		if (count($parts)<=1)
 			return false;

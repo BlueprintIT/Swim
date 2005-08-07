@@ -65,10 +65,13 @@ function method_view(&$request)
 			}
 			else if ($_SERVER['REQUEST_METHOD']=='PUT')
 			{
+				$log->debug('Checking write access');
 				if ($_USER->canWrite($resource))
 				{
+					$log->debug('Checking that this is the working version');
 					if ($resource->version=='temp')
 					{
+						$log->debug('Checking that we have the working lock');
 						$details=&$resource->getWorkingDetails();
 
 						if ($details->isMine())
@@ -121,6 +124,7 @@ function method_view(&$request)
 					}
 					else
 					{
+						$log->info('Version was '.$resource->version);
 						header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
 						print("You only have access to edit working versions.");
 						return;

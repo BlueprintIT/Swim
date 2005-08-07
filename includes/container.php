@@ -321,6 +321,11 @@ class Container extends Resource
 		return false;
 	}
 	
+	function &loadFile($id,$version = false)
+	{
+		return parent::loadFile($id,false);
+	}
+	
 	function hasResource($type,$id,$version = false)
 	{
 		$ext=$id;
