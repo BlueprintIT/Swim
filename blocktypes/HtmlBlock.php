@@ -54,20 +54,22 @@ class HtmlBlock extends Block
 			if (substr($link,0,12)=='attachments/')
 			{
 				$this->log->debug('Attachment link');
-				$data=&$parser->data;
-				$attrs['href']=$this->getPath().'/'.$link;
+				$request = new Request();
+				$request->method=$parser->data['request']->method;
+				$request->resource=$this->getPath().'/file/'.$link;
+				$attrs['href']=$request->encode();
 			}
-			else if (strpos($link,'://')!==false)
-			{
-				$this->log->debug('External link');
-			}
-			else
+			else if (substr($link,0,1)=='/')
 			{
 				$this->log->debug('Internal link');
 				$request = new Request();
-				$request->method='view';
-				$request->resource=$link;
+				$request->method=$parser->data['request']->method;
+				$request->resource=substr($link,1);
 				$attrs['href']=$request->encode();
+			}
+			else
+			{
+				$this->log->debug('External link');
 			}
 			print(Template::buildElement($parser,$tagname,$attrs,$text));
 			return true;
