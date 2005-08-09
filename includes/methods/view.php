@@ -31,7 +31,7 @@ function method_view(&$request)
 				{
 					if ($resource->exists())
 					{
-						if ((isset($request->query['version']))&&($request->query['version']!='temp'))
+						if (((isset($request->query['version']))&&($request->query['version']!='temp'))||($resource->version===false))
 						{
 							setValidTime(60);
 						}

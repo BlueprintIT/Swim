@@ -187,11 +187,18 @@ function setCacheInfo($date,$etag=false)
 {
 	$log=&LoggerManager::getLogger('swim.cache');
 	$cached=false;
-	if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))||(isset($_SERVER['HTTP_IF_NONE_MATCH'])))
+
+	if ($date!=false)
+		header('Last-Modified: '.httpdate($date));
+	if ($etag!==false)
+		header('ETag: '.$etag);
+
+	if (((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))&&($date!==false))
+		||((isset($_SERVER['HTTP_IF_NONE_MATCH'])))&&($etag!==false))
 	{
 		$log->debug('Found a cache check header');
 		$cached=true;
-		if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
+		if ((isset($_SERVER['HTTP_IF_NONE_MATCH']))&&($etag!==false))
 		{
 			$log->debug('Checking etag');
 			if ($etag!=$_SERVER['HTTP_IF_NONE_MATCH'])
@@ -200,7 +207,7 @@ function setCacheInfo($date,$etag=false)
 				$cached=false;
 			}
 		}
-		if (($cached)&&(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])))
+		if (($cached)&&(isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))&&($date!==false))
 		{
 			$log->debug('Checking modification date');
 			$checkdate=strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
@@ -217,8 +224,6 @@ function setCacheInfo($date,$etag=false)
 			exit;
 		}
 	}
-	header('Last-Modified: '.httpdate($date));
-	header('ETag: '.$etag);
 }
 
 function callMethod(&$request)
