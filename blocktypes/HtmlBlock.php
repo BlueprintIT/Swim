@@ -70,6 +70,7 @@ class HtmlBlock extends Block
 			else
 			{
 				$this->log->debug('External link');
+				$attrs['target']="_blank";
 			}
 			print(Template::buildElement($parser,$tagname,$attrs,$text));
 			return true;

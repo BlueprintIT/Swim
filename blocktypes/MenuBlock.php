@@ -33,7 +33,7 @@ class MenuItem
 		{
 			if (isset($this->url))
 			{
-				print('<a href="'.$this->url.'">'.$this->text.'</a>');
+				print('<a target="_blank" href="'.$this->url.'">'.$this->text.'</a>');
 			}
 			else if (isset($this->resource))
 			{
