@@ -128,8 +128,7 @@ function displayGeneralError(&$request,$message)
 {
 	global $_PREFS;
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-	$container = &getContainer('internal');
-	$page = &$container->getPage($_PREFS->getPref('errors.general.page'));
+	$page = &Resource::decodeResource($_PREFS->getPref('errors.general.page'));
 	$request->query['message']=$message;
 	if ($page!==false)
 	{
@@ -145,8 +144,7 @@ function displayNotFound(&$request)
 {
 	global $_PREFS;
  	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-	$container = &getContainer('internal');
-	$page = &$container->getPage($_PREFS->getPref('errors.notfound.page'));
+	$page = &Resource::decodeResource($_PREFS->getPref('errors.notfound.page'));
 	if ($page!==false)
 	{
 		$page->display($request);
@@ -161,8 +159,7 @@ function displayServerError(&$request)
 {
 	global $_PREFS;
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-	$container = &getContainer('internal');
-	$page = &$container->getPage($_PREFS->getPref('errors.server.page'));
+	$page = &Resource::decodeResource($_PREFS->getPref('errors.server.page'));
 	if ($page!==false)
 	{
 		$page->display($request);
