@@ -21,7 +21,15 @@ $cancel->nested=&$request->nested;
  <param name="swim.base" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $prefs->getPref('url.pagegen') ?>">
  <param name="style" value="<?= $resource->prefs->getPref('block.stylesheets') ?>">
  <param name="html" value="<?= $request->data['file'] ?>">
- <param name="resource" value="<?= $resource->getPath() ?>">
+<?
+
+if ((isset($resource->parent))&&($resource->parent->isPage()))
+{
+?> <param name="pageblock" value="<?= $resource->id ?>">
+<?
+}
+
+?> <param name="resource" value="<?= $resource->getPath() ?>">
  <param name="commit" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $commit->encode() ?>">
  <param name="cancel" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $cancel->encode() ?>">
 </applet>
