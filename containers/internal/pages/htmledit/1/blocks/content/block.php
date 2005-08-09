@@ -19,7 +19,7 @@ $cancel->nested=&$request->nested;
 <applet class="com.blueprintit.webedit.WebEdit" width="90%" height="400"
  codebase="/internal/file/webedit" classpath="webedit.jar,log4j-1.2.9.jar,jdom.jar,swixml.jar,swim.jar">
  <param name="swim.base" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $prefs->getPref('url.pagegen') ?>">
- <param name="style" value="<?= $resource->prefs->getPref('block.stylesheets') ?>">
+ <param name="style" value="global/file/styles/global.css,<?= $resource->prefs->getPref('block.stylesheets') ?>">
  <param name="html" value="<?= $request->data['file'] ?>">
 <?
 

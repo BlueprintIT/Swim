@@ -1,26 +1,24 @@
 #include global/file/styles/styles.css
+div#content {
+	font-size: 0.95em;
+}
+
 h1 {
-	font-size: 1.5em;
-	font-weight: bold;
 	margin-top: 0.67em;
 	margin-bottom: 0.67em;
 	margin-left: 0;
 	margin-right: 0;
 	padding: 0;
 	text-align: left;
-	color: h1color;
 }
 
 h2 {
-	font-size: 1.3em;
-	font-weight: bold;
 	margin-top: 0.83em;
 	margin-bottom: 0.83em;
 	margin-left: 0;
 	margin-right: 0;
 	padding: 0;
 	text-align: left;
-	color: h2color;
 }
 
 p {
@@ -30,6 +28,4 @@ p {
 	margin-right: 0;
 	padding: 0;
 	text-align: justify;
-	font-size: 1em;
-	font-family: paragraphfont;
 }

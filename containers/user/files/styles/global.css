@@ -1,0 +1,43 @@
+#include global/file/styles/styles.css
+body {
+	font-family: defaultfont;
+	font-size: 1em;
+	font-weight: normal;
+	color: black;
+}
+
+h1 {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: h1color;
+}
+
+h2 {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: h2color;
+}
+
+p {
+	font-family: paragraphfont;
+}
+
+ul, ol {
+	font-family: paragraphfont;
+}
+
+li {
+	font-family: paragraphfont;
+}
+
+a {
+	color: linkcolor;
+}
+
+a:visited {
+	color: linkvisited;
+}
+
+a:hover, a:visited:hover {
+	color: linkhover;
+}

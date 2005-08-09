@@ -42,6 +42,7 @@ ul.menupopup li.menuitem {
 	border: 1px black solid;
 	background-position: 0px 45% !important;
 	background-image: none !important;
+	font-family: menufont;
 }
 
 ul.menupopup li.menufocus {
