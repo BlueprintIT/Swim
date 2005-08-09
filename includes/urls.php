@@ -204,11 +204,15 @@ class Request
 	function &decodeCurrentRequest()
 	{
 		$path='';
-		if (isset($_SERVER['PATH_INFO']))
-		{
-			$path=$_SERVER['PATH_INFO'];
-		}
 		$query=decodeQuery($_SERVER['QUERY_STRING']);
+	  if ($_PREFS->getPref('url.encoding')=='path')
+	  {
+	  	$pathvar=$_PREFS->getPref('url.pathenvvar');
+			if (isset($_SERVER[$pathvar]))
+			{
+				$path=$_SERVER[$pathvar];
+			}
+	  }
 		if ($_SERVER['REQUEST_METHOD']=='POST')
 		{
 		  $in=@fopen('php://input','rb');
