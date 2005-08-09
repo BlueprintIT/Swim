@@ -36,12 +36,6 @@ table.highlight td {
 	border: 2px blue solid !important;
 }
 
-ul#sidemenu.highlight {
-	margin-top: sidetopgappx;
-	left: 0;
-	width: sidewidthpx;
-}
-
 div#content.highlight {
 	padding-top: 8px;
 	padding-right: 8px;
@@ -77,6 +71,7 @@ div#highlightadmin {
 
 div#sidemenuadmin {
 	position: absolute;
+	top: 0;
 	z-index: 20;
 }
 

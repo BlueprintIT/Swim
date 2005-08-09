@@ -4,7 +4,7 @@
 #define sidewidth 150
 #define footerheight 70
 
-#define sidetopgap 50
+#define sidetopgap 20
 
 #define defaultfont 'Arial Narrow', Arial, Helvetica, sans-serif
 #define paragraphfont Arial, Helvetics, sans-serif
@@ -23,9 +23,25 @@
 
 #define h1color bordertextcolor
 #define h2color yellowborder
+#define linkcolor bordertextcolor
+#define linkvisited yellowborder
+#define linkhover menuhighlight
 
 body {
 	font-family: defaultfont;
 	font-size: 1em;
 	font-weight: normal;
+	color: black;
+}
+
+a {
+	color: linkcolor;
+}
+
+a:visited {
+	color: linkvisited;
+}
+
+a:hover, a:visited:hover {
+	color: linkhover;
 }

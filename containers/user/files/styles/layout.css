@@ -103,24 +103,27 @@ div#menubar {
 	height: 100%;
 }
 
+div#sidebar {
+	position: absolute;
+	width: -swim-calc(sidewidth-2)px;	
+}
+
 h1#sidetitle {
 	font-weight: bold;
 	padding-left: 5px;
-	width: -swim-calc(sidewidth-2)px;
 	background: transparent;
-	position: absolute;
 	font-size: 1.2em;
 }
 
 *#sidemenu {
 	margin: 0;
-	margin-top: -swim-calc(sidetopgap+2)px;
+	border-left: 2px solid yellowborder;
+	border-top: 2px solid yellowborder;
+	border-bottom: 2px solid yellowborder;
+	margin-top: -swim-calc(sidetopgap)px;
 	padding: 0;
-	position: absolute;
-	left: 2px;
 	z-index: 10;
-	width: -swim-calc(sidewidth-2)px;
-	background: yellowborder;
+	width: 100%;
 }
 
 div#body {
