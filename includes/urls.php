@@ -203,6 +203,8 @@ class Request
 	
 	function &decodeCurrentRequest()
 	{
+		global $_PREFS;
+		
 		$path='';
 		$query=decodeQuery($_SERVER['QUERY_STRING']);
 	  if ($_PREFS->getPref('url.encoding')=='path')
@@ -211,6 +213,15 @@ class Request
 			if (isset($_SERVER[$pathvar]))
 			{
 				$path=$_SERVER[$pathvar];
+				$pathstart=$_PREFS->getPref('url.pathstart','');
+				if (substr($path,0,strlen($pathstart))==$pathstart)
+				{
+					$path=substr($path,strlen($pathstart));
+				}
+				else
+				{
+					$path='';
+				}
 			}
 	  }
 		if ($_SERVER['REQUEST_METHOD']=='POST')
