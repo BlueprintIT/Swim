@@ -26,9 +26,9 @@ class Page extends Resource
 		$blocks=$this->prefs->getPrefBranch('page.blocks');
 		foreach ($blocks as $key=>$id)
 		{
-			if (substr($key,-3,3)=='.id')
+			if (substr($key,-9,9)=='.resource')
 			{
-				$blk=substr($key,0,-3);
+				$blk=substr($key,0,-9);
 				$cont=$this->prefs->getPref('page.blocks.'.$blk.'.container');
 				if ($cont!='page')
 				{
