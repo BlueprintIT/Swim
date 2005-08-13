@@ -26,8 +26,8 @@ $commit->nested=&$request->nested;
 <?= $commit->getFormVars() ?>
 <table>
 <tr>
-	<td style="vertical-align: top">Title:</td>
-	<td style="vertical-align: top"><input type="input" name="page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
+	<td style="vertical-align: top"><label for="title">Title:</label></td>
+	<td style="vertical-align: top"><input type="input" id="title" name="page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
 	<td style="vertical-align: top">The page title is displayed in the browser title bar.</td>
 </tr>
 <?
@@ -38,8 +38,8 @@ $commit->nested=&$request->nested;
 		{
 ?>
 <tr>
-	<td style="vertical-align: top">Layout:</td>
-	<td style="vertical-align: top"><select name="layout">
+	<td style="vertical-align: top"><label for="layout">Layout:</label></td>
+	<td style="vertical-align: top"><select name="layout" id="layout">
 <?
 			foreach ($layouts as $id => $layout)
 			{
@@ -56,19 +56,25 @@ $commit->nested=&$request->nested;
 	}
 ?>
 <tr>
-	<td style="vertical-align: top">Description:</td>
-	<td style="vertical-align: top"><textarea name="page.variables.description" cols="40" rows="5"><?= $pageprefs->getPref('page.variables.description','') ?></textarea></td>
+	<td style="vertical-align: top"><label for="description">Description:</label></td>
+	<td style="vertical-align: top"><textarea id="description" name="page.variables.description" cols="40" rows="5"><?= $pageprefs->getPref('page.variables.description','') ?></textarea></td>
 	<td style="vertical-align: top">The page description is displayed by many search engines. If left blank search engines will normally display the first
 	 paragraph of the page instead.</td> 
 </tr>
 <tr>
-	<td style="vertical-align: top">Keywords:</td>
-	<td style="vertical-align: top"><input type="input" name="page.variables.keywords" value="<?= $pageprefs->getPref('page.variables.keywords','') ?>"></td>
+	<td style="vertical-align: top"><label for="keywords">Keywords:</label></td>
+	<td style="vertical-align: top"><input type="input" id="keywords" name="page.variables.keywords" value="<?= $pageprefs->getPref('page.variables.keywords','') ?>"></td>
 	<td style="vertical-align: top">Search engines may use these keywords when indexing this page. Many of the more popular search engines
 	 generally don't place very much weight on this.</td>
 </tr>
 <tr>
-	<td colspan="3"><input type="submit" value="Save"></td>
+	<td colspan="2" style="vertical-align: top">
+		<input type="checkbox" id="makedefault" name="makedefault" value="true"><label for="makedefault">This page is the default page.</label>
+	</td>
+	<td style="vertical-align: top">Makes this page the default home page for the website.</td>
+</tr>
+<tr>
+	<td colspan="2" style="text-align: center"><input type="submit" value="Save"></td><td></td>
 </tr>
 </table>
 </form>
@@ -105,11 +111,14 @@ $commit->nested=&$request->nested;
 ?>
 		</select>
 	</td>
-</tr>
-<tr>
-	<td colspan="2"><input type="submit" value="Revert"></td>
+	<td><input type="submit" value="Revert"></td>
 </tr>
 </table>
+</form>
+<hr>
+<form action="<?= $request->nested->encodePath() ?>" method="GET">
+<?= $request->nested->getFormVars() ?>
+<div style="text-align: center;"><input type="submit" value="Cancel changes"></div>
 </form>
 <?
 		}

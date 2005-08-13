@@ -118,3 +118,8 @@ if (isset($format))
 <?
 }
 ?>
+<hr>
+<form action="<?= $request->nested->encodePath() ?>" method="GET">
+<?= $request->nested->getFormVars() ?>
+<div style="text-align: center;"><input type="submit" value="Cancel changes"></div>
+</form>

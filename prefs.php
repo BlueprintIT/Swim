@@ -174,6 +174,15 @@ class Preferences
 	}
 }
 
+function saveSitePreferences()
+{
+	global $_PREFS;
+	
+	$file=fopen('site.conf','w');
+	$_PREFS->savePreferences($file);
+	fclose($file);
+}
+
 function init()
 {
 	global $_PREFS;
@@ -183,16 +192,13 @@ function init()
 	$default->loadPreferences($file);
 	fclose($file);
 	
-	$siteprefs = new Preferences();
-	$file=fopen('site.conf','r');
-	$siteprefs->loadPreferences($file);
-	fclose($file);
-	$siteprefs->setParent($default);
-	
-	$default->setDelegate($siteprefs);
-
 	$_PREFS = new Preferences();
-	$_PREFS->setParent($siteprefs);
+	$file=fopen('site.conf','r');
+	$_PREFS->loadPreferences($file);
+	fclose($file);
+	$_PREFS->setParent($default);
+	
+	$default->setDelegate($_PREFS);
 }
 
 init();

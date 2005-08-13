@@ -40,6 +40,17 @@ function method_docreate(&$request)
 	
 				$newpage=&$container->createPage($layout);
 					
+				if (isset($request->query['makedefault']))
+				{
+					if ($request->query['makedefault']=='true')
+					{
+						$_PREFS->setPref('method.view.defaultresource',$newpage->getPath());
+						$_PREFS->setPref('method.admin.defaultresource',$newpage->getPath());
+						saveSitePreferences();
+					}
+					unset($request->query['makedefault']);
+				}
+				
 				foreach ($request->query as $name => $value)
 				{
 					if (substr($name,0,5)=='page.')
@@ -50,6 +61,7 @@ function method_docreate(&$request)
 				}
 				$newpage->savePreferences();
 				
+
 				$nrequest = new Request();
 				$nrequest->method=$request->nested->method;
 				$nrequest->resource=$container->id.'/page/'.$newpage->id;

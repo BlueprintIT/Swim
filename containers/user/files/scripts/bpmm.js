@@ -593,14 +593,12 @@ MenuItem.prototype = {
 	
 	focus: function()
 	{
-		if (this.parentMenu.parentItem)
-			this.posel.addClass('menufocus');
+		this.posel.addClass('menufocus');
 	},
 	
 	unfocus: function()
 	{
-		if (this.parentMenu.parentItem)
-			this.posel.removeClass('menufocus');
+		this.posel.removeClass('menufocus');
 	},
 	
 	keyPress: function(code)

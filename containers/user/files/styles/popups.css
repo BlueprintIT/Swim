@@ -31,7 +31,9 @@ td.menufocus {
 
 ul.menupopup {
 	background-color: menubackground;
-	border: black 1px solid;
+	border-top: white 1px solid;
+	border-left: white 1px solid;
+	border-right: white 1px solid;
 }
 
 ul.menupopup li.menuitem {
@@ -39,7 +41,7 @@ ul.menupopup li.menuitem {
 	padding: 2px !important;
 	padding-left: 18px !important;
 	margin: 0 !important;
-	border: 1px black solid;
+	border-bottom: 1px white solid;
 	background-position: 0px 45% !important;
 	background-image: none !important;
 	font-family: menufont;

@@ -81,54 +81,62 @@ class CSSHandler
 	{
 		if (strlen($line)==0)
 		{
-			print "";
+			print "\n";
+			return;
 		}
-		else if ($line[0]=='#')
+		
+		if ((strlen($line)>=2)&&($line[0]=='/')&&($line[1]=='/'))
+		{
+			print '/*'.substr($line,2).' */'."\n";
+			return;
+		}
+
+		if ($line[0]=='#')
 		{
 			$type=substr($line,1,strpos($line,' ')-1);
 			$content=substr($line,2+strlen($type));
 			if ($type=='define')
 			{
 				$this->processDefine($content);
+				return;
 			}
 			else if ($type=='include')
 			{
 				$this->processInclude($content);
+				return;
 			}
 		}
-		else
+
+		$line=$this->applyDefines($line);
+		$pos=strpos($line,"-swim-");
+		while ($pos!==false)
 		{
-			$line=$this->applyDefines($line);
-			$pos=strpos($line,"-swim-");
-			while ($pos!==false)
+			$start=substr($line,0,$pos);
+			$spos=strpos($line,"(",$pos);
+			$epos=strpos($line,")",$spos);
+			$type=substr($line,$pos+6,$spos-($pos+6));
+			$content=substr($line,$spos+1,$epos-($spos+1));
+			$end=substr($line,$epos+1);
+			
+			if ($type=='url')
 			{
-				$start=substr($line,0,$pos);
-				$spos=strpos($line,"(",$pos);
-				$epos=strpos($line,")",$spos);
-				$type=substr($line,$pos+6,$spos-($pos+6));
-				$content=substr($line,$spos+1,$epos-($spos+1));
-				$end=substr($line,$epos+1);
-				
-				if ($type=='url')
-				{
-					$result=$this->evaluateUrl($content);
-				}
-				else if ($type=='calc')
-				{
-					$result=$this->evaluateCalc($content);
-				}
-				if (isset($result))
-				{
-					$line=$start.$result.$end;
-				}
-				else
-				{
-					$pos+=1;
-				}
-				$pos=strpos($line,'-swim-',$pos);
+				$result=$this->evaluateUrl($content);
 			}
-			print($line);
+			else if ($type=='calc')
+			{
+				$result=$this->evaluateCalc($content);
+			}
+			if (isset($result))
+			{
+				$line=$start.$result.$end;
+			}
+			else
+			{
+				$pos+=1;
+			}
+			$pos=strpos($line,'-swim-',$pos);
 		}
+		print($line."\n");
 	}
 	
 	function parse(&$resource)
@@ -140,7 +148,7 @@ class CSSHandler
 		$lines=explode("\n",$css);
 		foreach ($lines as $line)
 		{
-			$this->outputLine($line);
+			$this->outputLine(substr($line,0,-1));
 		}
 	}
 	

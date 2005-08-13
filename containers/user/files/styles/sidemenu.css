@@ -2,7 +2,6 @@
 
 ul#sidemenu {
 	width: -swim-calc(sidewidth-2)px;
-	background: yellowborder;
 }
 
 ul#sidemenu li.level1 {

@@ -39,6 +39,7 @@ div#header {
 	background-image: -swim-url('global/file/images/banner.jpg');
 	background-position: -swim-calc(sidewidth+SPACING)px 0;
 	background-repeat: repeat-x;
+	z-index: 5;
 }
 
 div#swim {
@@ -92,9 +93,10 @@ div#menubar {
 	top: -swim-calc(headerheight-menuheight)px;
 	left: 0;
 	height: menuheightpx;
+	z-index: 10;
 }
 
-*#menu {
+#menu {
 	margin: 0;
 	border: 0;
 	border-top: 1px white solid;
@@ -111,17 +113,19 @@ div#sidebar {
 h1#sidetitle {
 	font-weight: bold;
 	padding-left: 5px;
-	background: transparent;
 	font-size: 1.2em;
+	background: yellowborder;
 }
 
-*#sidemenu {
+#sidemenu {
 	margin: 0;
 	border-left: 2px solid yellowborder;
 	border-top: 2px solid yellowborder;
 	border-bottom: 2px solid yellowborder;
+//	background: yellowborder;
 	margin-top: -swim-calc(sidetopgap)px;
 	padding: 0;
+	position: absolute;
 	z-index: 10;
 	width: 100%;
 }

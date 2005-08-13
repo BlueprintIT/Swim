@@ -157,6 +157,18 @@ function method_commit(&$request)
 			else if ($resource->isPage())
 			{
 				$newpage=&$resource->makeNewVersion();
+
+				if (isset($request->query['makedefault']))
+				{
+					if ($request->query['makedefault']=='true')
+					{
+						$_PREFS->setPref('method.view.defaultresource',$newpage->getPath());
+						$_PREFS->setPref('method.admin.defaultresource',$newpage->getPath());
+						saveSitePreferences();
+					}
+					unset($request->query['makedefault']);
+				}
+				
 				foreach ($request->query as $name => $value)
 				{
 					if (substr($name,0,5)=='page.')
