@@ -34,9 +34,16 @@ if (isset($request->query[$id.':create']))
 }
 else if (isset($request->query[$id.':delete']))
 {
-	$user = new User($request->query[$id.':username']);
-	deleteUser($user);
+	if ($request->query[$id.':username']!='blueprintit')
+	{
+		$user = new User($request->query[$id.':username']);
+		deleteUser($user);
 ?><p class="info">User <?= $request->query[$id.':username'] ?> was deleted.</p><?
+	}
+	else
+	{
+?><p class="warning">The Blueprint IT administrative account cannot be deleted.</p><?
+	}
 }
 
 $users=&getAllUsers();
@@ -71,7 +78,13 @@ foreach (array_keys($users) as $uid)
 <td><?= $user->getName() ?></td>
 <td><?= $type ?></td>
 <td>
+<? if ($user->getUsername()!='blueprintit')
+{
+?>
 <a href="<?= $delete->encode() ?>">Delete</a>
+<?
+}
+?>
 <anchor query:user="<?= $user->getUsername() ?>" method="view" href="/global/page/filestore">View Files</anchor>
 </td>
 </tr>
