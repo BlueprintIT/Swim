@@ -25,7 +25,6 @@ class CSSHandler
 	
 	function processInclude($content)
 	{
-		$content=trim($content);
 		$resource=&Resource::decodeResource($content);
 		if (($resource!==false)&&($resource->exists()))
 		{
@@ -39,7 +38,6 @@ class CSSHandler
 	
 	function processDefine($content)
 	{
-		$content=trim($content);
 		list($text,$def)=explode(' ',$content,2);
 		$this->defines[$text]=$def;
 	}
@@ -51,7 +49,7 @@ class CSSHandler
 	
 	function evaluateUrl($content)
 	{
-		$content=substr($content,1,strlen($content)-2);
+		$content=substr($content,1,-1);
 		$request = new Request();
 		$request->method='view';
 		$request->resource=$content;
@@ -148,7 +146,7 @@ class CSSHandler
 		$lines=explode("\n",$css);
 		foreach ($lines as $line)
 		{
-			$this->outputLine(substr($line,0,-1));
+			$this->outputLine(rtrim($line));
 		}
 	}
 	
