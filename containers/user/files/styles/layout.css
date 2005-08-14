@@ -151,6 +151,14 @@ div#content {
 	margin: 0;
 }
 
+div#content2 {
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-left: 30px;
+	padding-bottom: 30px;
+	margin: 0;
+}
+
 div#footer {
 	margin: 0;
 	padding: 0;

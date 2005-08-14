@@ -133,6 +133,44 @@ class User
 		return $this->user;
 	}
 
+	function hasPrivilege($priv)
+	{
+		if ($priv[strlen($priv)-1]==')')
+		{
+			$pos=strrpos($priv,'(');
+			if ($pos>0)
+			{
+				$type=substr($priv,0,$pos);
+				$value=substr($priv,$pos+1,-1);
+				if ($type=='group')
+				{
+					return $this->inGroup($value);
+				}
+				else if ($type=='user')
+				{
+					return $this->getUsername()==$value;
+				}
+			}
+		}
+		else if ($priv=='*')
+		{
+			return $this->isLoggedIn();
+		}
+		return false;
+	}
+	
+	function hasAnyPrivilege($privs)
+	{
+		foreach ($privs as $priv)
+		{
+			if ($this->hasPrivilege($priv))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	function inAnyGroup($groups)
 	{
 		foreach ($groups as $group)
@@ -198,7 +236,11 @@ class User
 				$lck=lockResourceRead($dir);
 			}
 			$access=fopen($dir.'/access','r');
-			$line=explode(':',trim(fgets($access)));
+			do
+			{
+				$line=trim(fgets($access));
+			} while ($line[0]=='#');
+			$line=explode(':',$line);
 			
 			if ($line[$permission]=='INHERIT')
 			{
@@ -219,6 +261,9 @@ class User
 			while ($line!==false)
 			{
 				$line=trim($line);
+				if ($line[0]=='#')
+					continue;
+					
 				$parts=explode(':',$line);
 				$files=$parts[0];
 				if (($files[0]!='/')||($files[strlen($files)-1]!='/'))
@@ -233,14 +278,14 @@ class User
 					if (strlen($denymatch)>0)
 					{
 						$this->log->debug('Deny match is '.$denymatch);
-						if ($this->inAnyGroup(explode(',',$denymatch)))
+						if ($this->hasAnyPrivilege(explode(',',$denymatch)))
 							return PERMISSION_DENIED;
 					}
 					$allowmatch=$parts[($permission*2)+1];
 					if (strlen($allowmatch)>0)
 					{
 						$this->log->debug('Allow match is '.$allowmatch);
-						if ($this->inAnyGroup(explode(',',$allowmatch)))
+						if ($this->hasAnyPrivilege(explode(',',$allowmatch)))
 						{
 							$perm=PERMISSION_ALLOWED;
 							break;

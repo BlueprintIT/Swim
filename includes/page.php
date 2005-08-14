@@ -40,7 +40,14 @@ class Page extends Resource
 				}
 			}
 		}
-
+		
+		$blocks=$this->getResources('block');
+		foreach (array_keys($blocks) as $id)
+		{
+			$block=&$blocks[$id];
+			$modified=max($modified,$block->getModifiedDate());
+		}
+		
 		return $modified;
 	}
 	

@@ -13,6 +13,33 @@
  * $Revision$
  */
 
+function getReadableFileSize($path)
+{
+	$units = array('bytes','KB','MB','GB','TB');
+	$filesize = filesize($path);
+	
+	$un=0;
+	while (($filesize>1024)&&($un<(count($units)-1)))
+	{
+		$filesize=$filesize/1024;
+		$un++;
+	}
+	$filesize = round($filesize, 2);
+	return $filesize." ".$units[$un];
+}
+
+function recursiveMkDir($dir)
+{
+	if ((strlen($dir)==0)||($dir=='.'))
+		return;
+		
+	if (!is_dir($dir))
+	{
+		recursiveMkDir(dirname($dir));
+		mkdir($dir);
+	}
+}
+
 function recursiveDelete($dir,$ignorelock=false)
 {
 	global $_PREFS;

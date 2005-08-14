@@ -17,5 +17,6 @@ require $_PREFS->getPref('storage.blocks.classes').'/HtmlBlock.php';
 require $_PREFS->getPref('storage.blocks.classes').'/PhpBlock.php';
 require $_PREFS->getPref('storage.blocks.classes').'/MenuBlock.php';
 require $_PREFS->getPref('storage.blocks.classes').'/TemplateBlock.php';
+require $_PREFS->getPref('storage.blocks.classes').'/FileManagerBlock.php';
 
 ?>

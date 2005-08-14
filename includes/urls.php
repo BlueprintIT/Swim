@@ -85,6 +85,57 @@ function decodeQuery($query)
   return $result;
 }
 
+function readURLEncodedPost($in)
+{
+	$line='';
+  while (!feof($in))
+  {
+    $data=fread($in,1024);
+	  $line.=$data;
+	}
+ 	return decodeQuery($line);
+}
+
+function readMultipartPost($in)
+{
+	$query=array();
+	while (!feof($in))
+	{
+		$line=fgets($in);
+		$matches=array();
+		if (preg_match('/Content-disposition:\s*form-data;.*name="([^"]*)"/',$line,$matches))
+		{
+			$orig=$matches[1];
+			$name=$orig;
+			$name=str_replace('.','_',$name);
+			if (isset($_POST[$matches]))
+			{
+				$query[$orig]=$_POST[$name];
+			}
+		}
+	}
+	return $query;
+}
+
+function decodePostQuery()
+{
+	$query=$_POST;
+  $in=@fopen('php://input','rb');
+  if ($in!==false)
+  {
+  	if ($_SERVER['Content-Type']=='application/x-www-form-urlencoded')
+  	{
+  		$query=readURLEncodedPost($in);
+  	}
+  	else if ($_SERVER['Content-Type']=='multipart/form-data')
+  	{
+  		$query=readMultiPartPost($in);
+  	}
+		fclose($in);
+  }
+	return $query;
+}
+
 function redirect($request)
 {
 	$url=$request->encode();
@@ -226,22 +277,8 @@ class Request
 	  }
 		if ($_SERVER['REQUEST_METHOD']=='POST')
 		{
-		  $in=@fopen('php://input','rb');
-		  if ($in!==false)
-		  {
-		  	$line='';
-			  while (!feof($in))
-			  {
-			    $data=fread($in,1024);
-				  $line.=$data;
-				}
-		  	fclose($in);
-		  	$query=array_merge($query,decodeQuery($line));
-		  }
-		  else if (isset($_POST))
-			{
-				$query=array_merge($query,$_POST);
-			}
+			$postvars = decodePostQuery();
+			$query=array_merge($query,$postvars);
 		}
 		return Request::decode($path,$query);
 	}
