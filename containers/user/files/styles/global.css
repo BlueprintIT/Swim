@@ -22,6 +22,14 @@ p {
 	font-family: paragraphfont;
 }
 
+p.info {
+	color: blue;
+}
+
+p.warning {
+	color: red;
+}
+
 ul, ol {
 	font-family: paragraphfont;
 }

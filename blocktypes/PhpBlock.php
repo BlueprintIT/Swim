@@ -20,11 +20,16 @@ class PhpBlock extends Block
 		$this->Block($container,$id,$version);
 	}
 	
+	function getModifiedDate()
+	{
+		return time();
+	}
+
 	function displayContent(&$parser,$attrs,$text)
 	{
 		global $_USER;
 		
-		$request=$parser->data['request'];
+		$request=&$parser->data['request'];
 		$prefs=&$this->prefs;
 		$log = &LoggerManager::getLogger('page');
 		$name=$this->prefs->getPref('block.phpblock.filename','block.php');

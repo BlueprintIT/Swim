@@ -74,10 +74,19 @@ class User
 	var $log;
 	var $logged = false;
 	
-	function User($username)
+	function User($username=false)
 	{
 		$this->log = &LoggerManager::getLogger('swim.user');
-		$this->become($username);
+		if ($username!==false)
+		{
+			$this->become($username);
+		}
+		else
+		{
+			$this->user='guest';
+			$this->groups=array();
+			$this->account=array();
+		}
 	}
 	
 	function __sleep()
@@ -91,14 +100,56 @@ class User
 		$this->log = &LoggerManager::getLogger('swim.user');
 	}
 	
+	function setPassword($password)
+	{
+		$this->account['password']=md5($password);
+	}
+	
+	function store()
+	{
+		global $_PREFS;
+		$file = $_PREFS->getPref('security.database');
+    if (is_writable($file))
+    {
+			if (lockSecurityWrite())
+			{
+				$lines = array();
+	      $source=fopen($file,'r');
+	      while (!feof($source))
+	      {
+	        $line=trim(fgets($source));
+        	$details=explode(':',$line);
+        	if ($details[0]!=$this->username)
+        	{
+        		$lines[]=$line;
+        	}
+	      }
+	      fclose($source);
+	      $source=fopen($file,'w');
+	      foreach ($lines as $line)
+	      {
+	      	fwrite($source,$line."\n");
+	      }
+	      $line=$this->account['username'].':'.$this->account['password'].':'.$this->account['groups'].':'.$this->account['name'];
+	      fwrite($source,$line."\n");
+	      fclose($source);
+	      unlockSecurity();
+      }
+  	}
+	}
+	
+	function loadFromDescriptor($line)
+	{
+		$this->logged=false;
+  	$details=explode(':',$line);
+		$this->user=$details[0];
+  	$this->account = array('username'=>$details[0],'password'=>$details[1],'groups'=>$details[2],'name'=>$details[3]);
+  	$this->groups = explode(',',$this->account['groups']);
+	}
+	
 	function become($username)
 	{
 		global $_PREFS;
-		
-		$this->user=$username;
-		$this->groups = array();
-		$this->account = array();
-		$this->logged=false;
 		
 		$file = $_PREFS->getPref('security.database');
     if (is_readable($file))
@@ -111,9 +162,7 @@ class User
 	        $line=trim(fgets($source));
 	        if (substr($line,0,strlen($username)+1)==$username.':')
 	        {
-	        	$details=explode(':',$line);
-	        	$this->account = array('username'=>$details[0],'password'=>$details[1],'groups'=>$details[2]);
-	        	$this->groups = explode(',',$this->account['groups']);
+	        	$this->loadFromDescriptor($line);
 	        	break;
 	        }
 	      }
@@ -131,6 +180,16 @@ class User
 	function getUsername()
 	{
 		return $this->user;
+	}
+	
+	function getName()
+	{
+		return $this->account['name'];
+	}
+
+	function setName($value)
+	{
+		$this->account['name']=$value;
 	}
 
 	function hasPrivilege($priv)
@@ -195,6 +254,44 @@ class User
 		return true;
 	}
 		
+	function addGroup($group)
+	{
+		if (!in_array($group,$this->groups))
+		{
+			$this->groups[]=$group;
+			if (strlen($this->account['groups'])>0)
+			{
+				$this->account['groups'].=',';
+			}
+			$this->account['groups'].=$group;
+		}
+	}
+	
+	function removeGroup($group)
+	{
+		$nwgroups=array();
+		$this->account['groups']='';
+		foreach ($this->groups as $grp)
+		{
+			if ($grp!=$group)
+			{
+				$newgroups[]=$grp;
+				$this->account['groups'].=','.$grp;
+			}
+		}
+		if (strlen($this->account['groups'])>0)
+		{
+			$this->account['groups']=substr($this->account['groups'],1);
+		}
+		$this->groups=$nwgroups;
+	}
+	
+	function clearGroups()
+	{
+		$this->groups=array();
+		$this->account['groups']='';
+	}
+	
 	function inGroup($group)
 	{
 		$result=in_array($group,$this->groups);
@@ -370,6 +467,78 @@ class User
 		//return true;
 		$this->log->debug('Checking canWrite');
 		return $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
+	}
+}
+
+function &createUser($username)
+{
+	$user = new User($username);
+	if ($user->user==$username)
+	{
+		return false;
+	}
+	$user->user=$username;
+	$user->account['username']=$username;
+	return $user;
+}
+
+function deleteUser(&$user)
+{
+	global $_PREFS;
+	
+	$file = $_PREFS->getPref('security.database');
+	if (is_writable($file))
+	{
+		$users=array();
+		lockSecurityWrite();
+	  $lines=array();
+	  $source=fopen($file,'r');
+	  while (!feof($source))
+	  {
+      $line=trim(fgets($source));
+    	$details=explode(':',$line);
+    	if ($details[0]!=$user->getUsername())
+    	{
+    		$lines[]=$line;
+    	}
+    }
+    fclose($source);
+    $source=fopen($file,'w');
+    foreach ($lines as $line)
+    {
+    	fwrite($source,$line."\n");
+    }
+    fclose($source);
+	  unlockSecurity();
+	}
+}
+
+function &getAllUsers()
+{
+	global $_PREFS;
+	$file = $_PREFS->getPref('security.database');
+	if (is_readable($file))
+	{
+		$users=array();
+		lockSecurityRead();
+	  $source=fopen($file,'r');
+	  while (!feof($source))
+	  {
+	    $line=trim(fgets($source));
+	    if (strlen($line)>0)
+	    {
+		    $user = new User();
+		    $user->loadFromDescriptor($line);
+		    $users[$user->getUsername()]=&$user;
+		    unset($user);
+	    }
+	  }
+		unlockSecurity();
+		return $users;
+	}
+	else
+	{
+		return array();
 	}
 }
 
