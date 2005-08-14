@@ -490,7 +490,7 @@ class Resource
 	{
 		if (!isset($this->modified))
 		{
-			if ($this->prefs->preferences['resource.modified'])
+			if (isset($this->prefs->preferences['resource.modified']))
 			{
 				$this->modified=$this->prefs->preferences['resource.modified'];
 			}

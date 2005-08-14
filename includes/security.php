@@ -181,9 +181,16 @@ class User
 	
 	function checkSpecificPermission($permission,$dir,$file,$lock)
 	{
+		$perm=PERMISSION_UNKNOWN;
+		
+		if ((!isset($file))||(strlen($file)==0))
+		{
+			$this->log->error('Bad file specified in permissions check. Bailing out.');
+			$this->log->debug('Dir was '.$dir);
+			return $perm;
+		}
 		$this->log->debug('Checking permission on '.$file.' in dir '.$dir);
 		
-		$perm=PERMISSION_UNKNOWN;
 		if (is_readable($dir.'/access'))
 		{
 			if ($lock)
@@ -256,10 +263,11 @@ class User
 		global $_PREFS;
 		
 		$resource->lockRead();
-		if ($resource->isFile())
+		if (($resource->isFile())&&(strlen($resource->id)>0))
 		{
 			$file=basename($resource->id);
 			$dir=dirname($resource->id);
+			$this->log->debug('Checking permissions on '.$dir.' '.$file.' '.($resource->id));
 			while ($dir!='.')
 			{
 				$perm=$this->checkSpecificPermission($permission,$resource->getDir().'/'.$dir,$file,false);
@@ -280,18 +288,18 @@ class User
 		
 		$resource->unlock();
 		
+		while (isset($resource->parent))
+		{
+			$resource=&$resource->parent;
+			$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,false);
+			if ($perm!=PERMISSION_UNKNOWN)
+				return $perm;
+		}
+		
 		$container=&$resource->container;
 		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,true);
 		if ($perm!=PERMISSION_UNKNOWN)
 			return $perm;
-		
-		if (is_a($container,'Page'))
-		{
-			$container=&$container->container;
-			$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,true);
-			if ($perm!=PERMISSION_UNKNOWN)
-				return $perm;
-		}
 		
 		return $this->checkSpecificPermission($permission,$_PREFS->getPref('storage.basedir'),$file,true);
 	}

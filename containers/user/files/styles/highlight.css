@@ -12,14 +12,14 @@ div#highlight p {
 	margin-bottom: 0.5em;
 }
 
-div#highlightMain {
+#highlightMain {
 	padding: 10px;
 	margin-top: 20px;
 	margin-left: 20px;
 	background-color: highlightMainColor;
 }
 
-div#highlightTitle {
+#highlightTitle {
 	float: left;
 	padding: 10px;
 	margin-bottom: 20px;
@@ -27,14 +27,14 @@ div#highlightTitle {
 	width: 250px;
 }
 
-div#highlightTitle p {
+#highlightTitle p {
 	text-align: center;
 	font-size: 1.2em;
 	font-family: paragraphfont;
 	color: bordertextcolor;
 }
 
-div#highlightMain p {
+#highlightMain p {
 	color: bordertextcolor;
 	text-align: left;
 }

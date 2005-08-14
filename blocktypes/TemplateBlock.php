@@ -64,9 +64,14 @@ class TemplateBlock extends HtmlBlock
 			$parser->startBuffer();
 			if ($data['request']->method=='admin')
 			{
+				$id=$data['blockid'];
+				if (isset($attrs['reference']))
+				{
+					$id=$attrs['reference'];
+				}
 ?>
 <div class="adminpanel fileadmin">
-	<editlink block="<?= $data['blockid'] ?>" file="<?= $attrs['src'] ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</editlink>
+	<anchor query:reference="<?= $id ?>" nest="true" query:file="<?= $attrs['src'] ?>" method="edit" href="/<?= $this->getPath() ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</anchor>
 </div>
 <?
 			}

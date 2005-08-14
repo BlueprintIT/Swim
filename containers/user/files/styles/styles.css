@@ -6,7 +6,7 @@
 
 #define sidetopgap 20
 
-#define defaultfont Arial, Helvetics, sans-serif
+#define defaultfont Arial, Helvetica, sans-serif
 #define narrowfont 'Arial Narrow', Arial, Helvetica, sans-serif
 #define paragraphfont defaultfont
 #define borderfont narrowfont

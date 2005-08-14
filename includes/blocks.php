@@ -97,7 +97,7 @@ class Block extends Resource
 		if ($this->canEdit($request,$data,$attrs))
 		{
 ?>
-		<editlink block="<?= $data['blockid'] ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</editlink>
+		<anchor query:reference="<?= $data['blockid'] ?>" method="edit" nest="true" href="/<?= $this->getPath() ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</anchor>
 <?
 		}
 ?>
