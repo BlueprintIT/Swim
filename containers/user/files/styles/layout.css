@@ -16,6 +16,7 @@ body {
 	background-image: -swim-url('global/file/images/background.gif');
 	background-position: top left;
 	background-repeat: no-repeat;
+	z-index: 0;
 }
 
 div#searchbox {
@@ -107,7 +108,8 @@ div#menubar {
 
 div#sidebar {
 	position: absolute;
-	width: -swim-calc(sidewidth-2)px;	
+	width: -swim-calc(sidewidth-2)px;
+	z-index: 10;
 }
 
 h1#sidetitle {
@@ -126,7 +128,6 @@ h1#sidetitle {
 	margin-top: -swim-calc(sidetopgap)px;
 	padding: 0;
 	position: absolute;
-	z-index: 10;
 	width: 100%;
 }
 
@@ -168,6 +169,7 @@ div#footer {
 	overflow: hidden;
 	height: footerheightpx;
 	background-color: yellowborder;
+	z-index: 0;
 }
 
 div#base {
@@ -187,6 +189,7 @@ div#curve {
 	height: 104px;
 	background-image: -swim-url('global/file/images/curve.gif');
 	background-color: transparent;
+	z-index: 1;
 }
 
 p#mission {
