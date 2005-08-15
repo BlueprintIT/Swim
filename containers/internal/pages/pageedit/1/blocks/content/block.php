@@ -69,7 +69,12 @@ $commit->nested=&$request->nested;
 </tr>
 <tr>
 	<td colspan="2" style="vertical-align: top">
-		<input type="checkbox" id="makedefault" name="makedefault" value="true"><label for="makedefault">This page is the default page.</label>
+		<input type="checkbox" id="makedefault" name="makedefault" value="true"<?
+if (($page!==false)&&($page->getPath()==$this->prefs->getPref('method.view.defaultresource')))
+{
+	print(' checked="checked" disabled="true"');
+}
+?>><label for="makedefault">This page is the default page.</label>
 	</td>
 	<td style="vertical-align: top">Makes this page the default home page for the website.</td>
 </tr>
