@@ -98,6 +98,7 @@ function readURLEncodedPost($in)
 
 function readMultipartPost($in)
 {
+	$log=&LoggerManager::getLogger('swim.urls');
 	$query=array();
 	while (!feof($in))
 	{
@@ -106,6 +107,7 @@ function readMultipartPost($in)
 		if (preg_match('/Content-disposition:\s*form-data;.*name="([^"]*)"/',$line,$matches))
 		{
 			$orig=$matches[1];
+			$log->warn('Read post param '.$orig);
 			$name=$orig;
 			$name=str_replace('.','_',$name);
 			if (isset($_POST[$matches]))
@@ -119,20 +121,35 @@ function readMultipartPost($in)
 
 function decodePostQuery()
 {
+	$log=&LoggerManager::getLogger('swim.urls');
 	$query=$_POST;
-  $in=@fopen('php://input','rb');
-  if ($in!==false)
-  {
-  	if ($_SERVER['Content-Type']=='application/x-www-form-urlencoded')
-  	{
-  		$query=readURLEncodedPost($in);
-  	}
-  	else if ($_SERVER['Content-Type']=='multipart/form-data')
-  	{
-  		$query=readMultiPartPost($in);
-  	}
-		fclose($in);
-  }
+	if (isset($_SERVER['CONTENT_TYPE']))
+	{
+		$ct=$_SERVER['CONTENT_TYPE'];
+		$pos=strpos($ct,';');
+		if ($pos>0)
+		{
+			$ct=substr($ct,0,$pos);
+		}
+	  $in=@fopen('php://input','rb');
+	  if ($in!==false)
+	  {
+	  	if ($ct=='application/x-www-form-urlencoded')
+	  	{
+	  		$query=readURLEncodedPost($in);
+	  	}
+	  	else if ($ct=='multipart/form-data')
+	  	{
+//	  		$query=readMultiPartPost($in);
+	  	}
+			fclose($in);
+	  }
+	}
+	else
+	{
+		$log->warn('No Content Type. Logging $_SERVER');
+		$log->warn($_SERVER);
+	}
 	return $query;
 }
 

@@ -69,8 +69,8 @@ function logout()
 class User
 {
 	var $user;
-	var $groups;
-	var $account;
+	var $groups = array();
+	var $account = array();
 	var $log;
 	var $logged = false;
 	

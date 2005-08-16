@@ -188,9 +188,19 @@ class Logger
 	
 	function output($level,$text,$trace)
 	{
-		$trace['level']=$level;
-		$trace['text']=$text;
-		$this->doOutput($this,$trace);
+		if (is_array($text))
+		{
+			foreach ($text as $name => $value)
+			{
+				$this->output($level,'"'.$name.'" => "'.$value.'"',$trace);
+			}
+		}
+		else
+		{
+			$trace['level']=$level;
+			$trace['text']=$text;
+			$this->doOutput($this,$trace);
+		}
 	}
 	
 	function getStackTrace()
