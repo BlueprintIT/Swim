@@ -41,7 +41,7 @@ function lockResourceRead($dir,$id=false)
 	}
 	else
 	{
-	  $log->warn('Lock failed');
+	  $log->warntrace('Lock failed on dir '.$dir);
 		return false;
 	}
 }
@@ -72,7 +72,7 @@ function lockResourceWrite($dir,$id=false)
 	}
 	else
 	{
-	  $log->warn('Lock failed');
+	  $log->warntrace('Lock failed on dir '.$dir);
 		return false;
 	}
 }
@@ -92,7 +92,7 @@ function unlockResource($id)
 	}
 	else
 	{
-		$log->warn('Attempt to unlock unlocked id '.$id);
+		$log->warntrace('Attempt to unlock unlocked id '.$id);
 	}
 }
 

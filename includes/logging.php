@@ -24,11 +24,13 @@ define('SWIM_LOG_ALL',2000);
 class LogOutput
 {
 	var $pattern;
+	var $tracePattern;
 	var $level = SWIM_LOG_ALL;
 	
 	function LogOutput()
 	{
 		$pattern='';
+		$tracePattern='';
 	}
 	
 	function setLevel($level)
@@ -62,32 +64,46 @@ class LogOutput
 		return $text;
 	}
 	
+	function convertTrace(&$logger,$detail)
+	{
+		$detail['txtlevel']='UNKNOWN';
+		switch($detail['level'])
+		{
+			case SWIM_LOG_FATAL:
+				$detail['txtlevel']='FATAL';
+				break;
+			case SWIM_LOG_ERROR:
+				$detail['txtlevel']='ERROR';
+				break;
+			case SWIM_LOG_WARN:
+				$detail['txtlevel']='WARN';
+				break;
+			case SWIM_LOG_INFO:
+				$detail['txtlevel']='INFO';
+				break;
+			case SWIM_LOG_DEBUG:
+				$detail['txtlevel']='DEBUG';
+				break;
+		}
+		$detail['logger']=$logger->name;
+		return $detail;
+	}
+	
 	function output(&$logger,$detail)
 	{
 		if ($detail['level']<=$this->level)
 		{
-			$detail['txtlevel']='UNKNOWN';
-			switch($detail['level'])
-			{
-				case SWIM_LOG_FATAL:
-					$detail['txtlevel']='FATAL';
-					break;
-				case SWIM_LOG_ERROR:
-					$detail['txtlevel']='ERROR';
-					break;
-				case SWIM_LOG_WARN:
-					$detail['txtlevel']='WARN';
-					break;
-				case SWIM_LOG_INFO:
-					$detail['txtlevel']='INFO';
-					break;
-				case SWIM_LOG_DEBUG:
-					$detail['txtlevel']='DEBUG';
-					break;
-			}
-			$detail['logger']=$logger->name;
-			
+			$detail=$this->convertTrace($logger,$detail);
 			$this->internalOutput($this->convertPattern($this->pattern,$detail));
+		}
+	}
+	
+	function outputTrace(&$logger,$detail)
+	{
+		if ($detail['level']<=$this->level)
+		{
+			$detail=$this->convertTrace($logger,$detail);
+			$this->internalOutput($this->convertPattern($this->tracePattern,$detail));
 		}
 	}
 }
@@ -101,6 +117,7 @@ class FileLogOutput extends LogOutput
 		$this->LogOutput();
 		$this->filename=$filename;
 		$this->pattern="[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])\n";
+		$this->tracePattern="[$[txtlevel]] $[logger]: $[function] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
@@ -119,6 +136,7 @@ class PageLogOutput extends LogOutput
 	{
 		$this->LogOutput();
 		$this->pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
+		$this->tracePattern="<b>[$[txtlevel]]</b> $[logger]: $[function] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
@@ -174,54 +192,105 @@ class Logger
 		$this->level=$level;
 	}
 	
-	function doOutput(&$logger,$detail)
+	function &getOutputter()
 	{
 		if (isset($this->output))
 		{
-			$this->output->doOutput($logger,$detail);
+			return $this->output;
 		}
 		else
 		{
-			$this->parent->doOutput($logger,$detail);
+			return $this->parent->getOutputter();
 		}
 	}
 	
-	function output($level,$text,$trace)
-	{
-		if (is_array($text))
-		{
-			foreach ($text as $name => $value)
-			{
-				$this->output($level,'"'.$name.'" => "'.$value.'"',$trace);
-			}
-		}
-		else
-		{
-			$trace['level']=$level;
-			$trace['text']=$text;
-			$this->doOutput($this,$trace);
-		}
-	}
-	
-	function getStackTrace()
+	function buildStackTrace()
 	{
 		$trace=debug_backtrace();
-		if (count($trace)<4)
-			return;
-		$calledfrom=$trace[2];
-		$calledfrom['function']=$trace[3]['function'];
-		return $calledfrom;
+		$result = array();
+
+		$diff=3;
+		$pos=0;
+		$tpos=$diff;
+		$count=count($trace)-$diff;
+		while ($pos<$count)
+		{
+			if (isset($trace[$tpos]['class']))
+			{
+				$result[$pos]['function']=$trace[$tpos]['class'].$trace[$tpos]['type'].$trace[$tpos]['function'];
+			}
+			else
+			{
+				$result[$pos]['function']=$trace[$tpos]['function'];
+			}
+				$result[$pos]['args']=$trace[$tpos]['args'];
+			$result[$pos]['line']=$trace[$tpos-1]['line'];
+			$result[$pos]['file']=$trace[$tpos-1]['file'];
+			$pos++;
+			$tpos++;
+		}
+		$result[$pos]['line']=$trace[$tpos-1]['line'];
+		$result[$pos]['file']=$trace[$tpos-1]['file'];
+		$result[$pos]['args']=array();
+		$result[$pos]['function']='';
+		
+		return $result;
 	}
 	
 	function log($level,$text,$trace = null)
 	{
 		if ($this->getLevel()>=$level)
 		{
+			$out = &$this->getOutputter();
 			if (!isset($trace))
 			{
-				$trace=$this->getStackTrace();
+				$trace=$this->buildStackTrace();
 			}
-			$this->output($level,$text,$trace);
+			$trace=$trace[0];
+			$trace['level']=$level;
+			$trace['text']=$text;
+			if (is_array($text))
+			{
+				foreach ($text as $name => $value)
+				{
+					$trace['text']='"'.$name.'" => "'.$value.'"';
+				}
+			}
+			$out->output($this,$trace);
+		}
+	}
+	
+	function logtrace($level,$text,$trace = null)
+	{
+		if ($this->getLevel()>=$level)
+		{
+			$out = &$this->getOutputter();
+
+			if (!isset($trace))
+			{
+				$trace=$this->buildStackTrace();
+			}
+			$base=$trace[0];
+			$base['level']=$level;
+			$base['text']=$text;
+			if (is_array($text))
+			{
+				foreach ($text as $name => $value)
+				{
+					$base['text']='"'.$name.'" => "'.$value.'"';
+					$out->output($this,$base);
+				}
+			}
+			else
+			{
+				$out->output($this,$base);
+			}
+
+			foreach ($trace as $line)
+			{
+				$line['level']=$level;
+				$out->outputTrace($this,$line);
+			}
 		}
 	}
 	
@@ -230,9 +299,19 @@ class Logger
 		$this->log(SWIM_LOG_FATAL,$text);
 	}
 	
+	function fataltrace($text)
+	{
+		$this->logtrace(SWIM_LOG_FATAL,$text);
+	}
+	
 	function error($text)
 	{
 		$this->log(SWIM_LOG_ERROR,$text);
+	}
+	
+	function errortrace($text)
+	{
+		$this->logtrace(SWIM_LOG_ERROR,$text);
 	}
 	
 	function warn($text)
@@ -240,14 +319,29 @@ class Logger
 		$this->log(SWIM_LOG_WARN,$text);
 	}
 	
+	function warntrace($text)
+	{
+		$this->logtrace(SWIM_LOG_WARN,$text);
+	}
+	
 	function info($text)
 	{
 		$this->log(SWIM_LOG_INFO,$text);
 	}
 	
+	function infotrace($text)
+	{
+		$this->logtrace(SWIM_LOG_INFO,$text);
+	}
+	
 	function debug($text)
 	{
 		$this->log(SWIM_LOG_DEBUG,$text);
+	}
+	
+	function debugtrace($text)
+	{
+		$this->logtrace(SWIM_LOG_DEBUG,$text);
 	}
 	
 	function isFatalEnabled()
@@ -287,9 +381,9 @@ class LoggerManager
 		$this->output = new PageLogOutput();
 	}
 	
-	function doOutput(&$logger,$detail)
+	function &getOutputter()
 	{
-		$this->output->output($logger,$detail);
+		return $this->output;
 	}
 	
 	function getLevel()
@@ -384,6 +478,7 @@ function caught_error($type,$text,$file,$line)
 	$log = &LoggerManager::getLogger('php');
 	
 	$trace = array('file' => $file, 'line' => $line, 'function' => '');
+	$trace = array($trace);
 	
 	if (($type==E_ERROR)||($type==E_PARSE)||($type==E_CORE_ERROR)||($type==E_COMPILE_ERROR))
 	{
