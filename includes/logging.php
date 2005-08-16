@@ -96,7 +96,11 @@ class LogOutput
 				}
 				else if (is_array($arg))
 				{
-					$list.='array,';
+					$list.='Array,';
+				}
+				else if (is_object($arg))
+				{
+					$list.='Object,';
 				}
 				else
 				{
@@ -104,7 +108,7 @@ class LogOutput
 				}
 			}
 			$list=substr($list,0,-1);
-			$details['arglist']='('.$list.')';
+			$detail['arglist']='('.$list.')';
 		}
 		$detail['logger']=$logger->name;
 		return $detail;
