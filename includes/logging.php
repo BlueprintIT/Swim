@@ -85,6 +85,27 @@ class LogOutput
 				$detail['txtlevel']='DEBUG';
 				break;
 		}
+		if (isset($detail['args']))
+		{
+			$list = '';
+			foreach ($detail['args'] as $arg)
+			{
+				if (is_string($arg))
+				{
+					$list.='"'.$arg.'",';
+				}
+				else if (is_array($arg))
+				{
+					$list.='array,';
+				}
+				else
+				{
+					$list.=$arg.',';
+				}
+			}
+			$list=substr($list,0,-1);
+			$details['arglist']='('.$list.')';
+		}
 		$detail['logger']=$logger->name;
 		return $detail;
 	}
@@ -117,7 +138,7 @@ class FileLogOutput extends LogOutput
 		$this->LogOutput();
 		$this->filename=$filename;
 		$this->pattern="[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])\n";
-		$this->tracePattern="[$[txtlevel]] $[logger]: $[function] ($[file]:$[line])\n";
+		$this->tracePattern="[$[txtlevel]] $[logger]: $[function]$[arglist] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
@@ -136,7 +157,7 @@ class PageLogOutput extends LogOutput
 	{
 		$this->LogOutput();
 		$this->pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
-		$this->tracePattern="<b>[$[txtlevel]]</b> $[logger]: $[function] ($[file]:$[line])\n";
+		$this->tracePattern="<b>[$[txtlevel]]</b> $[logger]: $[function]$[arglist] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
@@ -223,7 +244,7 @@ class Logger
 			{
 				$result[$pos]['function']=$trace[$tpos]['function'];
 			}
-				$result[$pos]['args']=$trace[$tpos]['args'];
+			$result[$pos]['args']=$trace[$tpos]['args'];
 			$result[$pos]['line']=$trace[$tpos-1]['line'];
 			$result[$pos]['file']=$trace[$tpos-1]['file'];
 			$pos++;
