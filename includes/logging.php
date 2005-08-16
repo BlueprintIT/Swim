@@ -85,7 +85,7 @@ class LogOutput
 				$detail['txtlevel']='DEBUG';
 				break;
 		}
-		if (isset($detail['args']))
+		if ((isset($detail['args']))&&(count($detail['args'])>0))
 		{
 			$list = '';
 			foreach ($detail['args'] as $arg)
