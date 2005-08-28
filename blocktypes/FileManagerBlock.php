@@ -20,40 +20,48 @@ class FileManagerBlock extends Block
 		$this->Block($container,$id,$version);
 	}
 
-	function getStoreUser($request)
+	function &getStoreResource($request)
 	{
-		global $_USER;
-		
-		if (isset($request->query['user']))
-		{
-			return $request->query['user'];
-		}
-		else
-		{
-			return $_USER->getUsername();
-		}
+		return Resource::decodeResource($request->resource);
 	}
 	
-	function getStoreDir($request)
+	function onDirCreated($request,&$dir)
 	{
-		$user=$this->getStoreUser($request);
-		return $this->prefs->getPref('block.filemanager.storage').'/'.$user;
 	}
 	
 	function checkForDir($request)
 	{
-		$dir=$this->getStoreDir($request);
-		if (!is_dir($dir))
+		$resource=&$this->getStoreResource($request);
+		if ($resource!==null)
 		{
-			recursiveMkDir($dir);
-			$user=$this->getStoreUser($request);
-			$lock=lockResourceWrite($dir);
-			$access=fopen($dir.'/access','w');
-			fwrite($access,'DENY:DENY'."\n");
-			fwrite($access,'*:group(admin),user('.$user.')::group(admin),user('.$user.'):'."\n");
-			unlockResource($lock);
+			if (!$resource->exists())
+			{
+				$resource->mkDir();
+				$this->onDirCreated($request,$resource);
+			}
 		}
-		return $dir;
+		return $resource;
+	}
+	
+	function displayTableHeader()
+	{
+?>
+<th style="width: 20%; text-align: left">Filename</th>
+<th style="width: 50%; text-align: left">Description</th>
+<th style="width: 15%; text-align: left">Size</th>
+<th style="width: 15%; text-align: left">Options</th>
+<?
+	}
+	
+	function displayFileDetails(&$resource,$description,&$delete)
+	{
+		$size=getReadableFileSize($resource->getDir().'/'.$resource->id);
+?>
+<td><anchor method="view" href="/<?= $resource->getFile() ?>"><?= basename($resource->id) ?></anchor></td>
+<td><?= $description ?></td>
+<td><?= $size ?></td>
+<td><a href="<?= $delete->encode() ?>">Delete</a></td>
+<?
 	}
 	
 	// TODO do something a bit cleverer here.
@@ -69,19 +77,17 @@ class FileManagerBlock extends Block
 	function displayContent(&$parser,$attrs,$text)
 	{
 		global $_USER;
+
 		$request=&$parser->data['request'];
-		if (isset($request->query['user']))
+		$resource=$this->checkForDir($request);
+		if (!$_USER->canRead($resource))
 		{
-			if (($request->query['user']!=$_USER->getUsername())&&
-					(!$_USER->inGroup('admin')))
-			{
-				print('You are not allowed to view this file store.');
-				return true;
-			}
+			print('You are not allowed to view this file store.');
+			return true;
 		}
-		$dir=$this->checkForDir($request);
+		$dir=$resource->getDir().'/'.$resource->id;
 		$id=$parser->data['blockid'];
-		$lock=lockResourceRead($dir);
+		$resource->lockRead();
 
 		$descriptions=array();
 		if (is_readable($dir.'/.descriptions'))
@@ -98,19 +104,60 @@ class FileManagerBlock extends Block
 			}
 		}
 
-		if (isset($request->query[$id.':upload']))
+		if ($_USER->canWrite($resource))
 		{
-			$file=$_FILES[$id.':file'];
-			if (($file['error']==UPLOAD_ERR_OK)&&(is_uploaded_file($file['tmp_name'])))
+			if (isset($request->query[$id.':upload']))
 			{
-				if (!is_readable($dir.'/'.$file['name']))
+				$file=$_FILES[$id.':file'];
+				if (($file['error']==UPLOAD_ERR_OK)&&(is_uploaded_file($file['tmp_name'])))
 				{
-					unlockResource($lock);
-					$lock=lockResourceWrite($dir);
-					move_uploaded_file($file['tmp_name'],$dir.'/'.$file['name']);
-					if (isset($request->query[$id.':description']))
+					if (!is_readable($dir.'/'.$file['name']))
 					{
-						$descriptions[$file['name']]=$request->query[$id.':description'];
+						$resource->lockWrite();
+						$resource->unlock();
+						move_uploaded_file($file['tmp_name'],$dir.'/'.$file['name']);
+						if (isset($request->query[$id.':description']))
+						{
+							$descriptions[$file['name']]=$request->query[$id.':description'];
+							$desc=fopen($dir.'/.descriptions','w');
+							foreach ($descriptions as $name => $description)
+							{
+								fwrite($desc,$name.'='.$description."\n");
+							}
+							fclose($desc);
+							unset($request->query[$id.':description']);
+						}
+?><p class="info">File <?= $file['name'] ?> was uploaded.</p><?
+					}
+					else
+					{
+?><p class="warning">Upload failed because a file of that name already exists.</p><?
+					}
+				}
+				else
+				{
+					if ($file['error']==UPLOAD_ERR_INI_SIZE)
+					{
+?><p class="warning">File was too large to be uploaded.</p><?
+					}
+					else
+					{
+?><p class="warning">File upload failed due to a server misconfiguration (error <?= $file['error'] ?>).</p><?
+					}
+				}
+				unset($request->query[$id.':upload']);
+			}
+			else if (isset($request->query[$id.':delete']))
+			{
+				$file=$request->query[$id.':file'];
+				if (is_readable($dir.'/'.$file))
+				{
+					$resource->lockWrite();
+					$resource->unlock();
+					unlink($dir.'/'.$file);
+					if (isset($descriptions[$file]))
+					{
+						unset($descriptions[$file]);
 						$desc=fopen($dir.'/.descriptions','w');
 						foreach ($descriptions as $name => $description)
 						{
@@ -118,45 +165,11 @@ class FileManagerBlock extends Block
 						}
 						fclose($desc);
 					}
-?><p class="info">File <?= $file['name'] ?> was uploaded.</p><?
-				}
-				else
-				{
-?><p class="warning">Upload failed because a file of that name already exists.</p><?
-				}
-			}
-			else
-			{
-				if ($file['error']==UPLOAD_ERR_INI_SIZE)
-				{
-?><p class="warning">File was too large to be uploaded.</p><?
-				}
-				else
-				{
-?><p class="warning">File upload failed due to a server misconfiguration (error <?= $file['error'] ?>).</p><?
-				}
-			}
-		}
-		else if (isset($request->query[$id.':delete']))
-		{
-			$file=$request->query[$id.':file'];
-			if (is_readable($dir.'/'.$file))
-			{
-				unlockResource($lock);
-				$lock=lockResourceWrite($dir);
-				unlink($dir.'/'.$file);
-				if (isset($descriptions[$file]))
-				{
-					unset($descriptions[$file]);
-					$desc=fopen($dir.'/.descriptions','w');
-					foreach ($descriptions as $name => $description)
-					{
-						fwrite($desc,$name.'='.$description."\n");
-					}
-					fclose($desc);
-				}
 ?><p class="info">File <?= $file ?> was deleted.</p><?
+				}
 			}
+			unset($request->query[$id.':file']);
+			unset($request->query[$id.':delete']);
 		}
 		
 		$list=opendir($dir);
@@ -171,10 +184,9 @@ class FileManagerBlock extends Block
 ?>
 <table style="width: 100%">
 <tr>
-<th style="width: 20%; text-align: left">Filename</th>
-<th style="width: 50%; text-align: left">Description</th>
-<th style="width: 15%; text-align: left">Size</th>
-<th style="width: 15%; text-align: left">Options</th>
+<?
+					$this->displayTableHeader();
+?>
 </tr>
 <?
 				}
@@ -187,22 +199,16 @@ class FileManagerBlock extends Block
 				{
 					$description='No description';
 				}
-				$size=getReadableFileSize($dir.'/'.$file);
+				$fileresource=&$resource->getSubfile($file);
 				$delete = new Request();
-				$delete->resource=$request->resource;
-				$delete->method=$request->method;
-				if (isset($request->query['user']))
-				{
-					$delete->query['user'];
-				}
+				$delete=$request;
 				$delete->query[$id.':delete']='true';
 				$delete->query[$id.':file']=$file;
 ?>
 <tr>
-<td><anchor href="/global/file/extranet/<?= $this->getStoreUser($request) ?>/<?= $file ?>"><?= $file ?></anchor></td>
-<td><?= $description ?></td>
-<td><?= $size ?></td>
-<td><a href="<?= $delete->encode() ?>">Delete</a></td>
+<?
+				$this->displayFileDetails($fileresource,$description,$delete);
+?>
 </tr>
 <?
 			}
@@ -219,20 +225,17 @@ No files stored.
 </table>
 <?
 		}
-		unlockResource($lock);
-		$upload = new Request();
-		$upload->resource=$request->resource;
-		$upload->method=$request->method;
-		if (isset($request->query['user']))
+		$resource->unlock();
+		if ($_USER->canWrite($resource))
 		{
-			$upload->query['user'];
-		}
+			$upload=$request;
 ?>
 <form method="POST" action="<?= $upload->encodePath() ?>" enctype="multipart/form-data">
 <?= $upload->getFormVars() ?>
 <p>Upload a file: <input type="file" name="<?= $id ?>:file"> Description: <input type="text" name="<?= $id ?>:description"> <input type="submit" name="<?= $id ?>:upload" value="Upload"></p>
 </form>
 <?
+		}
 		return true;
 	}
 }

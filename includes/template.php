@@ -271,8 +271,13 @@ class Template extends Resource
 	
 	function displayStylesheet(&$parser,$tag,$attrs,$text)
 	{
-		$link=$this->buildElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$this->generateURL($parser->data,$attrs['src'])),'',false);
-		$parser->data['head'].=$link."\n";
+		$src=$this->generateURL($parser->data,$attrs['src']);
+		if (!isset($parser->data['styles'][$src]))
+		{
+			$link=$this->buildElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$src),'',false);
+			$parser->data['head'].=$link."\n";
+			$parser->data['styles'][$src]=true;
+		}
 		return true;
 	}
 	
@@ -280,8 +285,13 @@ class Template extends Resource
 	{
 		if (isset($attrs['src']))
 		{
-			$script=$this->buildElement($parser,'script',array('type'=>'text/javascript','src'=>$this->generateURL($parser->data,$attrs['src'])));
-			$parser->data['head'].=$script."\n";
+			$src=$this->generateURL($parser->data,$attrs['src']);
+			if (!isset($parser->data['scripts'][$src]))
+			{
+				$script=$this->buildElement($parser,'script',array('type'=>'text/javascript','src'=>$src));
+				$parser->data['head'].=$script."\n";
+				$parser->data['scripts'][$src]=true;
+			}
 		}
 		else
 		{
@@ -556,7 +566,7 @@ class Template extends Resource
 		// Parse the template and display
 		$parser = new TemplateParser();
 		$parser->addEmptyTag("img");
-		$parser->data=array('page'=>&$page,'request'=>&$request,'mode'=>$mode,'head'=>'');
+		$parser->data=array('page'=>&$page,'template'=>&$this,'request'=>&$request,'mode'=>$mode,'head'=>'');
 		$parser->addObserver('head',$this);
 		$parser->addObserver('html',$this);
 		$parser->addObserver('block',$this);
@@ -565,7 +575,7 @@ class Template extends Resource
 		$parser->addObserver('script',$this);
 		$parser->addObserver('applet',$this);
 		$parser->addObserver('image',$this);
-		$parser->addObserver('img',$this);
+		//$parser->addObserver('img',$this);
 		$parser->addObserver('anchor',$this);
 		$parser->addObserver('editlink',$this);
 		$parser->addObserver('if',$this);

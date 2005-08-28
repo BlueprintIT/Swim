@@ -37,7 +37,7 @@ class TemplateBlock extends HtmlBlock
 	{
 		$name=$this->prefs->getPref('block.templateblock.'.$this->getFormat().'.template',$this->prefs->getPref('block.templateblock.template'));
 		$resource = &Resource::decodeResource($name);
-		if ($resource->isFile())
+		if (($resource!==false)&&($resource->isFile()))
 		{
 			$resource->outputFile();
 		}
@@ -46,14 +46,16 @@ class TemplateBlock extends HtmlBlock
 	
 	function registerObservers(&$parser)
 	{
+		$parser->addObserver('img',$parser->data['template']);
 		$parser->addObserver('a',$this);
 		$parser->addObserver('section',$this);
 	}
 	
 	function unregisterObservers(&$parser)
 	{
-		$parser->removeObserver('a',$this);
 		$parser->removeObserver('section',$this);
+		$parser->removeObserver('a',$this);
+		$parser->removeObserver('img',$parser->data['template']);
 	}
 	
 	function observeTag(&$parser,$tagname,$attrs,$text)

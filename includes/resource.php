@@ -586,7 +586,8 @@ class Resource
 		{
 			if (isset($this->readLock))
 			{
-				$this->log->warn('Write locking read locked template '.$this->id);
+				// No longer warning on this, its going to be used normally.
+				$this->log->debug('Write locking read locked resource '.$this->id);
 				unlockResource($this->readLock);
 				unset($this->readLock);
 				
@@ -634,7 +635,7 @@ class Resource
 					}
 					else
 					{
-						$this->log->error('Unlocking but there is no lock');
+						$this->log->errortrace('Unlocking but there is no lock');
 					}
 				}
 			}
@@ -645,8 +646,14 @@ class Resource
 		}
 		else
 		{
-			$this->log->warn('Cannot unlock resource '.$this->id.' since it is not locked');
+			$this->log->warntrace('Cannot unlock resource '.$this->id.' since it is not locked');
 		}
+	}
+	
+	function dirExists($filename)
+	{
+		$this->log->debug('Testing for existance of '.$this->getDir().'/'.$filename);
+		return is_dir($this->getDir().'/'.$filename);
 	}
 	
 	function fileExists($filename)
@@ -805,9 +812,49 @@ class File extends Resource
 		}
 	}
 	
-	function exists()
+	function getSubfile($name)
+	{
+		if (isset($this->parent))
+		{
+			return $this->parent->getFile($this->id.'/'.$name,$this->version);
+		}
+		else
+		{
+			return $this->container->getFile($this->id.'/'.$name,$this->version);
+		}
+	}
+	
+	function isExistingDir()
+	{
+		return parent::dirExists($this->id);
+	}
+	
+	function isExistingFile()
 	{
 		return ((parent::fileExists($this->id))||(parent::fileExists($this->id.'.php')));
+	}
+	
+	function exists()
+	{
+		return (($this->isExistingFile())||($this->isExistingDir()));
+	}
+	
+	function mkDir()
+	{
+		if ($this->isExistingFile())
+		{
+			$this->log->error('Attempt to create a dir when a file already exists with the same name.');
+			return false;
+		}
+		else if (!$this->isExistingDir())
+		{
+			$this->lockWrite();
+			$dir=$this->getDir().'/'.$this->id;
+			recursiveMkDir($dir);
+			$this->unlock();
+			return true;
+		}
+		return true;
 	}
 	
 	function fileIsReadable()
@@ -875,26 +922,9 @@ class File extends Resource
 		return parent::openFileRead($this->id);
 	}
 	
-	function makeDir($dir)
-	{
-		if (is_dir($dir))
-		{
-			return;
-		}
-		$base=dirname($dir);
-		if (is_dir($base))
-		{
-			mkdir($dir);
-			return;
-		}
-		else
-		{
-			$this->makeDir($base);
-		}
-	}
-	
 	function openFileWrite($append=false)
 	{
+		$this->lockWrite();
 		$dir=dirname($this->id);
 		if ($dir=='.')
 		{
@@ -904,8 +934,9 @@ class File extends Resource
 		{
 			$dir=$this->getDir().'/'.$dir;
 		}
-		$this->makeDir($dir);
-
+		recursiveMkDir($dir);
+		$this->unlock();
+		
 		return parent::openFileWrite($this->id,$append);
 	}
 }

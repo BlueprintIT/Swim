@@ -37,12 +37,14 @@ class HtmlBlock extends Block
 	
 	function registerObservers(&$parser)
 	{
+		$parser->addObserver('img',$parser->data['template']);
 		$parser->addObserver('a',$this);
 	}
 	
 	function unregisterObservers(&$parser)
 	{
 		$parser->removeObserver('a',$this);
+		$parser->removeObserver('img',$parser->data['template']);
 	}
 	
 	function observeTag(&$parser,$tagname,$attrs,$text)

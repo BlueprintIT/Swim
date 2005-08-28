@@ -69,21 +69,25 @@ class Container extends Resource
 	
 	function getCurrentVersion($dir)
 	{
-		if ($this->isWritable())
+		if (is_dir($dir))
 		{
-			$lock=lockResourceRead($dir);
+			if ($this->isWritable())
+			{
+				$lock=lockResourceRead($dir);
+			}
+	
+			$vers=fopen($dir.'/version','r');
+			$version=fgets($vers);
+			fclose($vers);
+	
+			if ($this->isWritable())
+			{
+				unlockResource($lock);
+			}
+			
+			return $version;
 		}
-
-		$vers=fopen($dir.'/version','r');
-		$version=fgets($vers);
-		fclose($vers);
-
-		if ($this->isWritable())
-		{
-			unlockResource($lock);
-		}
-		
-		return $version;
+		return false;
 	}
 	
 	function getResourceBaseDir(&$resource)
@@ -230,6 +234,7 @@ class Container extends Resource
 			recursiveCopy($source,$details->getDir(),true);
 			unlockResource($lock);
 			$resource->unlock();
+			$details->blank=false;
 		}
 
 		if (is_a($resource,'Page'))
@@ -341,6 +346,10 @@ class Container extends Resource
 		if (($version===false)&&(($type=='block')||($type=='page')||($type=='template')))
 		{
 			$version=$this->getCurrentVersion($this->getDir().'/'.$type.'s/'.$id);
+			if ($version===false)
+			{
+				return false;
+			}
 		}
 		return parent::getResource($type,$id,$version);
 	}

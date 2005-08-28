@@ -407,8 +407,16 @@ class User
 		$resource->lockRead();
 		if (($resource->isFile())&&(strlen($resource->id)>0))
 		{
-			$file=basename($resource->id);
-			$dir=dirname($resource->id);
+			if ($resource->isExistingDir())
+			{
+				$file='resource.conf';
+				$dir=$resource->id;
+			}
+			else
+			{
+				$file=basename($resource->id);
+				$dir=dirname($resource->id);
+			}
 			$this->log->debug('Checking permissions on '.$dir.' '.$file.' '.($resource->id));
 			while ($dir!='.')
 			{

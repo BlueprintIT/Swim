@@ -308,6 +308,8 @@ class MenuBlock extends Block
 	
 	function displayContent(&$parser,$attrs,$text)
 	{
+		print('<script src="/global/file/scripts/cbdom.js"/>');
+		print('<script src="/global/file/scripts/bpmm.js"/>');
 		$this->rootmenu->display(false);
 		return true;
 	}
