@@ -447,7 +447,7 @@ class User
 		}
 		
 		$container=&$resource->container;
-		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,true);
+		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,$container->isWritable());
 		if ($perm!=PERMISSION_UNKNOWN)
 			return $perm;
 		
