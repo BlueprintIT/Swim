@@ -1,0 +1,11 @@
+#! /bin/sh
+
+PERMS=apache:apache
+
+chown $PERMS -R containers/user
+chown $PERMS -R security
+touch logfile.txt
+chown $PERMS logfile.txt
+chown $PERMS site.conf
+touch dir.lock
+chown $PERMS dir.lock
