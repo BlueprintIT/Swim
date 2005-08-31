@@ -495,7 +495,7 @@ class LoggerManager
 }
 
 $_LOGMANAGER = new LoggerManager();
-LoggerManager::setLogOutput('',new FileLogOutput('logfile.txt'));
+LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
 LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)

@@ -1,0 +1,7 @@
+#! /bin/sh
+
+rm -f ../site.tar.gz
+rm -f ../site.tar
+find containers/user \( -name temp -o -name .svn -o -name dir.lock \) -prune -o -print | tar -cvf ../site.tar --no-recursion -T -
+tar -rvf ../site.tar bootstrap/host.conf conf
+gzip ../site.tar

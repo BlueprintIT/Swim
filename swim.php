@@ -13,11 +13,18 @@
  * $Revision$
  */
 
+$source = __FILE__;
+while (is_link($source))
+{
+	$source=readlink($source);
+}
+$bootstrap=dirname($source).'/bootstrap';
+
 // Load the preferences engine
-require_once 'prefs.php';
+require_once $bootstrap.'/prefs.php';
 
 // Include various utils
-require_once $_PREFS->getPref('storage.includes').'/includes.php';
+require_once $bootstrap.'/includes.php';
 require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
 
 LoggerManager::setLogLevel('',SWIM_LOG_INFO);

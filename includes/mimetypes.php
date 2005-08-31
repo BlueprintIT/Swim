@@ -48,7 +48,7 @@ function initContentTypes()
 {
 	global $_TYPEMAP,$_PREFS;
 
-	$file=fopen($_PREFS->getPref('storage.basedir').'/mimetypes.conf','r');
+	$file=fopen($_PREFS->getPref('storage.bootstrap').'/mimetypes.conf','r');
 	$_TYPEMAP->loadPreferences($file);
 	fclose($file);
 }

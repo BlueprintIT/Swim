@@ -451,7 +451,7 @@ class User
 		if ($perm!=PERMISSION_UNKNOWN)
 			return $perm;
 		
-		return $this->checkSpecificPermission($permission,$_PREFS->getPref('storage.basedir'),$file,true);
+		return $this->checkSpecificPermission($permission,$_PREFS->getPref('storage.basedir'),$file,false);
 	}
 	
 	function getPermission($permission,&$resource)

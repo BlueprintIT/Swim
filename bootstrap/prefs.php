@@ -178,29 +178,48 @@ function saveSitePreferences()
 {
 	global $_PREFS;
 	
-	$file=fopen('site.conf','w');
+	$lock=lockResourceWrite($host->getPref('storage.config'));
+	$file=fopen($_PREFS->getPref('storage.config').'/site.conf','w');
 	$_PREFS->savePreferences($file);
 	fclose($file);
+	unlockResource($lock);
 }
 
-function init()
+$default = new Preferences();
+$file=fopen($bootstrap.'/default.conf','r');
+$default->loadPreferences($file);
+fclose($file);
+
+$host = new Preferences();
+if (is_readable($bootstrap.'/host.conf'))
 {
-	global $_PREFS;
-	
-	$default = new Preferences();
-	$file=fopen('default.conf','r');
-	$default->loadPreferences($file);
+	$file=fopen($bootstrap.'/host.conf','r');
+	$host->loadPreferences($file);
 	fclose($file);
-	
-	$_PREFS = new Preferences();
-	$file=fopen('site.conf','r');
+}
+$host->setParent($default);
+$default->setDelegate($host);
+
+$_PREFS=&$host;
+require_once $bootstrap.'/baseincludes.php';
+
+$lock=lockResourceRead($host->getPref('storage.config'));
+unset($_PREFS);
+$_PREFS = new Preferences();
+if (is_readable($host->getPref('storage.config').'/site.conf'))
+{
+	$file=fopen($host->getPref('storage.config').'/site.conf','r');
 	$_PREFS->loadPreferences($file);
 	fclose($file);
-	$_PREFS->setParent($default);
-	
-	$default->setDelegate($_PREFS);
 }
+$_PREFS->setParent($host);
+unlockResource($lock);
 
-init();
+$default->setDelegate($_PREFS);
+
+unset($default);
+unset($host);
+unset($file);
+unset($lock);
 
 ?>
