@@ -17,7 +17,7 @@ table#menu td {
 	padding: 0;
 	margin: 0;
 	background-color: menubackground;
-	color: bordertextcolor;
+	color: stdblue;
 	font-weight: bold;
 	font-family: borderfont;
 	font-size: 0.8em;
@@ -30,7 +30,7 @@ table#menu td a, table#menu td a:visited {
 	height: 100%;
 	width: 100%;
 	text-decoration: none;
-	color: bordertextcolor;
+	color: stdblue;
 }
 
 table#menu td a:hover, table#menu td a:visited:hover {
@@ -40,5 +40,5 @@ table#menu td a:hover, table#menu td a:visited:hover {
 	height: 100%;
 	width: 100%;
 	text-decoration: none;
-	color: bordertextcolor;
+	color: stdblue;
 }

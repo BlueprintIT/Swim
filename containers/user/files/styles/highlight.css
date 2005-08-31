@@ -1,5 +1,5 @@
 #include global/file/styles/styles.css
-div#highlight {
+#highlight {
 	margin-top: 20px;
 	margin-left: 20px;
 	float: right;
@@ -7,9 +7,16 @@ div#highlight {
 	border: 2px solid white;
 }
 
-div#highlight p {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+#highlight a {
+	color: stdblue;
+}
+
+#highlight a:visited {
+	color: stdblue;
+}
+
+#highlight a:hover, #highlight a:visited:hover {
+	color: stdorange;
 }
 
 #highlightMain {
@@ -28,6 +35,8 @@ div#highlight p {
 }
 
 #highlightTitle p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 	text-align: center;
 	font-size: 1.2em;
 	font-family: paragraphfont;
@@ -35,6 +44,8 @@ div#highlight p {
 }
 
 #highlightMain p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 	color: bordertextcolor;
 	text-align: left;
 }

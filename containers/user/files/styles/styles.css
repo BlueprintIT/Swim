@@ -9,22 +9,28 @@
 #define defaultfont Arial, Helvetica, sans-serif
 #define narrowfont 'Arial Narrow', Arial, Helvetica, sans-serif
 #define paragraphfont defaultfont
+#define titlefont narrowfont
 #define borderfont narrowfont
 #define menufont narrowfont
 
-#define yellowborder rgb(234,180,16)
-#define bordertextcolor #366aa6
+#define stdorange rgb(234,180,16)
+#define stdblue #366aa6
+#define lightblue rgb(87,155,231)
+#define lightorange rgb(253,223,101)
+
+#define bordercolor stdorange
+#define bordertextcolor stdblue
 
 #define pagebackground rgb(246,250,254)
 
-#define menubackground rgb(253,223,101)
-#define menuhighlight rgb(87,155,231)
+#define menubackground lightorange
+#define menuhighlight lightblue
 
-#define highlightMainColor rgb(87,155,231)
-#define highlightTitleColor yellowborder
+#define highlightMainColor lightblue
+#define highlightTitleColor stdorange
 
-#define h1color bordertextcolor
-#define h2color yellowborder
-#define linkcolor bordertextcolor
-#define linkvisited yellowborder
-#define linkhover menuhighlight
+#define h1color stdblue
+#define h2color stdorange
+#define linkcolor stdblue
+#define linkvisited stdorange
+#define linkhover lightblue

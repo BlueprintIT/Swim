@@ -116,15 +116,14 @@ h1#sidetitle {
 	font-weight: bold;
 	padding-left: 5px;
 	font-size: 1.2em;
-	background: yellowborder;
 }
 
 #sidemenu {
 	margin: 0;
-	border-left: 2px solid yellowborder;
-	border-top: 2px solid yellowborder;
-	border-bottom: 2px solid yellowborder;
-//	background: yellowborder;
+	border-left: 2px solid bordercolor;
+	border-top: 2px solid bordercolor;
+	border-bottom: 2px solid bordercolor;
+//	background: bordercolor;
 	margin-top: -swim-calc(sidetopgap)px;
 	padding: 0;
 	position: absolute;
@@ -134,7 +133,7 @@ h1#sidetitle {
 div#body {
 	padding: 0;
 	margin: 0;
-	border-left: sidewidthpx solid yellowborder;
+	border-left: sidewidthpx solid bordercolor;
 	height: 100%;
 	overflow: auto;
 }
@@ -168,7 +167,7 @@ div#footer {
 	position: absolute;
 	overflow: hidden;
 	height: footerheightpx;
-	background-color: yellowborder;
+	background-color: bordercolor;
 	z-index: 0;
 }
 

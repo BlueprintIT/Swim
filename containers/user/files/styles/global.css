@@ -4,18 +4,21 @@ body {
 	font-size: 1em;
 	font-weight: normal;
 	color: black;
+	text-align: justify;
 }
 
 h1 {
 	font-size: 1.5em;
 	font-weight: bold;
 	color: h1color;
+	font-family: titlefont;
 }
 
 h2 {
 	font-size: 1.2em;
 	font-weight: bold;
 	color: h2color;
+	font-family: titlefont;
 }
 
 p {

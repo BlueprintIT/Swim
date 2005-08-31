@@ -9,7 +9,6 @@ h1 {
 	margin-left: 0;
 	margin-right: 0;
 	padding: 0;
-	text-align: left;
 }
 
 h2 {
@@ -18,7 +17,6 @@ h2 {
 	margin-left: 0;
 	margin-right: 0;
 	padding: 0;
-	text-align: left;
 }
 
 p {
@@ -27,7 +25,6 @@ p {
 	margin-left: 0;
 	margin-right: 0;
 	padding: 0;
-	text-align: justify;
 }
 
 p.tight {
