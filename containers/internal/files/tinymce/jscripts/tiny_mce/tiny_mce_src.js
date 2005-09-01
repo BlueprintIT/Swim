@@ -607,9 +607,9 @@ TinyMCE.prototype.setupContent = function(editor_id) {
 		doc.documentElement.editorId = editor_id;
 
 	// Setup base element
-	base = doc.createElement("base");
+	/*base = doc.createElement("base");
 	base.setAttribute('href', tinyMCE.settings['base_href']);
-	head.appendChild(base);
+	head.appendChild(base);*/
 
 	// Replace new line characters to BRs
 	if (tinyMCE.settings['convert_newlines_to_brs']) {
