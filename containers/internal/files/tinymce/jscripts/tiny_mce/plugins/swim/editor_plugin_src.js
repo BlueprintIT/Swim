@@ -28,6 +28,7 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
+	alert(url);
 	return url;
 }
 
@@ -87,6 +88,17 @@ function TinyMCE_swim_execCommand(editor_id, element, command, user_interface, v
  */
 function TinyMCE_swim_handleNodeChange(editor_id, node, undo_index, undo_levels, visual_aid, any_selection)
 {
+	// Get link
+	var anchorLink = tinyMCE.getParentElement(node, "a", "href");
+
+	if (any_selection || anchorLink)
+	{
+		tinyMCE.switchClassSticky(editor_id + '_pagelink', anchorLink ? 'mceButtonSelected' : 'mceButtonNormal', false);
+	}
+	else
+	{
+		tinyMCE.switchClassSticky(editor_id + '_pagelink', 'mceButtonDisabled', true);
+	}
 }
 
 /**

@@ -46,12 +46,12 @@ function pageselect()
 
 addEvent(window,"load",pageselect,false);
 </script>
-<table style="width: 100%; height: 100%">
+<table style="width: 100%; height: 350px">
 <tr>
 <th>Page</th>
 <th>Preview</th>
 </tr>
-<tr>
+<tr style="height: 300px;">
 <td style="width: 25%; vertical-align: top">
 <select id="page" name="page" multiple="multiple" style="width: 100%; height: 100%" onchange="pageselect()">
 <?

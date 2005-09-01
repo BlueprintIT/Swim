@@ -75,8 +75,8 @@ tinyMCE.init({
 });
 </script>
 
-<div align="center" style="width: 90%; height: 80%; margin-left: auto; margin-right: auto">
-<div style="text-align: center; width: 100%; height: 10%; background: #F0F0EE; border-top: 1px solid #cccccc; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc;">
+<div align="center" style="padding: 0; margin: 0; width: 90%; margin-left: auto; margin-right: auto; background: #F0F0EE; border: 1px solid #cccccc;">
+<div style="margin: 0; padding: 0; text-align: center; width: 100%; height: 50px;">
 <div style="float: left; color: blue; font-weight: bold; padding-top: 15px;">
 <image style="vertical-align: middle" src="/global/file/images/edit.gif"/> Content Editor
 </div>
