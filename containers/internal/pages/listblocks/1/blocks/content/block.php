@@ -1,3 +1,4 @@
+<script src="/global/file/scripts/cbdom.js"/>
 <?
 	$setblock = new Request();
 	$setblock->method='setblock';

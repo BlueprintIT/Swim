@@ -1,6 +1,27 @@
 .mceButtonNormal, .mceButtonOver, .mceButtonDown, .mceSeparator, .mceButtonDisabled, .mceButtonSelected {
 	margin-top: 1px;
 	margin-left: 1px;
+	vertical-align: middle;
+	font-size: 8pt;
+	cursor: default;
+}
+
+a.mceButtonNormal, a.mceButtonOver, a.mceButtonDown, a.mceSeparator, a.mceButtonDisabled, a.mceButtonSelected {
+	padding: 1px;
+	color: black;
+	text-decoration: none;
+}
+
+input.mceButtonNormal[type=submit], input.mceButtonOver[type=submit], input.mceButtonDown[type=submit], input.mceButtonDisabled[type=submit], input.mceButtonSelected[type=submit] {
+	padding: 1px;
+	color: black;
+	text-decoration: none;
+}
+
+button.mceButtonNormal, button.mceButtonOver, button.mceButtonDown, button.mceButtonDisabled, button.mceButtonSelected {
+	padding: 1px;
+	color: black;
+	text-decoration: none;
 }
 
 .mceButtonNormal {
@@ -57,6 +78,7 @@
 	border-right: 1px solid buttonshadow;
 	margin-right: 2px;
 	margin-left: 2px;
+	vertical-align: middle;
 }
 
 .mceSeparatorLine {
@@ -69,6 +91,7 @@
 	border-right: 1px solid buttonhighlight;
 	width: 0px;
 	height: 15px;
+	vertical-align: middle;
 }
 
 .mceSelectList {
@@ -78,7 +101,7 @@
 	margin-top: 3px;
 	padding: 0px;
 	display: inline;
-	vertical-align: top;
+	vertical-align: middle;
 	background-color: #F0F0EE
 }
 
@@ -88,7 +111,7 @@
 }
 
 .mceLabel {
-	color: #000000;
+	color: blue;
 }
 
 .mceLabelDisabled {

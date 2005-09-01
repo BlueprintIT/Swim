@@ -3244,20 +3244,28 @@ TinyMCE.prototype.openFileBrowser = function(field_name, url, type, win) {
 };
 
 TinyMCE.prototype.getControlHTML = function(control_name) {
-	var themePlugins = tinyMCE.getParam('plugins', '', true, ',');
-	var templateFunction;
-
-	// Is it defined in any plugins
-	for (var i=themePlugins.length; i>=0; i--) {
-		templateFunction = 'TinyMCE_' + themePlugins[i] + "_getControlHTML";
-		if (eval("typeof(" + templateFunction + ")") != 'undefined') {
-			var html = eval(templateFunction + "('" + control_name + "');");
-			if (html != "")
-				return tinyMCE.replaceVar(html, "pluginurl", tinyMCE.baseURL + "/plugins/" + themePlugins[i]);
-		}
+	if (control_name[0]=="'")
+	{
+		var text = control_name.substring(1,control_name.length-1);
+		return '<span class="mceLabel">'+text+'</span>';
 	}
-
-	return eval('TinyMCE_' + tinyMCE.settings['theme'] + "_getControlHTML" + "('" + control_name + "');");
+	else
+	{
+		var themePlugins = tinyMCE.getParam('plugins', '', true, ',');
+		var templateFunction;
+	
+		// Is it defined in any plugins
+		for (var i=themePlugins.length; i>=0; i--) {
+			templateFunction = 'TinyMCE_' + themePlugins[i] + "_getControlHTML";
+			if (eval("typeof(" + templateFunction + ")") != 'undefined') {
+				var	html = eval(templateFunction + "('" + control_name + "');");
+				if (html != "")
+					return tinyMCE.replaceVar(html, "pluginurl", tinyMCE.baseURL + "/plugins/" + themePlugins[i]);
+			}
+		}
+	
+		return eval('TinyMCE_' + tinyMCE.settings['theme'] + "_getControlHTML" + "('" + control_name + "');");
+	}
 };
 
 TinyMCE.prototype._themeExecCommand = function(editor_id, element, command, user_interface, value) {

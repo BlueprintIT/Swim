@@ -35,6 +35,38 @@ class FileSelectorBlock extends FileManagerBlock
 <?
 		parent::displayFileDetails($resource,$description,$delete);
 	}
+	
+	function displayContent(&$parser,$attrs,$text)
+	{
+?>
+<script>
+
+function select()
+{
+	var inputs = document.getElementsByTagName("INPUT");
+	for (var i=0; i<inputs.length; i++)
+	{
+		if ((inputs[i].getAttribute("type")=="radio")&&(inputs[i].checked))
+		{
+			alert(window.targetField);
+			window.opener.document.getElementById(window.targetField).value=inputs[i].value;
+		}
+	}
+	window.close();
+}
+
+function cancel()
+{
+	window.close();
+}
+
+</script>
+<?
+		parent::displayContent($parser,$attrs,$text);
+?>
+<button onclick="select()">Select</button> <button onclick="cancel()">Cancel</button>
+<?
+	}
 }
 
 ?>
