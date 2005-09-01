@@ -70,6 +70,7 @@ tinyMCE.init({
 	remove_linebreaks : false,
 	relative_urls : true,
 	document_base_url : "<?= $expurl->encode() ?>",
+	document_host : "<?= $_SERVER['HTTP_HOST'] ?>",
 	inline_styles : true,
 	theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",

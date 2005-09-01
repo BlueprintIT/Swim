@@ -29,7 +29,7 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
 	//alert(url);
-	var hostpart="http://localhost";
+	var hostpart="http://"+tinyMCE.getParam('document_host','');;
 	var page=tinyMCE.getParam('document_base_url','');
 	var base=tinyMCE.getParam('swim_view','');
 	
