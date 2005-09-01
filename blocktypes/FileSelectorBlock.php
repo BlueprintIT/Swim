@@ -64,7 +64,7 @@ function select()
 	{
 		if ((inputs[i].getAttribute("type")=="radio")&&(inputs[i].checked))
 		{
-			window.opener.document.getElementById(window.targetField).value=inputs[i].value;
+			window.opener.document.getElementById('href').value=inputs[i].value;
 		}
 	}
 	window.close();
