@@ -37,14 +37,22 @@ if (url != null) {
 				document.forms[0].align.options.selectedIndex = i;
 		}
 
-		formObj.src.value = tinyMCE.getWindowArg('src');
-		formObj.alt.value = tinyMCE.getWindowArg('alt');
-		formObj.border.value = tinyMCE.getWindowArg('border');
-		formObj.vspace.value = tinyMCE.getWindowArg('vspace');
-		formObj.hspace.value = tinyMCE.getWindowArg('hspace');
-		formObj.width.value = tinyMCE.getWindowArg('width');
-		formObj.height.value = tinyMCE.getWindowArg('height');
-		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
+		if (formObj.src)
+			formObj.src.value = tinyMCE.getWindowArg('src');
+		if (formObj.alt)
+			formObj.alt.value = tinyMCE.getWindowArg('alt');
+		if (formObj.border)
+			formObj.border.value = tinyMCE.getWindowArg('border');
+		if (formObj.vspace)
+			formObj.vspace.value = tinyMCE.getWindowArg('vspace');
+		if (formObj.hspace)
+			formObj.hspace.value = tinyMCE.getWindowArg('hspace');
+		if (formObj.width)
+			formObj.width.value = tinyMCE.getWindowArg('width');
+		if (formObj.height)
+			formObj.height.value = tinyMCE.getWindowArg('height');
+		if (formObj.insert)
+			formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
 
 		// Handle file browser
 		if (tinyMCE.getParam("file_browser_callback") != null) {
@@ -144,32 +152,32 @@ if (url != null) {
             <td nowrap="nowrap">{$lang_insert_image_align}:</td>
             <td><select name="align">
                 <option value="">{$lang_insert_image_align_default}</option>
-                <option value="baseline">{$lang_insert_image_align_baseline}</option>
-                <option value="top">{$lang_insert_image_align_top}</option>
-                <option value="middle">{$lang_insert_image_align_middle}</option>
-                <option value="bottom">{$lang_insert_image_align_bottom}</option>
-                <option value="texttop">{$lang_insert_image_align_texttop}</option>
-                <option value="absmiddle">{$lang_insert_image_align_absmiddle}</option>
-                <option value="absbottom">{$lang_insert_image_align_absbottom}</option>
+                <option style="display: none" value="baseline">{$lang_insert_image_align_baseline}</option>
+                <option style="display: none" hidden" value="top">{$lang_insert_image_align_top}</option>
+                <option style="display: none" hidden" value="middle">{$lang_insert_image_align_middle}</option>
+                <option style="display: none" hidden" value="bottom">{$lang_insert_image_align_bottom}</option>
+                <option style="display: none" hidden" value="texttop">{$lang_insert_image_align_texttop}</option>
+                <option style="display: none" hidden" value="absmiddle">{$lang_insert_image_align_absmiddle}</option>
+                <option style="display: none" hidden" value="absbottom">{$lang_insert_image_align_absbottom}</option>
                 <option value="left">{$lang_insert_image_align_left}</option>
                 <option value="right">{$lang_insert_image_align_right}</option>
               </select></td>
           </tr>
-          <tr>
+          <tr style="visibility: hidden">
             <td nowrap="nowrap">{$lang_insert_image_dimensions}:</td>
             <td><input name="width" type="text" id="width" value="" size="3" maxlength="3">
               x
               <input name="height" type="text" id="height" value="" size="3" maxlength="3"></td>
           </tr>
-          <tr>
+          <tr style="visibility: hidden">
             <td nowrap="nowrap">{$lang_insert_image_border}:</td>
             <td><input name="border" type="text" id="border" value="" size="3" maxlength="3"></td>
           </tr>
-          <tr>
+          <tr style="visibility: hidden">
             <td nowrap="nowrap">{$lang_insert_image_vspace}:</td>
             <td><input name="vspace" type="text" id="vspace" value="" size="3" maxlength="3"></td>
           </tr>
-          <tr>
+          <tr style="visibility: hidden">
             <td nowrap="nowrap">{$lang_insert_image_hspace}:</td>
             <td><input name="hspace" type="text" id="hspace" value="" size="3" maxlength="3"></td>
           </tr>

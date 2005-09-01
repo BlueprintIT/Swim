@@ -15,7 +15,7 @@ tinyMCE.importPluginLanguagePack('swim', 'en'); // <- Add a comma separated list
 
 function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 {
-	var newwin = win.open(tinyMCE.getParam('swim_browser',''),'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=600,height=400');
+	var newwin = win.open(tinyMCE.getParam('swim_browser',''),'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=630,height=400');
 	if (newwin)
 	{
 		newwin.targetField=field_name;

@@ -39,6 +39,7 @@ $browser = new Request();
 $browser->method='fileselect';
 $browser->resource=$working->getPath().'/file/attachments';
 $browser->query['version']=$working->version;
+$browser->query['baseurl']=$working->getPath().'/file/';
 
 $pagebrowser = new Request();
 $pagebrowser->method='view';

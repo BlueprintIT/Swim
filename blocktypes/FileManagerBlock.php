@@ -53,11 +53,15 @@ class FileManagerBlock extends Block
 <?
 	}
 	
-	function displayFileDetails(&$resource,$description,&$delete)
+	function displayTableFooter($id)
+	{
+	}
+	
+	function displayFileDetails(&$request,&$resource,$description,&$delete)
 	{
 		$size=getReadableFileSize($resource->getDir().'/'.$resource->id);
 ?>
-<td><anchor method="view" href="/<?= $resource->getFile() ?>"><?= basename($resource->id) ?></anchor></td>
+<td><anchor target="_blank" method="view" href="/<?= $resource->getPath() ?>"><?= basename($resource->id) ?></anchor></td>
 <td><?= $description ?></td>
 <td><?= $size ?></td>
 <td><a href="<?= $delete->encode() ?>">Delete</a></td>
@@ -68,6 +72,10 @@ class FileManagerBlock extends Block
 	function getModifiedDate()
 	{
 		return time();
+	}
+	
+	function displayFormHeader()
+	{
 	}
 	
 	function displayAdminPanel(&$request,&$data,$attrs)
@@ -207,7 +215,7 @@ class FileManagerBlock extends Block
 ?>
 <tr>
 <?
-				$this->displayFileDetails($fileresource,$description,$delete);
+				$this->displayFileDetails($request,$fileresource,$description,$delete);
 ?>
 </tr>
 <?
@@ -221,6 +229,7 @@ No files stored.
 		}
 		else
 		{
+			$this->displayTableFooter();
 ?>
 </table>
 <?
@@ -230,10 +239,15 @@ No files stored.
 		{
 			$upload=$request;
 ?>
+<table align="center">
 <form method="POST" action="<?= $upload->encodePath() ?>" enctype="multipart/form-data">
 <?= $upload->getFormVars() ?>
-<p>Upload a file: <input type="file" name="<?= $id ?>:file"> Description: <input type="text" name="<?= $id ?>:description"> <input type="submit" name="<?= $id ?>:upload" value="Upload"></p>
+<? $this->displayFormHeader($id); ?>
+<tr><td><label for="file">Upload a file:</label></td><td><input type="file" id="file" name="<?= $id ?>:file"></td></tr>
+<tr><td><label for="description">Description:</label></td><td><input type="text" id="description" name="<?= $id ?>:description"></td></tr>
+<tr><td colspan="2" align="center"><input type="submit" name="<?= $id ?>:upload" value="Upload"></td></tr>
 </form>
+</table>
 <?
 		}
 		return true;

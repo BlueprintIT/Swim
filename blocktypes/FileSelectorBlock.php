@@ -27,17 +27,33 @@ class FileSelectorBlock extends FileManagerBlock
 <?
 		parent::displayTableHeader();
 	}
-	
-	function displayFileDetails(&$resource,$description,&$delete)
+
+	function displayTableFooter()
 	{
+		parent::displayTableFooter();
 ?>
-	<td><input type="radio" name="file" value="<?= $resource->getPath() ?>"></td>
+<tr><td colspan="5" style="text-align: center">
+<button onclick="select()">Select</button>
+<button onclick="cancel()">Cancel</button>
+</td></tr>
+<tr><td colspan="5" style="text-align: center"><hr></td></td>
 <?
-		parent::displayFileDetails($resource,$description,$delete);
+	}
+	
+	function displayFileDetails(&$request,&$resource,$description,&$delete)
+	{
+		$path=$resource->getPath();
+		$path=substr($path,strlen($request->query['baseurl']));
+?>
+	<td><input type="radio" name="file" value="<?= $path ?>"></td>
+<?
+		parent::displayFileDetails($request,$resource,$description,$delete);
 	}
 	
 	function displayContent(&$parser,$attrs,$text)
 	{
+		$request=&$parser->data['request'];
+		$id=$parser->data['blockid'];
 ?>
 <script>
 
@@ -48,7 +64,6 @@ function select()
 	{
 		if ((inputs[i].getAttribute("type")=="radio")&&(inputs[i].checked))
 		{
-			alert(window.targetField);
 			window.opener.document.getElementById(window.targetField).value=inputs[i].value;
 		}
 	}
@@ -63,9 +78,6 @@ function cancel()
 </script>
 <?
 		parent::displayContent($parser,$attrs,$text);
-?>
-<button onclick="select()">Select</button> <button onclick="cancel()">Cancel</button>
-<?
 	}
 }
 
