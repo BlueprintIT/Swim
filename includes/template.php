@@ -134,6 +134,10 @@ class Template extends Resource
 	
 	function generateURL(&$data,$url,$method='view')
 	{
+		if (strpos($url,"://")>0)
+		{
+			return $url;
+		}
 	  $request=&$this->generateRequest($data,$url,$method);
 	  return $request->encode();
 	}

@@ -47,7 +47,11 @@ $pagebrowser->resource='internal/page/pageselect';
 
 $expurl = new Request();
 $expurl->method='view';
-$expurl->resource='version/'.$working->version.'/'.$working->getPath().'/file/';
+$expurl->resource=$working->getPath().'/file/';
+
+$viewurl = new Request();
+$viewurl->method='view';
+$viewurl->resource='';
 
 ?>
 
@@ -61,6 +65,7 @@ tinyMCE.init({
 	swim_pagebrowser : "<?= $pagebrowser->encode() ?>",
 	swim_attachments : "<?= $expurl->encode() ?>",
 	swim_cancel : "<?= $cancel->encode() ?>",
+	swim_view : "<?= $viewurl->encode() ?>",
 	content_css : new Array(<?= $list ?>),
 	remove_linebreaks : false,
 	relative_urls : true,

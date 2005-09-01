@@ -28,7 +28,48 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
-	alert(url);
+	//alert(url);
+	var hostpart="http://localhost";
+	var page=tinyMCE.getParam('document_base_url','');
+	var base=tinyMCE.getParam('swim_view','');
+	
+	if (url.indexOf('tiny_mce')>0)
+	{
+		url=url.substring(url.indexOf('tiny_mce')+9);
+	}
+	else if (url.indexOf(hostpart)==0)
+	{
+		url=url.substring(hostpart.length);
+	}
+	
+	//alert(url);
+	
+	if (url.indexOf(page)==0)
+	{
+		url=url.substring(page.length);
+	}
+	else if (url.indexOf(base)==0)
+	{
+		url=url.substring(base.length-1);
+	}
+	
+	//alert(url);
+	
+	if (!on_save)
+	{
+		if (url.substring(0,1)=='/')
+		{
+			url=hostpart+base+url.substring(1);
+		}
+		else if (url.indexOf('://')>0)
+		{
+		}
+		else
+		{
+			url=hostpart+page+url;
+		}
+		//alert(url);
+	}
 	return url;
 }
 
@@ -106,5 +147,20 @@ function TinyMCE_swim_handleNodeChange(editor_id, node, undo_index, undo_levels,
  */
 function TinyMCE_swim_cleanup(type, content)
 {
+	if (type=='insert_to_editor_dom')
+	{
+		var nodes = content.getElementsByTagName('IMG');
+		for (var i=0; i<nodes.length; i++)
+		{
+			var src = nodes[i].getAttribute('src');
+			nodes[i].src=TinyMCE_swim_convertURL(src,nodes[i],false);
+		}
+		nodes = content.getElementsByTagName('A');
+		for (var i=0; i<nodes.length; i++)
+		{
+			var src = nodes[i].getAttribute('href');
+			nodes[i].href=TinyMCE_swim_convertURL(src,nodes[i],false);
+		}
+	}
 	return content;
 }
