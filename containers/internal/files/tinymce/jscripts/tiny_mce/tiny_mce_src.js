@@ -80,7 +80,7 @@ TinyMCE.prototype.init = function(settings) {
 	this.defParam("docs_language", this.settings['language']);
 	this.defParam("elements", "");
 	this.defParam("textarea_trigger", "mce_editable");
-	this.defParam("valid_elements", "+a[name|href|target|title|class],strong/b[class],em/i[class],strike[class],u[class],+p[dir|class|align],ol,ul,li,br,img[class|src|border=0|alt|title|hspace|vspace|width|height|align],sub,sup,blockquote[dir|style],table[border=0|cellspacing|cellpadding|width|height|class|align],tr[class|rowspan|width|height|align|valign],td[dir|class|colspan|rowspan|width|height|align|valign],div[dir|class|align],span[class|align],pre[class|align],address[class|align],h1[dir|class|align],h2[dir|class|align],h3[dir|class|align],h4[dir|class|align],h5[dir|class|align],h6[dir|class|align],hr");
+	this.defParam("valid_elements", "+a[name|href|target|title|class],strong/b[class],em/i[class],strike[class],u[class],+p[dir|class|align],ol,ul,li,br,img[class|src|border=0|alt|title|hspace|vspace|width|height|align|style],sub,sup,blockquote[dir|style],table[border=0|cellspacing|cellpadding|width|height|class|align],tr[class|rowspan|width|height|align|valign],td[dir|class|colspan|rowspan|width|height|align|valign],div[dir|class|align],span[class|align],pre[class|align],address[class|align],h1[dir|class|align],h2[dir|class|align],h3[dir|class|align],h4[dir|class|align],h5[dir|class|align],h6[dir|class|align],hr");
 	this.defParam("extended_valid_elements", "");
 	this.defParam("invalid_elements", "");
 	this.defParam("encoding", "");
@@ -1446,12 +1446,26 @@ TinyMCE.prototype._fixInlineStyles = function(elm) {
 	value = elm.getAttribute("align");
 	if (value && value != "") {
 		if (elm.nodeName.toLowerCase() == "img") {
-			if (tinyMCE.isMSIE)
-				elm.style.styleFloat = value;
+			var floatval;
+			var vertval;
+			if ((value=="left")||(value=="right"))
+			{
+				floatval=value;
+				vertval="";
+			}
 			else
-				elm.style.cssFloat = value;
+			{
+				floatval="";
+				vertval=value;
+			}
+			if (tinyMCE.isMSIE)
+				elm.style.styleFloat = floatval;
+			else
+				elm.style.cssFloat = floatval;
+			elm.style.verticalAlign = vertval;
 		} else
 			elm.style.textAlign = value;
+		elm.removeAttribute("align");
 	}
 
 	// Setup vspace

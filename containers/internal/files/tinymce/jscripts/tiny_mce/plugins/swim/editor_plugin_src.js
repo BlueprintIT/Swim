@@ -154,6 +154,26 @@ function TinyMCE_swim_cleanup(type, content)
 		{
 			var src = nodes[i].getAttribute('src');
 			nodes[i].src=TinyMCE_swim_convertURL(src,nodes[i],false);
+			
+			var floatval;
+			if (tinyMCE.isMSIE)
+				floatval = nodes[i].style.styleFloat;
+			else
+				floatval = nodes[i].style.cssFloat;
+			var vertval = nodes[i].style.verticalAlign;
+			if ((floatval)&&(floatval!='')&&(floatval!='none'))
+			{
+				nodes[i].setAttribute('align',floatval);
+			}
+			else if ((vertval)&&(vertval!='')&&(vertval!='baseline'))
+			{
+				nodes[i].setAttribute('align',vertval);
+			}
+			if (tinyMCE.isMSIE)
+				nodes[i].style.styleFloat = '';
+			else
+				nodes[i].style.cssFloat = '';
+			nodes[i].style.verticalAlign = '';
 		}
 		nodes = content.getElementsByTagName('A');
 		for (var i=0; i<nodes.length; i++)
