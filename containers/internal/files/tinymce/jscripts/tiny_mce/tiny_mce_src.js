@@ -4098,28 +4098,26 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 
 		switch (command) {
 			case "JustifyLeft":
-				if (align == 'left')
-					this.getFocusElement().removeAttribute('align');
-				else
-					this.getFocusElement().setAttribute('align', 'left');
+				this.getFocusElement().setAttribute('align', 'left');
 
 				tinyMCE.triggerNodeChange();
 				return;
 
 			case "JustifyCenter":
-				if (align == 'middle')
-					this.getFocusElement().removeAttribute('align');
-				else
-					this.getFocusElement().setAttribute('align', 'middle');
+				this.getFocusElement().removeAttribute('align');
+				this.getFocusElement().parentNode.setAttribute('align', 'center');
 
 				tinyMCE.triggerNodeChange();
 				return;
 
 			case "JustifyRight":
-				if (align == 'right')
-					this.getFocusElement().removeAttribute('align');
-				else
-					this.getFocusElement().setAttribute('align', 'right');
+				this.getFocusElement().setAttribute('align', 'right');
+
+				tinyMCE.triggerNodeChange();
+				return;
+
+			case "JustifyFull":
+				this.getFocusElement().removeAttribute('align');
 
 				tinyMCE.triggerNodeChange();
 				return;
