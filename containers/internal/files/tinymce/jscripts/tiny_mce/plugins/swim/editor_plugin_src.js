@@ -26,6 +26,11 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 	}
 }
 
+function TinyMCE_swim_convertURL(url, node, on_save)
+{
+	return url;
+}
+
 /**
  * Gets executed when a editor instance is initialized
  */
@@ -33,6 +38,7 @@ function TinyMCE_swim_initInstance(inst)
 {
 	// You can take out plugin specific parameters
 	tinyMCE.settings['file_browser_callback']='TinyMCE_swim_file_browser_callback';
+	TinyMCE.prototype.convertURL=TinyMCE_swim_convertURL;
 }
 
 /**
@@ -61,7 +67,11 @@ function TinyMCE_swim_execCommand(editor_id, element, command, user_interface, v
 {
 	if (command=="mcePageLink")
 	{
-		window.open(tinyMCE.getParam('swim_pagebrowser',''),'swimpagebrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=600,height=400');
+		var newwin = window.open(tinyMCE.getParam('swim_pagebrowser',''),'swimpagebrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=600,height=400');
+		if (!newwin)
+		{
+			alert("You must disable popup blocking in your web browser to use this feature.");
+		}
 		return true;
 	}
 	else if (command=="mceSwimCancel")
@@ -82,37 +92,7 @@ function TinyMCE_swim_handleNodeChange(editor_id, node, undo_index, undo_levels,
 /**
  * Gets executed when contents is inserted / retrived.
  */
- 
-function expandURL(url)
-{
-	if (url.substring(0,12)=="attachments/")
-	{
-		url=tinyMCE.getParam('swim_attachments','')+url.substring(12);
-	}
-	return url;
-}
-
-function compressURL(url)
-{
-}
-
 function TinyMCE_swim_cleanup(type, content)
 {
-	if (type=="insert_to_editor_dom")
-	{
-		var nodes = content.getElementsByTagName("A");
-		for (var i=0; i<nodes.length; i++)
-		{
-			nodes[i].href=expandURL(nodes[i].getAttribute('href'));
-		}
-		nodes = content.getElementsByTagName("IMG");
-		for (var i=0; i<nodes.length; i++)
-		{
-			nodes[i].src=expandURL(nodes[i].getAttribute('src'));
-		}
-	}
-	else if (type=="get_from_editor_dom")
-	{
-	}
 	return content;
 }

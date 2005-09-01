@@ -66,12 +66,12 @@ foreach ($pageset as $key => $title)
 </select>
 </td>
 <td style="vertical-align: top">
-<iframe id="preview" style="border: 1px solid black; width: 100%; height: 100%"></iframe>
+<iframe id="preview" height="100%" width="100%" style="border: 1px solid black; width: 100%; height: 100%"></iframe>
 </td>
 </tr>
 <tr>
 <td colspan="2" style="text-align: center">
-<button onclick="submit()">Select</button>
+<button onclick="submit()">Select</button> <button onclick="window.close()">Cancel</button>
 </td>
 </tr>
 </table>

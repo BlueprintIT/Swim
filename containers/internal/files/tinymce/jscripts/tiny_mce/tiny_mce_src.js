@@ -3244,7 +3244,7 @@ TinyMCE.prototype.openFileBrowser = function(field_name, url, type, win) {
 };
 
 TinyMCE.prototype.getControlHTML = function(control_name) {
-	if (control_name[0]=="'")
+	if (control_name.substring(0,1)=="'")
 	{
 		var text = control_name.substring(1,control_name.length-1);
 		return '<span class="mceLabel">'+text+'</span>';

@@ -88,7 +88,7 @@ by
 <?= $upload->getFormVars(); ?>
 <input type="hidden" name="commit" value="<?= $commit->encode(); ?>">
 <input type="hidden" name="continue" value="<?= $request->encode(); ?>">
-<textarea id="editor" name="content" style="width: 100%; height: 90%;"><?
+<textarea id="editor" name="content" style="width: 100%; height: 300px"><?
 
 $file=$working->openFileRead($request->data['file']);
 fpassthru($file);
