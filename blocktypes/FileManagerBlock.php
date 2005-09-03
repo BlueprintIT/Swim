@@ -53,7 +53,7 @@ class FileManagerBlock extends Block
 <?
 	}
 	
-	function displayTableFooter($id)
+	function displayTableFooter()
 	{
 	}
 	

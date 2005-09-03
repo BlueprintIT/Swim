@@ -513,7 +513,7 @@ function caught_error($type,$text,$file,$line)
 	{
 		$log->log(SWIM_LOG_ERROR,$text,$trace);
 	}
-	else if (($type==E_NOTICE)||($type==E_USER_WARNING))
+	else if (($type==E_NOTICE)||($type==E_USER_WARNING)||($type==2048))
 	{
 		$log->log(SWIM_LOG_WARN,$text,$trace);
 	}

@@ -19,6 +19,7 @@ while (is_link($source))
 	$source=readlink($source);
 }
 $bootstrap=dirname($source).'/bootstrap';
+unset($source);
 
 // Load the preferences engine
 require_once $bootstrap.'/prefs.php';
@@ -26,6 +27,7 @@ require_once $bootstrap.'/prefs.php';
 // Include various utils
 require_once $bootstrap.'/includes.php';
 require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
+unset($bootstrap);
 
 LoggerManager::setLogLevel('',SWIM_LOG_INFO);
 //LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);

@@ -166,8 +166,7 @@ class Container extends Resource
 	{
 		$dir=$this->getResourceBaseDir($resource);
 		
-		$lock=fopen($dir.'/'.$this->prefs->getPref('locking.lockfile'),'a');
-		flock($lock,LOCK_EX);
+		$lock=lockResourceWrite($dir);
 		
 		$newest=-1;
 		if ($res=@opendir($dir))
@@ -198,8 +197,7 @@ class Container extends Resource
 		
 		mkdir($dir.'/'.$next);
 	
-		flock($lock,LOCK_UN);
-		fclose($lock);
+		unlockResource($lock);
 		
 		$source=$resource->getDir();
 		$target=$dir.'/'.$next;

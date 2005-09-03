@@ -189,6 +189,7 @@ $default = new Preferences();
 $file=fopen($bootstrap.'/default.conf','r');
 $default->loadPreferences($file);
 fclose($file);
+$default->setPref('storage.basedir',dirname($bootstrap));
 
 $host = new Preferences();
 if (is_readable($bootstrap.'/host.conf'))
