@@ -500,6 +500,9 @@ LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)
 {
+	if (ini_get('error_reporting')==0)
+		return;
+
 	$log = &LoggerManager::getLogger('php');
 	
 	$trace = array('file' => $file, 'line' => $line, 'function' => '');

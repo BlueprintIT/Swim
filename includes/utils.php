@@ -48,11 +48,12 @@ function recursiveDelete($dir,$ignorelock=false)
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
+		$lockfiles=getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
 			if ($file[0]!='.')
 			{
-				if ((($file==$_PREFS->getPref('locking.lockfile'))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
+				if (((in_array($file,$lockfiles))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
 				{
 					$log->debug('Ignoring lock file '.$file);
 					continue;
@@ -85,11 +86,12 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{
+		$lockfiles=getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
 			if ($file[0]!='.')
 			{
-				if ((($file==$_PREFS->getPref('locking.lockfile'))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
+				if (((in_array($file,$lockfiles))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
 				{
 					$log->debug('Ignoring lock file '.$file);
 					continue;

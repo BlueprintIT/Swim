@@ -379,10 +379,10 @@ class Resource
 		$resources=array();
 		$dir=$this->getDir().'/'.$type.'s';
 		$dir=opendir($dir);
-		$lockname=$this->prefs->getPref('locking.lockfile');
+		$locknames=getLockFiles();
 		while (false !== ($entry=readdir($dir)))
 		{
-			if (($entry[0]!='.')&&($entry!=$lockname))
+			if (($entry[0]!='.')&&(!in_array($entry,$locknames)))
 			{
 				$resource=&$this->getResource($type,$entry);
 				if ($resource!==false)

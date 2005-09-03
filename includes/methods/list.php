@@ -63,7 +63,7 @@ function listContainer(&$container,$type=false)
 function listDir($path,$name)
 {
 	global $_PREFS;
-	$lockfile=$_PREFS->getPref('locking.lockfile');
+	$lockfiles=getLockFiles();
 	$templockfile=$_PREFS->getPref('locking.templockfile');
 	$log=&LoggerManager::getLogger('swim.method.list');
 	print('<dir');
@@ -74,7 +74,7 @@ function listDir($path,$name)
 	{
 		while (($file = readdir($dir)) !== false)
 		{
-			if (($file[0]!='.')&&($file!=$lockfile)&&($file!=$templockfile))
+			if (($file[0]!='.')&&(!in_array($file,$lockfiles))&&($file!=$templockfile))
 			{
 				if (is_dir($path.'/'.$file))
 				{

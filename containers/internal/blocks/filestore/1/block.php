@@ -126,10 +126,10 @@
 		
 		$list=opendir($dir);
 		$count=0;
-		$lockfile=$this->prefs->getPref('locking.lockfile');
+		$lockfiles=getLockFiles();
 		while (($file=readdir($list))!==false)
 		{
-			if (($file[0]!='.')&&($file!='access')&&($file!='dir.lock'))
+			if (($file[0]!='.')&&($file!='access')&&(!in_array($file,$lockfiles)))
 			{
 				if ($count==0)
 				{

@@ -15,6 +15,25 @@
 
 $_LOCKS = array();
 
+function getLockFiles()
+{
+	global $_PREFS;
+	
+  $type=$_PREFS->getPref('locking.type','flock');
+  if ($type=='flock')
+ 	{
+	  return array($_PREFS->getPref('locking.lockfile'));
+ 	}
+  else if ($type=='mkdir')
+ 	{
+	  return array($_PREFS->getPref('locking.lockfile'), $_PREFS->getPref('locking.mkdirlock'));
+ 	}
+ 	else
+ 	{
+ 		return array();
+ 	}
+}
+
 function &flockRead(&$log,$dir,$id)
 {
 	global $_PREFS;
@@ -55,11 +74,9 @@ function flockUnlock(&$log,$id,&$lock)
 	fclose($lock);
 }
 
-function mkdirGetLock(&$log,$lockdir)
+function mkdirGetLock(&$log,$lockdir,$staleage)
 {
 	global $_PREFS;
-
-	$staleage=$_PREFS->getPRef('locking.staleage');
 	
   if (is_dir($lockdir))
   {
@@ -73,6 +90,7 @@ function mkdirGetLock(&$log,$lockdir)
 	$locked=@mkdir($lockdir);
 	while (!$locked)
 	{
+		usleep(10000);
 		$locked=@mkdir($lockdir);
 	}
 }
@@ -82,34 +100,41 @@ function &mkdirRead(&$log,$dir,$id)
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
 	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
-	mkdirGetLock($log,$lockdir);
-	if (is_file($lockfile))
+	$staleage=$_PREFS->getPref('locking.staleage');
+	mkdirGetLock($log,$lockdir,$staleage);
+
+	if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockdir))<$staleage))
 	{
-		$file=fopen($lockfile,'a+');
+		$file=fopen($lockfile,'r');
 		if ($file===false)
 		{
 			$log->error('Error opening lockfile '.$lockfile);
 			rmdir($lockdir);
 			return false;
 		}
-		fseek($file,0);
-		$count=fgets($file);
-		fseek($file,0);
-		fwrite($file,$count+1);
+		$count=(int)fgets($file);
 		fclose($file);
 	}
 	else
 	{
-		$file=fopen($lockfile,'w');
-		if ($file===false)
+		if (is_file($lockfile))
 		{
-			$log->error('Error opening lockfile '.$lockfile);
-			rmdir($lockdir);
-			return false;
+			$log->warn('Clearing stale lock file '.$lockfile);
 		}
-		fwrite($file,'1');
-		fclose($file);
+		$count=0;
 	}
+	
+	$count++;
+	$file=fopen($lockfile,'w');
+	if ($file===false)
+	{
+		$log->error('Error opening lockfile '.$lockfile);
+		rmdir($lockdir);
+		return false;
+	}
+	fwrite($file,$count);
+	fclose($file);
+
 	rmdir($lockdir);
 	return array($dir,'read');
 }
@@ -119,12 +144,21 @@ function &mkdirWrite(&$log,$dir,$id)
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
 	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
-	mkdirGetLock($log,$lockdir);
-	while (is_file($lockfile))
+	$staleage=$_PREFS->getPref('locking.staleage');
+	mkdirGetLock($log,$lockdir,$staleage);
+	while ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockdir))<$staleage))
 	{
 		rmdir($lockdir);
 		sleep(1);
-		mkdirGetLock($log,$lockdir);
+		mkdirGetLock($log,$lockdir,$staleage);
+	}
+	if (is_file($lockfile))
+	{
+		if (is_file($lockfile))
+		{
+			$log->warn('Clearing stale lock file '.$lockfile);
+		}
+		unlink($lockfile);
 	}
 	return array($dir,'write');
 }
@@ -137,22 +171,46 @@ function mkdirUnlock(&$log,$id,&$lock)
 	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
 	if ($lock[1]=='read')
 	{
-		mkdirGetLock($log,$lockdir);
-		$file=fopen($lockfile,'r+');
-		$count=fgets($file);
-		if ($count>1)
+		$staleage=$_PREFS->getPref('locking.staleage');
+		mkdirGetLock($log,$lockdir,$staleage);
+
+		if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockdir))<$staleage))
 		{
-			fseek($file,0);
-			fwrite($file,$count-1);
+			$file=fopen($lockfile,'r');
+			if ($file===false)
+			{
+				$log->error('Error opening lockfile '.$lockfile);
+				rmdir($lockdir);
+				return false;
+			}
+			$count=(int)fgets($file);
 			fclose($file);
+			$count--;
 		}
 		else
 		{
+			if (is_file($lockfile))
+			{
+				$log->warn('Clearing stale lock file '.$lockfile);
+			}
+			$count=0;
+		}
+
+		if ($count>0)
+		{
+			$file=fopen($lockfile,'w');
+			fwrite($file,$count);
 			fclose($file);
+		}
+		else if (is_file($lockfile))
+		{
 			unlink($lockfile);
 		}
 	}
-	rmdir($lockdir);
+	if (!@rmdir($lockdir))
+	{
+		$log->warntrace('Could not remove lock dir '.$lockdir);
+	}
 }
 
 function lockResourceRead($dir,$id=false)
