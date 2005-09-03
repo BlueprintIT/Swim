@@ -103,7 +103,7 @@ function &mkdirRead(&$log,$dir,$id)
 	$staleage=$_PREFS->getPref('locking.staleage');
 	mkdirGetLock($log,$lockdir,$staleage);
 
-	if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockdir))<$staleage))
+	if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockfile))<$staleage))
 	{
 		$file=fopen($lockfile,'r');
 		if ($file===false)
@@ -146,7 +146,7 @@ function &mkdirWrite(&$log,$dir,$id)
 	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
 	$staleage=$_PREFS->getPref('locking.staleage');
 	mkdirGetLock($log,$lockdir,$staleage);
-	while ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockdir))<$staleage))
+	while ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockfile))<$staleage))
 	{
 		rmdir($lockdir);
 		sleep(1);
@@ -174,7 +174,7 @@ function mkdirUnlock(&$log,$id,&$lock)
 		$staleage=$_PREFS->getPref('locking.staleage');
 		mkdirGetLock($log,$lockdir,$staleage);
 
-		if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockdir))<$staleage))
+		if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockfile))<$staleage))
 		{
 			$file=fopen($lockfile,'r');
 			if ($file===false)
@@ -216,6 +216,11 @@ function mkdirUnlock(&$log,$id,&$lock)
 function lockResourceRead($dir,$id=false)
 {
 	global $_LOCKS,$_PREFS;
+	
+	if ($_PREFS->getPref('locking.alwaysexclusive',false))
+	{
+		return lockResourceWrite($dir,$id);
+	}
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
