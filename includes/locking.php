@@ -15,6 +15,9 @@
 
 $_LOCKS = array();
 
+define('LOCK_READ',1);
+define('LOCK_WRITE',2);
+
 function getLockFiles()
 {
 	global $_PREFS;
@@ -34,7 +37,7 @@ function getLockFiles()
  	}
 }
 
-function &flockRead(&$log,$dir,$id)
+function &flockRead(&$log,$dir)
 {
 	global $_PREFS;
 	
@@ -51,7 +54,7 @@ function &flockRead(&$log,$dir,$id)
 	}
 }
 
-function &flockWrite(&$log,$dir,$id)
+function &flockWrite(&$log,$dir)
 {
 	global $_PREFS;
 	
@@ -68,7 +71,13 @@ function &flockWrite(&$log,$dir,$id)
 	}
 }
 
-function flockUnlock(&$log,$id,&$lock)
+function &flockUpgrade(&$log,$dir,&$lock)
+{
+	flock($lock,LOCK_EX);
+	return $lock;
+}
+
+function flockUnlock(&$log,$dir,&$lock,$type)
 {
 	flock($lock,LOCK_UN);
 	fclose($lock);
@@ -95,7 +104,7 @@ function mkdirGetLock(&$log,$lockdir,$staleage)
 	}
 }
 
-function &mkdirRead(&$log,$dir,$id)
+function &mkdirRead(&$log,$dir)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
@@ -136,10 +145,10 @@ function &mkdirRead(&$log,$dir,$id)
 	fclose($file);
 
 	rmdir($lockdir);
-	return array($dir,'read');
+	return LOCK_READ;
 }
 
-function &mkdirWrite(&$log,$dir,$id)
+function &mkdirWrite(&$log,$dir)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
@@ -160,16 +169,51 @@ function &mkdirWrite(&$log,$dir,$id)
 		}
 		unlink($lockfile);
 	}
-	return array($dir,'write');
+	return true;
 }
 
-function mkdirUnlock(&$log,$id,&$lock)
+function &mkdirUpgrade(&$log,$dir,&$lock)
 {
 	global $_PREFS;
-	$dir=$lock[0];
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
 	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
-	if ($lock[1]=='read')
+	$staleage=$_PREFS->getPref('locking.staleage');
+	$count=-1;
+
+	mkdirGetLock($log,$lockdir,$staleage);
+	while ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockfile))<$staleage))
+	{
+		$file=fopen($lockfile,'r');
+		if ($file===false)
+		{
+			$log->error('Error opening lockfile '.$lockfile);
+			rmdir($lockdir);
+			return false;
+		}
+		$count=(int)fgets($file);
+		fclose($file);
+		if ($count==1)
+			break;
+		rmdir($lockdir);
+		sleep(1);
+		mkdirGetLock($log,$lockdir,$staleage);
+	}
+
+	if (is_file($lockfile))
+	{
+		if ($count!=1)
+			$log->warn('Clearing stale lock file '.$lockfile);
+		unlink($lockfile);
+	}
+	return true;
+}
+
+function mkdirUnlock(&$log,$dir,&$lock,$type)
+{
+	global $_PREFS;
+	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
+	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
+	if ($type==LOCK_READ)
 	{
 		$staleage=$_PREFS->getPref('locking.staleage');
 		mkdirGetLock($log,$lockdir,$staleage);
@@ -213,55 +257,139 @@ function mkdirUnlock(&$log,$id,&$lock)
 	}
 }
 
-function lockResourceRead($dir,$id=false)
+function &getReadLock(&$log,$dir)
+{
+	global $_PREFS;
+	
+  $type=$_PREFS->getPref('locking.type','flock');
+  if ($type=='flock')
+ 	{
+	  $lock=&flockRead($log,$dir);
+ 	}
+  else if ($type=='mkdir')
+ 	{
+	  $lock=&mkdirRead($log,$dir);
+ 	}
+ 	else if ($type=='none')
+ 	{
+ 		$lock=true;
+ 	}
+ 	else
+ 	{
+ 		$log->error('No valid locking type specified');
+ 		$lock=true;
+ 	}
+ 	return $lock;
+}
+
+function &getWriteLock(&$log,$dir)
+{
+	global $_PREFS;
+	
+  $type=$_PREFS->getPref('locking.type','flock');
+  if ($type=='flock')
+ 	{
+	  $lock=&flockWrite($log,$dir);
+ 	}
+  else if ($type=='mkdir')
+ 	{
+	  $lock=&mkdirWrite($log,$dir);
+ 	}
+ 	else if ($type=='none')
+ 	{
+ 		$lock=true;
+ 	}
+ 	else
+ 	{
+ 		$log->error('No valid locking type specified');
+ 		$lock=true;
+ 	}
+ 	return $lock;
+}
+
+function &upgradeLock(&$log,$dir,&$lock)
+{
+	global $_PREFS;
+	
+  $type=$_PREFS->getPref('locking.type','flock');
+  if ($type=='flock')
+ 	{
+	  $lock=&flockUpgrade($log,$dir,$lock);
+ 	}
+  else if ($type=='mkdir')
+ 	{
+	  $lock=&mkdirUpgrade($log,$dir,$lock);
+ 	}
+ 	else if ($type=='none')
+ 	{
+ 	}
+ 	else
+ 	{
+ 		$log->error('No valid locking type specified');
+ 	}
+}
+
+function unLock(&$log,$dir,&$lock,$type)
+{
+	global $_PREFS;
+	
+  $type=$_PREFS->getPref('locking.type','flock');
+  if ($type=='flock')
+ 	{
+	  flockUnlock($log,$dir,$lock,$type);
+ 	}
+  else if ($type=='mkdir')
+ 	{
+	  mkdirUnlock($log,$dir,$lock,$type);
+ 	}
+ 	else if ($type=='none')
+ 	{
+ 	}
+ 	else
+ 	{
+ 		$log->error('No valid locking type specified');
+ 	}
+}
+
+function lockResourceRead($dir)
 {
 	global $_LOCKS,$_PREFS;
 	
 	if ($_PREFS->getPref('locking.alwaysexclusive',false))
 	{
-		return lockResourceWrite($dir,$id);
+		return lockResourceWrite($dir);
 	}
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
-	if ($id===false)
+	if (!isset($_LOCK[$dir]))
 	{
-		$id=1;
-		while (isset($_LOCKS[$id]))
-		{
-			$id++;
-		}
+		$_LOCKS[$dir] = array('dir' => $dir, 'count' => 0);
 	}
-	
-	$log->debug('Read locking '.$dir.' as '.$id);
-  $type=$_PREFS->getPref('locking.type','flock');
-  if ($type=='flock')
- 	{
-	  $_LOCKS[$id]=&flockRead($log,$dir,$id);
- 	}
-  else if ($type=='mkdir')
- 	{
-	  $_LOCKS[$id]=&mkdirRead($log,$dir,$id);
- 	}
- 	else if ($type=='none')
- 	{
- 		$_LOCKS[$id]=true;
- 	}
- 	else
- 	{
- 		$log->error('No valid locking type specified');
- 		$_LOCKS[$id]=true;
- 	}
- 	
-	if ($_LOCKS[$id]!==false)
+		
+	if ($_LOCKS[$dir]['count']==0)
 	{
-	  $log->debug('Lock complete');
+		$log->debug('Read locking '.$dir);
+	 	
+	 	$lock=&getReadLock($log,$dir);
+	 	
+		if ($lock!==false)
+		{
+		  $log->debug('Lock complete');
+		  $_LOCKS[$dir]['type']=LOCK_READ;
+		  $_LOCKS[$dir]['lock']=&$lock;
+		  $_LOCKS[$dir]['count']++;
+		}
+		else
+		{
+		  $log->warntrace('Lock failed on dir '.$dir);
+		}
 	}
 	else
 	{
-	  $log->warntrace('Lock failed on dir '.$dir);
+		$_LOCKS[$dir]['count']++;
 	}
-	return $id;
+	return true;
 }
 
 function lockResourceWrite($dir,$id=false)
@@ -270,78 +398,68 @@ function lockResourceWrite($dir,$id=false)
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
-	if ($id===false)
+	if (!isset($_LOCK[$dir]))
 	{
-		$id=0;
-		while (isset($_LOCKS[$id]))
-		{
-			$id++;
-		}
+		$_LOCKS[$dir] = array('dir' => $dir, 'count' => 0);
 	}
 	
-	$log->debug('Write locking '.$dir.' as '.$id);
-  $type=$_PREFS->getPref('locking.type','flock');
-  if ($type=='flock')
- 	{
-	  $_LOCKS[$id]=&flockWrite($log,$dir,$id);
- 	}
-  else if ($type=='mkdir')
- 	{
-	  $_LOCKS[$id]=&mkdirWrite($log,$dir,$id);
- 	}
- 	else if ($type=='none')
- 	{
- 		$_LOCKS[$id]=true;
- 	}
- 	else
- 	{
- 		$log->error('No valid locking type specified');
- 		$_LOCKS[$id]=true;
- 	}
- 	
-	if ($_LOCKS[$id]!==false)
+	if ($_LOCKS[$dir]['count']==0)
 	{
-	  $log->debug('Lock complete');
+		$log->debug('Write locking '.$dir);
+		$lock=&getWriteLock($log,$dir);
+	 	
+		if ($lock!==false)
+		{
+		  $log->debug('Lock complete');
+		  $_LOCKS[$dir]['type']=LOCK_WRITE;
+		  $_LOCKS[$dir]['lock']=&$lock;
+		  $_LOCKS[$dir]['count']++;
+		}
+		else
+		{
+		  $log->warntrace('Lock failed on dir '.$dir);
+		}
+	}
+	else if ($_LOCKS[$dir]['type']==LOCK_READ)
+	{
+		$lock=&upgradeLock($log,$dir,$_LOCKS[$id]['lock']);
+		if ($lock)
+		{
+			$_LOCKS[$dir]['type']=LOCK_WRITE;
+			$_LOCKS[$dir]['lock']=&$lock;
+			$_LOCKS[$dir]['count']++;
+		}
+		else
+		{
+			$log->error('Failed to upgrade lock on '.$dir);
+		}
 	}
 	else
 	{
-	  $log->warntrace('Lock failed on dir '.$dir);
+	  $_LOCKS[$dir]['count']++;
 	}
 	return $id;
 }
 
-function unlockResource($id)
+function unlockResource($dir)
 {
 	global $_LOCKS,$_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.locking');
-	if (isset($_LOCKS[$id]))
+	if ((isset($_LOCKS[$dir]))&&($_LOCKS[$dir]['count']>0))
 	{
-		if ($_LOCKS[$id]!==false)
-		{
-		  $log->debug('Unlocking '.$id);
-		  $type=$_PREFS->getPref('locking.type','flock');
-		  if ($type=='flock')
-		 	{
-			  flockUnlock($log,$id,$_LOCKS[$id]);
-		 	}
-		  else if ($type=='mkdir')
-		 	{
-			  mkdirUnlock($log,$id,$_LOCKS[$id]);
-		 	}
-		 	else if ($type=='none')
-		 	{
-		 	}
-		 	else
-		 	{
-		 		$log->error('No valid locking type specified');
-		 	}
-		}
- 		unset($_LOCKS[$id]);
+	  $log->debug('Unlocking '.$dir);
+	  unLock($log,$dir,$_LOCKS[$dir]['lock'],$_LOCKS[$dir]['type']);
+	  $_LOCKS[$dir]['count']--;
+	  if ($_LOCKS[$dir]['count']==0)
+	  {
+	  	unset($_LOCKS[$dir]['type']);
+	  	unset($_LOCKS[$dir]['lock']);
+	  }
 	}
 	else
 	{
-		$log->warntrace('Attempt to unlock unlocked id '.$id);
+		$log->warntrace('Attempt to unlock unlocked '.$dir);
 	}
 }
 

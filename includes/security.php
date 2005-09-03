@@ -24,20 +24,21 @@ define('PERMISSION_WRITE',1);
 function lockSecurityRead()
 {
 	global $_PREFS;
-	lockResourceRead($_PREFS->getPref('storage.security'),'security');
+	lockResourceRead($_PREFS->getPref('storage.security'));
 	return true;
 }
 
 function lockSecurityWrite()
 {
 	global $_PREFS;
-	lockResourceWrite($_PREFS->getPref('storage.security'),'security');
+	lockResourceWrite($_PREFS->getPref('storage.security'));
 	return true;
 }
 
 function unlockSecurity()
 {
-	unlockResource('security');
+	global $_PREFS;
+	unlockResource($_PREFS->getPref('storage.security'));
 }
 
 function login($username,$password)

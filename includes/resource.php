@@ -63,40 +63,40 @@ class WorkingDetails
 	
 	function clean()
 	{
-		$lock=lockResourceWrite($this->dir);
+		lockResourceWrite($this->dir);
 		$this->internalClean();
-		unlockResource($lock);
+		unlockResource($this->dir);
 	}
 	
 	function takeOver()
 	{
 		global $_USER;
 		
-		$lock=lockResourceWrite($this->dir);
+		lockResourceWrite($this->dir);
 		$this->user=&$_USER;
 		$this->internalSave();
-		unlockResource($lock);
+		unlockResource($this->dir);
 	}
 	
 	function takeOverClean()
 	{
 		global $_USER;
 		
-		$lock=lockResourceWrite($this->dir);
+		lockResourceWrite($this->dir);
 		$this->user=&$_USER;
 		$this->internalClean();
 		$this->internalSave();
-		unlockResource($lock);
+		unlockResource($this->dir);
 	}
 	
 	function free()
 	{
 		global $_PREFS;
 		
-		$lock=lockResourceWrite($this->dir);
+		lockResourceWrite($this->dir);
 		$this->internalClean();
 		unlink($this->dir.'/'.$_PREFS->getPref('locking.templockfile'));
-		unlockResource($lock);
+		unlockResource($this->dir);
 		return true;
 	}
 	
@@ -104,7 +104,7 @@ class WorkingDetails
 	{
 		global $_PREFS;
 		
-		$lock=lockResourceWrite($this->dir);
+		lockResourceWrite($this->dir);
 		if (is_readable($this->dir.'/'.$_PREFS->getPref('locking.templockfile')))
 		{
 			$this->blank=false;
@@ -122,7 +122,7 @@ class WorkingDetails
 		{
 			$this->internalSave();
 		}
-		unlockResource($lock);
+		unlockResource($this->dir);
 	}
 	
 	function internalSave()
@@ -138,9 +138,9 @@ class WorkingDetails
 	
 	function saveDetails()
 	{
-		$lock=lockResourceWrite($this->dir);
+		lockResourceWrite($this->dir);
 		$this->internalSave();
-		unlockResource($lock);
+		unlockResource($this->dir);
 	}
 }
 
@@ -320,9 +320,9 @@ class Resource
 		{
 			$layoutdir=$this->prefs->getPref('storage.layouts').'/'.$layout;
 		}
-		$lock=lockResourceWrite($pdir);
+		lockResourceWrite($pdir);
 		recursiveCopy($layoutdir,$pdir,true);
-		unlockResource($lock);
+		unlockResource($pdir);
 
 		$newresource=&$this->getResource($type,$id);
 
@@ -573,7 +573,8 @@ class Resource
 		if (($this->isWritable())&&(!isset($this->readLock))&&(!isset($this->writeLock)))
 		{
 			$this->log->debug('Making read lock');
-			$this->readLock=lockResourceRead($this->getDir());
+			lockResourceRead($this->getDir());
+			$this->readLock='locked';
 			$this->log->debug('Locked as '.$this->readLock);
 		}
 		$this->lockCount++;
@@ -588,7 +589,7 @@ class Resource
 			{
 				// No longer warning on this, its going to be used normally.
 				$this->log->debug('Write locking read locked resource '.$this->id);
-				unlockResource($this->readLock);
+				unlockResource($this->getDir());
 				unset($this->readLock);
 				
 				if (isset($this->writeLock))
@@ -600,7 +601,8 @@ class Resource
 			if (!isset($this->writeLock))
 			{
 				$this->log->debug('Making write lock');
-				$this->writeLock=lockResourceWrite($this->getDir());
+				lockResourceWrite($this->getDir());
+				$this->writeLock='locked';
 				$this->log->debug('Locked as '.$this->writeLock);
 			}
 		}
@@ -624,13 +626,13 @@ class Resource
 					if (isset($this->writeLock))
 					{
 						$this->log->debug('Unlocking write lock');
-						unlockResource($this->writeLock);
+						unlockResource($this->getDir());
 						unset($this->writeLock);
 					}
 					else if (isset($this->readLock))
 					{
 						$this->log->debug('Unlocking read lock');
-						unlockResource($this->readLock);
+						unlockResource($this->getDir());
 						unset($this->readLock);
 					}
 					else

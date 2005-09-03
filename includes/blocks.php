@@ -185,7 +185,7 @@ function &loadBlock($blockdir,&$container,$id,$version=false)
 	if (is_dir($blockdir))
 	{
 		if ($container->isWritable())
-			$lock=lockResourceRead($blockdir);
+			lockResourceRead($blockdir);
 	
 		$blockprefs = new Preferences();
 		$blockprefs->setParent($_PREFS);
@@ -206,7 +206,7 @@ function &loadBlock($blockdir,&$container,$id,$version=false)
 		}
 	
 		if ($container->isWritable())
-			unlockResource($lock);
+			unlockResource($blockdir);
 	
 		if (class_exists($class))
 		{
