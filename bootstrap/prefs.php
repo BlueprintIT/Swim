@@ -71,7 +71,7 @@ class Preferences
     {
       $line=fgets($source);
       $matches=array();
-      if (preg_match('/^([^=#$[\]]+)=(.*?)\s*$/',$line,$matches))
+      if (preg_match('/^([^=#$[\]\/]+)=(.*?)\s*$/',$line,$matches))
       {
       	if (substr($matches[1],0,strlen($branch))==$branch)
       	{
@@ -203,6 +203,7 @@ $host->setParent($default);
 $default->setDelegate($host);
 
 $_PREFS=&$host;
+LoggerManager::loadPreferences();
 require_once $bootstrap.'/baseincludes.php';
 
 $confdir=$host->getPref('storage.config');

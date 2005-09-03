@@ -22,6 +22,9 @@ $bootstrap=dirname($source).'/bootstrap';
 unset($source);
 
 // Load the preferences engine
+require_once $bootstrap.'/logging.php';
+
+// Load the preferences engine
 require_once $bootstrap.'/prefs.php';
 
 // Include various utils

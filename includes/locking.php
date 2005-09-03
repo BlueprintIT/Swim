@@ -262,6 +262,7 @@ function &getReadLock(&$log,$dir)
 	global $_PREFS;
 	
   $type=$_PREFS->getPref('locking.type','flock');
+  $log->debug('Calling '.$type.' to lock '.$dir.' to level '.LOCK_READ);
   if ($type=='flock')
  	{
 	  $lock=&flockRead($log,$dir);
@@ -287,6 +288,7 @@ function &getWriteLock(&$log,$dir)
 	global $_PREFS;
 	
   $type=$_PREFS->getPref('locking.type','flock');
+  $log->debug('Calling '.$type.' to lock '.$dir.' to level '.LOCK_WRITE);
   if ($type=='flock')
  	{
 	  $lock=&flockWrite($log,$dir);
@@ -312,6 +314,7 @@ function &upgradeLock(&$log,$dir,&$lock)
 	global $_PREFS;
 	
   $type=$_PREFS->getPref('locking.type','flock');
+  $log->debug('Calling '.$type.' to upgrade lock on '.$dir.' to level '.LOCK_WRITE);
   if ($type=='flock')
  	{
 	  $lock=&flockUpgrade($log,$dir,$lock);
@@ -333,16 +336,17 @@ function unLock(&$log,$dir,&$lock,$type)
 {
 	global $_PREFS;
 	
-  $type=$_PREFS->getPref('locking.type','flock');
-  if ($type=='flock')
+  $ltype=$_PREFS->getPref('locking.type','flock');
+  $log->debug('Calling '.$ltype.' to unlock '.$dir.' from level '.$type);
+  if ($ltype=='flock')
  	{
 	  flockUnlock($log,$dir,$lock,$type);
  	}
-  else if ($type=='mkdir')
+  else if ($ltype=='mkdir')
  	{
 	  mkdirUnlock($log,$dir,$lock,$type);
  	}
- 	else if ($type=='none')
+ 	else if ($ltype=='none')
  	{
  	}
  	else
@@ -362,15 +366,13 @@ function lockResourceRead($dir)
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
-	if (!isset($_LOCK[$dir]))
+	if (!isset($_LOCKS[$dir]))
 	{
-		$_LOCKS[$dir] = array('dir' => $dir, 'count' => 0);
+		$_LOCKS[$dir] = array('dir' => $dir);
 	}
 		
-	if ($_LOCKS[$dir]['count']==0)
+	if (!isset($_LOCKS[$dir]['count']))
 	{
-		$log->debug('Read locking '.$dir);
-	 	
 	 	$lock=&getReadLock($log,$dir);
 	 	
 		if ($lock!==false)
@@ -378,7 +380,7 @@ function lockResourceRead($dir)
 		  $log->debug('Lock complete');
 		  $_LOCKS[$dir]['type']=LOCK_READ;
 		  $_LOCKS[$dir]['lock']=&$lock;
-		  $_LOCKS[$dir]['count']++;
+		  $_LOCKS[$dir]['count']=1;
 		}
 		else
 		{
@@ -398,14 +400,13 @@ function lockResourceWrite($dir,$id=false)
 	
 	$log=&LoggerManager::getLogger('swim.locking');
 
-	if (!isset($_LOCK[$dir]))
+	if (!isset($_LOCKS[$dir]))
 	{
-		$_LOCKS[$dir] = array('dir' => $dir, 'count' => 0);
+		$_LOCKS[$dir] = array('dir' => $dir);
 	}
 	
-	if ($_LOCKS[$dir]['count']==0)
+	if (!isset($_LOCKS[$dir]['count']))
 	{
-		$log->debug('Write locking '.$dir);
 		$lock=&getWriteLock($log,$dir);
 	 	
 		if ($lock!==false)
@@ -413,7 +414,7 @@ function lockResourceWrite($dir,$id=false)
 		  $log->debug('Lock complete');
 		  $_LOCKS[$dir]['type']=LOCK_WRITE;
 		  $_LOCKS[$dir]['lock']=&$lock;
-		  $_LOCKS[$dir]['count']++;
+		  $_LOCKS[$dir]['count']=1;
 		}
 		else
 		{
@@ -446,13 +447,13 @@ function unlockResource($dir)
 	global $_LOCKS,$_PREFS;
 	
 	$log=&LoggerManager::getLogger('swim.locking');
-	if ((isset($_LOCKS[$dir]))&&($_LOCKS[$dir]['count']>0))
+	if ((isset($_LOCKS[$dir]))&&(isset($_LOCKS[$dir]['count']))&&($_LOCKS[$dir]['count']>0))
 	{
-	  $log->debug('Unlocking '.$dir);
-	  unLock($log,$dir,$_LOCKS[$dir]['lock'],$_LOCKS[$dir]['type']);
 	  $_LOCKS[$dir]['count']--;
-	  if ($_LOCKS[$dir]['count']==0)
+	  if (($_LOCKS[$dir]['count']==0)&&(!$_PREFS->getPref('locking.extendedlocking')))
 	  {
+		  unLock($log,$dir,$_LOCKS[$dir]['lock'],$_LOCKS[$dir]['type']);
+	  	unset($_LOCKS[$dir]['count']);
 	  	unset($_LOCKS[$dir]['type']);
 	  	unset($_LOCKS[$dir]['lock']);
 	  }
@@ -462,5 +463,29 @@ function unlockResource($dir)
 		$log->warntrace('Attempt to unlock unlocked '.$dir);
 	}
 }
+
+function shutdownLocking()
+{
+	global $_LOCKS,$_PREFS;
+	
+	$log=&LoggerManager::getLogger('swim.locking');
+	foreach ($_LOCKS as $dir => $lock)
+	{
+		if (isset($lock['count']))
+		{
+			if ($lock['count']>0)
+			{
+				$log->warn($dir.' was not properly unlocked');
+				unLock($log,$dir,$lock['lock'],$lock['type']);
+			}
+			else if ($_PREFS->getPref('locking.extendedlocking'))
+			{
+				unLock($log,$dir,$lock['lock'],$lock['type']);
+			}
+		}
+	}
+}
+
+register_shutdown_function('shutdownLocking');
 
 ?>

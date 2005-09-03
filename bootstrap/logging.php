@@ -254,8 +254,22 @@ class Logger
 			$pos++;
 			$tpos++;
 		}
-		$result[$pos]['line']=$trace[$tpos-1]['line'];
-		$result[$pos]['file']=$trace[$tpos-1]['file'];
+		if (isset($trace[$tpos-1]['line']))
+		{
+			$result[$pos]['line']=$trace[$tpos-1]['line'];
+		}
+		else
+		{
+			$result[$pos]['line']='-1';
+		}
+		if (isset($trace[$tpos-1]['file']))
+		{
+			$result[$pos]['file']=$trace[$tpos-1]['file'];
+		}
+		else
+		{
+			$result[$pos]['file']='Unknown';
+		}
 		$result[$pos]['args']=array();
 		$result[$pos]['function']='';
 		
@@ -406,6 +420,12 @@ class LoggerManager
 		$this->output = new PageLogOutput();
 	}
 	
+	function loadPreferences()
+	{
+		global $_PREFS;
+		LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
+	}
+	
 	function &getOutputter()
 	{
 		return $this->output;
@@ -495,7 +515,6 @@ class LoggerManager
 }
 
 $_LOGMANAGER = new LoggerManager();
-LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
 LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)

@@ -16,6 +16,5 @@
 // Include all the support routines
 
 require $host->getPref('storage.includes').'/locking.php';
-require $host->getPref('storage.includes').'/logging.php';
 
 ?>
