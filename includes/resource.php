@@ -93,6 +93,7 @@ class WorkingDetails
 	{
 		global $_PREFS;
 		
+		$this->log->debug('Freeing working version');
 		lockResourceWrite($this->dir);
 		$this->internalClean();
 		unlink($this->dir.'/'.$_PREFS->getPref('locking.templockfile'));
@@ -418,6 +419,7 @@ class Resource
 	
 	function &makeNewVersion()
 	{
+		$this->log->debug('Cloning '.$this->id.' to a new version');
 		if (isset($this->parent))
 		{
 			$parentv=&$this->parent->makeNewVersion();
@@ -470,6 +472,7 @@ class Resource
 	
 	function makeCurrentVersion()
 	{
+		$this->log->debug('Making this the current version');
 		if (isset($this->parent))
 		{
 			$this->parent->makeCurrentVersion();
@@ -478,6 +481,7 @@ class Resource
 		{
 			$this->container->makeCurrentResourceVersion($this);
 		}
+		$this->log->debug('Complete');
 	}
 	
 	function &getCurrentVersion()

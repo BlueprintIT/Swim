@@ -28,7 +28,7 @@ function shutdown()
 	}
 	else if ($_STATE==STATE_SHUTDOWN)
 	{
-		$log->warn('Shutdown called during shutdown phase.');
+		$log->warntrace('Shutdown called during shutdown phase.');
 	}
 	else
 	{

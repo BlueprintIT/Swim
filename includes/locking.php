@@ -212,48 +212,56 @@ function mkdirUnlock(&$log,$dir,&$lock,$type)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
-	$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
-	if ($type==LOCK_READ)
+
+	if (is_dir($dir))
 	{
-		$staleage=$_PREFS->getPref('locking.staleage');
-		mkdirGetLock($log,$lockdir,$staleage);
-
-		if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockfile))<$staleage))
+		$lockfile=$dir.'/'.$_PREFS->getPref('locking.lockfile');
+		if ($type==LOCK_READ)
 		{
-			$file=fopen($lockfile,'r');
-			if ($file===false)
+			$staleage=$_PREFS->getPref('locking.staleage');
+			mkdirGetLock($log,$lockdir,$staleage);
+	
+			if ((is_file($lockfile))&&(filesize($lockfile)>0)&&((time()-filemtime($lockfile))<$staleage))
 			{
-				$log->error('Error opening lockfile '.$lockfile);
-				rmdir($lockdir);
-				return false;
+				$file=fopen($lockfile,'r');
+				if ($file===false)
+				{
+					$log->error('Error opening lockfile '.$lockfile);
+					rmdir($lockdir);
+					return false;
+				}
+				$count=(int)fgets($file);
+				fclose($file);
+				$count--;
 			}
-			$count=(int)fgets($file);
-			fclose($file);
-			$count--;
-		}
-		else
-		{
-			if (is_file($lockfile))
+			else
 			{
-				$log->warn('Clearing stale lock file '.$lockfile);
+				if (is_file($lockfile))
+				{
+					$log->warn('Clearing stale lock file '.$lockfile);
+				}
+				$count=0;
 			}
-			$count=0;
+	
+			if ($count>0)
+			{
+				$file=fopen($lockfile,'w');
+				fwrite($file,$count);
+				fclose($file);
+			}
+			else if (is_file($lockfile))
+			{
+				unlink($lockfile);
+			}
 		}
-
-		if ($count>0)
+		if (!@rmdir($lockdir))
 		{
-			$file=fopen($lockfile,'w');
-			fwrite($file,$count);
-			fclose($file);
-		}
-		else if (is_file($lockfile))
-		{
-			unlink($lockfile);
+			$log->warntrace('Could not remove lock dir '.$lockdir);
 		}
 	}
-	if (!@rmdir($lockdir))
+	else
 	{
-		$log->warntrace('Could not remove lock dir '.$lockdir);
+		$log->info('Non-existant directory unlocked - '.$dir);
 	}
 }
 
@@ -280,6 +288,7 @@ function &getReadLock(&$log,$dir)
  		$log->error('No valid locking type specified');
  		$lock=true;
  	}
+  $log->debug('Lock complete');
  	return $lock;
 }
 
@@ -306,6 +315,7 @@ function &getWriteLock(&$log,$dir)
  		$log->error('No valid locking type specified');
  		$lock=true;
  	}
+  $log->debug('Lock complete');
  	return $lock;
 }
 
@@ -330,6 +340,7 @@ function &upgradeLock(&$log,$dir,&$lock)
  	{
  		$log->error('No valid locking type specified');
  	}
+  $log->debug('Upgrade complete');
  	return $lock;
 }
 
@@ -354,6 +365,7 @@ function unLock(&$log,$dir,&$lock,$type)
  	{
  		$log->error('No valid locking type specified');
  	}
+  $log->debug('Unlock complete');
 }
 
 function lockResourceRead($dir)
