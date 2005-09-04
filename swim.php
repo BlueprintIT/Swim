@@ -20,6 +20,7 @@ define('STATE_SHUTDOWN',3);
 define('STATE_COMPLETE',4);
 
 $_STATE=STATE_BOOTSTRAP;
+error_reporting(E_ALL);
 $source = __FILE__;
 while (is_link($source))
 {

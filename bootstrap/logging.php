@@ -529,7 +529,6 @@ class LoggerManager
 }
 
 $_LOGMANAGER = new LoggerManager();
-LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)
 {
@@ -550,13 +549,17 @@ function caught_error($type,$text,$file,$line)
 	{
 		$log->log(SWIM_LOG_ERROR,$text,$trace);
 	}
-	else if (($type==E_NOTICE)||($type==E_USER_WARNING)||($type==2048))
+	else if (($type==E_NOTICE)||($type==E_USER_WARNING))
 	{
 		$log->log(SWIM_LOG_WARN,$text,$trace);
 	}
 	else if ($type==E_USER_NOTICE)
 	{
 		$log->log(SWIM_LOG_INFO,$text,$trace);
+	}
+	else if ($type==2048)
+	{
+		$log->log(SWIM_LOG_DEBUG,$text,$trace);
 	}
 }
 
