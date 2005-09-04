@@ -229,17 +229,7 @@ function &loadBlock($blockdir,&$container,$id,$version=false)
 
 function &getAllBlocks()
 {
-	global $_PREFS;
-	
-	$blocks=array();
-	$containers=&getAllContainers();
-	foreach(array_keys($containers) as $id)
-	{
-		$container=&$containers[$id];
-		$newblocks=&$container->getResources('block');
-		$blocks=array_merge($blocks,$newblocks);
-	}
-	return $blocks;
+	return getAllResources('block');
 }
 
 ?>

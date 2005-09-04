@@ -330,6 +330,7 @@ function &upgradeLock(&$log,$dir,&$lock)
  	{
  		$log->error('No valid locking type specified');
  	}
+ 	return $lock;
 }
 
 function unLock(&$log,$dir,&$lock,$type)
@@ -377,7 +378,6 @@ function lockResourceRead($dir)
 	 	
 		if ($lock!==false)
 		{
-		  $log->debug('Lock complete');
 		  $_LOCKS[$dir]['type']=LOCK_READ;
 		  $_LOCKS[$dir]['lock']=&$lock;
 		  $_LOCKS[$dir]['count']=1;
@@ -411,7 +411,6 @@ function lockResourceWrite($dir,$id=false)
 	 	
 		if ($lock!==false)
 		{
-		  $log->debug('Lock complete');
 		  $_LOCKS[$dir]['type']=LOCK_WRITE;
 		  $_LOCKS[$dir]['lock']=&$lock;
 		  $_LOCKS[$dir]['count']=1;
@@ -484,8 +483,7 @@ function shutdownLocking()
 			}
 		}
 	}
+	$_LOCKS=array();
 }
-
-register_shutdown_function('shutdownLocking');
 
 ?>

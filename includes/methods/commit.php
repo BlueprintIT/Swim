@@ -51,7 +51,7 @@ function method_commit(&$request)
 						$newversion->makeCurrentVersion();
 					}
 	
-					if (is_a($oldversion->container,'Page'))
+					if (!isset($oldversion->parent))
 					{
 						redirect($request->nested);
 					}

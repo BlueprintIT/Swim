@@ -483,6 +483,20 @@ class LoggerManager
 		}
 	}
 	
+	function clearLogLevel($prefix)
+	{
+		global $_LOGMANAGER;
+		
+		if (strlen($prefix)>0)
+		{
+			$logger=&LoggerManager::getLogger($prefix);
+			$logger->clearLevel();
+		}
+		else
+		{
+		}
+	}
+	
 	function setLogOutput($prefix,&$output)
 	{
 		global $_LOGMANAGER;
@@ -519,6 +533,7 @@ LoggerManager::getLogger('php');
 
 function caught_error($type,$text,$file,$line)
 {
+	// Filter out lines marked with @ for expected errors.
 	if (ini_get('error_reporting')==0)
 		return;
 

@@ -607,17 +607,7 @@ class Template extends Resource
 
 function &getAllTemplates()
 {
-	global $_PREFS;
-	
-	$templates=array();
-	$containers=&getAllContainers();
-	foreach(array_keys($containers) as $id)
-	{
-		$container=&$containers[$id];
-		$newtemplates=&$container->getResources('template');
-		$templates=array_merge($templates,$newtemplates);
-	}
-	return $templates;
+	return getAllResources('template');
 }
 
 ?>

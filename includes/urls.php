@@ -158,7 +158,7 @@ function redirect($request)
 	$url=$request->encode();
 	$url='http://'.$_SERVER['HTTP_HOST'].$url;
 	header('Location: '.$url);
-	exit;
+	shutdown();
 }
 
 class Request

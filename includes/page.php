@@ -203,17 +203,7 @@ class Page extends Resource
 
 function &getAllPages()
 {
-	global $_PREFS;
-	
-	$pages=array();
-	$containers=&getAllContainers();
-	foreach(array_keys($containers) as $id)
-	{
-		$container=&$containers[$id];
-		$newpages=&$container->getResources('page');
-		$pages=array_merge($pages,$newpages);
-	}
-	return $pages;
+	return getAllResources('page');
 }
 
 ?>

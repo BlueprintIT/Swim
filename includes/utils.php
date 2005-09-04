@@ -13,6 +13,31 @@
  * $Revision$
  */
 
+function shutdown()
+{
+	global $_STATE;
+	$log=&LoggerManager::getLogger('swim.utils.shutdown');
+	if ($_STATE<STATE_SHUTDOWN)
+	{
+		$log->debug('Shutdown started');
+		$_STATE=STATE_SHUTDOWN;
+		shutdownLocking();
+		LoggerManager::shutdown();
+		$_STATE=STATE_COMPLETE;
+		exit;
+	}
+	else if ($_STATE==STATE_SHUTDOWN)
+	{
+		$log->warn('Shutdown called during shutdown phase.');
+	}
+	else
+	{
+		$log->debug('Shutdown called after shutdown complete (shutdown handler fallback).');
+	}
+}
+
+register_shutdown_function('shutdown');
+
 function getReadableFileSize($path)
 {
 	$units = array('bytes','KB','MB','GB','TB');
@@ -44,7 +69,7 @@ function recursiveDelete($dir,$ignorelock=false)
 {
 	global $_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.version');
+	$log=&LoggerManager::getLogger('swim.utils.delete');
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
@@ -82,7 +107,7 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 {
 	global $_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.version');
+	$log=&LoggerManager::getLogger('swim.utils.copy');
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{
@@ -103,7 +128,7 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 				else if (is_dir($dir.'/'.$file))
 				{
 					mkdir($target.'/'.$file);
-					recursiveCopy($dir.'/'.$file,$target.'/'.$file);
+					recursiveCopy($dir.'/'.$file,$target.'/'.$file,$ignorelock);
 				}
 				else
 				{
@@ -250,7 +275,7 @@ function setCacheInfo($date,$etag=false)
 		{
 			$log->debug('Resource is cached');
 			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
-			exit;
+			shutdown();
 		}
 	}
 }

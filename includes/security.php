@@ -331,7 +331,7 @@ class User
 		{
 			if ($lock)
 			{
-				$lck=lockResourceRead($dir);
+				lockResourceRead($dir);
 			}
 			$access=fopen($dir.'/access','r');
 			do
@@ -395,7 +395,7 @@ class User
 			fclose($access);
 			if ($lock)
 			{
-				unlockResource($lck);
+				unlockResource($dir);
 			}
 		}
 		return $perm;
@@ -423,7 +423,10 @@ class User
 			{
 				$perm=$this->checkSpecificPermission($permission,$resource->getDir().'/'.$dir,$file,false);
 				if ($perm!=PERMISSION_UNKNOWN)
+				{
+					$resource->unlock();
 					return $perm;
+				}
 
 				$dir=dirname($dir);
 			}
@@ -435,14 +438,17 @@ class User
 		
 		$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,false);
 		if ($perm!=PERMISSION_UNKNOWN)
+		{
+			$resource->unlock();
 			return $perm;
+		}
 		
 		$resource->unlock();
 		
 		while (isset($resource->parent))
 		{
 			$resource=&$resource->parent;
-			$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,false);
+			$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,$resource->isWritable());
 			if ($perm!=PERMISSION_UNKNOWN)
 				return $perm;
 		}

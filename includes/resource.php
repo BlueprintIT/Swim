@@ -157,10 +157,6 @@ class Resource
 	
 	var $resources = array();
 
-	var $readLock;
-	var $writeLock;
-	var $lockCount=0;
-	
 	var $dir;
 	
 	function Resource(&$container, $id, $version)
@@ -195,11 +191,18 @@ class Resource
 		$this->prefs->setParent($this->container->prefs);
 		if (!is_a($this,'File'))
 		{
+			$this->log->debug('Opening resource configuration');
 			$file=$this->openFileRead('resource.conf');
 			if ($file!==false)
 			{
+				$this->log->debug('Loading preferences');
 				$this->prefs->loadPreferences($file);
+				$this->log->debug('Closing configuration');
 				$this->closeFile($file);
+			}
+			else
+			{
+				$this->log->debug('Resource configuration not found');
 			}
 		}
 	}
@@ -376,6 +379,7 @@ class Resource
 	
 	function &getResources($type)
 	{
+		$this->lockRead();
 		$resources=array();
 		$dir=$this->getDir().'/'.$type.'s';
 		$dir=opendir($dir);
@@ -392,6 +396,7 @@ class Resource
 			}
 		}
 		closedir($dir);
+		$this->unlock();
 		return $resources;
 	}
 
@@ -570,14 +575,10 @@ class Resource
 	function lockRead()
 	{
 		$this->log->debug('lockRead - '.$this->id);
-		if (($this->isWritable())&&(!isset($this->readLock))&&(!isset($this->writeLock)))
+		if ($this->isWritable())
 		{
-			$this->log->debug('Making read lock');
 			lockResourceRead($this->getDir());
-			$this->readLock='locked';
-			$this->log->debug('Locked as '.$this->readLock);
 		}
-		$this->lockCount++;
 	}
 	
 	function lockWrite()
@@ -585,70 +586,20 @@ class Resource
 		$this->log->debug('lockWrite - '.$this->id);
 		if ($this->isWritable())
 		{
-			if (isset($this->readLock))
-			{
-				// No longer warning on this, its going to be used normally.
-				$this->log->debug('Write locking read locked resource '.$this->id);
-				unlockResource($this->getDir());
-				unset($this->readLock);
-				
-				if (isset($this->writeLock))
-				{
-					$this->log->error('Both read and write lock were applied');
-				}
-			}
-			
-			if (!isset($this->writeLock))
-			{
-				$this->log->debug('Making write lock');
-				lockResourceWrite($this->getDir());
-				$this->writeLock='locked';
-				$this->log->debug('Locked as '.$this->writeLock);
-			}
+			lockResourceWrite($this->getDir());
 		}
 		else
 		{
 			$this->log->warn('Obtained a write lock on a read only resource');
 		}
-		$this->lockCount++;
 	}
 	
 	function unlock()
 	{
 		$this->log->debug('unlock - '.$this->id);
-		if ($this->lockCount>0)
+		if ($this->isWritable())
 		{
-			$this->lockCount--;
-			if ($this->lockCount==0)
-			{
-				if ($this->isWritable())
-				{
-					if (isset($this->writeLock))
-					{
-						$this->log->debug('Unlocking write lock');
-						unlockResource($this->getDir());
-						unset($this->writeLock);
-					}
-					else if (isset($this->readLock))
-					{
-						$this->log->debug('Unlocking read lock');
-						unlockResource($this->getDir());
-						unset($this->readLock);
-					}
-					else
-					{
-						$this->log->errortrace('Unlocking but there is no lock');
-					}
-				}
-			}
-			else
-			{
-				$this->log->debug($this->lockCount.' locks left in play.');
-			}
-		}
-		else
-		{
-			$this->log->warntrace('Cannot unlock resource '.$this->id.' since it is not locked');
+				unlockResource($this->getDir());
 		}
 	}
 	
@@ -669,7 +620,7 @@ class Resource
 		global $_USER;
 		if ($this->isWritable())
 		{
-			return (((!is_file($this->getDir().'/'.$filename))||(is_writable($this->getDir().'/'.$filename)))&&($_USER->canWrite($this)));
+			return (((!file_exists($this->getDir().'/'.$filename))||(is_writable($this->getDir().'/'.$filename)))&&($_USER->canWrite($this)));
 		}
 		return false;
 	}
@@ -721,7 +672,7 @@ class Resource
 		}
 		else
 		{
-			$this->log->warn('Could not open '.$filename.' for writing');
+			//$this->log->warn('Could not open '.$filename.' for writing');
 		}
 		return false;
 	}
@@ -941,6 +892,21 @@ class File extends Resource
 		
 		return parent::openFileWrite($this->id,$append);
 	}
+}
+
+function &getAllResources($type)
+{
+	global $_PREFS;
+	
+	$resources=array();
+	$containers=&getAllContainers();
+	foreach(array_keys($containers) as $id)
+	{
+		$container=&$containers[$id];
+		$newresources=&$container->getResources($type);
+		$resources=array_merge($resources,$newresources);
+	}
+	return $resources;
 }
 
 ?>
