@@ -286,10 +286,21 @@ function callMethod(&$request)
 	
 	$methodfile=$request->method.".php";
 	$methodfunc='method_'.$request->method;
-	if (is_readable($_PREFS->getPref('storage.methods')))
+	if (is_readable($_PREFS->getPref('storage.methods').'/'.$methodfile))
 	{
 		require_once($_PREFS->getPref('storage.methods').'/'.$methodfile);
-		$methodfunc($request);
+		if (function_exists($methodfunc))
+		{
+			$methodfunc($request);
+		}
+		else
+		{
+			displayServerError($request);
+		}
+	}
+	else
+	{
+		displayNotFound($request);
 	}
 }
 
