@@ -22,7 +22,7 @@ class FileManagerBlock extends Block
 
 	function &getStoreResource($request)
 	{
-		return Resource::decodeResource($request->resource);
+		return Resource::decodeResource($request);
 	}
 	
 	function onDirCreated($request,&$dir)

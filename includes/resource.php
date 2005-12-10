@@ -691,8 +691,12 @@ class Resource
 	{
 		if (count($parts)>=2)
 		{
+      $log=&LoggerManager::getLogger('swim.resource');
+      
 			$type=$parts[0];
 			$id=$parts[1];
+
+      $log->debug("Decoding ".$type." resource ".$id." version ".$version);
 
 			if ($type=='file')
 			{
@@ -706,6 +710,10 @@ class Resource
 				{
 					return $resource->decodeRelativeResource(array_slice($parts,2));
 				}
+        else
+        {
+          $log->debug("Request for ".$type." ".$id." version ".$version." failed.");
+        }                
 			}
 		}
 		return $this;
