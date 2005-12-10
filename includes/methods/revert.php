@@ -23,18 +23,8 @@ function method_revert(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->isBlock())
-			{
-			}
-			else if ($resource->isPage())
-			{
-				$resource->makeCurrentVersion();
-				redirect($request->nested);
-			}
-			else
-			{
-				displayGeneralError($request,'You can only revert blocks or pages.');
-			}
+			$resource->makeCurrentVersion();
+			redirect($request->nested);
 		}
 		else
 		{

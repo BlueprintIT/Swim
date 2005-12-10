@@ -31,18 +31,18 @@ else
 <table>
 <tr>
     <td style="vertical-align: top"><label for="title">Version:</label></td>
-    <td style="vertical-align: top"><?
+    <td style="vertical-align: top" colspan="2"><?
 
 $versions=&$page->getVersions();
 $verlist = array_keys($versions);
 rsort($verlist);
-$revert = new Request();
-$revert->method=$request->method;
-$revert->resource=$request->resource;
+$select = new Request();
+$select->method=$request->method;
+$select->resource=$request->resource;
 
 ?>
-<form action="<?= $revert->encodePath() ?>" method="GET">
-<?= $revert->getFormVars() ?>
+<form style="display: inline" action="<?= $select->encodePath() ?>" method="GET">
+<?= $select->getFormVars() ?>
         <select name="version" onchange="this.form.submit();">
 <?
         foreach ($verlist as $version)
@@ -67,8 +67,23 @@ $revert->resource=$request->resource;
 ?>
         </select>
 </form>
+<?
+$revert = new Request();
+$revert->query['version']=$page->version;
+$revert->method='revert';
+$revert->resource=$request->resource;
+$revert->nested=$request;
+?>
+<form style="display: inline" method="POST" action="<?= $revert->encodePath() ?>">
+<?= $revert->getFormVars() ?>
+<input type="submit" value="Make current version" <? 
+if ($page->isCurrentVersion())
+{
+  print('disabled="true"');
+}
+?>>
+</form>
 </td>
-    <td style="vertical-align: top"></td>
 </tr>
 <tr>
     <td style="vertical-align: top">Title:</td>
