@@ -4,7 +4,7 @@
  * $Date$
  *
  * @author Moxiecode
- * @copyright Copyright © 2004, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004, Moxiecode Systems AB, All rights reserved.
  */
 
 function TinyMCE() {
@@ -203,15 +203,25 @@ TinyMCE.prototype.init = function(settings) {
 		this.settings['force_br_newlines'] = false;
 
 	if (tinyMCE.getParam("content_css", false)) {
-		var cssPath = tinyMCE.getParam("content_css", "");
+		var cssPaths = tinyMCE.getParam("content_css", "");
 
-		// Is relative
-		if (cssPath.indexOf('://') == -1 && cssPath.charAt(0) != '/')
-			this.settings['content_css'] = this.documentBasePath + "/" + cssPath;
-		else
-			this.settings['content_css'] = cssPath;
+		if (typeof cssPaths != 'object') {
+			var temp = cssPaths;
+			cssPaths = [];
+			cssPaths[0] = temp;
+		}
+
+		this.settings['content_css'] = [];
+
+		for (var i=0; i<cssPaths.length; i++) {
+			// Is relative
+			if (cssPaths[i].indexOf('://') == -1 && cssPaths[i].charAt(0) != '/')
+				this.settings['content_css'][i] = this.documentBasePath + "/" + cssPaths[i];
+			else
+				this.settings['content_css'][i] = cssPaths[i];
+		}
 	} else
-		this.settings['content_css'] = '';
+		this.settings['content_css'] = new Array(tinyMCE.baseURL + "/themes/" + theme + "/editor_content.css");
 
 	if (tinyMCE.getParam("popups_css", false)) {
 		var cssPath = tinyMCE.getParam("popups_css", "");
@@ -327,6 +337,12 @@ TinyMCE.prototype.importCSS = function(doc, css_file) {
 			headArr[0].appendChild(elm);
 	} else
 		var styleSheet = doc.createStyleSheet(css_file);
+};
+
+TinyMCE.prototype.importCSSs = function(doc, css_files) {
+	for (var i=0; i<css_files.length; i++) {
+		this.importCSS(doc, css_files[i]);
+	}
 };
 
 TinyMCE.prototype.confirmAdd = function(e, settings) {
@@ -693,8 +709,7 @@ TinyMCE.prototype.setupContent = function(editor_id) {
 	}
 
 	// Import theme specific content CSS the user specific
-	tinyMCE.importCSS(inst.getDoc(), tinyMCE.baseURL + "/themes/" + inst.settings['theme'] + "/css/editor_content.css");
-	tinyMCE.importCSS(inst.getDoc(), inst.settings['content_css']);
+	tinyMCE.importCSSs(inst.getDoc(), inst.settings['content_css']);
 	tinyMCE.executeCallback('init_instance_callback', '_initInstance', 0, inst);
 
 	// Setup span styles
