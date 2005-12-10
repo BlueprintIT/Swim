@@ -1626,6 +1626,15 @@ TinyMCE.prototype._moveStyle = function(elm, style, attrib) {
 
 				case "align":
 					if (elm.nodeName == "IMG") {
+					  if ((value!="left")&&(value!="right"))
+					  {
+					  	elm.style.verticalAlign=val;
+					  	val = null;
+					  }
+					  else
+					  {
+					  	elm.style.verticalAlign=null;
+					  }
 						if (tinyMCE.isMSIE)
 							elm.style.styleFloat = val;
 						else
@@ -4890,10 +4899,7 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 
 		switch (command) {
 			case "JustifyLeft":
-				if (align == 'left')
-					img.removeAttribute('align');
-				else
-					img.setAttribute('align', 'left');
+				img.setAttribute('align', 'left');
 
 				// Remove the div
 				var div = focusElm.parentNode;
@@ -4929,9 +4935,20 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 
 			case "JustifyRight":
 				if (align == 'right')
-					img.removeAttribute('align');
-				else
-					img.setAttribute('align', 'right');
+				img.setAttribute('align', 'right');
+
+				// Remove the div
+				var div = focusElm.parentNode;
+				if (div && div.nodeName == "DIV" && div.childNodes.length == 1 && div.parentNode)
+					div.parentNode.replaceChild(img, div);
+
+				this.selectNode(img);
+				this.repaint();
+				tinyMCE.triggerNodeChange();
+				return;
+				
+			case "JustifyFull":
+				img.removeAttribute('align');
 
 				// Remove the div
 				var div = focusElm.parentNode;

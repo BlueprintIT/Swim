@@ -92,12 +92,6 @@ function TinyMCE_swim_getControlHTML(control_name)
 	{
 		case "pagelink":
 			return '<img id="{$editor_id}_pagelink" src="{$pluginurl}/images/pagelink.gif" title="{$lang_swim_pagelinkdesc}" width="20" height="20" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);" onmousedown="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mcePageLink\', true);" />';
-		case "commit":
-			return '<input id="{$editor_id}_commit" title="{$lang_swim_committip}" name="action_commit" value="{$lang_swim_commitdesc}" type="submit" style="height: 20px" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);">';
-		case "save":
-			return '<input id="{$editor_id}_save" title="{$lang_swim_savetip}" name="action_continue" value="{$lang_swim_savedesc}" type="submit" style="height: 20px" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);">';
-		case "cancel":
-			return '<button id="{$editor_id}_cancel" title="{$lang_swim_canceltip}" onclick="tinyMCE.restoreAndSwitchClass(this,\'mceButtonDown\');tinyMCE.execInstanceCommand(\'{$editor_id}\',\'mceSwimCancel\', true);return false;" style="height: 20px" class="mceButtonNormal" onmouseover="tinyMCE.switchClass(this,\'mceButtonOver\');" onmouseout="tinyMCE.restoreClass(this);">{$lang_swim_canceldesc}</button>';
 	}
 	return "";
 }
