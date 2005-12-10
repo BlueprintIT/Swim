@@ -406,7 +406,7 @@ function lockResourceRead($dir)
 	return true;
 }
 
-function lockResourceWrite($dir,$id=false)
+function lockResourceWrite($dir)
 {
 	global $_LOCKS,$_PREFS;
 	
@@ -434,7 +434,7 @@ function lockResourceWrite($dir,$id=false)
 	}
 	else if ($_LOCKS[$dir]['type']==LOCK_READ)
 	{
-		$lock=&upgradeLock($log,$dir,$_LOCKS[$id]['lock']);
+		$lock=&upgradeLock($log,$dir,$_LOCKS[$dir]['lock']);
 		if ($lock)
 		{
 			$_LOCKS[$dir]['type']=LOCK_WRITE;
@@ -450,7 +450,6 @@ function lockResourceWrite($dir,$id=false)
 	{
 	  $_LOCKS[$dir]['count']++;
 	}
-	return $id;
 }
 
 function unlockResource($dir)

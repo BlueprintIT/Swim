@@ -15,16 +15,18 @@
 
 // Include all the support routines
 
+require $_PREFS->getPref('storage.includes').'/storage/sqlite.php';
 require $_PREFS->getPref('storage.includes').'/security.php';
-require $_PREFS->getPref('storage.includes').'/resource.php';
-require $_PREFS->getPref('storage.includes').'/container.php';
-require $_PREFS->getPref('storage.includes').'/page.php';
-require $_PREFS->getPref('storage.includes').'/template.php';
+require $_PREFS->getPref('storage.includes').'/resource/resource.php';
+require $_PREFS->getPref('storage.includes').'/resource/container.php';
+require $_PREFS->getPref('storage.includes').'/resource/page.php';
+require $_PREFS->getPref('storage.includes').'/resource/template.php';
+require $_PREFS->getPref('storage.includes').'/resource/blocks.php';
 require $_PREFS->getPref('storage.includes').'/layout.php';
 require $_PREFS->getPref('storage.includes').'/utils.php';
 require $_PREFS->getPref('storage.includes').'/urls.php';
 require $_PREFS->getPref('storage.includes').'/parser.php';
-require $_PREFS->getPref('storage.includes').'/blocks.php';
 require $_PREFS->getPref('storage.includes').'/mimetypes.php';
+require $_PREFS->getPref('storage.includes').'/categories.php';
 
 ?>

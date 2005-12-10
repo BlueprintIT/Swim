@@ -35,12 +35,6 @@ require_once $bootstrap.'/logging.php';
 // Load the preferences engine
 require_once $bootstrap.'/prefs.php';
 
-$_STATE=STATE_STARTUP;
-// Include various utils
-require_once $bootstrap.'/includes.php';
-require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
-unset($bootstrap);
-
 LoggerManager::setLogLevel('',SWIM_LOG_INFO);
 LoggerManager::setLogLevel('swim.utils.shutdown',SWIM_LOG_WARN);
 //LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
@@ -51,6 +45,13 @@ LoggerManager::setLogLevel('swim.utils.shutdown',SWIM_LOG_WARN);
 //LoggerManager::setLogLevel('swim.page',SWIM_LOG_WARN);
 //LoggerManager::setLogLevel('swim.resource',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.preferences',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.storage',SWIM_LOG_ALL);
+
+$_STATE=STATE_STARTUP;
+// Include various utils
+require_once $bootstrap.'/includes.php';
+require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
+unset($bootstrap);
 
 $log=&LoggerManager::getLogger('swim');
 
