@@ -24,7 +24,7 @@ function method_edit(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->isBlock())
+			if (($resource->isBlock())||($resource->isPage()))
 			{
 				$details=&$resource->getWorkingDetails();
 				
@@ -43,19 +43,22 @@ function method_edit(&$request)
 				if ($details->isMine())
 				{
 					$working=&$resource->makeWorkingVersion();
-					$page=&$working->getBlockEditor($request);
-					$page->display($request);
+          if ($resource->isBlock())
+          {
+  					$page=&$working->getBlockEditor($request);
+  					$page->display($request);
+          }
+          else
+          {
+            $container=&getContainer('internal');
+            $page=&$container->getPage('pageedit');
+            $page->display($request);
+          }
 				}
 				else
 				{
 					displayLocked($request,$details,$resource);
 				}
-			}
-			else if ($resource->isPage())
-			{
-				$container=&getContainer('internal');
-				$page=&$container->getPage('pageedit');
-				$page->display($request);
 			}
 			else
 			{

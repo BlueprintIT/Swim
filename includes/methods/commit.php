@@ -23,34 +23,31 @@ function method_commit(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->isBlock())
-			{
-				$oldversion=&$resource;
-				$details=&$resource->getWorkingDetails();
+			$oldversion=&$resource;
+			$details=&$resource->getWorkingDetails();
 
-				if ((!$details->isMine())&&(isset($request->query['forcelock'])))
+			if ((!$details->isMine())&&(isset($request->query['forcelock'])))
+			{
+				if ($request->query['forcelock']=='continue')
 				{
-					if ($request->query['forcelock']=='continue')
-					{
-						$details->takeOver();
-					}
-					else if ($request->query['forcelock']=='discard')
-					{
-						$details->takeOverClean();
-					}
+					$details->takeOver();
 				}
-				
-				if ($details->isMine())
+				else if ($request->query['forcelock']=='discard')
 				{
-					$workingversion=$resource->makeWorkingVersion();
-					$newversion=$workingversion->makeNewVersion();
-					$details->free();
+					$details->takeOverClean();
+				}
+			}
+			
+			if ($details->isMine())
+			{
+				$workingversion=$resource->makeWorkingVersion();
+				$newversion=$workingversion->makeNewVersion();
+				$details->free();
+
+				$newversion->makeCurrentVersion();
 	
-					if ($oldversion->isCurrentVersion())
-					{
-						$newversion->makeCurrentVersion();
-					}
-	
+        if ($resource->isBlock())
+        {
 					if (!isset($oldversion->parent))
 					{
 						redirect($request->nested);
@@ -148,42 +145,15 @@ function method_commit(&$request)
 							redirect($request->nested);
 						}
 					}
-				}
-				else
-				{
-					displayLocked($request,$details,$resource);
-				}
-			}
-			else if ($resource->isPage())
-			{
-				$newpage=&$resource->makeNewVersion();
-
-				if (isset($request->query['makedefault']))
-				{
-					if ($request->query['makedefault']=='true')
-					{
-						$_PREFS->setPref('method.view.defaultresource',$newpage->getPath());
-						$_PREFS->setPref('method.admin.defaultresource',$newpage->getPath());
-						saveSitePreferences();
-					}
-					unset($request->query['makedefault']);
-				}
-				
-				foreach ($request->query as $name => $value)
-				{
-					if (substr($name,0,5)=='page.')
-					{
-						$newpage->prefs->setPref($name,$value);
-					}
-				}
-				$newpage->savePreferences();
-				if ($resource->isCurrentVersion())
-					$newpage->makeCurrentVersion();
-				redirect($request->nested);
+        }
+        else
+        {
+          redirect($request->nested);
+        }
 			}
 			else
 			{
-				displayGeneralError($request,'Only blocks and pages can be committed.');
+				displayLocked($request,$details,$resource);
 			}
 		}
 		else

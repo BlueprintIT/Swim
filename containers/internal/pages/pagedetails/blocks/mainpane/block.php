@@ -6,17 +6,17 @@ $page = &Resource::decodeResource($request);
 $pageprefs = &$page->prefs;
 $edit->query['version']=$page->version;
 $edit->method='edit';
+$edit->nested=$request;
 
 $edit->resource=$request->resource;
-$edit->nested=&$request;
 
 
 ?>
 <div class="header">
-<form action="<?= $edit->encodePath() ?>" method="POST">
+<form action="<?= $edit->encodePath() ?>" method="GET">
 <?= $edit->getFormVars() ?>
 <?
-if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")===false))
+if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
 {
   ?><input type="submit" value="Edit"><?
 }
@@ -39,10 +39,9 @@ rsort($verlist);
 $revert = new Request();
 $revert->method=$request->method;
 $revert->resource=$request->resource;
-$revert->nested=&$request->nested;
 
 ?>
-<form action="<?= $revert->encodePath() ?>" method="POST">
+<form action="<?= $revert->encodePath() ?>" method="GET">
 <?= $revert->getFormVars() ?>
         <select name="version" onchange="this.form.submit();">
 <?

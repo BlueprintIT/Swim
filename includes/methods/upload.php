@@ -19,7 +19,7 @@ function method_upload(&$request)
 	global $_USER;
 	
 	$resource=&Resource::decodeResource($request);
-	$log=&LoggerManager::getLogger("swim.method.view");
+	$log=&LoggerManager::getLogger("swim.method.upload");
 
 	if ($resource!==false)
 	{

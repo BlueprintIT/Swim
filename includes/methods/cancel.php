@@ -23,19 +23,12 @@ function method_cancel(&$request)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			if ($resource->isBlock())
+			$details=&$resource->getWorkingDetails();
+			if ($details->isMine())
 			{
-				$details=&$resource->getWorkingDetails();
-				if ($details->isMine())
-				{
-					$details->free();
-				}
-				redirect($request->nested);
+				$details->free();
 			}
-			else
-			{
-				displayGeneralError($request,'You cannot cancel anything other than a block edit.');
-			}
+			redirect($request->nested);
 		}
 		else
 		{
