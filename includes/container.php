@@ -23,6 +23,7 @@ class Container extends Resource
 	var $working = array();
 	var $writable;
 	var $visible;
+  var $versioned;
 	
 	function Container($id)
 	{
@@ -44,7 +45,8 @@ class Container extends Resource
 			}
 		}
 		$this->writable=$this->prefs->getPref('container.writable',true);
-		$this->visible=$this->prefs->getPref('container.visible',true);
+    $this->visible=$this->prefs->getPref('container.visible',true);
+    $this->versioned=$this->prefs->getPref('container.versioned',true);
 	}
 	
 	function getDir()
@@ -69,24 +71,27 @@ class Container extends Resource
 	
 	function getCurrentVersion($dir)
 	{
-		if (is_dir($dir))
-		{
-			if ($this->isWritable())
-			{
-				lockResourceRead($dir);
-			}
-	
-			$vers=fopen($dir.'/version','r');
-			$version=fgets($vers);
-			fclose($vers);
-	
-			if ($this->isWritable())
-			{
-				unlockResource($dir);
-			}
-			
-			return $version;
-		}
+    if ($this->isVersioned())
+    {
+    	if (is_dir($dir))
+    	{
+    		if ($this->isWritable())
+    		{
+    			lockResourceRead($dir);
+    		}
+    
+    		$vers=fopen($dir.'/version','r');
+    		$version=fgets($vers);
+    		fclose($vers);
+    
+    		if ($this->isWritable())
+    		{
+    			unlockResource($dir);
+    		}
+    		
+    		return $version;
+    	}
+    }
 		return false;
 	}
 	
@@ -108,7 +113,7 @@ class Container extends Resource
 
 		$dir=$this->getResourceBaseDir($resource);
 
-		if ($res=@opendir($dir))
+		if (($this->isVersioned())&&($res=@opendir($dir)))
 		{
 			while (($file=readdir($res))!== false)
 			{
@@ -133,6 +138,10 @@ class Container extends Resource
 			}
 			closedir($res);
 		}
+    else
+    {
+      $versions[$resource->id] = &$resource;
+    }
 		
 		return $versions;
 	}
@@ -251,47 +260,63 @@ class Container extends Resource
 	
 	function isCurrentResourceVersion(&$resource)
 	{
-		$current=&$this->getCurrentResourceVersion($resource);
-		return ($current->version==$resource->version);
+    if ($this->isVersioned())
+    {
+    	$current=&$this->getCurrentResourceVersion($resource);
+    	return ($current->version==$resource->version);
+    }
+    else
+    {
+      return true;
+    }
 	}
 	
 	function makeCurrentResourceVersion(&$resource)
 	{
 		$dir=$this->getResourceBaseDir($resource);
 
-		if ($this->isWritable())
+		if (($this->isWritable())&&($this->isVersioned()))
 		{
 			lockResourceWrite($dir);
-		}
-		$vers=fopen($dir.'/version','w');
-		fwrite($vers,$resource->version);
-		fclose($vers);
-		if ($this->isWritable())
-		{
+    	$vers=fopen($dir.'/version','w');
+    	fwrite($vers,$resource->version);
+    	fclose($vers);
 			unlockResource($dir);
 		}
 	}
 	
 	function &getCurrentResourceVersion(&$resource)
 	{
-		$dir=$this->getResourceBaseDir($resource);
-
-		$version=$this->getCurrentVersion($dir);
-
-		if (is_a($resource,'Page'))
-		{
-			return $this->getPage($resource->id,$version);
-		}
-		else if (is_a($resource,'Block'))
-		{
-			return $this->getBlock($resource->id,$version);
-		}
-		else if (is_a($resource,'Template'))
-		{
-			return $this->getTemplate($resource->id,$version);
-		}
+    if ($this->isVersioned())
+    {
+    	$dir=$this->getResourceBaseDir($resource);
+    
+    	$version=$this->getCurrentVersion($dir);
+    
+    	if (is_a($resource,'Page'))
+    	{
+    		return $this->getPage($resource->id,$version);
+    	}
+    	else if (is_a($resource,'Block'))
+    	{
+    		return $this->getBlock($resource->id,$version);
+    	}
+    	else if (is_a($resource,'Template'))
+    	{
+    		return $this->getTemplate($resource->id,$version);
+    	}
+    }
+    else
+    {
+      return $resource;
+    }
 	}
 	
+  function isVersioned()
+  {
+    return $this->versioned;
+  }
+  
 	function isVisible()
 	{
 		return $this->visible;
@@ -304,7 +329,7 @@ class Container extends Resource
 	
 	function getResourceDir(&$resource)
 	{
-		if (is_a($resource,'File'))
+		if ((is_a($resource,'File'))||(!$this->isVersioned()))
 		{
 			return $this->getResourceBaseDir($resource);
 		}
@@ -316,7 +341,12 @@ class Container extends Resource
 	
 	function &loadBlock($id,$version = false)
 	{
-		$block = &loadBlock($this->getDir().'/blocks/'.$id.'/'.$version,$this,$id,$version);
+    $dir = $this->getDir().'/blocks/'.$id;
+    if ($this->isVersioned())
+    {
+      $dir = $dir.'/'.$version;
+    }
+		$block = &loadBlock($dir,$this,$id,$version);
 		if (($block!==false)&&($block->exists()))
 		{
 			return $block;
@@ -332,7 +362,7 @@ class Container extends Resource
 	function hasResource($type,$id,$version = false)
 	{
 		$ext=$id;
-		if ($version!==false)
+		if (($version!==false)&&($this->isVersioned()))
 		{
 			$ext=$id.'/'.$version;
 		}
@@ -341,7 +371,7 @@ class Container extends Resource
 	
 	function &getResource($type,$id,$version = false)
 	{
-		if (($version===false)&&(($type=='block')||($type=='page')||($type=='template')))
+		if (($version===false)&&(($type=='block')||($type=='page')||($type=='template'))&&($this->isVersioned()))
 		{
 			$version=$this->getCurrentVersion($this->getDir().'/'.$type.'s/'.$id);
 			if ($version===false)
@@ -356,13 +386,16 @@ class Container extends Resource
 	{
 		$this->lockWrite();
 		list($id,$rdir)=parent::createNewResource($type,$id);
-		$version=1;
-		$pdir=$rdir.'/'.$version;
-		$vers=fopen($rdir.'/version','w');
-		fwrite($vers,$version);
-		fclose($vers);
-		mkdir($pdir);
-		$this->unlock();
+    if ($this->isVersioned())
+    {
+    	$version=1;
+    	$pdir=$rdir.'/'.$version;
+    	$vers=fopen($rdir.'/version','w');
+    	fwrite($vers,$version);
+    	fclose($vers);
+    	mkdir($pdir);
+    	$this->unlock();
+    }
 		return array($id,$pdir);
 	}
 }

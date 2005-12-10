@@ -1,0 +1,126 @@
+html {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	overflow: hidden;
+	padding-top: 130px;
+	padding-bottom: 10px;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#banner h1 {
+  margin: 10px;
+  border: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  text-align: center;
+  font-size: 25pt;
+  font-weight: normal;
+  height: 70px;
+}
+
+#banner img {
+  vertical-align: -18px;
+}
+
+#tabpanel {
+  position: absolute;
+  top: 90px;
+  left: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+#tabpanel td {
+  padding: 5px;
+  border: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  width: 150px;
+  height: 30px;
+  text-align: center;
+}
+
+#tabpanel .remainder {
+  width: auto;
+  background-color: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+#tabpanel .spacer {
+  width: 10px;
+  padding: 0;
+  background-color: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+#tabpanel .selected {
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.pane {
+  height: 100%;
+  border: 1px solid ThreeDShadow;
+  overflow: auto;
+  text-align: center;
+}
+
+#leftpane {
+  float: left;
+  width: 300px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+#mainpane {
+  height: 100%;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.pane .header {
+  border-bottom: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  text-align: right;
+}
+
+.pane .header form {
+  margin: 0;
+  padding: 0;
+}
+
+.pane .header input {
+  float: left;
+  margin: 10px;
+}
+
+.pane .header h2 {
+  margin: 0;
+  padding: 10px;
+  color: blue;
+}
+
+.pane .body {
+  padding: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: justify;
+}

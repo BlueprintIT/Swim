@@ -5,8 +5,11 @@ $newrequest->method='login';
 $newrequest->nested=&$request->nested;
 
 ?>
-<h1>Please Log In</h1>
-<h2><?= $request->query['message'] ?></h2>
+<div class="header">
+<h2>Please log in</h2>
+</div>
+<div class="body">
+<h3><?= $request->query['message'] ?></h3>
 <?
 	if ($_USER->isLoggedIn())
 	{
@@ -37,3 +40,5 @@ $newrequest->nested=&$request->nested;
 </tr>
 </table>
 </form>
+</div>
+

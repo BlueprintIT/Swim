@@ -22,27 +22,14 @@ function method_admin(&$request)
 
 	if ($resource!==false)
 	{
-		if ($_USER->canWrite($resource))
-		{
-			if ($resource->isPage())
-			{
-				if ($resource->prefs->getPref("page.editable")===false)
-				{
-					$resource->display($request);
-				}
-				else
-				{
-					$resource->displayAdmin($request);
-				}
-			}
-			else
-			{
-				displayGeneralError($request,'You can only administrate pages.');
-			}
+    if ($resource->isPage())
+    {
+      $page = &Resource::decodeResource('internal/page/pagedetails');
+      $page->display($request);
 		}
 		else
 		{
-			displayAdminLogin($request);
+      displayGeneralError($request,'You can only administrate pages.');
 		}
 	}
 	else
