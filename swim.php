@@ -47,6 +47,7 @@ LoggerManager::setLogLevel('swim.utils.shutdown',SWIM_LOG_WARN);
 //LoggerManager::setLogLevel('swim.preferences',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.storage',SWIM_LOG_ALL);
 LoggerManager::setLogLevel('swim.categories',SWIM_LOG_ALL);
+LoggerManager::setLogLevel('swim.method.upload',SWIM_LOG_ALL);
 
 $_STATE=STATE_STARTUP;
 // Include various utils

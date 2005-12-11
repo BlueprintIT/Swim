@@ -34,8 +34,16 @@ class LinkedCategoryTree extends PageTree
   }
 }
 
+$edit = new Request();
+$edit->method='view';
+$edit->resource='internal/page/siteedit';
+$edit->nested=&$request;
 ?>
 <div class="header">
+<form method="GET" action="<?= $edit->encodePath() ?>">
+<?= $edit->getFormVars(); ?>
+<input type="submit" value="Edit">
+</form>
 <h2>Structure</h2>
 </div>
 <div class="body">

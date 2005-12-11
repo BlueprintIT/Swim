@@ -18,9 +18,10 @@ function method_upload(&$request)
 {
 	global $_USER;
 	
-	$resource=&Resource::decodeResource($request);
-	$log=&LoggerManager::getLogger("swim.method.upload");
+  $log=&LoggerManager::getLogger("swim.method.upload");
 
+	$resource=&Resource::decodeResource($request);
+  
 	if ($resource!==false)
 	{
     if ($resource->isFile())
@@ -91,10 +92,50 @@ function method_upload(&$request)
 			displayGeneralError($request,'You can only upload files.');
 		}
 	}
-	else
-	{
-		displayNotFound($request);
-	}
+  else
+  {
+    $parts=split('/',$request->resource,2);
+    if ((count($parts)==2)&&($parts[0]=='categories'))
+    {
+      $log->debug('Uploading category database');
+      if ($_USER->inGroup('admin'))
+      {
+        $cm = &getCategoryManager($parts[1]);
+        if ($_SERVER['REQUEST_METHOD']=='PUT')
+        {
+          $doc = new DOMDocument();
+          if ($doc->load('php://input'))
+          {
+            $log->info('XML successfully loaded');
+            header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
+            print("Resource accepted");
+            return;
+          }
+          else
+          {
+            $log->error('Error loading XML');
+            displayServerError($request);
+          }
+        }
+        else
+        {
+          $log->error('Invalid HTTP method - '.$_SERVER['REQUEST_METHOD']);
+          displayServerError($request);
+        }
+      }
+      else
+      {
+        header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
+        print("You only have access to edit working versions.");
+        return;
+      }
+    }
+    else
+    {
+      $log->warn('Nowhere to uplaod to');
+      displayNotFound($request);
+    }
+  }
 }
 
 

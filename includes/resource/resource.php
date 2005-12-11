@@ -760,8 +760,14 @@ class Resource
 			return false;
 		
 		$container=&getContainer($parts[0]);
-
-		return $container->decodeRelativeResource(array_slice($parts,1),$version);
+    if ($container!==null)
+    {
+  		return $container->decodeRelativeResource(array_slice($parts,1),$version);
+    }
+    else
+    {
+      return false;
+    }
 	}
 }
 

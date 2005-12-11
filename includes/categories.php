@@ -57,6 +57,10 @@ class CategoryManager
     }
     return $this->cache[$id];
   }
+  
+  function load($document)
+  {
+  }
 }
 
 class Category
@@ -115,7 +119,6 @@ class Category
       {
         $this->manager->cache[$details['id']] = new Category($this->manager,$this,$details['id'],$details['name']);
       }
-      $this->manager->log->debug('Found category '.$details['name'].' at '.$details['sortkey']);
       $list[$details['sortkey']]=&$this->manager->cache[$details['id']];
       $set->next();
     }
@@ -123,7 +126,6 @@ class Category
     while ($set->valid())
     {
       $details = $set->current();
-      $this->manager->log->debug('Found page '.$details['page'].' at '.$details['sortkey']);
       $list[$details['sortkey']]=&Resource::decodeResource($details['page']);
       $set->next();
     }
@@ -131,7 +133,6 @@ class Category
     while ($set->valid())
     {
       $details = $set->current();
-      $this->manager->log->debug('Found link '.$details['link'].' at '.$details['sortkey']);
       $list[$details['sortkey']]=$details['link'];
       $set->next();
     }
@@ -150,18 +151,28 @@ class CategoryTree
     $this->root=$root;
   }
   
+  function displayCategoryContentStartTag(&$category,$indent)
+  {
+    print("\n".$indent."<ul>\n");
+  }
+  
+  function displayCategoryContentEndTag(&$category,$indent)
+  {
+    print($indent."</ul>\n");
+  }
+  
   function displayCategoryContent(&$category,$indent)
   {
     $items = &$category->items();
     if (count($items)>0)
     {
-      print("\n".$indent."<ul>\n");
+      $this->displayCategoryContentStartTag($category,$indent);
       $ni=$indent.$this->padding;
       foreach (array_keys($items) as $i)
       {
         $this->displayItem($items[$i],$ni);
       }
-      print($indent."</ul>\n");
+      $this->displayCategoryContentEndTag($category,$indent);
     }
   }
   
@@ -180,27 +191,44 @@ class CategoryTree
     print($link);
   }
   
-  function displayItem(&$item,$indent)
+  function displayItemStartTag(&$item,$indent)
   {
     if (is_a($item,'Category'))
     {
       print($indent.'<li class="category">');
-      $this->displayCategoryLabel($item);
-      $this->displayCategoryContent($item,$indent.$this->padding);
-      print("</li>\n");
     }
     else if (is_a($item,'Page'))
     {
       print($indent.'<li class="page">');
-      $this->displayPageLabel($item);
-      print("</li>\n");
     }
     else
     {
       print($indent.'<li class="link">');
-      $this->displayLinkLabel($item);
-      print("</li>\n");
     }
+  }
+  
+  function displayItemEndTag(&$item)
+  {
+    print("</li>\n");
+  }
+  
+  function displayItem(&$item,$indent)
+  {
+    $this->displayItemStartTag($item,$indent);
+    if (is_a($item,'Category'))
+    {
+      $this->displayCategoryLabel($item);
+      $this->displayCategoryContent($item,$indent.$this->padding);
+    }
+    else if (is_a($item,'Page'))
+    {
+      $this->displayPageLabel($item);
+    }
+    else
+    {
+      $this->displayLinkLabel($item);
+    }
+    $this->displayItemEndTag($item,$indent);
   }
   
   function display($indent='')
@@ -242,8 +270,9 @@ class PageTree extends CategoryTree
     foreach (array_keys($list) as $i)
     {
       $page=&$list[$i];
-      $this->pages[$page->getPath()]=&$page;
+      $this->pages[$page->getPath()]=$page->prefs->getPref('page.variables.title','');
     }
+    asort($this->pages);
     parent::display($indent);
     if (count($this->pages)>0)
     {
@@ -251,7 +280,7 @@ class PageTree extends CategoryTree
       print($indent.$this->padding.'<ul>');
       foreach (array_keys($this->pages) as $path)
       {
-        $page=&$this->pages[$path];
+        $page=&Resource::decodeResource($path);
         print($indent.$this->padding.$this->padding.'<li class="page">');
         $this->displayPageLabel($page);
         print("</li>\n");

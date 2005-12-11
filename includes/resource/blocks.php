@@ -15,7 +15,6 @@
 
 class Block extends Resource
 {
-	var $type = 'div';
 	var $log;
 	var $format;
 	
@@ -42,7 +41,7 @@ class Block extends Resource
 	
 	function getType()
 	{
-		return $this->type;
+		return $this->prefs->getPref('block.type','div');
 	}
 	
 	function displayIntro($attrs)
@@ -66,7 +65,7 @@ class Block extends Resource
 	
 	function displayOutro($attrs)
 	{
-		print('</'.$this->type.'>');
+		print('</'.$this->getType().'>');
 	}
 	
 	function canEdit(&$request,&$data,$attrs)

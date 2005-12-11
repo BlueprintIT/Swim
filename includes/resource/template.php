@@ -212,19 +212,24 @@ class Template extends Resource
 	function displayApplet(&$parser,$tag,$attrs,$text)
 	{
 		$this->log->debug('Displaying applet');
-		$width=$attrs['width'];
-		$height=$attrs['height'];
+    $dims="";
+    if (isset($attrs['width']))
+      $dims.=' width="'.$attrs['width'].'"';
+    if (isset($attrs['height']))
+      $dims.=' height="'.$attrs['height'].'"';
+    if (isset($attrs['style']))
+      $dims.=' style="'.$attrs['style'].'"';
 		$class=$attrs['class'];
 		$classpath=$attrs['classpath'];
 		$codebase=$this->generateURL($parser,$attrs['codebase']);
-		print('<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="'.$height.'" width="'.$width.'"'."\n\t");
+		print('<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"'.$dims."\n\t");
 		print('codebase="http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0">'."\n\t");
 		$this->displayElement($parser,'param',array('name'=>'type','value'=>'application/x-java-applet;version=1.4'),'',false); print("\n\t");
 		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class.'.class'),'',false); print("\n\t");
 		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t");
 		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
 		print($text);
-		print('<comment><object type="application/x-java-applet;version=1.4" height="'.$height.'" width="'.$width.'">'."\n\t\t");
+		print('<comment><object type="application/x-java-applet;version=1.4"'.$dims.'">'."\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class),'',false); print("\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t\t");
 		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
@@ -544,7 +549,8 @@ class Template extends Resource
 	{
 		$xmlpref='template.'.$mode.'.xml';
 		$htmlpref='template.'.$mode.'.html';
-		if ($request->isXML())
+    $pagecontent = $page->prefs->getPref('page.contenttype','text/html');
+    if ((substr($pagecontent,-4)=='+xml')||(substr($pagecontent,-4)=='/xml')||($request->isXHTML()))
 		{
 			$file=$this->prefs->getPref($xmlpref);
 			if (!is_readable($this->dir.'/'.$file))
@@ -552,20 +558,31 @@ class Template extends Resource
 				$request->setXML(false);
 				$file=$this->prefs->getPref($htmlpref);
 			}
+      else
+      {
+        $request->setXML(true);
+      }
 		}
 		else
 		{
 			$file=$this->prefs->getPref($htmlpref);
 		}
 		
-		if ($request->isXML())
-		{
-			setContentType('application/xhtml+xml');
-		}
-		else
-		{
-			setContentType('text/html');
-		}
+    if ($page->prefs->isPrefSet('page.contenttype'))
+    {
+      setContentType($pagecontent);
+    }
+    else
+    {
+  		if ($request->isXML())
+  		{
+  			setContentType('application/xhtml+xml');
+  		}
+  		else
+  		{
+  			setContentType('text/html');
+  		}
+    }
 						
 		// Parse the template and display
 		$parser = new TemplateParser();
