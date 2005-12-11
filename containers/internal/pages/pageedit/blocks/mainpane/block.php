@@ -1,9 +1,9 @@
 <?
 
-$page = &Resource::decodeResource($request);
+$page = Resource::decodeResource($request);
 $version=$page->version;
-$page = &$page->makeWorkingVersion();
-$pageprefs = &$page->prefs;
+$page = $page->makeWorkingVersion();
+$pageprefs = $page->prefs;
 
 $upload = new Request();
 $upload->method = 'save';

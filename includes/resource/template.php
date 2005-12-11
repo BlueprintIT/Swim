@@ -17,11 +17,11 @@ class Template extends Resource
 {
 	var $log;
 	
-	function Template(&$container,$id,$version)
+	function Template($container,$id,$version)
 	{
 		$this->Resource($container,$id,$version);
 		
-		$this->log=&LoggerManager::getLogger('swim.template');
+		$this->log=LoggerManager::getLogger('swim.template');
 	}
 	
 	function getPath()
@@ -73,7 +73,7 @@ class Template extends Resource
 		return $modified;
 	}
 	
-	function &generateRelativeURL(&$data,$url,$method)
+	function generateRelativeURL($data,$url,$method)
 	{
 		$request = new Request();
 		$request->method=$method;
@@ -111,7 +111,7 @@ class Template extends Resource
 		return $request;
 	}
 	
-	function &generateRequest(&$data,$url,$method)
+	function generateRequest($data,$url,$method)
 	{
 		if (strlen($url)==0)
 		{
@@ -127,22 +127,22 @@ class Template extends Resource
 		}
 		else
 		{
-		  $request=&$this->generateRelativeURL($data,$url,$method);
+		  $request=$this->generateRelativeURL($data,$url,$method);
 		}
 		return $request;
 	}
 	
-	function generateURL(&$data,$url,$method='view')
+	function generateURL($data,$url,$method='view')
 	{
 		if (strpos($url,"://")>0)
 		{
 			return $url;
 		}
-	  $request=&$this->generateRequest($data,$url,$method);
+	  $request=$this->generateRequest($data,$url,$method);
 	  return $request->encode();
 	}
 	
-	function displayDate(&$parser,$tag,$attrs,$text)
+	function displayDate($parser,$tag,$attrs,$text)
 	{
 		if (isset($attrs['source']))
 		{
@@ -183,7 +183,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function buildElement(&$parser,$tag,$attrs,$text='',$closetag=true)
+	function buildElement($parser,$tag,$attrs,$text='',$closetag=true)
 	{
 		$result='<'.$tag;
 		foreach ($attrs as $name => $value)
@@ -203,13 +203,13 @@ class Template extends Resource
 		return $result;
 	}
 	
-	function displayElement(&$parser,$tag,$attrs,$text='',$closetag=true)
+	function displayElement($parser,$tag,$attrs,$text='',$closetag=true)
 	{
 		$element=$this->buildElement($parser,$tag,$attrs,$text,$closetag);
 		print($element);
 	}
 	
-	function displayApplet(&$parser,$tag,$attrs,$text)
+	function displayApplet($parser,$tag,$attrs,$text)
 	{
 		$this->log->debug('Displaying applet');
     $dims="";
@@ -239,10 +239,10 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayEditLink(&$parser,$tag,$attrs,$text)
+	function displayEditLink($parser,$tag,$attrs,$text)
 	{
 		$request = new Request();
-		$request->nested=&$parser->data['request'];
+		$request->nested=$parser->data['request'];
 		if (isset($attrs['method']))
 		{
 			$request->method=$attrs['method'];
@@ -254,7 +254,7 @@ class Template extends Resource
 		}
 		if (isset($attrs['block']))
 		{
-			$block=&$parser->data['page']->getReferencedBlock($attrs['block']);
+			$block=$parser->data['page']->getReferencedBlock($attrs['block']);
 			if ($block===false)
 			{
 				return true;
@@ -269,7 +269,7 @@ class Template extends Resource
 		}
 		else
 		{
-			$page=&$parser->data['page'];
+			$page=$parser->data['page'];
 			$request->resource=$page->getPath();
 			$request->query['version']=$page->version;
 		}
@@ -278,7 +278,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayStylesheet(&$parser,$tag,$attrs,$text)
+	function displayStylesheet($parser,$tag,$attrs,$text)
 	{
 		$src=$this->generateURL($parser->data,$attrs['src']);
 		if (!isset($parser->data['styles'][$src]))
@@ -290,7 +290,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayScript(&$parser,$tag,$attrs,$text)
+	function displayScript($parser,$tag,$attrs,$text)
 	{
 		if (isset($attrs['src']))
 		{
@@ -309,28 +309,28 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayImage(&$parser,$tag,$attrs,$text)
+	function displayImage($parser,$tag,$attrs,$text)
 	{
 		$attrs['src']=$this->generateURL($parser->data,$attrs['src']);
 		$this->displayElement($parser,'img',$attrs,$text,false);
 		return true;
 	}
 	
-	function displayBlock(&$parser,$tag,$attrs,$text)
+	function displayBlock($parser,$tag,$attrs,$text)
 	{
 		if (isset($attrs['src']))
 		{
-			$block=&Resource::decodeResource($attrs['src']);
+			$block=Resource::decodeResource($attrs['src']);
 		}
 		else if (isset($attrs['id']))
 		{
-			$page=&$parser->data['page'];
+			$page=$parser->data['page'];
 			$block=$page->getReferencedBlock($attrs['id']);
 		}
 		if ($block!==false)
 		{
 			$parser->data['blockid']=$attrs['id'];
-			$parser->data['block']=&$block;
+			$parser->data['block']=$block;
 			$result=$block->display($parser,$attrs,$text);
 			unset($parser->data['block']);
 			unset($parser->data['blockid']);
@@ -363,10 +363,10 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayFile(&$parser,$tag,$attrs,$text)
+	function displayFile($parser,$tag,$attrs,$text)
 	{
-		$request=&$this->generateRequest($parser->data,$attrs['src'],"view");
-		$resource=&Resource::decodeResource($request);
+		$request=$this->generateRequest($parser->data,$attrs['src'],"view");
+		$resource=Resource::decodeResource($request);
 		if ($resource->isFile())
 		{
 			ob_start();
@@ -378,7 +378,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayAnchor(&$parser,$tag,$attrs,$text)
+	function displayAnchor($parser,$tag,$attrs,$text)
 	{
 		if (isset($attrs['method']))
 		{
@@ -389,10 +389,10 @@ class Template extends Resource
 		{
 			$method=$parser->data['request']->method;
 		}
-		$request=&$this->generateRequest($parser->data,$attrs['href'],$method);
+		$request=$this->generateRequest($parser->data,$attrs['href'],$method);
 		if (isset($attrs['nest']))
 		{
-			$request->nested=&$parser->data['request'];
+			$request->nested=$parser->data['request'];
 			unset($attrs['nest']);
 		}
 		if (isset($attrs['template']))
@@ -414,7 +414,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayIf(&$parser,$tag,$attrs,$text)
+	function displayIf($parser,$tag,$attrs,$text)
 	{
 		$result=false;
 		if (isset($attrs['hasVar']))
@@ -431,7 +431,7 @@ class Template extends Resource
 					$name='page.variables.'.$name;
 				}
 			}
-			$page=&$parser->data['page'];
+			$page=$parser->data['page'];
 			if ($page->prefs->isPrefSet($name))
 			{
 				$value=$page->prefs->getPref($name);
@@ -440,7 +440,7 @@ class Template extends Resource
 		}
 		else if (isset($attrs['hasBlock']))
 		{
-			$block=&$parser->data['page']->getBlock($attrs['hasBlock']);
+			$block=$parser->data['page']->getBlock($attrs['hasBlock']);
 			if ($block!==false)
 			{
 				$result=true;
@@ -453,7 +453,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function displayVar(&$parser,$tag,$attrs,$text)
+	function displayVar($parser,$tag,$attrs,$text)
 	{
 		$name=$attrs['name'];
 		if (isset($attrs['namespace']))
@@ -467,7 +467,7 @@ class Template extends Resource
 				$name='page.variables.'.$name;
 			}
 		}
-		$page=&$parser->data['page'];
+		$page=$parser->data['page'];
 		if ($page->prefs->isPrefSet($name))
 		{
 			print($page->prefs->getPref($name));
@@ -475,7 +475,7 @@ class Template extends Resource
 		return true;
 	}
 	
-	function observeTag(&$parser,$tag,$attrs,$text)
+	function observeTag($parser,$tag,$attrs,$text)
 	{
 		$this->log->debug('Observed '.$tag);
 		if ($tag=='var')
@@ -545,7 +545,7 @@ class Template extends Resource
 		}
 	}
 	
-	function internalDisplay(&$request,&$page,$mode)
+	function internalDisplay($request,$page,$mode)
 	{
 		$xmlpref='template.'.$mode.'.xml';
 		$htmlpref='template.'.$mode.'.html';
@@ -587,7 +587,7 @@ class Template extends Resource
 		// Parse the template and display
 		$parser = new TemplateParser();
 		$parser->addEmptyTag("img");
-		$parser->data=array('page'=>&$page,'template'=>&$this,'request'=>&$request,'mode'=>$mode,'head'=>'');
+		$parser->data=array('page'=>$page,'template'=>$this,'request'=>$request,'mode'=>$mode,'head'=>'');
 		$parser->addObserver('head',$this);
 		$parser->addObserver('html',$this);
 		$parser->addObserver('block',$this);
@@ -611,18 +611,13 @@ class Template extends Resource
 		$this->unlock();
 	}
 	
-	function displayAdmin(&$request,&$page)
-	{
-		$this->internalDisplay($request,$page,'admin');
-	}
-	
-	function display(&$request,&$page)
+	function display($request,$page)
 	{
 		$this->internalDisplay($request,$page,'normal');
 	}
 }
 
-function &getAllTemplates()
+function getAllTemplates()
 {
 	return getAllResources('template');
 }

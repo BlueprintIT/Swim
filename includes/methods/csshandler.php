@@ -18,14 +18,14 @@ class CSSHandler
 	var $defines = array();
 	var $base;
 	
-	function CSSHandler(&$resource)
+	function CSSHandler($resource)
 	{
-		$this->base=&$resource;
+		$this->base=$resource;
 	}
 	
 	function processInclude($content)
 	{
-		$resource=&Resource::decodeResource($content);
+		$resource=Resource::decodeResource($content);
 		if (($resource!==false)&&($resource->exists()))
 		{
 			$this->parse($resource);
@@ -137,7 +137,7 @@ class CSSHandler
 		print($line."\n");
 	}
 	
-	function parse(&$resource)
+	function parse($resource)
 	{
 		ob_start();
 		$resource->outputFile();
@@ -162,14 +162,14 @@ class CSSHandlerFactory
 	{
 	}
 	
-	function &getHandler(&$resource)
+	function getHandler($resource)
 	{
 		return new CSSHandler($resource);
 	}
 	
-	function output(&$resource)
+	function output($resource)
 	{
-		$handler = &$this->getHandler($resource);
+		$handler = $this->getHandler($resource);
 		$handler->output();
 	}
 }

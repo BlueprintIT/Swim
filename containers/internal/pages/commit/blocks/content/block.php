@@ -5,16 +5,16 @@ $newrequest->method='docommit';
 $newrequest->resource=$request->resource;
 $newrequest->query['version']=$request->query['version'];
 $newrequest->query['newversion']=$request->data['newversion'];
-$newrequest->nested=&$request->nested;
+$newrequest->nested=$request->nested;
 
 ?>
 <form action="<?= $newrequest->encodePath() ?>" method="get">
 <?= $newrequest->getFormVars() ?>
 <?
-$pages=&$request->data['pages'];
+$pages=$request->data['pages'];
 foreach (array_keys($pages) as $key)
 {
-	$page=&$pages[$key];
+	$page=$pages[$key];
 ?>
 <p>
 <input type="hidden" name="container[<?= $key ?>]" value="<?= $page->container ?>">

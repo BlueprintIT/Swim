@@ -14,11 +14,11 @@
  */
 
 
-function method_admin(&$request)
+function method_admin($request)
 {
 	global $_USER;
 	
-	$resource=&Resource::decodeResource($request);
+	$resource=Resource::decodeResource($request);
 
 	if ($_USER->isLoggedIn())
   {
@@ -26,7 +26,7 @@ function method_admin(&$request)
     {
       if ($resource->isPage())
       {
-        $page = &Resource::decodeResource('internal/page/pagedetails');
+        $page = Resource::decodeResource('internal/page/pagedetails');
         $page->display($request);
     	}
     	else

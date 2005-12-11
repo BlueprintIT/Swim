@@ -18,13 +18,13 @@ class Block extends Resource
 	var $log;
 	var $format;
 	
-	function Block(&$container,$id,$version)
+	function Block($container,$id,$version)
 	{
 		$this->Resource($container,$id,$version);
-		$this->log=&LoggerManager::getLogger('swim.block');
+		$this->log=LoggerManager::getLogger('swim.block');
 	}
 	
-	function &getBlockEditor(&$request)
+	function getBlockEditor($request)
 	{
 		return null;
 	}
@@ -68,59 +68,28 @@ class Block extends Resource
 		print('</'.$this->getType().'>');
 	}
 	
-	function canEdit(&$request,&$data,$attrs)
+	function canEdit($request,$data,$attrs)
 	{
 		return true;
 	}
-	
-	function displayAdminPanel(&$request,&$data,$attrs)
-	{
-?>
-	<div id="<?= $data['blockid'] ?>admin" class="adminpanel">
-<?
-		if ($data['page']->canChangeReferencedBlock($data['blockid']))
-		{
-			if ((!isset($attrs['canchange']))||($attrs['canchange']=='true'))
-			{
-				$format='';
-				if (isset($attrs['format']))
-				{
-					$format=' query:format="'.$attrs['format'].'"';
-				}
-?>
-		<anchor query:reference="<?= $data['blockid'] ?>"<?= $format ?> method="change" nest="true" href="/internal/page/listblocks"><image class="icon" src="/global/file/images/edit.gif"/>Select</anchor>
-		<anchor query:reference="<?= $data['blockid'] ?>" query:block="" method="setblock" nest="true" href=""><image class="icon" src="/global/file/images/edit.gif"/>Clear</anchor>
-<?
-			}
-		}
-		if ($this->canEdit($request,$data,$attrs))
-		{
-?>
-		<anchor query:reference="<?= $data['blockid'] ?>" method="edit" nest="true" href="/<?= $this->getPath() ?>"><image class="icon" src="/global/file/images/edit.gif"/>Edit</anchor>
-<?
-		}
-?>
-	</div>
-<?
-	}
-	
-	function displayContent(&$parser,$attrs,$text)
+		
+	function displayContent($parser,$attrs,$text)
 	{
 		print($text);
 	}
 	
-	function registerObservers(&$parser)
+	function registerObservers($parser)
 	{
 	}
 	
-	function unregisterObservers(&$parser)
+	function unregisterObservers($parser)
 	{
 	}
 	
-	function display(&$parser,$attrs,$text)
+	function display($parser,$attrs,$text)
 	{
-		$request=&$parser->data['request'];
-		$page=&$parser->data['page'];
+		$request=$parser->data['request'];
+		$page=$parser->data['page'];
 		$parser->data['blockattrs']=&$attrs;
 		if (strlen(trim($text))>0)
 		{
@@ -150,16 +119,12 @@ class Block extends Resource
 		unset($parser->data['blockattrs']);
 	}
 	
-	function observeTag(&$parser,$tagname,$attrs,$text)
+	function observeTag($parser,$tagname,$attrs,$text)
 	{
 		if ($tagname=='content')
 		{
 			ob_start();
-			$request=&$parser->data['request'];
-			if (($parser->data['mode']=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
-			{
-				$this->displayAdminPanel($request,$parser->data,$parser->data['blockattrs']);
-			}
+			$request=$parser->data['request'];
 			$this->displayIntro($parser->data['blockattrs']);
 			$this->displayContent($parser,$attrs,$text);
 			$this->displayOutro($attrs);
@@ -175,11 +140,11 @@ class Block extends Resource
 	}
 }
 
-function &loadBlock($blockdir,&$container,$id,$version=false)
+function loadBlock($blockdir,$container,$id,$version=false)
 {
 	global $_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.block.loader');
+	$log=LoggerManager::getLogger('swim.block.loader');
 	
 	if (is_dir($blockdir))
 	{
@@ -226,7 +191,7 @@ function &loadBlock($blockdir,&$container,$id,$version=false)
 	}
 }
 
-function &getAllBlocks()
+function getAllBlocks()
 {
 	return getAllResources('block');
 }

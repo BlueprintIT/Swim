@@ -15,12 +15,12 @@
 
 class PhpBlock extends Block
 {
-	function PhpBlock(&$container,$id,$version)
+	function PhpBlock($container,$id,$version)
 	{
 		$this->Block($container,$id,$version);
 	}
 	
-	function registerObservers(&$parser)
+	function registerObservers($parser)
 	{
 		if ($this->prefs->getPref("block.observe.a"))
 			$parser->addObserver('img',$parser->data['template']);
@@ -28,7 +28,7 @@ class PhpBlock extends Block
 			$parser->addObserver('a',$this);
 	}
 	
-	function unregisterObservers(&$parser)
+	function unregisterObservers($parser)
 	{
 		if ($this->prefs->getPref("block.observe.a"))
 			$parser->removeObserver('a',$this);
@@ -41,19 +41,19 @@ class PhpBlock extends Block
 		return time();
 	}
 
-	function displayContent(&$parser,$attrs,$text)
+	function displayContent($parser,$attrs,$text)
 	{
 		global $_USER;
 		
-		$request=&$parser->data['request'];
-		$prefs=&$this->prefs;
-		$log = &LoggerManager::getLogger('page');
+		$request=$parser->data['request'];
+		$prefs=$this->prefs;
+		$log = LoggerManager::getLogger('page');
 		$name=$this->prefs->getPref('block.phpblock.filename','block.php');
 		include($this->getDir().'/'.$name);
 		return true;
 	}
 
-	function observeTag(&$parser,$tagname,$attrs,$text)
+	function observeTag($parser,$tagname,$attrs,$text)
 	{
 		if ($tagname=='a')
 		{

@@ -14,12 +14,12 @@
  */
 
 
-function method_view(&$request)
+function method_view($request)
 {
 	global $_USER;
 	
-	$resource=&Resource::decodeResource($request);
-	$log=&LoggerManager::getLogger("swim.method.view");
+	$resource=Resource::decodeResource($request);
+	$log=LoggerManager::getLogger("swim.method.view");
 
 	if ($resource!==false)
 	{
@@ -72,7 +72,7 @@ function method_view(&$request)
 					if ($resource->version=='temp')
 					{
 						$log->debug('Checking that we have the working lock');
-						$details=&$resource->getWorkingDetails();
+						$details=$resource->getWorkingDetails();
 
 						if ($details->isMine())
 						{
@@ -149,7 +149,7 @@ function method_view(&$request)
 				$modified=$resource->getTotalModifiedDate();
 				if (isset($request->query['template']))
 				{
-					$template=&Resource::decodeResource($request->query['template']);
+					$template=Resource::decodeResource($request->query['template']);
 					if ($template!==false)
 					{
 						$modified=max($modified,$template->getModifiedDate());
@@ -157,7 +157,7 @@ function method_view(&$request)
 				}
 				if ($template===false)
 				{
-					$template=&$resource->getReferencedTemplate();
+					$template=$resource->getReferencedTemplate();
 				}
 				setCacheInfo($modified,$resource->getETag());
 				$template->display($request,$resource);

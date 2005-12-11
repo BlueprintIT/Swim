@@ -14,13 +14,13 @@
  */
 
 
-function method_displayLogin(&$request)
+function method_displayLogin($request)
 {
 	global $_PREFS;
 	
 	$version=false;
-	$container = &getContainer('internal');
-	$page = &$container->getPage($_PREFS->getPref('method.login.page'),$version);
+	$container = getContainer('internal');
+	$page = $container->getPage($_PREFS->getPref('method.login.page'),$version);
 	if ($page!==false)
 	{
 		header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");

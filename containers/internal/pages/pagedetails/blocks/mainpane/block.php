@@ -2,8 +2,8 @@
 
 $edit = new Request();
 
-$page = &Resource::decodeResource($request);
-$pageprefs = &$page->prefs;
+$page = Resource::decodeResource($request);
+$pageprefs = $page->prefs;
 $edit->query['version']=$page->version;
 $edit->method='edit';
 $edit->nested=$request;
@@ -33,7 +33,7 @@ else
     <td style="vertical-align: top"><label for="title">Version:</label></td>
     <td style="vertical-align: top" colspan="2"><?
 
-$versions=&$page->getVersions();
+$versions=$page->getVersions();
 $verlist = array_keys($versions);
 rsort($verlist);
 $select = new Request();
@@ -47,7 +47,7 @@ $select->resource=$request->resource;
 <?
         foreach ($verlist as $version)
         {
-            $pagev = &$versions[$version];
+            $pagev = $versions[$version];
             if ($version == $page->version)
             {
 ?>            <option value="<?= $version ?>" selected="true"><?

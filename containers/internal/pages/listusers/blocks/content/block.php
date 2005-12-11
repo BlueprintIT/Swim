@@ -4,7 +4,7 @@ $id=$parser->data['blockid'];
 
 if (isset($request->query[$id.':create']))
 {
-	$user=&createUser($request->query[$id.':username']);
+	$user=createUser($request->query[$id.':username']);
 	if ($user!==false)
 	{
 		if ($request->query[$id.':pass1']==$request->query[$id.':pass2'])
@@ -46,7 +46,7 @@ else if (isset($request->query[$id.':delete']))
 	}
 }
 
-$users=&getAllUsers();
+$users=getAllUsers();
 ?>
 <table style="width: 100%">
 <tr>
@@ -58,7 +58,7 @@ $users=&getAllUsers();
 <?
 foreach (array_keys($users) as $uid)
 {
-	$user=&$users[$uid];
+	$user=$users[$uid];
 	if ($user->inGroup('admin'))
 	{
 		$type='Administrator';

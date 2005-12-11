@@ -98,7 +98,7 @@ function readURLEncodedPost($in)
 
 function readMultipartPost($in)
 {
-	$log=&LoggerManager::getLogger('swim.urls');
+	$log=LoggerManager::getLogger('swim.urls');
 	$query=array();
 	while (!feof($in))
 	{
@@ -121,7 +121,7 @@ function readMultipartPost($in)
 
 function decodePostQuery()
 {
-	$log=&LoggerManager::getLogger('swim.urls');
+	$log=LoggerManager::getLogger('swim.urls');
 	$query=$_POST;
 	if (isset($_SERVER['CONTENT_TYPE']))
 	{
@@ -173,7 +173,7 @@ class Request
 	
 	function Request()
 	{
-		$this->log=&LoggerManager::getLogger('swim.request');
+		$this->log=LoggerManager::getLogger('swim.request');
 	}
 	
   function isXHTML()
@@ -270,7 +270,7 @@ class Request
 		return $url;
 	}
 	
-	function &decodeCurrentRequest()
+	function decodeCurrentRequest()
 	{
 		global $_PREFS;
 		
@@ -301,7 +301,7 @@ class Request
 		return Request::decode($path,$query);
 	}
 	
-	function &decode($path,$query)
+	function decode($path,$query)
 	{
 		global $_PREFS;
 
@@ -350,7 +350,7 @@ class Request
     
     if (isset($query[$_PREFS->getPref('url.nestedvar')]))
     {
-      $request->nested=&Request::decode('',decodeQuery($query[$_PREFS->getPref('url.nestedvar')]));
+      $request->nested=Request::decode('',decodeQuery($query[$_PREFS->getPref('url.nestedvar')]));
       unset($query[$_PREFS->getPref('url.nestedvar')]);
     }
     

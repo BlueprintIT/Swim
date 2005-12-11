@@ -16,7 +16,7 @@
 function shutdown()
 {
 	global $_STATE;
-	$log=&LoggerManager::getLogger('swim.utils.shutdown');
+	$log=LoggerManager::getLogger('swim.utils.shutdown');
 	if ($_STATE<STATE_SHUTDOWN)
 	{
 		$log->debug('Shutdown started');
@@ -69,7 +69,7 @@ function recursiveDelete($dir,$ignorelock=false)
 {
 	global $_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.utils.delete');
+	$log=LoggerManager::getLogger('swim.utils.delete');
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
@@ -107,7 +107,7 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 {
 	global $_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.utils.copy');
+	$log=LoggerManager::getLogger('swim.utils.copy');
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{
@@ -151,38 +151,38 @@ function formatdate($date)
 	return date('g:ia d/m/Y',$date);
 }
 
-function displayLocked(&$request,&$details,$resource)
+function displayLocked($request,$details,$resource)
 {
 	header($_SERVER["SERVER_PROTOCOL"]." 409 Conflict");
-	$request->data['details']=&$details;
-	$request->data['resource']=&$resource;
-	$container = &getContainer('internal');
-	$page=&$container->getPage('locked');
+	$request->data['details']=$details;
+	$request->data['resource']=$resource;
+	$container = getContainer('internal');
+	$page=$container->getPage('locked');
 	if ($page!==false)
 	{
 		$page->display($request);
 	}
 }
 
-function displayAdminLogin(&$request)
+function displayAdminLogin($request)
 {
 	displayLogin($request,'You must log in to administer this website.');
 }
 
-function displayLogin(&$request,$message)
+function displayLogin($request,$message)
 {
 	$newrequest = new Request();
 	$newrequest->method='displayLogin';
-	$newrequest->nested=&$request;
+	$newrequest->nested=$request;
 	$newrequest->query['message']=$message;
 	callMethod($newrequest);
 }
 
-function displayGeneralError(&$request,$message)
+function displayGeneralError($request,$message)
 {
 	global $_PREFS;
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-	$page = &Resource::decodeResource($_PREFS->getPref('errors.general.page'));
+	$page = Resource::decodeResource($_PREFS->getPref('errors.general.page'));
 	$request->query['message']=$message;
 	if ($page!==false)
 	{
@@ -194,11 +194,11 @@ function displayGeneralError(&$request,$message)
 	}
 }
 
-function displayNotFound(&$request)
+function displayNotFound($request)
 {
 	global $_PREFS;
  	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-	$page = &Resource::decodeResource($_PREFS->getPref('errors.notfound.page'));
+	$page = Resource::decodeResource($_PREFS->getPref('errors.notfound.page'));
 	if ($page!==false)
 	{
 		$page->display($request);
@@ -209,11 +209,11 @@ function displayNotFound(&$request)
 	}
 }
 
-function displayServerError(&$request)
+function displayServerError($request)
 {
 	global $_PREFS;
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-	$page = &Resource::decodeResource($_PREFS->getPref('errors.server.page'));
+	$page = Resource::decodeResource($_PREFS->getPref('errors.server.page'));
 	if ($page!==false)
 	{
 		$page->display($request);
@@ -239,7 +239,7 @@ function setValidTime($minutes)
 
 function setCacheInfo($date,$etag=false)
 {
-	$log=&LoggerManager::getLogger('swim.cache');
+	$log=LoggerManager::getLogger('swim.cache');
 	$cached=false;
 
 	if ($date!=false)
@@ -280,7 +280,7 @@ function setCacheInfo($date,$etag=false)
 	}
 }
 
-function callMethod(&$request)
+function callMethod($request)
 {
 	global $_PREFS;
 	

@@ -13,13 +13,13 @@
  * $Revision$
  */
 
-function method_create(&$request)
+function method_create($request)
 {
 	global $_USER;
 	
 	list($container,$type)=explode('/',$request->resource);
 	
-	$container=&getContainer($container);
+	$container=getContainer($container);
 	if ($container!==false)
 	{
 		if ($container->isWritable())
@@ -27,8 +27,8 @@ function method_create(&$request)
 			// TODO possibly a better security check here
 			if ($type=='page')
 			{
-				$container=&getContainer('internal');
-				$page=&$container->getPage('pageedit');
+				$container=getContainer('internal');
+				$page=$container->getPage('pageedit');
 				$page->display($request);
 			}
 			else

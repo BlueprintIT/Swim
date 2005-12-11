@@ -13,11 +13,11 @@
  * $Revision$
  */
 
-function method_docommit(&$request)
+function method_docommit($request)
 {
 	global $_USER,$_PREFS;
 	
-	$resource = &Resource::decodeResource($request);
+	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{
@@ -25,12 +25,12 @@ function method_docommit(&$request)
 		{
 			if ($resource->isBlock())
 			{
-				$block=&$resource;
+				$block=$resource;
 				$oldversion=$block->version;
 				$newversion=$request->query['newversion'];
 				if (isset($request->query['commit']))
 				{
-					$commits=&$request->query['commit'];
+					$commits=$request->query['commit'];
 					if (count($commits)>0)
 					{
 						$containers=$request->query['container'];
@@ -40,9 +40,9 @@ function method_docommit(&$request)
 						{
 							if ($value)
 							{
-								$container=&getContainer($containers[$key]);
-								$page=&$container->getPage($ids[$key],$versions[$key]);
-								$newpage=&$page->makeNewVersion();
+								$container=getContainer($containers[$key]);
+								$page=$container->getPage($ids[$key],$versions[$key]);
+								$newpage=$page->makeNewVersion();
 
 								$usage=$newpage->getReferencedBlockUsage($oldversion);
 								

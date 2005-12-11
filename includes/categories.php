@@ -26,19 +26,19 @@ class CategoryManager
     
     $this->cache=array();
     $this->namespace=$namespace;
-    $this->log = &LoggerManager::getLogger('swim.categories.'.$namespace);
+    $this->log = LoggerManager::getLogger('swim.categories.'.$namespace);
     $set=$_STORAGE->query('SELECT id,Category.name FROM Namespace,Category WHERE id=rootcategory;');
     $details = $set->current();
     $this->root = new Category($this,$this,$details['id'],$details['Category.name']);
-    $this->cache[$this->root->id]=&$this->root;
+    $this->cache[$this->root->id]=$this->root;
   }
   
-  function &getRootCategory()
+  function getRootCategory()
   {
     return $this->root;
   }
   
-  function &getCategory($id)
+  function getCategory($id)
   {
     global $_STORAGE;
     
@@ -58,46 +58,54 @@ class CategoryManager
     return $this->cache[$id];
   }
   
-  function getTextContent(&$element)
+  function getTextContent($element)
   {
     $text='';
-    $el=&$element->firstChild;
+    $el=$element->firstChild;
     while ($el!==null)
     {
       if ($el->nodeType==XML_TEXT_NODE)
       {
         $text.=$el->nodeValue;
       }
-      $el=&$el->nextSibling;
+      $el=$el->nextSibling;
     }
     return $text;
   }
   
-  function loadCategory(&$element, &$category)
+  function loadCategory($element, $category)
   {
     global $_STORAGE;
     
+    $this->log->info('Loading category '.$category->id);
     $pos=0;
-    $el=&$element->firstChild;
+    $el=$element->firstChild;
     while ($el!==null)
     {
       if ($el->nodeType==XML_ELEMENT_NODE)
       {
         if ($el->tagName=='link')
         {
-          $name=$this->getTextContent($el);
-          $path=$el->getAttribute('path');
+          $this->log->debug('Adding link');
+          $name="'".sqlite_escape_string($this->getTextContent($el))."'";
+          $path="'".sqlite_escape_string($el->getAttribute('path'))."'";
+          $this->log->debug('path => '.$path.' name => '.$name.' sortkey => '.$pos);
           $_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES ('.$path.','.$name.','.$category->id.','.$pos.');');
+          $this->log->debug('Insert complete - '.$_STORAGE->changes());
           $pos++;
         }
         else if ($el->tagName=='page')
         {
-          $path=$el->getAttribute('path');
-          $_STORAGE->queryExec('INSERT INTO LinkCategory (page,category,sortkey) VALUES ('.$path.','.$category->id.','.$pos.');');
+          $this->log->debug('Adding page');
+          $path="'".sqlite_escape_string($el->getAttribute('path'))."'";
+          $this->log->debug('path => '.$path.' sortkey => '.$pos);
+          $_STORAGE->queryExec('INSERT INTO PageCategory (page,category,sortkey) VALUES ('.$path.','.$category->id.','.$pos.');');
+          $this->log->debug('Insert complete - '.$_STORAGE->changes());
           $pos++;
         }
         else if ($el->tagName=='category')
         {
+          $this->log->debug('Adding category');
           if ($el->hasAttribute('id'))
           {
             $id=$el->getAttribute('id');
@@ -107,26 +115,35 @@ class CategoryManager
             $id='NULL';
           }
           $name=$this->getTextContent($el);
-          $_STORAGE->queryExec('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$name.','.$category->id.','.$pos.');');
+          $ename="'".sqlite_escape_string($name)."'";
+          $this->log->debug('id => '.$id.' name => '.$ename.' sortkey => '.$pos);
+          $this->log->debug('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$ename.','.$category->id.','.$pos.');');
+          $_STORAGE->queryExec('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$ename.','.$category->id.','.$pos.');');
+          $this->log->debug('Insert complete - '.$_STORAGE->changes());
           if ($id=='NULL')
             $id=$_STORAGE->lastInsertRowid();
-          $this->loadCategory($el,$this->getCategory($id));
+          
+          $this->cache[$id] = new Category($this,$category,$id,$name);
+          $this->loadCategory($el,$this->cache[$id]);
           $pos++;
         }
       }
-      $el=&$el->nextSibling;
+      $el=$el->nextSibling;
     }
+    $this->log->debug('Completed category '.$category->id);    
   }
   
-  function load(&$document)
+  function load($document)
   {
     global $_STORAGE;
     $_STORAGE->queryExec('BEGIN TRANSACTION;');
+    $this->log->info('Wiping categories');
     $items = $this->root->clean();
     $this->cache=array();
-    $this->cache[$this->root->id]=&$this->root;
+    $this->cache[$this->root->id]=$this->root;
     $this->loadCategory($document->documentElement,$this->root);
     $_STORAGE->queryExec('COMMIT TRANSACTION;');
+    $this->log->debug('Transaction committed - '.$_STORAGE->lastError());
   }
 }
 
@@ -137,10 +154,10 @@ class Category
   var $id;
   var $manager;
   
-  function Category(&$manager,&$parent,$id,$name)
+  function Category($manager,$parent,$id,$name)
   {
-    $this->parent=&$parent;
-    $this->manager=&$manager;
+    $this->parent=$parent;
+    $this->manager=$manager;
     $this->id=$id;
     $this->name=$name;
   }
@@ -155,7 +172,7 @@ class Category
     $id = $_STORAGE->singleQuery('SELECT id FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
     if ($id!=false)
     {
-      $cat=&$this->manager->getCategory($id);
+      $cat=$this->manager->getCategory($id);
       $cat->clean();
       $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
       $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey-1 WHERE parent='.$this->id.' AND sortkey>'.$pos.';');
@@ -172,8 +189,9 @@ class Category
     while ($result->valid())
     {
       $id=$result->current();
-      $cat=&$this->manager->getCategory($id[0]);
+      $cat=$this->manager->getCategory($id[0]);
       $cat->clean();
+      $result->next();
     }
     $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.';');
   }
@@ -187,7 +205,7 @@ class Category
     $count+=$_STORAGE->singleQuery('SELECT COUNT() FROM PageCategory WHERE category='.$this->id.';');
   }
   
-  function &item($pos)
+  function item($pos)
   {
     $id=$_STORAGE->singleQuery('SELECT id FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
     if ($id!==false)
@@ -206,7 +224,7 @@ class Category
     }
   }
   
-  function &items()
+  function items()
   {
     global $_STORAGE;
     
@@ -219,14 +237,14 @@ class Category
       {
         $this->manager->cache[$details['id']] = new Category($this->manager,$this,$details['id'],$details['name']);
       }
-      $list[$details['sortkey']]=&$this->manager->cache[$details['id']];
+      $list[$details['sortkey']]=$this->manager->cache[$details['id']];
       $set->next();
     }
     $set=$_STORAGE->query('SELECT page,sortkey FROM PageCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->current();
-      $list[$details['sortkey']]=&Resource::decodeResource($details['page']);
+      $list[$details['sortkey']]=Resource::decodeResource($details['page']);
       $set->next();
     }
     $set=$_STORAGE->query('SELECT link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
@@ -246,24 +264,24 @@ class CategoryTree
   var $padding = '  ';
   var $showRoot = true;
   
-  function CategoryTree(&$root)
+  function CategoryTree($root)
   {
     $this->root=$root;
   }
   
-  function displayCategoryContentStartTag(&$category,$indent)
+  function displayCategoryContentStartTag($category,$indent)
   {
     print("\n".$indent."<ul>\n");
   }
   
-  function displayCategoryContentEndTag(&$category,$indent)
+  function displayCategoryContentEndTag($category,$indent)
   {
     print($indent."</ul>\n");
   }
   
-  function displayCategoryContent(&$category,$indent)
+  function displayCategoryContent($category,$indent)
   {
-    $items = &$category->items();
+    $items = $category->items();
     if (count($items)>0)
     {
       $this->displayCategoryContentStartTag($category,$indent);
@@ -276,12 +294,12 @@ class CategoryTree
     }
   }
   
-  function displayCategoryLabel(&$category)
+  function displayCategoryLabel($category)
   {
     print($category->name);
   }
   
-  function displayPageLabel(&$page)
+  function displayPageLabel($page)
   {
     print($page->prefs->getPref('page.variables.title'));
   }
@@ -291,7 +309,7 @@ class CategoryTree
     print($link);
   }
   
-  function displayItemStartTag(&$item,$indent)
+  function displayItemStartTag($item,$indent)
   {
     if (is_a($item,'Category'))
     {
@@ -307,12 +325,12 @@ class CategoryTree
     }
   }
   
-  function displayItemEndTag(&$item)
+  function displayItemEndTag($item)
   {
     print("</li>\n");
   }
   
-  function displayItem(&$item,$indent)
+  function displayItem($item,$indent)
   {
     $this->displayItemStartTag($item,$indent);
     if (is_a($item,'Category'))
@@ -348,12 +366,12 @@ class PageTree extends CategoryTree
 {
   var $pages;
   
-  function PageTree(&$root)
+  function PageTree($root)
   {
     $this->CategoryTree($root);
   }
   
-  function displayItem(&$item,$indent)
+  function displayItem($item,$indent)
   {
     if (is_a($item,'Page'))
     {
@@ -364,12 +382,11 @@ class PageTree extends CategoryTree
   
   function display($indent='')
   {
-    $container = &getContainer('global');
-    $list=&$container->getResources('page');
+    $container = getContainer('global');
+    $list=$container->getResources('page');
     $this->pages=array();
-    foreach (array_keys($list) as $i)
+    foreach ($list as &$page)
     {
-      $page=&$list[$i];
       $this->pages[$page->getPath()]=$page->prefs->getPref('page.variables.title','');
     }
     asort($this->pages);
@@ -380,7 +397,7 @@ class PageTree extends CategoryTree
       print($indent.$this->padding.'<ul>');
       foreach (array_keys($this->pages) as $path)
       {
-        $page=&Resource::decodeResource($path);
+        $page=Resource::decodeResource($path);
         print($indent.$this->padding.$this->padding.'<li class="page">');
         $this->displayPageLabel($page);
         print("</li>\n");
@@ -391,7 +408,7 @@ class PageTree extends CategoryTree
   }
 }
 
-function &getCategoryManager($space)
+function getCategoryManager($space)
 {
   global $_CATMAN;
   

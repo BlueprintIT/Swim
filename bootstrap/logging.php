@@ -64,7 +64,7 @@ class LogOutput
 		return $text;
 	}
 	
-	function convertTrace(&$logger,$detail)
+	function convertTrace($logger,$detail)
 	{
 		$detail['txtlevel']='UNKNOWN';
 		switch($detail['level'])
@@ -114,7 +114,7 @@ class LogOutput
 		return $detail;
 	}
 	
-	function output(&$logger,$detail)
+	function output($logger,$detail)
 	{
 		if ($detail['level']<=$this->level)
 		{
@@ -123,7 +123,7 @@ class LogOutput
 		}
 	}
 	
-	function outputTrace(&$logger,$detail)
+	function outputTrace($logger,$detail)
 	{
 		if ($detail['level']<=$this->level)
 		{
@@ -177,20 +177,20 @@ class Logger
 	var $parent;
 	var $output;
 	
-	function Logger(&$parent,$name)
+	function Logger($parent,$name)
 	{
 		$this->name=$name;
-		$this->parent=&$parent;
+		$this->parent=$parent;
 	}
 	
-	function setParent(&$parent)
+	function setParent($parent)
 	{
-		$this->parent=&$parent;
+		$this->parent=$parent;
 	}
 	
-	function setLogOutput(&$output)
+	function setLogOutput($output)
 	{
-		$this->output=&$output;
+		$this->output=$output;
 	}
 	
 	function clearLogOutput()
@@ -217,7 +217,7 @@ class Logger
 		$this->level=$level;
 	}
 	
-	function &getOutputter()
+	function getOutputter()
 	{
 		if (isset($this->output))
 		{
@@ -280,7 +280,7 @@ class Logger
 	{
 		if ($this->getLevel()>=$level)
 		{
-			$out = &$this->getOutputter();
+			$out = $this->getOutputter();
 			if (!isset($trace))
 			{
 				$trace=$this->buildStackTrace();
@@ -303,7 +303,7 @@ class Logger
 	{
 		if ($this->getLevel()>=$level)
 		{
-			$out = &$this->getOutputter();
+			$out = $this->getOutputter();
 
 			if (!isset($trace))
 			{
@@ -426,7 +426,7 @@ class LoggerManager
 		LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
 	}
 	
-	function &getOutputter()
+	function getOutputter()
 	{
 		return $this->output;
 	}
@@ -443,7 +443,7 @@ class LoggerManager
 			$logger = new Logger($this,$name);
 
 			$bestcount=0;
-			$bestparent=&$this;
+			$bestparent=$this;
 			foreach (array_keys($this->loggers) as $key)
 			{
 				if (strlen($key)<strlen($name))
@@ -451,20 +451,20 @@ class LoggerManager
 					if ((strlen($key)>$bestcount)&&(substr($name,0,strlen($key))==$key))
 					{
 						$bestcount=strlen($key);
-						$bestparent=&$this->loggers[$key];
+						$bestparent=$this->loggers[$key];
 					}
 				}
 				else if (strlen($key)>strlen($name))
 				{
 					if (substr($key,0,strlen($name))==$name)
 					{
-						$tlogger=&$this->loggers[$key];
+						$tlogger=$this->loggers[$key];
 						$tlogger->setParent($logger);
 					}
 				}
 			}
 			$logger->setParent($bestparent);
-			$this->loggers[$name]=&$logger;
+			$this->loggers[$name]=$logger;
 		}
 	}
 	
@@ -474,7 +474,7 @@ class LoggerManager
 		
 		if (strlen($prefix)>0)
 		{
-			$logger=&LoggerManager::getLogger($prefix);
+			$logger=LoggerManager::getLogger($prefix);
 			$logger->setLevel($level);
 		}
 		else
@@ -489,7 +489,7 @@ class LoggerManager
 		
 		if (strlen($prefix)>0)
 		{
-			$logger=&LoggerManager::getLogger($prefix);
+			$logger=LoggerManager::getLogger($prefix);
 			$logger->clearLevel();
 		}
 		else
@@ -497,22 +497,22 @@ class LoggerManager
 		}
 	}
 	
-	function setLogOutput($prefix,&$output)
+	function setLogOutput($prefix,$output)
 	{
 		global $_LOGMANAGER;
 		
 		if (strlen($prefix)>0)
 		{
-			$logger=&LoggerManager::getLogger($prefix);
+			$logger=LoggerManager::getLogger($prefix);
 			$logger->setOutput($output);
 		}
 		else
 		{
-			$_LOGMANAGER->output=&$output;
+			$_LOGMANAGER->output=$output;
 		}
 	}
 	
-	function &getLogger($name)
+	function getLogger($name)
 	{
 		global $_LOGMANAGER;
 		
@@ -536,7 +536,7 @@ function caught_error($type,$text,$file,$line)
 	if (ini_get('error_reporting')==0)
 		return;
 
-	$log = &LoggerManager::getLogger('php');
+	$log = LoggerManager::getLogger('php');
 	
 	$trace = array('file' => $file, 'line' => $line, 'function' => '');
 	$trace = array($trace);

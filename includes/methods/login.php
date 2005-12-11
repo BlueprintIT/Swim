@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-function method_login(&$request)
+function method_login($request)
 {
 	global $_PREFS;
 	

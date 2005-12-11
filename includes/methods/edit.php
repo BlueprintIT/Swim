@@ -13,12 +13,12 @@
  * $Revision$
  */
 
-function method_edit(&$request)
+function method_edit($request)
 {
 	global $_USER;
 	
-	$log=&LoggerManager::getLogger('swim.method.edit');
-	$resource = &Resource::decodeResource($request);
+	$log=LoggerManager::getLogger('swim.method.edit');
+	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{
@@ -26,7 +26,7 @@ function method_edit(&$request)
 		{
 			if (($resource->isBlock())||($resource->isPage()))
 			{
-				$details=&$resource->getWorkingDetails();
+				$details=$resource->getWorkingDetails();
 				
 				if ((!$details->isMine())&&(isset($request->query['forcelock'])))
 				{
@@ -42,16 +42,16 @@ function method_edit(&$request)
 				
 				if ($details->isMine())
 				{
-					$working=&$resource->makeWorkingVersion();
+					$working=$resource->makeWorkingVersion();
           if ($resource->isBlock())
           {
-  					$page=&$working->getBlockEditor($request);
+  					$page=$working->getBlockEditor($request);
   					$page->display($request);
           }
           else
           {
-            $container=&getContainer('internal');
-            $page=&$container->getPage('pageedit');
+            $container=getContainer('internal');
+            $page=$container->getPage('pageedit');
             $page->display($request);
           }
 				}

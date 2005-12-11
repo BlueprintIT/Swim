@@ -7,22 +7,22 @@
 	{
 		$setblock->query['version']=$request->nested->query['version'];
 	}
-	$setblock->nested=&$request->nested;
-	$page=&Resource::decodeResource($request->nested);
+	$setblock->nested=$request->nested;
+	$page=Resource::decodeResource($request->nested);
 	if (isset($request->query['format']))
 	{
 		$format=$request->query['format'];
 	}
 	$blocks=array();
-	$allblocks=&getAllBlocks();
+	$allblocks=getAllBlocks();
 	$current=$page->getReferencedBlock($request->query['reference']);
 	foreach(array_keys($allblocks) as $id)
 	{
-		$block=&$allblocks[$id];
+		$block=$allblocks[$id];
 		$title=$block->prefs->getPref('block.title');
 		if ((isset($format))&&($format!=$block->prefs->getPref('block.format')))
 			continue;
-		$blocks[$title]=&$block;
+		$blocks[$title]=$block;
 	}
 	ksort($blocks);
 ?>
@@ -32,7 +32,7 @@ var blockurl=[];
 	$pos=0;
 	foreach(array_keys($blocks) as $title)
 	{
-		$block=&$blocks[$title];
+		$block=$blocks[$title];
 		$req = new Request();
 		$req->method='preview';
 		$req->resource=$block->getPath();
@@ -76,7 +76,7 @@ addEvent(window,"load",displaypreview,false);
 <?
 	foreach(array_keys($blocks) as $title)
 	{
-		$block=&$blocks[$title];
+		$block=$blocks[$title];
 		$form=$block->prefs->getPref('block.format');
 ?>
 				<option value="<?= $block->getPath() ?>"<?
@@ -107,7 +107,7 @@ if (isset($format))
 	$create = new Request();
 	$create->method='docreate';
 	$create->resource='global/block';
-	$create->nested=&$request;
+	$create->nested=$request;
 
 ?>
 <form method="POST" action="<?= $create->encodePath() ?>">

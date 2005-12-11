@@ -14,13 +14,13 @@
  */
 
 
-function method_upload(&$request)
+function method_upload($request)
 {
 	global $_USER;
 	
-  $log=&LoggerManager::getLogger("swim.method.upload");
+  $log=LoggerManager::getLogger("swim.method.upload");
 
-	$resource=&Resource::decodeResource($request);
+	$resource=Resource::decodeResource($request);
   
 	if ($resource!==false)
 	{
@@ -35,7 +35,7 @@ function method_upload(&$request)
 					if ($resource->version=='temp')
 					{
 						$log->debug('Checking that we have the working lock');
-						$details=&$resource->getWorkingDetails();
+						$details=$resource->getWorkingDetails();
 	
 						if (!$details->isMine())
 						{
@@ -100,7 +100,7 @@ function method_upload(&$request)
       $log->debug('Uploading category database');
       if ($_USER->inGroup('admin'))
       {
-        $cm = &getCategoryManager($parts[1]);
+        $cm = getCategoryManager($parts[1]);
         if ($_SERVER['REQUEST_METHOD']=='PUT')
         {
           $doc = new DOMDocument();

@@ -51,8 +51,8 @@ function login($username,$password)
 		if (md5($password)==$newuser->account['password'])
 		{
 			$newuser->logged=true;
-			$_USER=&$newuser;
-			$_SESSION['Swim.User']=&$_USER;
+			$_USER=$newuser;
+			$_SESSION['Swim.User']=$_USER;
 			
 			return $_USER;
 		}
@@ -77,7 +77,7 @@ class User
 	
 	function User($username=false)
 	{
-		$this->log = &LoggerManager::getLogger('swim.user');
+		$this->log = LoggerManager::getLogger('swim.user');
 		if ($username!==false)
 		{
 			$this->become($username);
@@ -98,7 +98,7 @@ class User
 	
 	function __wakeup()
 	{
-		$this->log = &LoggerManager::getLogger('swim.user');
+		$this->log = LoggerManager::getLogger('swim.user');
 	}
 	
 	function setPassword($password)
@@ -401,7 +401,7 @@ class User
 		return $perm;
 	}
 	
-	function checkPermission($permission,&$resource)
+	function checkPermission($permission,$resource)
 	{
 		global $_PREFS;
 		
@@ -447,13 +447,13 @@ class User
 		
 		while (isset($resource->parent))
 		{
-			$resource=&$resource->parent;
+			$resource=$resource->parent;
 			$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,$resource->isWritable());
 			if ($perm!=PERMISSION_UNKNOWN)
 				return $perm;
 		}
 		
-		$container=&$resource->container;
+		$container=$resource->container;
 		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,$container->isWritable());
 		if ($perm!=PERMISSION_UNKNOWN)
 			return $perm;
@@ -461,7 +461,7 @@ class User
 		return $this->checkSpecificPermission($permission,$_PREFS->getPref('storage.basedir'),$file,false);
 	}
 	
-	function getPermission($permission,&$resource)
+	function getPermission($permission,$resource)
 	{
 		$perm=$this->checkPermission($permission,$resource);
 		if ($perm==PERMISSION_UNKNOWN)
@@ -470,14 +470,14 @@ class User
 		return $perm;
 	}
 	
-	function canRead(&$resource)
+	function canRead($resource)
 	{
 		//return true;
 		$this->log->debug('Checking canRead');
 		return $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
 	}
 	
-	function canWrite(&$resource)
+	function canWrite($resource)
 	{
 		//return true;
 		$this->log->debug('Checking canWrite');
@@ -485,7 +485,7 @@ class User
 	}
 }
 
-function &createUser($username)
+function createUser($username)
 {
 	$user = new User($username);
 	if ($user->user==$username)
@@ -497,7 +497,7 @@ function &createUser($username)
 	return $user;
 }
 
-function deleteUser(&$user)
+function deleteUser($user)
 {
 	global $_PREFS;
 	
@@ -528,7 +528,7 @@ function deleteUser(&$user)
 	}
 }
 
-function &getAllUsers()
+function getAllUsers()
 {
 	global $_PREFS;
 	$file = $_PREFS->getPref('security.database');
@@ -544,7 +544,7 @@ function &getAllUsers()
 	    {
 		    $user = new User();
 		    $user->loadFromDescriptor($line);
-		    $users[$user->getUsername()]=&$user;
+		    $users[$user->getUsername()]=$user;
 		    unset($user);
 	    }
 	  }
@@ -564,12 +564,12 @@ session_start();
 
 if (isset($_SESSION['Swim.User']))
 {
-	$_USER=&$_SESSION['Swim.User'];
+	$_USER=$_SESSION['Swim.User'];
 }
 else
 {
 	$_USER = new User('guest');
-	$_SESSION['Swim.User']=&$_USER;
+	$_SESSION['Swim.User']=$_USER;
 }
 
 ?>

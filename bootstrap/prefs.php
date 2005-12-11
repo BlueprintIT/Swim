@@ -23,14 +23,14 @@ class Preferences
 	{
 	}
 	
-	function setParent(&$parprefs)
+	function setParent($parprefs)
 	{
-		$this->parent=&$parprefs;
+		$this->parent=$parprefs;
 	}
 	
-	function setDelegate(&$overprefs)
+	function setDelegate($overprefs)
 	{
-		$this->delegate=&$overprefs;
+		$this->delegate=$overprefs;
 	}
 	
 	function getPrefBranch($branch)
@@ -202,7 +202,7 @@ if (is_readable($bootstrap.'/host.conf'))
 $host->setParent($default);
 $default->setDelegate($host);
 
-$_PREFS=&$host;
+$_PREFS=$host;
 LoggerManager::loadPreferences();
 require_once $bootstrap.'/baseincludes.php';
 

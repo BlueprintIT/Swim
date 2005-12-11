@@ -1,6 +1,6 @@
 <?
 
-$resource = &Resource::decodeResource($request);
+$resource = Resource::decodeResource($request);
 if ($resource->prefs->isPrefSet('block.stylesheets'))
 {
 	$styles=explode(',',$resource->prefs->getPref('block.stylesheets'));
@@ -16,7 +16,7 @@ if ($resource->prefs->isPrefSet('block.stylesheets'))
 	$list=substr($list,0,-1);
 }		
 
-$working=&$resource->makeWorkingVersion();
+$working=$resource->makeWorkingVersion();
 
 $upload = new Request();
 $upload->method="upload";
@@ -27,13 +27,13 @@ $commit = new Request();
 $commit->method='commit';
 $commit->resource=$request->resource;
 $commit->query['version']=$resource->version;
-$commit->nested=&$request->nested;
+$commit->nested=$request->nested;
 
 $cancel = new Request();
 $cancel->method='cancel';
 $cancel->resource=$request->resource;
 $cancel->query['version']=$resource->version;
-$cancel->nested=&$request->nested;
+$cancel->nested=$request->nested;
 
 $browser = new Request();
 $browser->method='fileselect';

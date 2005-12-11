@@ -13,18 +13,18 @@
  * $Revision$
  */
 
-function method_commit(&$request)
+function method_commit($request)
 {
 	global $_USER,$_PREFS;
 	
-	$resource = &Resource::decodeResource($request);
+	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			$oldversion=&$resource;
-			$details=&$resource->getWorkingDetails();
+			$oldversion=$resource;
+			$details=$resource->getWorkingDetails();
 
 			if ((!$details->isMine())&&(isset($request->query['forcelock'])))
 			{
@@ -54,10 +54,10 @@ function method_commit(&$request)
 					}
 					else
 					{
-						$nresource=&Resource::decodeResource($request->nested);
+						$nresource=Resource::decodeResource($request->nested);
 						if ($nresource->isPage())
 						{
-							$page=&$nresource;
+							$page=$nresource;
 							$usage=$page->getReferencedBlockUsage($oldversion);
 							if (count($usage)>0)
 							{
@@ -72,7 +72,7 @@ function method_commit(&$request)
 								}
 								if ($clone)
 								{
-									$newpage=&$page->makeNewVersion();
+									$newpage=$page->makeNewVersion();
 	
 									foreach ($usage as $id)
 									{
@@ -90,11 +90,11 @@ function method_commit(&$request)
 						}
 	
 						$autocommit=$_PREFS->getPref('update.autocommit',false);
-						$list=&getAllPages();
+						$list=getAllPages();
 						$pages=array();
 						foreach(array_keys($list) as $pkey)
 						{
-							$page=&$list[$pkey];
+							$page=$list[$pkey];
 							$usage=$page->getReferencedBlockUsage($oldversion);
 							
 							if (count($usage)>0)
@@ -112,7 +112,7 @@ function method_commit(&$request)
 								{
 									if ($autocommit)
 									{
-										$newpage=&$page->makeNewVersion();
+										$newpage=$page->makeNewVersion();
 	
 										foreach ($usage as $id)
 										{
@@ -127,7 +127,7 @@ function method_commit(&$request)
 									}
 									else
 									{
-										$pages[]=&$page;
+										$pages[]=$page;
 									}
 								}
 							}
@@ -136,8 +136,8 @@ function method_commit(&$request)
 						{
 							$request->data['newversion']=$newversion->version;
 							$request->data['pages']=&$pages;
-							$internal=&getContainer('internal');
-							$page=&$internal->getPage('commit');
+							$internal=getContainer('internal');
+							$page=$internal->getPage('commit');
 							$page->display($request);
 						}
 						else

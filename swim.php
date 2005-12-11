@@ -55,12 +55,12 @@ require_once $bootstrap.'/includes.php';
 require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
 unset($bootstrap);
 
-$log=&LoggerManager::getLogger('swim');
+$log=LoggerManager::getLogger('swim');
 
 $log->debug('Request start');
 $_STATE=STATE_PROCESSING;
 
-$request=&Request::decodeCurrentRequest();
+$request=Request::decodeCurrentRequest();
 
 callMethod($request);
 

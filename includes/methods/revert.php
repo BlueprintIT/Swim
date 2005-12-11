@@ -13,11 +13,11 @@
  * $Revision$
  */
 
-function method_revert(&$request)
+function method_revert($request)
 {
 	global $_USER;
 	
-	$resource = &Resource::decodeResource($request);
+	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{

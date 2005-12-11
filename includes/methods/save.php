@@ -13,12 +13,12 @@
  * $Revision$
  */
 
-function method_save(&$request)
+function method_save($request)
 {
   global $_USER;
   
-  $resource=&Resource::decodeResource($request);
-  $log=&LoggerManager::getLogger("swim.method.save");
+  $resource=Resource::decodeResource($request);
+  $log=LoggerManager::getLogger("swim.method.save");
 
   if ($resource!==false)
   {
@@ -27,7 +27,7 @@ function method_save(&$request)
       $log->debug('Checking write access');
       if ($_USER->canWrite($resource))
       {
-        $details=&$resource->getWorkingDetails();
+        $details=$resource->getWorkingDetails();
         
         if ((!$details->isMine())&&(isset($request->query['forcelock'])))
         {
@@ -43,7 +43,7 @@ function method_save(&$request)
         
         if ($details->isMine())
         {
-          $working=&$resource->makeWorkingVersion();
+          $working=$resource->makeWorkingVersion();
           foreach ($request->query as $name => $value)
           {
             if (substr($name,0,7)=='action:')

@@ -25,7 +25,7 @@ class Layout
 		
 		$this->id=$id;
 		$this->name=$name;
-		$this->prefs=&$_PREFS;
+		$this->prefs=$_PREFS;
 	}
 	
 	function getDir()
@@ -36,7 +36,7 @@ class Layout
 
 $_LAYOUTS = array();
 
-function &getLayout($id)
+function getLayout($id)
 {
 	global $_LAYOUTS,$_PREFS;
 	
@@ -47,10 +47,10 @@ function &getLayout($id)
 	return $_LAYOUTS[$id];
 }
 
-function &getAllLayouts()
+function getAllLayouts()
 {
 	global $_LAYOUTS,$_PREFS;
-	$log=&LoggerManager::getLogger('swim.layout');
+	$log=LoggerManager::getLogger('swim.layout');
 	
 	$file=$_PREFS->getPref('layouts.conf');
 	if (is_readable($file))
@@ -66,7 +66,7 @@ function &getAllLayouts()
 			{
 				$_LAYOUTS[$id]=new Layout($id,$name);
 			}
-			$layouts[$id]=&$_LAYOUTS[$id];
+			$layouts[$id]=$_LAYOUTS[$id];
 		}
 		return $layouts;
 	}

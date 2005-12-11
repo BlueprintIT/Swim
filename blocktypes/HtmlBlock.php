@@ -15,39 +15,39 @@
 
 class HtmlBlock extends Block
 {
-	function HtmlBlock(&$container,$id,$version)
+	function HtmlBlock($container,$id,$version)
 	{
 		$this->Block($container,$id,$version);
 	}
 	
-	function &getBlockEditor(&$request)
+	function getBlockEditor($request)
 	{
 		$request->data['file']=$this->prefs->getPref('block.htmlblock.filename','block.html');
-		$container=&getContainer('internal');
-		$page=&$container->getPage('htmledit');
+		$container=getContainer('internal');
+		$page=$container->getPage('htmledit');
 		return $page;
 	}
 	
-	function displayContent(&$parser,$attrs,$text)
+	function displayContent($parser,$attrs,$text)
 	{
 		$name=$this->prefs->getPref('block.htmlblock.filename','block.html');
 		readfile($this->getDir().'/'.$name);
 		return true;
 	}
 	
-	function registerObservers(&$parser)
+	function registerObservers($parser)
 	{
 		$parser->addObserver('img',$parser->data['template']);
 		$parser->addObserver('a',$this);
 	}
 	
-	function unregisterObservers(&$parser)
+	function unregisterObservers($parser)
 	{
 		$parser->removeObserver('a',$this);
 		$parser->removeObserver('img',$parser->data['template']);
 	}
 	
-	function observeTag(&$parser,$tagname,$attrs,$text)
+	function observeTag($parser,$tagname,$attrs,$text)
 	{
 		if ($tagname=='a')
 		{

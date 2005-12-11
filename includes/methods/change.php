@@ -14,13 +14,13 @@
  */
 
 
-function method_change(&$request)
+function method_change($request)
 {
 	global $_USER;
 	
-	$resource=&Resource::decodeResource($request);
-	$nested=&Resource::decodeResource($request->nested);
-	$log=&LoggerManager::getLogger("swim.method.change");
+	$resource=Resource::decodeResource($request);
+	$nested=Resource::decodeResource($request->nested);
+	$log=LoggerManager::getLogger("swim.method.change");
 
 	if ($resource->isPage())
 	{

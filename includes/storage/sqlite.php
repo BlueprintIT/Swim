@@ -17,7 +17,7 @@ function storage_init()
 {
   global $_PREFS,$_STORAGE;
   
-  $log = &LoggerManager::getLogger('swim.storage');
+  $log = LoggerManager::getLogger('swim.storage');
   $log->debug('Starting SQLite storage engine: '.sqlite_libversion());
   lockResourceWrite($_PREFS->getPref('storage.security'));
   $create=false;

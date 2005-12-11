@@ -15,23 +15,23 @@
 
 class FileManagerBlock extends Block
 {
-	function FileManagerBlock(&$container,$id,$version)
+	function FileManagerBlock($container,$id,$version)
 	{
 		$this->Block($container,$id,$version);
 	}
 
-	function &getStoreResource($request)
+	function getStoreResource($request)
 	{
 		return Resource::decodeResource($request);
 	}
 	
-	function onDirCreated($request,&$dir)
+	function onDirCreated($request,$dir)
 	{
 	}
 	
 	function checkForDir($request)
 	{
-		$resource=&$this->getStoreResource($request);
+		$resource=$this->getStoreResource($request);
 		if ($resource!==null)
 		{
 			if (!$resource->exists())
@@ -57,7 +57,7 @@ class FileManagerBlock extends Block
 	{
 	}
 	
-	function displayFileDetails(&$request,&$resource,$description,&$delete)
+	function displayFileDetails($request,$resource,$description,$delete)
 	{
 		$size=getReadableFileSize($resource->getDir().'/'.$resource->id);
 ?>
@@ -78,15 +78,15 @@ class FileManagerBlock extends Block
 	{
 	}
 	
-	function displayAdminPanel(&$request,&$data,$attrs)
+	function displayAdminPanel($request,$data,$attrs)
 	{
 	}
 	
-	function displayContent(&$parser,$attrs,$text)
+	function displayContent($parser,$attrs,$text)
 	{
 		global $_USER;
 
-		$request=&$parser->data['request'];
+		$request=$parser->data['request'];
 		$resource=$this->checkForDir($request);
 		if (!$_USER->canRead($resource))
 		{
@@ -207,7 +207,7 @@ class FileManagerBlock extends Block
 				{
 					$description='No description';
 				}
-				$fileresource=&$resource->getSubfile($file);
+				$fileresource=$resource->getSubfile($file);
 				$delete = new Request();
 				$delete=$request;
 				$delete->query[$id.':delete']='true';

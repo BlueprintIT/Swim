@@ -2,12 +2,12 @@
 
 class LinkedCategoryTree extends PageTree
 {
-  function LinkedCategoryTree(&$root)
+  function LinkedCategoryTree($root)
   {
     $this->PageTree($root);
   }
   
-  function displayPageLabel(&$page)
+  function displayPageLabel($page)
   {
     global $request,$pages;
     

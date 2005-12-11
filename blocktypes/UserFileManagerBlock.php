@@ -15,7 +15,7 @@
 
 class UserFileManagerBlock extends FileManagerBlock
 {
-	function UserFileManagerBlock(&$container,$id,$version)
+	function UserFileManagerBlock($container,$id,$version)
 	{
 		$this->FileManagerBlock($container,$id,$version);
 	}
@@ -34,13 +34,13 @@ class UserFileManagerBlock extends FileManagerBlock
 		}
 	}
 	
-	function &getStoreResource($request)
+	function getStoreResource($request)
 	{
 		$user=$this->getStoreUser($request);
 		return Resource::decodeResource($this->prefs->getPref('block.filemanager.storage').'/'.$user);
 	}
 	
-	function onDirCreated($request,&$dir)
+	function onDirCreated($request,$dir)
 	{
 		$file=$dir->getSubfile("access");
 		$user=$this->getStoreUser($request);

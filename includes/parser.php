@@ -31,7 +31,7 @@ class Parser
     $this->_attrname='';
     $this->_attrvalue='';
     $this->_quote='';
-    $this->_log=&LoggerManager::getLogger('swim.parser.'.get_class($this));
+    $this->_log=LoggerManager::getLogger('swim.parser.'.get_class($this));
     $this->_log->debug('In state 0');
   }
   
@@ -297,7 +297,7 @@ class TagObserver
 		$this->callback=$callback;
 	}
 
-  function observeTag(&$parser,$tagname,$attrs,$content)
+  function observeTag($parser,$tagname,$attrs,$content)
   {
   	return $this->callback($parser,$tagname,$attrs,$content);
   }
@@ -316,18 +316,18 @@ class TemplateParser extends StackedParser
   }
 
 	// Adds an object observer to the parser
-	function addObserver($tagname,&$observer)
+	function addObserver($tagname,$observer)
 	{
     $this->_log->debug('Observer added for '.$tagname);
     if (!isset($this->observers[$tagname]))
     {
     	$this->observers[$tagname]=array();
     }
-    $this->observers[$tagname][]=&$observer;
+    $this->observers[$tagname][]=$observer;
 	}
 	
   // Adds an observer to a number of tag names.
-  function addObservers($tagnames,&$observer)
+  function addObservers($tagnames,$observer)
   {
     foreach ($tagnames as $tagname)
     {
@@ -335,7 +335,7 @@ class TemplateParser extends StackedParser
     }
   }
   
-  function removeObserver($tag,&$observer)
+  function removeObserver($tag,$observer)
   {
   	if (is_array($this->observers[$tag]))
   	{
@@ -364,7 +364,7 @@ class TemplateParser extends StackedParser
   }
   
   // Called when a tag has been fully extracted to call the user function.
-  function callObserver(&$observer,$tagname,$attrs,$content)
+  function callObserver($observer,$tagname,$attrs,$content)
   {
     ob_start();
     $this->_log->debug('Calling observer for '.$tagname);
@@ -410,7 +410,7 @@ class TemplateParser extends StackedParser
 		    $this->_log->debug('Buffering callbacks');
 		    foreach (array_keys($this->observers[$tag]) as $i)
 		    {
-		    	$observer=&$this->observers[$tag][$i];
+		    	$observer=$this->observers[$tag][$i];
 		    	if ($this->callObserver($observer,$tag,$result['attrs'],$result['text']))
 		    	{
 		    		break;

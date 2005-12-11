@@ -37,7 +37,7 @@ function getLockFiles()
  	}
 }
 
-function &flockRead(&$log,$dir)
+function &flockRead($log,$dir)
 {
 	global $_PREFS;
 	
@@ -54,7 +54,7 @@ function &flockRead(&$log,$dir)
 	}
 }
 
-function &flockWrite(&$log,$dir)
+function &flockWrite($log,$dir)
 {
 	global $_PREFS;
 	
@@ -71,19 +71,19 @@ function &flockWrite(&$log,$dir)
 	}
 }
 
-function &flockUpgrade(&$log,$dir,&$lock)
+function &flockUpgrade($log,$dir,&$lock)
 {
 	flock($lock,LOCK_EX);
 	return $lock;
 }
 
-function flockUnlock(&$log,$dir,&$lock,$type)
+function flockUnlock($log,$dir,&$lock,$type)
 {
 	flock($lock,LOCK_UN);
 	fclose($lock);
 }
 
-function mkdirGetLock(&$log,$lockdir,$staleage)
+function mkdirGetLock($log,$lockdir,$staleage)
 {
 	global $_PREFS;
 	
@@ -104,7 +104,7 @@ function mkdirGetLock(&$log,$lockdir,$staleage)
 	}
 }
 
-function &mkdirRead(&$log,$dir)
+function &mkdirRead($log,$dir)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
@@ -148,7 +148,7 @@ function &mkdirRead(&$log,$dir)
 	return LOCK_READ;
 }
 
-function &mkdirWrite(&$log,$dir)
+function &mkdirWrite($log,$dir)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
@@ -172,7 +172,7 @@ function &mkdirWrite(&$log,$dir)
 	return true;
 }
 
-function &mkdirUpgrade(&$log,$dir,&$lock)
+function &mkdirUpgrade($log,$dir,&$lock)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
@@ -208,7 +208,7 @@ function &mkdirUpgrade(&$log,$dir,&$lock)
 	return true;
 }
 
-function mkdirUnlock(&$log,$dir,&$lock,$type)
+function mkdirUnlock($log,$dir,&$lock,$type)
 {
 	global $_PREFS;
 	$lockdir=$dir.'/'.$_PREFS->getPref('locking.mkdirlock');
@@ -265,7 +265,7 @@ function mkdirUnlock(&$log,$dir,&$lock,$type)
 	}
 }
 
-function &getReadLock(&$log,$dir)
+function &getReadLock($log,$dir)
 {
 	global $_PREFS;
 	
@@ -292,7 +292,7 @@ function &getReadLock(&$log,$dir)
  	return $lock;
 }
 
-function &getWriteLock(&$log,$dir)
+function &getWriteLock($log,$dir)
 {
 	global $_PREFS;
 	
@@ -319,7 +319,7 @@ function &getWriteLock(&$log,$dir)
  	return $lock;
 }
 
-function &upgradeLock(&$log,$dir,&$lock)
+function &upgradeLock($log,$dir,&$lock)
 {
 	global $_PREFS;
 	
@@ -344,7 +344,7 @@ function &upgradeLock(&$log,$dir,&$lock)
  	return $lock;
 }
 
-function unLock(&$log,$dir,&$lock,$type)
+function unLock($log,$dir,&$lock,$type)
 {
 	global $_PREFS;
 	
@@ -377,7 +377,7 @@ function lockResourceRead($dir)
 		return lockResourceWrite($dir);
 	}
 	
-	$log=&LoggerManager::getLogger('swim.locking');
+	$log=LoggerManager::getLogger('swim.locking');
 
 	if (!isset($_LOCKS[$dir]))
 	{
@@ -410,7 +410,7 @@ function lockResourceWrite($dir)
 {
 	global $_LOCKS,$_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.locking');
+	$log=LoggerManager::getLogger('swim.locking');
 
 	if (!isset($_LOCKS[$dir]))
 	{
@@ -456,7 +456,7 @@ function unlockResource($dir)
 {
 	global $_LOCKS,$_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.locking');
+	$log=LoggerManager::getLogger('swim.locking');
 	if ((isset($_LOCKS[$dir]))&&(isset($_LOCKS[$dir]['count']))&&($_LOCKS[$dir]['count']>0))
 	{
 	  $_LOCKS[$dir]['count']--;
@@ -478,7 +478,7 @@ function shutdownLocking()
 {
 	global $_LOCKS,$_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.locking');
+	$log=LoggerManager::getLogger('swim.locking');
 	foreach ($_LOCKS as $dir => $lock)
 	{
 		if (isset($lock['count']))

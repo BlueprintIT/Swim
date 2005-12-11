@@ -14,12 +14,12 @@
  */
 
 
-function method_delete(&$request)
+function method_delete($request)
 {
 	global $_USER;
 	
-	$resource=&Resource::decodeResource($request);
-	$log=&LoggerManager::getLogger("swim.method.view");
+	$resource=Resource::decodeResource($request);
+	$log=LoggerManager::getLogger("swim.method.view");
 
 	if ($resource!==false)
 	{
@@ -29,7 +29,7 @@ function method_delete(&$request)
 			{
 				if ($resource->version=="temp")
 				{
-					$details=&$resource->getWorkingDetails();
+					$details=$resource->getWorkingDetails();
 					if ($details->isMine())
 					{
 						$log->warn('Deleting file');

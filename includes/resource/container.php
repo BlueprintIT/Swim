@@ -29,7 +29,7 @@ class Container extends Resource
 	{
 		global $_PREFS;
 		
-		$this->log=&LoggerManager::getLogger('swim.container');
+		$this->log=LoggerManager::getLogger('swim.container');
 		$this->id=$id;
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($_PREFS);
@@ -95,7 +95,7 @@ class Container extends Resource
 		return false;
 	}
 	
-	function getResourceBaseDir(&$resource)
+	function getResourceBaseDir($resource)
 	{
 		if (is_a($resource,'File'))
 		{
@@ -107,7 +107,7 @@ class Container extends Resource
 		}
 	}
 	
-	function &getResourceVersions(&$resource)
+	function getResourceVersions($resource)
 	{
 		$versions=array();
 
@@ -146,7 +146,7 @@ class Container extends Resource
 		return $versions;
 	}
 	
-	function &getResourceWorkingDetails(&$resource)
+	function getResourceWorkingDetails($resource)
 	{
 		global $_USER;
 		
@@ -171,7 +171,7 @@ class Container extends Resource
 		return $this->working[$type][$resource->id];
 	}
 	
-	function &makeNewResourceVersion(&$resource)
+	function makeNewResourceVersion($resource)
 	{
 		$dir=$this->getResourceBaseDir($resource);
 		
@@ -230,10 +230,10 @@ class Container extends Resource
 		}
 	}
 	
-	function &makeResourceWorkingVersion(&$resource)
+	function makeResourceWorkingVersion($resource)
 	{
 		$source=$resource->getDir();
-		$details=&$resource->getWorkingDetails();
+		$details=$resource->getWorkingDetails();
 		if ($details->isNew())
 		{
 			$resource->lockRead();
@@ -258,11 +258,11 @@ class Container extends Resource
 		}
 	}
 	
-	function isCurrentResourceVersion(&$resource)
+	function isCurrentResourceVersion($resource)
 	{
     if ($this->isVersioned())
     {
-    	$current=&$this->getCurrentResourceVersion($resource);
+    	$current=$this->getCurrentResourceVersion($resource);
     	return ($current->version==$resource->version);
     }
     else
@@ -271,7 +271,7 @@ class Container extends Resource
     }
 	}
 	
-	function makeCurrentResourceVersion(&$resource)
+	function makeCurrentResourceVersion($resource)
 	{
 		$dir=$this->getResourceBaseDir($resource);
 
@@ -285,7 +285,7 @@ class Container extends Resource
 		}
 	}
 	
-	function &getCurrentResourceVersion(&$resource)
+	function getCurrentResourceVersion($resource)
 	{
     if ($this->isVersioned())
     {
@@ -327,7 +327,7 @@ class Container extends Resource
 		return $this->writable;
 	}
 	
-	function getResourceDir(&$resource)
+	function getResourceDir($resource)
 	{
 		if ((is_a($resource,'File'))||(!$this->isVersioned()))
 		{
@@ -339,14 +339,14 @@ class Container extends Resource
 		}
 	}
 	
-	function &loadBlock($id,$version = false)
+	function loadBlock($id,$version = false)
 	{
     $dir = $this->getDir().'/blocks/'.$id;
     if ($this->isVersioned())
     {
       $dir = $dir.'/'.$version;
     }
-		$block = &loadBlock($dir,$this,$id,$version);
+		$block = loadBlock($dir,$this,$id,$version);
 		if (($block!==false)&&($block->exists()))
 		{
 			return $block;
@@ -369,7 +369,7 @@ class Container extends Resource
 		return is_dir($this->getDir().'/'.$type.'s/'.$ext);
 	}
 	
-	function &getResource($type,$id,$version = false)
+	function getResource($type,$id,$version = false)
 	{
 		if (($version===false)&&(($type=='block')||($type=='page')||($type=='template'))&&($this->isVersioned()))
 		{
@@ -400,7 +400,7 @@ class Container extends Resource
 	}
 }
 
-function &getAllContainers()
+function getAllContainers()
 {
 	global $_PREFS;
 	
@@ -411,9 +411,9 @@ function &getAllContainers()
 		list($id,$base)=explode('.',$text,2);
 		if ($base=='basedir')
 		{
-			$container=&getContainer($id);
+			$container=getContainer($id);
 			if ($container->isVisible())
-				$containers[$id]=&getContainer($id);
+				$containers[$id]=getContainer($id);
 		}
 	}
 	return $containers;
@@ -421,7 +421,7 @@ function &getAllContainers()
 
 $_CONTAINERS = array();
 
-function &getContainer($id)
+function getContainer($id)
 {
 	global $_CONTAINERS,$_PREFS;
 	

@@ -18,17 +18,17 @@ class WorkingDetails
 	var $container;
 	var $log;
 	
-	function WorkingDetails(&$container,$id,$version,$dir)
+	function WorkingDetails($container,$id,$version,$dir)
 	{
 		global $_USER;
 		
 		$this->id=$id;
-		$this->container=&$container;
+		$this->container=$container;
 		$this->version=$version;
 		$this->dir=$dir;
-		$this->user=&$_USER;
+		$this->user=$_USER;
 		$this->blank=true;
-		$this->log=&LoggerManager::getLogger('swim.working');
+		$this->log=LoggerManager::getLogger('swim.working');
 		
 		if (!is_dir($dir))
 		{
@@ -73,7 +73,7 @@ class WorkingDetails
 		global $_USER;
 		
 		lockResourceWrite($this->dir);
-		$this->user=&$_USER;
+		$this->user=$_USER;
 		$this->internalSave();
 		unlockResource($this->dir);
 	}
@@ -83,7 +83,7 @@ class WorkingDetails
 		global $_USER;
 		
 		lockResourceWrite($this->dir);
-		$this->user=&$_USER;
+		$this->user=$_USER;
 		$this->internalClean();
 		$this->internalSave();
 		unlockResource($this->dir);
@@ -114,7 +114,7 @@ class WorkingDetails
 			$user=new User($line);
 			if ($user->userExists())
 			{
-				$this->user=&$user;
+				$this->user=$user;
 			}
 			$this->date=trim(fgets($file));
 			fclose($file);
@@ -160,24 +160,24 @@ class Resource
 
 	var $dir;
 	
-	function Resource(&$container, $id, $version)
+	function Resource($container, $id, $version)
 	{
 		global $_PREFS;
 		
-		$this->log=&LoggerManager::getLogger('swim.resource.'.get_class($this));
+		$this->log=LoggerManager::getLogger('swim.resource.'.get_class($this));
 		$this->id=$id;
 		
 		if (is_a($container,"Container"))
 		{
-			$this->container=&$container;
+			$this->container=$container;
 			$this->version=$version;
 			$this->dir=$this->container->getResourceDir($this);
 		}
 		else
 		{
-			$this->parent=&$container;
+			$this->parent=$container;
 			$this->version=$this->parent->version;
-			$this->container=&$container->container;
+			$this->container=$container->container;
 			if (is_a($this,'File'))
 			{
 				$this->dir=$this->parent->getDir();
@@ -236,9 +236,9 @@ class Resource
 		}
 	}
 	
-	function &loadBlock($id,$version = false)
+	function loadBlock($id,$version = false)
 	{
-		$block = &loadBlock($this->getDir().'/blocks/'.$id,$this,$id,$version);
+		$block = loadBlock($this->getDir().'/blocks/'.$id,$this,$id,$version);
 		if (($block!==false)&&($block->exists()))
 		{
 			return $block;
@@ -246,7 +246,7 @@ class Resource
 		return false;
 	}
 	
-	function &loadTemplate($id,$version = false)
+	function loadTemplate($id,$version = false)
 	{
 		$template = new Template($this,$id,$version);
 		if ($template->exists())
@@ -256,7 +256,7 @@ class Resource
 		return false;
 	}
 	
-	function &loadPage($id,$version = false)
+	function loadPage($id,$version = false)
 	{
 		$page = new Page($this,$id,$version);
 		if ($page->exists())
@@ -266,27 +266,27 @@ class Resource
 		return false;
 	}
 	
-	function &loadFile($id,$version = false)
+	function loadFile($id,$version = false)
 	{
 		return new File($this,$id,$version);
 	}
 	
-	function &getBlock($id,$version = false)
+	function getBlock($id,$version = false)
 	{
 		return $this->getResource('block',$id,$version);
 	}
 	
-	function &getTemplate($id,$version = false)
+	function getTemplate($id,$version = false)
 	{
 		return $this->getResource('template',$id,$version);
 	}
 	
-	function &getPage($id,$version = false)
+	function getPage($id,$version = false)
 	{
 		return $this->getResource('page',$id,$version);
 	}
 	
-	function &getFile($id,$version = false)
+	function getFile($id,$version = false)
 	{
 		return $this->getResource('file',$id);
 	}
@@ -309,12 +309,12 @@ class Resource
 		return array($id,$rdir);
 	}
 	
-	function &createResource($type,&$layout,$id=false)
+	function createResource($type,$layout,$id=false)
 	{
 		list($id,$pdir)=$this->createNewResource($type,$id);
 		if ($layout===false)
 		{
-			$layout=&getLayout($this->prefs->getPref('layouts.default'));
+			$layout=getLayout($this->prefs->getPref('layouts.default'));
 		}
 		if (is_object($layout))
 		{
@@ -328,17 +328,17 @@ class Resource
 		recursiveCopy($layoutdir,$pdir,true);
 		unlockResource($pdir);
 
-		$newresource=&$this->getResource($type,$id);
+		$newresource=$this->getResource($type,$id);
 
 		return $newresource;
 	}
 	
-	function &createPage(&$layout, $id=false)
+	function createPage($layout, $id=false)
 	{
 		return $this->createResource('page',$layout,$id);
 	}
 	
-	function &createBlock(&$layout, $id=false)
+	function createBlock($layout, $id=false)
 	{
 		return $this->createResource('block',$layout,$id);
 	}
@@ -348,37 +348,37 @@ class Resource
 		return is_dir($this->getDir().'/'.$type.'s/'.$id);
 	}
 	
-	function &getResource($type,$id,$version = false)
+	function getResource($type,$id,$version = false)
 	{
 		$path=$type.'/'.$id.':'.$version;
 		if (!isset($this->resources[$path]))
 		{
 			if ($type=='block')
 			{
-				$resource=&$this->loadBlock($id,$version);
+				$resource=$this->loadBlock($id,$version);
 			}
 			else if ($type=='template')
 			{
-				$resource=&$this->loadTemplate($id,$version);
+				$resource=$this->loadTemplate($id,$version);
 			}
 			else if ($type=='page')
 			{
-				$resource=&$this->loadPage($id,$version);
+				$resource=$this->loadPage($id,$version);
 			}
 			else if ($type=='file')
 			{
-				$resource=&$this->loadFile($id,$version);
+				$resource=$this->loadFile($id,$version);
 			}
 			else
 			{
 				return false;
 			}
-			$this->resources[$path]=&$resource;
+			$this->resources[$path]=$resource;
 		}
 		return $this->resources[$path];
 	}
 	
-	function &getResources($type)
+	function getResources($type)
 	{
 		$this->lockRead();
 		$resources=array();
@@ -389,10 +389,10 @@ class Resource
 		{
 			if (($entry[0]!='.')&&(!in_array($entry,$locknames)))
 			{
-				$resource=&$this->getResource($type,$entry);
+				$resource=$this->getResource($type,$entry);
 				if ($resource!==false)
 				{
-					$resources[]=&$resource;
+					$resources[]=$resource;
 				}
 			}
 		}
@@ -401,43 +401,43 @@ class Resource
 		return $resources;
 	}
 
-	function &getWorkingDetails()
+	function getWorkingDetails()
 	{
 		if (!isset($this->working))
 		{
 			if (isset($this->parent))
 			{
-				$this->working=&$this->parent->getWorkingDetails();
+				$this->working=$this->parent->getWorkingDetails();
 			}
 			else
 			{
-				$this->working=&$this->container->getResourceWorkingDetails($this);
+				$this->working=$this->container->getResourceWorkingDetails($this);
 			}
 		}
 		return $this->working;
 	}
 	
-	function &makeNewVersion()
+	function makeNewVersion()
 	{
 		$this->log->debug('Cloning '.$this->id.' to a new version');
 		if (isset($this->parent))
 		{
-			$parentv=&$this->parent->makeNewVersion();
-			$newv=&$parentv->getResource($this->getTypeName(),$this->id);
+			$parentv=$this->parent->makeNewVersion();
+			$newv=$parentv->getResource($this->getTypeName(),$this->id);
 		}
 		else
 		{
-			$newv=&$this->container->makeNewResourceVersion($this);
+			$newv=$this->container->makeNewResourceVersion($this);
 		}
 		$newv->savePreferences();
 		return $newv;
 	}
 	
-	function &makeWorkingVersion()
+	function makeWorkingVersion()
 	{
 		if (isset($this->parent))
 		{
-			$parentv=&$this->parent->makeWorkingVersion();
+			$parentv=$this->parent->makeWorkingVersion();
 			return $parentv->getResource($this->getTypeName(),$this->id);
 		}
 		else
@@ -446,7 +446,7 @@ class Resource
 		}
 	}
 	
-	function &getVersions()
+	function getVersions()
 	{
 		if (isset($this->parent))
 		{
@@ -484,7 +484,7 @@ class Resource
 		$this->log->debug('Complete');
 	}
 	
-	function &getCurrentVersion()
+	function getCurrentVersion()
 	{
 		if (isset($this->parent))
 		{
@@ -687,11 +687,11 @@ class Resource
 		$this->unlock();
 	}
 
-	function &decodeRelativeResource($parts,$version=false)
+	function decodeRelativeResource($parts,$version=false)
 	{
 		if (count($parts)>=2)
 		{
-      $log=&LoggerManager::getLogger('swim.resource');
+      $log=LoggerManager::getLogger('swim.resource');
       
 			$type=$parts[0];
 			$id=$parts[1];
@@ -705,7 +705,7 @@ class Resource
 			}
 			else
 			{
-				$resource=&$this->getResource($type,$id,$version);
+				$resource=$this->getResource($type,$id,$version);
 				if ($resource!==false)
 				{
 					return $resource->decodeRelativeResource(array_slice($parts,2));
@@ -719,11 +719,11 @@ class Resource
 		return $this;
 	}
 	
-	function &decodeResource($request,$version=false)
+	function decodeResource($request,$version=false)
 	{
 		global $_PREFS;
 		
-		$log=&LoggerManager::getLogger('swim.resource');
+		$log=LoggerManager::getLogger('swim.resource');
 		
 		if (is_object($request))
 		{
@@ -759,7 +759,7 @@ class Resource
 		if (count($parts)<=1)
 			return false;
 		
-		$container=&getContainer($parts[0]);
+		$container=getContainer($parts[0]);
     if ($container!==null)
     {
   		return $container->decodeRelativeResource(array_slice($parts,1),$version);
@@ -912,16 +912,16 @@ class File extends Resource
 	}
 }
 
-function &getAllResources($type)
+function getAllResources($type)
 {
 	global $_PREFS;
 	
 	$resources=array();
-	$containers=&getAllContainers();
+	$containers=getAllContainers();
 	foreach(array_keys($containers) as $id)
 	{
-		$container=&$containers[$id];
-		$newresources=&$container->getResources($type);
+		$container=$containers[$id];
+		$newresources=$container->getResources($type);
 		$resources=array_merge($resources,$newresources);
 	}
 	return $resources;

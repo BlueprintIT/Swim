@@ -1,5 +1,5 @@
 <?
-$page = &Resource::decodeResource($request);
+$page = Resource::decodeResource($request);
 ?>
 <script>
 var selectedpage = '';

@@ -2,7 +2,7 @@
 
 $newrequest = new Request();
 $newrequest->method='login';
-$newrequest->nested=&$request->nested;
+$newrequest->nested=$request->nested;
 
 ?>
 <div class="header">

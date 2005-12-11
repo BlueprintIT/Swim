@@ -13,16 +13,15 @@
  * $Revision$
  */
 
-function listContainer(&$container,$type=false)
+function listContainer($container,$type=false)
 {
 	print("\t<container id=\"".$container->id."\">\n");
 	
 	if (($type==false)||($type=="template"))
 	{
-		$set=&$container->getResources('template');
-		foreach (array_keys($set) as $k)
+		$set=$container->getResources('template');
+		foreach ($set as &$item)
 		{
-			$item=&$set[$k];
 			print("\t\t<template id=\"".$item->id."\"");
 			print(" version=\"".$item->version."\"");
 			print(">\n");
@@ -32,10 +31,9 @@ function listContainer(&$container,$type=false)
 	
 	if (($type==false)||($type=="page"))
 	{
-		$set=&$container->getResources('page');
-		foreach (array_keys($set) as $k)
+		$set=$container->getResources('page');
+		foreach ($set as &$item)
 		{
-			$item=&$set[$k];
 			print("\t\t<page id=\"".$item->id."\"");
 			print(" version=\"".$item->version."\"");
 			print(" title=\"".htmlspecialchars($item->prefs->getPref('page.variables.title'))."\"");
@@ -46,10 +44,9 @@ function listContainer(&$container,$type=false)
 	
 	if (($type==false)||($type=="block"))
 	{
-		$set=&$container->getResources('block');
-		foreach (array_keys($set) as $k)
+		$set=$container->getResources('block');
+		foreach ($set as &$item)
 		{
-			$item=&$set[$k];
 			print("\t\t<block id=\"".$item->id."\"");
 			print(" type=\"".get_class($item)."\"");
 			print(" version=\"".$item->version."\"");
@@ -65,7 +62,7 @@ function listDir($path,$name)
 	global $_PREFS;
 	$lockfiles=getLockFiles();
 	$templockfile=$_PREFS->getPref('locking.templockfile');
-	$log=&LoggerManager::getLogger('swim.method.list');
+	$log=LoggerManager::getLogger('swim.method.list');
 	print('<dir');
 	print(' name="'.$name.'"');
 	print('>');
@@ -97,7 +94,7 @@ function listDir($path,$name)
 
 function listFile($path,$name)
 {
-	$log=&LoggerManager::getLogger('swim.method.list');
+	$log=LoggerManager::getLogger('swim.method.list');
 	print('<file');
 	print(' name="'.$name.'"');
 	if (is_readable($path))
@@ -115,15 +112,15 @@ function listFile($path,$name)
 	print('/>');
 }
 
-function method_list(&$request)
+function method_list($request)
 {
-	$log=&LoggerManager::getLogger('swim.method.list');
+	$log=LoggerManager::getLogger('swim.method.list');
 	
 	setContentType('text/xml');
 	if (strlen($request->resource)>0)
 	{
 		$paths = explode('/',$request->resource);
-		$container=&getContainer($paths[0]);
+		$container=getContainer($paths[0]);
 		if (count($paths)==1)
 		{
 			listContainer($container);
@@ -134,7 +131,7 @@ function method_list(&$request)
 		}
 		else
 		{
-			$resource = &Resource::decodeResource($request);
+			$resource = Resource::decodeResource($request);
 			if ($resource->isFile())
 			{
 				$path=$resource->getDir().'/'.$resource->id;
@@ -157,10 +154,10 @@ function method_list(&$request)
 	else
 	{
 		print ("<site>\n");
-		$containers=&getAllContainers();
+		$containers=getAllContainers();
 		foreach (array_keys($containers) as $id)
 		{
-			$container=&$containers[$id];
+			$container=$containers[$id];
 			listContainer($container);
 		}
 		print ("</site>\n");

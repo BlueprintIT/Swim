@@ -1,10 +1,10 @@
 <?
 
-$block = &Resource::decodeResource($request);
+$block = Resource::decodeResource($request);
 
-$commit = &$request->nested;
+$commit = $request->nested;
 
-$cancel = &$commit;
+$cancel = $commit;
 
 ?>
 <applet class="com.blueprintit.menuedit.MenuEdit" style="width: 100%; height: 100%"

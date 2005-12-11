@@ -15,7 +15,7 @@
 
 class FileSelectorBlock extends FileManagerBlock
 {
-	function FileSelectorBlock(&$container,$id,$version)
+	function FileSelectorBlock($container,$id,$version)
 	{
 		$this->FileManagerBlock($container,$id,$version);
 	}
@@ -40,7 +40,7 @@ class FileSelectorBlock extends FileManagerBlock
 <?
 	}
 	
-	function displayFileDetails(&$request,&$resource,$description,&$delete)
+	function displayFileDetails($request,$resource,$description,$delete)
 	{
 		$path=$resource->getPath();
 		$path=substr($path,strlen($request->query['baseurl']));
@@ -50,9 +50,9 @@ class FileSelectorBlock extends FileManagerBlock
 		parent::displayFileDetails($request,$resource,$description,$delete);
 	}
 	
-	function displayContent(&$parser,$attrs,$text)
+	function displayContent($parser,$attrs,$text)
 	{
-		$request=&$parser->data['request'];
+		$request=$parser->data['request'];
 		$id=$parser->data['blockid'];
 ?>
 <script>

@@ -13,17 +13,17 @@
  * $Revision$
  */
 
-function method_cancel(&$request)
+function method_cancel($request)
 {
 	global $_USER;
 	
-	$resource = &Resource::decodeResource($request);
+	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)
 	{
 		if ($_USER->canWrite($resource))
 		{
-			$details=&$resource->getWorkingDetails();
+			$details=$resource->getWorkingDetails();
 			if ($details->isMine())
 			{
 				$details->free();

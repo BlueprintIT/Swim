@@ -13,9 +13,9 @@
  * $Revision$
  */
 
-function method_fileselect(&$request)
+function method_fileselect($request)
 {
-	$page = &Resource::decodeResource('internal/page/fileselect');
+	$page = Resource::decodeResource('internal/page/fileselect');
 	$page->display($request);
 }
 

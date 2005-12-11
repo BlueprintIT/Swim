@@ -1,9 +1,9 @@
 <?
 
-$resource=&Resource::decodeResource($request);
+$resource=Resource::decodeResource($request);
 if ($resource->isPage())
 {
-	$resource=&$resource->getReferencedBlock('content');
+	$resource=$resource->getReferencedBlock('content');
 }
 if ($resource->isBlock())
 {

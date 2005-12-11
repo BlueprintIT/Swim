@@ -24,7 +24,7 @@ class MenuItem
 	
 	function MenuItem()
 	{
-		$this->log = &LoggerManager::getLogger('swim.menu.item');
+		$this->log = LoggerManager::getLogger('swim.menu.item');
 	}
 	
 	function display()
@@ -83,14 +83,14 @@ class Menu
 	
 	function Menu()
 	{
-		$this->log = &LoggerManager::getLogger('swim.menu.menu');
+		$this->log = LoggerManager::getLogger('swim.menu.menu');
 	}
 	
 	function displayVerticalTableItems()
 	{
 		foreach (array_keys($this->items) as $k)
 		{
-			$item=&$this->items[$k];
+			$item=$this->items[$k];
 			print('<tr>'."\n");
 			print('<td class="menuitem">'."\n");
 			$item->display();
@@ -104,7 +104,7 @@ class Menu
 		print('<tr>'."\n");
 		foreach (array_keys($this->items) as $k)
 		{
-			$item=&$this->items[$k];
+			$item=$this->items[$k];
 			print('<td class="menuitem level'.$this->level.'">'."\n");
 			$item->display();
 			print('</td>'."\n");
@@ -116,7 +116,7 @@ class Menu
 	{
 		foreach (array_keys($this->items) as $k)
 		{
-			$item=&$this->items[$k];
+			$item=$this->items[$k];
 			print('<li class="menuitem level'.$this->level.'">'."\n");
 			$item->display();
 			print('</li>'."\n");
@@ -195,11 +195,11 @@ class Menu
 		}
 	}
 	
-	function addItem(&$item)
+	function addItem($item)
 	{
 		$this->log->debug('Added new item');
-		$this->items[]=&$item;
-		$item->parentMenu=&$this;
+		$this->items[]=$item;
+		$item->parentMenu=$this;
 	}
 }
 
@@ -225,7 +225,7 @@ class MenuParser extends StackedParser
   		$this->_log->debug('Adding item');
  			$newitem = new MenuItem();
  			$this->current->addItem($newitem);
- 			$this->current=&$newitem;
+ 			$this->current=$newitem;
  			return true;
  		}
  		else if ($tag=='menu')
@@ -234,16 +234,16 @@ class MenuParser extends StackedParser
  			$newmenu = new Menu();
 			if (isset($this->current))
 			{
-				$newmenu->parentItem=&$this->current;
+				$newmenu->parentItem=$this->current;
 				$newmenu->level=$this->current->parentMenu->level+1;
-				$this->current->submenu=&$newmenu;
+				$this->current->submenu=$newmenu;
 			}
 			else
 			{
 				$newmenu->level=1;
- 				$this->menu=&$newmenu;
+ 				$this->menu=$newmenu;
 			}
- 			$this->current=&$newmenu;
+ 			$this->current=$newmenu;
 	 		return true;
  		}
   }
@@ -254,11 +254,11 @@ class MenuParser extends StackedParser
   	$result=$this->popStack();
   	if ($result['tag']=='item')
   	{
-  		$this->current=&$this->current->parentMenu;
+  		$this->current=$this->current->parentMenu;
   	}
   	else if ($result['tag']=='menu')
   	{
-  		$this->current=&$this->current->parentItem;
+  		$this->current=$this->current->parentItem;
   	}
   }
 }
@@ -267,7 +267,7 @@ class MenuBlock extends Block
 {
 	var $rootmenu;
 	
-	function MenuBlock(&$container,$id,$version)
+	function MenuBlock($container,$id,$version)
 	{
 		$this->Block($container,$id,$version);
 
@@ -276,13 +276,13 @@ class MenuBlock extends Block
 		//LoggerManager::setLogLevel('',SWIM_LOG_ALL);
 		$parser->parseFile($this->getDir().'/'.$file);
 		//LoggerManager::setLogLevel('',SWIM_LOG_WARN);
-		$this->rootmenu=&$parser->menu;
+		$this->rootmenu=$parser->menu;
 	}
 	
-	function &getBlockEditor(&$request)
+	function getBlockEditor($request)
 	{
-		$container=&getContainer('internal');
-		$page=&$container->getPage('menuedit');
+		$container=getContainer('internal');
+		$page=$container->getPage('menuedit');
 		return $page;
 	}
 	
@@ -306,7 +306,7 @@ class MenuBlock extends Block
 		Block::displayIntro($attrs);
 	}
 	
-	function displayContent(&$parser,$attrs,$text)
+	function displayContent($parser,$attrs,$text)
 	{
 		print('<script src="/global/file/scripts/cbdom.js"/>');
 		print('<script src="/global/file/scripts/bpmm.js"/>');

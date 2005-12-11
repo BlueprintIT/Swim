@@ -13,15 +13,15 @@
  * $Revision$
  */
 
-function method_docreate(&$request)
+function method_docreate($request)
 {
 	global $_USER,$_PREFS;
 	
-	$log=&LoggerManager::getLogger('swim.method.docreate');
+	$log=LoggerManager::getLogger('swim.method.docreate');
 	
 	list($container,$type)=explode('/',$request->resource);
 	
-	$container=&getContainer($container);
+	$container=getContainer($container);
 	if ($container!==false)
 	{
 		if ($container->isWritable())
@@ -31,14 +31,14 @@ function method_docreate(&$request)
 			{
 				if (isset($request->query['layout']))
 				{
-					$layout=&getLayout($request->query['layout']);
+					$layout=getLayout($request->query['layout']);
 				}
 				else
 				{
 					$layout=false;
 				}
 	
-				$newpage=&$container->createPage($layout);
+				$newpage=$container->createPage($layout);
 					
 				if (isset($request->query['makedefault']))
 				{
@@ -69,7 +69,7 @@ function method_docreate(&$request)
 			}
 			else if ($type=='block')
 			{
-				$newblock=&$container->createBlock($request->query['layout']);
+				$newblock=$container->createBlock($request->query['layout']);
 					
 				foreach ($request->query as $name => $value)
 				{

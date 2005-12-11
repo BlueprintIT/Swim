@@ -2,12 +2,12 @@
 
 class LinkedCategoryTree extends PageTree
 {
-  function LinkedCategoryTree(&$root)
+  function LinkedCategoryTree($root)
   {
     $this->PageTree($root);
   }
   
-  function displayPageLabel(&$page)
+  function displayPageLabel($page)
   {
     global $request,$pages;
     
@@ -37,7 +37,7 @@ class LinkedCategoryTree extends PageTree
 $edit = new Request();
 $edit->method='view';
 $edit->resource='internal/page/siteedit';
-$edit->nested=&$request;
+$edit->nested=$request;
 ?>
 <div class="header">
 <form method="GET" action="<?= $edit->encodePath() ?>">
