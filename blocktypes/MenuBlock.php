@@ -88,9 +88,8 @@ class Menu
 	
 	function displayVerticalTableItems()
 	{
-		foreach (array_keys($this->items) as $k)
+		foreach ($this->items as $item)
 		{
-			$item=$this->items[$k];
 			print('<tr>'."\n");
 			print('<td class="menuitem">'."\n");
 			$item->display();
@@ -102,9 +101,8 @@ class Menu
 	function displayHorizontalTableItems()
 	{
 		print('<tr>'."\n");
-		foreach (array_keys($this->items) as $k)
+		foreach ($this->items as $item)
 		{
-			$item=$this->items[$k];
 			print('<td class="menuitem level'.$this->level.'">'."\n");
 			$item->display();
 			print('</td>'."\n");
@@ -114,9 +112,8 @@ class Menu
 	
 	function displayListItems()
 	{
-		foreach (array_keys($this->items) as $k)
+		foreach ($this->items as $item)
 		{
-			$item=$this->items[$k];
 			print('<li class="menuitem level'.$this->level.'">'."\n");
 			$item->display();
 			print('</li>'."\n");

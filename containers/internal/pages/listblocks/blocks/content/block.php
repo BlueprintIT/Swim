@@ -16,9 +16,8 @@
 	$blocks=array();
 	$allblocks=getAllBlocks();
 	$current=$page->getReferencedBlock($request->query['reference']);
-	foreach(array_keys($allblocks) as $id)
+	foreach($allblocks as $block)
 	{
-		$block=$allblocks[$id];
 		$title=$block->prefs->getPref('block.title');
 		if ((isset($format))&&($format!=$block->prefs->getPref('block.format')))
 			continue;
@@ -30,7 +29,7 @@
 var blockurl=[];
 <?
 	$pos=0;
-	foreach(array_keys($blocks) as $title)
+	foreach($blocks as $block)
 	{
 		$block=$blocks[$title];
 		$req = new Request();

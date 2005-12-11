@@ -61,9 +61,9 @@ $tree->display('  ');
 <?
 $container = getContainer('global');
 $pages = $container->getResources('page');
-foreach (array_keys($pages) as $i)
+foreach ($pages as $page)
 {
-?>    <page path="<?= $pages[$i]->getPath() ?>"><?= htmlspecialchars($pages[$i]->prefs->getPref('page.variables.title')) ?></page>
+?>    <page path="<?= $page->getPath() ?>"><?= htmlspecialchars($page->prefs->getPref('page.variables.title')) ?></page>
 <?
 }
 ?>

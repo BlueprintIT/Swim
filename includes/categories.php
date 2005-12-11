@@ -77,7 +77,7 @@ class CategoryManager
   {
     global $_STORAGE;
     
-    $this->log->info('Loading category '.$category->id);
+    $this->log->debug('Loading category '.$category->id);
     $pos=0;
     $el=$element->firstChild;
     while ($el!==null)
@@ -137,7 +137,7 @@ class CategoryManager
   {
     global $_STORAGE;
     $_STORAGE->queryExec('BEGIN TRANSACTION;');
-    $this->log->info('Wiping categories');
+    $this->log->debug('Wiping categories');
     $items = $this->root->clean();
     $this->cache=array();
     $this->cache[$this->root->id]=$this->root;
@@ -286,9 +286,9 @@ class CategoryTree
     {
       $this->displayCategoryContentStartTag($category,$indent);
       $ni=$indent.$this->padding;
-      foreach (array_keys($items) as $i)
+      foreach ($items as $item)
       {
-        $this->displayItem($items[$i],$ni);
+        $this->displayItem($item,$ni);
       }
       $this->displayCategoryContentEndTag($category,$indent);
     }

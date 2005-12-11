@@ -42,9 +42,8 @@ class Page extends Resource
 		}
 		
 		$blocks=$this->getResources('block');
-		foreach (array_keys($blocks) as $id)
+		foreach ($blocks as $block)
 		{
-			$block=$blocks[$id];
 			$modified=max($modified,$block->getModifiedDate());
 		}
 		

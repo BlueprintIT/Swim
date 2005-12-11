@@ -20,7 +20,7 @@ function listContainer($container,$type=false)
 	if (($type==false)||($type=="template"))
 	{
 		$set=$container->getResources('template');
-		foreach ($set as &$item)
+		foreach ($set as $item)
 		{
 			print("\t\t<template id=\"".$item->id."\"");
 			print(" version=\"".$item->version."\"");
@@ -32,7 +32,7 @@ function listContainer($container,$type=false)
 	if (($type==false)||($type=="page"))
 	{
 		$set=$container->getResources('page');
-		foreach ($set as &$item)
+		foreach ($set as $item)
 		{
 			print("\t\t<page id=\"".$item->id."\"");
 			print(" version=\"".$item->version."\"");
@@ -45,7 +45,7 @@ function listContainer($container,$type=false)
 	if (($type==false)||($type=="block"))
 	{
 		$set=$container->getResources('block');
-		foreach ($set as &$item)
+		foreach ($set as $item)
 		{
 			print("\t\t<block id=\"".$item->id."\"");
 			print(" type=\"".get_class($item)."\"");
@@ -155,9 +155,8 @@ function method_list($request)
 	{
 		print ("<site>\n");
 		$containers=getAllContainers();
-		foreach (array_keys($containers) as $id)
+		foreach ($containers as $container)
 		{
-			$container=$containers[$id];
 			listContainer($container);
 		}
 		print ("</site>\n");

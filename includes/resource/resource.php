@@ -918,9 +918,8 @@ function getAllResources($type)
 	
 	$resources=array();
 	$containers=getAllContainers();
-	foreach(array_keys($containers) as $id)
+	foreach($containers as $container)
 	{
-		$container=$containers[$id];
 		$newresources=$container->getResources($type);
 		$resources=array_merge($resources,$newresources);
 	}

@@ -56,9 +56,8 @@ $users=getAllUsers();
 <th style="text-align: left; width: 15%">Options</th>
 </tr>
 <?
-foreach (array_keys($users) as $uid)
+foreach ($users as $user)
 {
-	$user=$users[$uid];
 	if ($user->inGroup('admin'))
 	{
 		$type='Administrator';

@@ -408,9 +408,8 @@ class TemplateParser extends StackedParser
       if (isset($this->observers[$tag]))
       {
 		    $this->_log->debug('Buffering callbacks');
-		    foreach (array_keys($this->observers[$tag]) as $i)
+		    foreach ($this->observers[$tag] as $observer)
 		    {
-		    	$observer=$this->observers[$tag][$i];
 		    	if ($this->callObserver($observer,$tag,$result['attrs'],$result['text']))
 		    	{
 		    		break;

@@ -92,9 +92,8 @@ function method_commit($request)
 						$autocommit=$_PREFS->getPref('update.autocommit',false);
 						$list=getAllPages();
 						$pages=array();
-						foreach(array_keys($list) as $pkey)
+						foreach($list as $page)
 						{
-							$page=$list[$pkey];
 							$usage=$page->getReferencedBlockUsage($oldversion);
 							
 							if (count($usage)>0)
