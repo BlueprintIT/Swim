@@ -58,8 +58,75 @@ class CategoryManager
     return $this->cache[$id];
   }
   
-  function load($document)
+  function getTextContent(&$element)
   {
+    $text='';
+    $el=&$element->firstChild;
+    while ($el!==null)
+    {
+      if ($el->nodeType==XML_TEXT_NODE)
+      {
+        $text.=$el->nodeValue;
+      }
+      $el=&$el->nextSibling;
+    }
+    return $text;
+  }
+  
+  function loadCategory(&$element, &$category)
+  {
+    global $_STORAGE;
+    
+    $pos=0;
+    $el=&$element->firstChild;
+    while ($el!==null)
+    {
+      if ($el->nodeType==XML_ELEMENT_NODE)
+      {
+        if ($el->tagName=='link')
+        {
+          $name=$this->getTextContent($el);
+          $path=$el->getAttribute('path');
+          $_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES ('.$path.','.$name.','.$category->id.','.$pos.');');
+          $pos++;
+        }
+        else if ($el->tagName=='page')
+        {
+          $path=$el->getAttribute('path');
+          $_STORAGE->queryExec('INSERT INTO LinkCategory (page,category,sortkey) VALUES ('.$path.','.$category->id.','.$pos.');');
+          $pos++;
+        }
+        else if ($el->tagName=='category')
+        {
+          if ($el->hasAttribute('id'))
+          {
+            $id=$el->getAttribute('id');
+          }
+          else
+          {
+            $id='NULL';
+          }
+          $name=$this->getTextContent($el);
+          $_STORAGE->queryExec('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$name.','.$category->id.','.$pos.');');
+          if ($id=='NULL')
+            $id=$_STORAGE->lastInsertRowid();
+          $this->loadCategory($el,$this->getCategory($id));
+          $pos++;
+        }
+      }
+      $el=&$el->nextSibling;
+    }
+  }
+  
+  function load(&$document)
+  {
+    global $_STORAGE;
+    $_STORAGE->queryExec('BEGIN TRANSACTION;');
+    $items = $this->root->clean();
+    $this->cache=array();
+    $this->cache[$this->root->id]=&$this->root;
+    $this->loadCategory($document->documentElement,$this->root);
+    $_STORAGE->queryExec('COMMIT TRANSACTION;');
   }
 }
 
@@ -78,6 +145,39 @@ class Category
     $this->name=$name;
   }
   
+  function remove($pos)
+  {
+    global $_STORAGE;
+    $_STORAGE->queryExec('DELETE FROM LinkCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
+    $_STORAGE->queryExec('UPDATE LinkCategory SET sortkey=sortkey-1 WHERE category='.$this->id.' AND sortkey>'.$pos.';');
+    $_STORAGE->queryExec('DELETE FROM PageCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
+    $_STORAGE->queryExec('UPDATE PageCategory SET sortkey=sortkey-1 WHERE category='.$this->id.' AND sortkey>'.$pos.';');
+    $id = $_STORAGE->singleQuery('SELECT id FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
+    if ($id!=false)
+    {
+      $cat=&$this->manager->getCategory($id);
+      $cat->clean();
+      $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
+      $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey-1 WHERE parent='.$this->id.' AND sortkey>'.$pos.';');
+    }
+  }
+  
+  function clean()
+  {
+    global $_STORAGE;
+    $_STORAGE->queryExec('DELETE FROM LinkCategory WHERE category='.$this->id.';');
+    $_STORAGE->queryExec('DELETE FROM PageCategory WHERE category='.$this->id.';');
+    
+    $result = $_STORAGE->query('SELECT id FROM Category WHERE parent='.$this->id.';');
+    while ($result->valid())
+    {
+      $id=$result->current();
+      $cat=&$this->manager->getCategory($id[0]);
+      $cat->clean();
+    }
+    $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.';');
+  }
+  
   function count()
   {
     global $_STORAGE;
@@ -89,7 +189,7 @@ class Category
   
   function &item($pos)
   {
-    $id=$_STORAGE->singleQuery('SELECT COUNT() FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
+    $id=$_STORAGE->singleQuery('SELECT id FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
     if ($id!==false)
     {
       return $this->manager->getCategory($id);

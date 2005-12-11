@@ -107,6 +107,7 @@ function method_upload(&$request)
           if ($doc->load('php://input'))
           {
             $log->info('XML successfully loaded');
+            $cm->load($doc);
             header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
             print("Resource accepted");
             return;
