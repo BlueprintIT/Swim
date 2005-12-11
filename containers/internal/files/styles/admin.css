@@ -1,18 +1,10 @@
-html {
-	height: 100%;
-	width: 100%;
-	margin: 0;
-	padding: 0;
-}
+#include internal/file/styles/styles.css
 
 body {
-	margin: 0;
-	overflow: hidden;
 	padding-top: 130px;
 	padding-bottom: 10px;
 	padding-left: 0px;
 	padding-right: 0px;
-	font-family: Arial, Helvetica, sans-serif;
 }
 
 #banner {
@@ -74,97 +66,4 @@ body {
 #tabpanel .selected {
   background-color: transparent;
   border-bottom: none;
-}
-
-.pane {
-  height: 100%;
-  border: 1px solid ThreeDShadow;
-  overflow: auto;
-  text-align: center;
-  background-color: Window;
-  text-color: WindowText;
-}
-
-#leftpane {
-  float: left;
-  width: 300px;
-  margin-right: 10px;
-  margin-left: 10px;
-}
-
-#mainpane {
-  height: 100%;
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.pane .header {
-  border-bottom: 1px solid ThreeDShadow;
-  background-color: ThreeDFace;
-  text-align: right;
-}
-
-.pane .header form {
-  margin: 0;
-  padding: 0;
-}
-
-.pane .header input {
-  float: left;
-  margin: 10px;
-}
-
-.pane .header h2 {
-  margin: 0;
-  padding: 10px;
-  color: blue;
-}
-
-.pane .body {
-  padding: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: justify;
-}
-
-.categorytree {
-  margin-left: 20px;
-  margin-right: 0;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding: 0;
-}
-
-.categorytree ul {
-  padding-left: 20px;
-  padding-right: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  margin: 0;
-}
-
-.categorytree li {
-  vertical-align: middle;
-  padding: 1px;
-}
-
-.categorytree .selected {
-  background-color: Highlight;
-  color: HighlightText;
-}
-
-.categorytree a, .categorytree a:hover, .categorytree a:visited {
-  color: WindowText;
-}
-
-.categorytree .category {
-  list-style-image: -swim-url('internal/file/images/category.gif');
-}
-
-.categorytree .link {
-  list-style-image: -swim-url('internal/file/images/link.gif');
-}
-
-.categorytree .page {
-  list-style-image: -swim-url('internal/file/images/page.gif');
 }

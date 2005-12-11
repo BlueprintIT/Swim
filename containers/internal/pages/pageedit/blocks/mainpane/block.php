@@ -23,6 +23,19 @@ $cancel->resource=$request->resource;
 $cancel->nested=$request->nested;
 
 $block=$page->getReferencedBlock('content');
+
+$viewurl = new Request();
+$viewurl->method='view';
+$viewurl->resource='';
+
+$pageselect = new Request();
+$pageselect->method='pageselect';
+$pageselect->resource='';
+
+$expurl = new Request();
+$expurl->method='view';
+$expurl->resource=$block->getPath().'/file/';
+
 if ($block->prefs->isPrefSet('block.stylesheets'))
 {
     $styles=explode(',',$block->prefs->getPref('block.stylesheets'));
@@ -57,8 +70,12 @@ tinyMCE.init({
     plugins : "swim",
     content_css : new Array(<?= $list ?>),
     remove_linebreaks : false,
+    apply_source_formatting : true,
     relative_urls : true,
     document_host : "<?= $_SERVER['HTTP_HOST'] ?>",
+    document_base_url : "<?= $expurl->encode() ?>",
+    swim_view : "<?= $viewurl->encode() ?>",
+    swim_pagebrowser : "<?= $pageselect->encode() ?>",
     inline_styles : true,
     theme_advanced_toolbar_location : "top",
     theme_advanced_toolbar_align : "left",
@@ -103,7 +120,7 @@ if (isset($contentfile))
 {
 ?>
 <tr>
-	<td style="vertical-align: top"><label for="editor">Content:</label</td>
+	<td style="vertical-align: top"><label for="editor">Content:</label></td>
   <td style="vertical-align: top" colspan="2"><textarea id="editor" name="file:<?= $contentfile ?>" style="width: 100%; height: 400px"><?
 readfile($block->getDir().'/block.html');
 ?></textarea></td>

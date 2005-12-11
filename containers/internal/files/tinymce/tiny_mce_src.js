@@ -4894,17 +4894,11 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 
 	// Fix align on images
 	if (focusElm && focusElm.nodeName == "IMG") {
-		var align = focusElm.getAttribute('align');
-		var img = command == "JustifyCenter" ? focusElm.cloneNode(false) : focusElm;
+		var img = focusElm;
 
 		switch (command) {
 			case "JustifyLeft":
 				img.setAttribute('align', 'left');
-
-				// Remove the div
-				var div = focusElm.parentNode;
-				if (div && div.nodeName == "DIV" && div.childNodes.length == 1 && div.parentNode)
-					div.parentNode.replaceChild(img, div);
 
 				this.selectNode(img);
 				this.repaint();
@@ -4913,20 +4907,7 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 
 			case "JustifyCenter":
 				img.removeAttribute('align');
-
-				// Is centered
-				var div = tinyMCE.getParentElement(focusElm, "div");
-				if (div && div.style.textAlign == "center") {
-					// Remove div
-					if (div.nodeName == "DIV" && div.childNodes.length == 1 && div.parentNode)
-						div.parentNode.replaceChild(img, div);
-				} else {
-					// Add div
-					var div = this.getDoc().createElement("div");
-					div.style.textAlign = 'center';
-					div.appendChild(img);
-					focusElm.parentNode.replaceChild(div, focusElm);
-				}
+				img.parentNode.setAttribute('align','center');
 
 				this.selectNode(img);
 				this.repaint();
@@ -4934,13 +4915,7 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 				return;
 
 			case "JustifyRight":
-				if (align == 'right')
 				img.setAttribute('align', 'right');
-
-				// Remove the div
-				var div = focusElm.parentNode;
-				if (div && div.nodeName == "DIV" && div.childNodes.length == 1 && div.parentNode)
-					div.parentNode.replaceChild(img, div);
 
 				this.selectNode(img);
 				this.repaint();
@@ -4949,11 +4924,6 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 				
 			case "JustifyFull":
 				img.removeAttribute('align');
-
-				// Remove the div
-				var div = focusElm.parentNode;
-				if (div && div.nodeName == "DIV" && div.childNodes.length == 1 && div.parentNode)
-					div.parentNode.replaceChild(img, div);
 
 				this.selectNode(img);
 				this.repaint();
