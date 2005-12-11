@@ -296,17 +296,17 @@ class CategoryTree
   
   function displayCategoryLabel($category)
   {
-    print($category->name);
+    print(htmlspecialchars($category->name));
   }
   
   function displayPageLabel($page)
   {
-    print($page->prefs->getPref('page.variables.title'));
+    print(htmlspecialchars($page->prefs->getPref('page.variables.title')));
   }
   
   function displayLinkLabel($link)
   {
-    print($link);
+    print(htmlspecialchars($link));
   }
   
   function displayItemStartTag($item,$indent)
