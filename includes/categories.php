@@ -26,6 +26,7 @@ class CategoryManager
     
     $this->cache=array();
     $this->namespace=$namespace;
+    $this->log = &LoggerManager::getLogger('swim.categories.'.$namespace);
     $set=$_STORAGE->query('SELECT id,Category.name FROM Namespace,Category WHERE id=rootcategory;');
     $details = $set->current();
     $this->root = new Category($this,$this,$details['id'],$details['Category.name']);
@@ -105,29 +106,36 @@ class Category
   {
     global $_STORAGE;
     
-    $items=array();
+    $list=array();
     $set=$_STORAGE->query('SELECT id,name,sortkey FROM Category WHERE parent='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->current();
-      if (isset($this->manager->cache[$details['id']]))
+      if (!isset($this->manager->cache[$details['id']]))
       {
         $this->manager->cache[$details['id']] = new Category($this->manager,$this,$details['id'],$details['name']);
       }
-      $items[$details['sortkey']]=&$this->manager->cache[$details['id']];
+      $this->manager->log->debug('Found category '.$details['name'].' at '.$details['sortkey']);
+      $list[$details['sortkey']]=&$this->manager->cache[$details['id']];
+      $set->next();
     }
     $set=$_STORAGE->query('SELECT page,sortkey FROM PageCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->current();
-      $items[$details['sortkey']]=&Resource::decodeResource($details['page']);
+      $this->manager->log->debug('Found page '.$details['page'].' at '.$details['sortkey']);
+      $list[$details['sortkey']]=&Resource::decodeResource($details['page']);
+      $set->next();
     }
     $set=$_STORAGE->query('SELECT link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->current();
-      $items[$details['sortkey']]=$details['link'];
+      $this->manager->log->debug('Found link '.$details['link'].' at '.$details['sortkey']);
+      $list[$details['sortkey']]=$details['link'];
+      $set->next();
     }
+    return $list;
   }
 }
 
@@ -144,17 +152,17 @@ class CategoryTree
   
   function displayCategoryContent(&$category,$indent)
   {
-      $items = $category->items();
-      if (count($items)>0)
+    $items = &$category->items();
+    if (count($items)>0)
+    {
+      print("\n".$indent."<ul>\n");
+      $ni=$indent.$this->padding;
+      foreach (array_keys($items) as $i)
       {
-        print("\n".$indent."<ul>\n");
-        $ni=$indent.$this->padding;
-        foreach (array_keys($items) as $i)
-        {
-          $this->displayItem($items[$i],$ni);
-        }
-        print($indent."</ul>\n");
+        $this->displayItem($items[$i],$ni);
       }
+      print($indent."</ul>\n");
+    }
   }
   
   function displayCategoryLabel(&$category)
@@ -204,6 +212,52 @@ class CategoryTree
     else
     {
       $this->displayCategoryContent($this->root,$indent);
+    }
+  }
+}
+
+class PageTree extends CategoryTree
+{
+  var $pages;
+  
+  function PageTree(&$root)
+  {
+    $this->CategoryTree($root);
+  }
+  
+  function displayItem(&$item,$indent)
+  {
+    if (is_a($item,'Page'))
+    {
+      unset($this->pages[$item->getPath()]);
+    }
+    parent::displayItem($item,$indent);
+  }
+  
+  function display($indent='')
+  {
+    $container = &getContainer('global');
+    $list=&$container->getResources('page');
+    $this->pages=array();
+    foreach (array_keys($list) as $i)
+    {
+      $page=&$list[$i];
+      $this->pages[$page->getPath()]=&$page;
+    }
+    parent::display($indent);
+    if (count($this->pages)>0)
+    {
+      print($indent.'<li class="category">Uncategorised pages'."\n");
+      print($indent.$this->padding.'<ul>');
+      foreach (array_keys($this->pages) as $path)
+      {
+        $page=&$this->pages[$path];
+        print($indent.$this->padding.$this->padding.'<li class="page">');
+        $this->displayPageLabel($page);
+        print("</li>\n");
+      }
+      print($indent.$this->padding."</ul>\n");
+      print($indent."</li>\n");
     }
   }
 }

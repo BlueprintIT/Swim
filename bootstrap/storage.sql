@@ -11,7 +11,7 @@ CREATE TABLE Category (
 );
 
 CREATE TABLE PageCategory (
-	page INTEGER,
+	page TEXT,
 	category INTEGER,
 	sortkey INTEGER
 );

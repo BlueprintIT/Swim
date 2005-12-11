@@ -81,6 +81,8 @@ body {
   border: 1px solid ThreeDShadow;
   overflow: auto;
   text-align: center;
+  background-color: Window;
+  text-color: WindowText;
 }
 
 #leftpane {
@@ -123,4 +125,46 @@ body {
   margin-left: auto;
   margin-right: auto;
   text-align: justify;
+}
+
+.categorytree {
+  margin-left: 20px;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.categorytree ul {
+  padding-left: 20px;
+  padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin: 0;
+}
+
+.categorytree li {
+  vertical-align: middle;
+  padding: 1px;
+}
+
+.categorytree .selected {
+  background-color: Highlight;
+  color: HighlightText;
+}
+
+.categorytree a, .categorytree a:hover, .categorytree a:visited {
+  color: WindowText;
+}
+
+.categorytree .category {
+  list-style-image: -swim-url('internal/file/images/category.gif');
+}
+
+.categorytree .link {
+  list-style-image: -swim-url('internal/file/images/link.gif');
+}
+
+.categorytree .page {
+  list-style-image: -swim-url('internal/file/images/page.gif');
 }
