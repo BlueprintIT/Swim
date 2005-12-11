@@ -29,7 +29,7 @@ function method_upload($request)
 			$log->debug('Checking write access');
 			if ($_USER->canWrite($resource))
 			{
-				if (!is_a($resource->parent,'Container'))
+				if (!($resource->parent instanceof Container))
 				{
 					$log->debug('Checking that this is the working version');
 					if ($resource->version=='temp')

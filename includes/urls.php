@@ -270,7 +270,7 @@ class Request
 		return $url;
 	}
 	
-	function decodeCurrentRequest()
+	static function decodeCurrentRequest()
 	{
 		global $_PREFS;
 		
@@ -301,7 +301,7 @@ class Request
 		return Request::decode($path,$query);
 	}
 	
-	function decode($path,$query)
+	static function decode($path,$query)
 	{
 		global $_PREFS;
 

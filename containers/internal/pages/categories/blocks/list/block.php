@@ -17,11 +17,11 @@ class XMLTree extends CategoryTree
   
   function displayItemStartTag($item,$indent)
   {
-    if (is_a($item,'Category'))
+    if ($item instanceof Category)
     {
       print($indent.'<category id="'.$item->id.'">');
     }
-    else if (is_a($item,'Page'))
+    else if ($item instanceof Page)
     {
       print($indent.'<page path="'.$item->getPath().'">');
     }
@@ -33,11 +33,11 @@ class XMLTree extends CategoryTree
   
   function displayItemEndTag($item)
   {
-    if (is_a($item,'Category'))
+    if ($item instanceof Category)
     {
       print("</category>\n");
     }
-    else if (is_a($item,'Page'))
+    else if ($item instanceof Page)
     {
       print("</page>\n");
     }

@@ -16,7 +16,7 @@
 
 function method_view($request)
 {
-	global $_USER;
+	global $_USER,$_PREFS;
 	
 	$resource=Resource::decodeResource($request);
 	$log=LoggerManager::getLogger("swim.method.view");
@@ -44,7 +44,7 @@ function method_view($request)
 						setContentType($type);
 						if ($type=='text/css')
 						{
-							include 'csshandler.php';
+							include $_PREFS->getPref('storage.handlers').'/csshandler.php';
 							$handlerf = new CSSHandlerFactory();
 							$handlerf->output($resource);
 						}

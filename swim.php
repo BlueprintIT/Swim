@@ -23,6 +23,7 @@ unset($source);
 
 require_once $bootstrap.'/bootstrap.php';
 
+LoggerManager::setLogLevel('php',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.locking',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.method.view',SWIM_LOG_ALL);

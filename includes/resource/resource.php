@@ -167,7 +167,7 @@ class Resource
 		$this->log=LoggerManager::getLogger('swim.resource.'.get_class($this));
 		$this->id=$id;
 		
-		if (is_a($container,"Container"))
+		if ($container instanceof Container)
 		{
 			$this->container=$container;
 			$this->version=$version;
@@ -178,7 +178,7 @@ class Resource
 			$this->parent=$container;
 			$this->version=$this->parent->version;
 			$this->container=$container->container;
-			if (is_a($this,'File'))
+			if ($this instanceof File)
 			{
 				$this->dir=$this->parent->getDir();
 			}
@@ -190,7 +190,7 @@ class Resource
 
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($this->container->prefs);
-		if (!is_a($this,'File'))
+		if (!($this instanceof File))
 		{
 			$this->log->debug('Opening resource configuration');
 			$file=$this->openFileRead('resource.conf');
@@ -218,19 +218,19 @@ class Resource
 	
 	function getTypeName()
 	{
-		if (is_a($this,'Page'))
+		if ($this instanceof Page)
 		{
 			return 'page';
 		}
-		if (is_a($this,'Template'))
+		if ($this instanceof Template)
 		{
 			return 'template';
 		}
-		if (is_a($this,'File'))
+		if ($this instanceof File)
 		{
 			return 'file';
 		}
-		if (is_a($this,'Block'))
+		if ($this instanceof Block)
 		{
 			return 'block';
 		}
@@ -558,22 +558,22 @@ class Resource
 	
 	function isFile()
 	{
-		return is_a($this,'File');
+		return $this instanceof File;
 	}
 
 	function isPage()
 	{
-		return is_a($this,'Page');
+		return $this instanceof Page;
 	}
 
 	function isBlock()
 	{
-		return is_a($this,'Block');
+		return $this instanceof Block;
 	}
 
 	function isTemplate()
 	{
-		return is_a($this,'Template');
+		return $this instanceof Template;
 	}
 
 	function lockRead()
@@ -719,7 +719,7 @@ class Resource
 		return $this;
 	}
 	
-	function decodeResource($request,$version=false)
+	static function decodeResource($request,$version=false)
 	{
 		global $_PREFS;
 		

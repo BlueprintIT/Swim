@@ -38,6 +38,16 @@ class CategoryManager
     return $this->root;
   }
   
+  function getReadyCategory($id,$parent,$name)
+  {
+    if (!isset($this->cache[$id]))
+    {
+      $parent=$this->getCategory($parent);
+      $this->cache[$id] = new Category($this,$parent,$id,$name);
+    }
+    return $this->cache[$id];
+  }
+  
   function getCategory($id)
   {
     global $_STORAGE;
@@ -56,6 +66,22 @@ class CategoryManager
       }
     }
     return $this->cache[$id];
+  }
+  
+  function getPageCategories($page)
+  {
+    global $_STORAGE;
+
+    $path="'".sqlite_escape_string($page->getPath())."'";
+    $set=$_STORAGE->query('SELECT id,parent,name FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE Page.path='.$path.';');
+    $results = array();
+    while ($set->valid())
+    {
+      $details=$set->current();
+      $results[]=$this->getReadyCategory($details['id'],$details['parent'],$details['name']);
+      $set->next();
+    }
+    return $results;
   }
   
   function getTextContent($element)
@@ -185,11 +211,11 @@ class Category
     $_STORAGE->queryExec('DELETE FROM LinkCategory WHERE category='.$this->id.';');
     $_STORAGE->queryExec('DELETE FROM PageCategory WHERE category='.$this->id.';');
     
-    $result = $_STORAGE->query('SELECT id FROM Category WHERE parent='.$this->id.';');
+    $result = $_STORAGE->query('SELECT id,parent,name FROM Category WHERE parent='.$this->id.';');
     while ($result->valid())
     {
       $id=$result->current();
-      $cat=$this->manager->getCategory($id[0]);
+      $cat=$this->manager->getReadyCategory($id[0],$id[1],$id[2]);
       $cat->clean();
       $result->next();
     }
@@ -256,6 +282,28 @@ class Category
     }
     return $list;
   }
+  
+  function getDefaultPage()
+  {
+    $items = $this->items();
+    foreach($items as $item)
+    {
+      if ($item instanceof Page)
+      {
+        return $item;
+      }
+    }
+    foreach($items as $item)
+    {
+      if ($item instanceof Category)
+      {
+        $page=$item->getDefaultPage();
+        if ($page!==null)
+          return $page;
+      }
+    }
+    return null;
+  }
 }
 
 class CategoryTree
@@ -311,11 +359,11 @@ class CategoryTree
   
   function displayItemStartTag($item,$indent)
   {
-    if (is_a($item,'Category'))
+    if ($item instanceof Category)
     {
       print($indent.'<li class="category">');
     }
-    else if (is_a($item,'Page'))
+    else if ($item instanceof Page)
     {
       print($indent.'<li class="page">');
     }
@@ -333,12 +381,12 @@ class CategoryTree
   function displayItem($item,$indent)
   {
     $this->displayItemStartTag($item,$indent);
-    if (is_a($item,'Category'))
+    if ($item instanceof Category)
     {
       $this->displayCategoryLabel($item);
       $this->displayCategoryContent($item,$indent.$this->padding);
     }
-    else if (is_a($item,'Page'))
+    else if ($item instanceof Page)
     {
       $this->displayPageLabel($item);
     }
@@ -373,7 +421,7 @@ class PageTree extends CategoryTree
   
   function displayItem($item,$indent)
   {
-    if (is_a($item,'Page'))
+    if ($item instanceof Page)
     {
       unset($this->pages[$item->getPath()]);
     }

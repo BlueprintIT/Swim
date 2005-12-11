@@ -420,7 +420,7 @@ class LoggerManager
 		$this->output = new PageLogOutput();
 	}
 	
-	function loadPreferences()
+	static function loadPreferences()
 	{
 		global $_PREFS;
 		LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
@@ -468,7 +468,7 @@ class LoggerManager
 		}
 	}
 	
-	function setLogLevel($prefix,$level)
+	static function setLogLevel($prefix,$level)
 	{
 		global $_LOGMANAGER;
 		
@@ -483,7 +483,7 @@ class LoggerManager
 		}
 	}
 	
-	function clearLogLevel($prefix)
+	static function clearLogLevel($prefix)
 	{
 		global $_LOGMANAGER;
 		
@@ -497,7 +497,7 @@ class LoggerManager
 		}
 	}
 	
-	function setLogOutput($prefix,$output)
+	static function setLogOutput($prefix,$output)
 	{
 		global $_LOGMANAGER;
 		
@@ -512,7 +512,7 @@ class LoggerManager
 		}
 	}
 	
-	function getLogger($name)
+	static function getLogger($name)
 	{
 		global $_LOGMANAGER;
 		

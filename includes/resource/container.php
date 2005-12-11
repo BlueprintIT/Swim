@@ -97,7 +97,7 @@ class Container extends Resource
 	
 	function getResourceBaseDir($resource)
 	{
-		if (is_a($resource,'File'))
+		if ($resource instanceof File)
 		{
 			return $this->getDir().'/files';
 		}
@@ -121,15 +121,15 @@ class Container extends Resource
 				{
 					if ((is_dir($dir.'/'.$file))&&(is_numeric($file)))
 					{
-						if (is_a($resource,'Page'))
+						if ($resource instanceof Page)
 						{
 							$versions[$file] = $this->getPage($resource->id,$file);
 						}
-						else if (is_a($resource,'Block'))
+						else if ($resource instanceof Block)
 						{
 							$versions[$file] = $this->getBlock($resource->id,$file);
 						}
-						else if (is_a($resource,'Template'))
+						else if ($resource instanceof Template)
 						{
 							$versions[$file] = $this->getTemplate($resource->id,$file);
 						}
@@ -151,15 +151,15 @@ class Container extends Resource
 		global $_USER;
 		
 		$dir=$this->getResourceBaseDir($resource);
-		if (is_a($resource,'Page'))
+		if ($resource instanceof Page)
 		{
 			$type='page';
 		}
-		else if (is_a($resource,'Block'))
+		else if ($resource instanceof Block)
 		{
 			$type='block';
 		}
-		else if (is_a($resource,'Template'))
+		else if ($resource instanceof Template)
 		{
 			$type='template';
 		}
@@ -216,15 +216,15 @@ class Container extends Resource
 		unlockResource($target);
 		$resource->unlock();
 
-		if (is_a($resource,'Page'))
+		if ($resource instanceof Page)
 		{
 			return $this->getPage($resource->id,$next);
 		}
-		else if (is_a($resource,'Block'))
+		else if ($resource instanceof Block)
 		{
 			return $this->getBlock($resource->id,$next);
 		}
-		else if (is_a($resource,'Template'))
+		else if ($resource instanceof Template)
 		{
 			return $this->getTemplate($resource->id,$next);
 		}
@@ -244,15 +244,15 @@ class Container extends Resource
 			$details->blank=false;
 		}
 
-		if (is_a($resource,'Page'))
+		if ($resource instanceof Page)
 		{
 			return $this->getPage($resource->id,$details->version);
 		}
-		else if (is_a($resource,'Block'))
+		else if ($resource instanceof Block)
 		{
 			return $this->getBlock($resource->id,$details->version);
 		}
-		else if (is_a($resource,'Template'))
+		else if ($resource instanceof Template)
 		{
 			return $this->getTemplate($resource->id,$details->version);
 		}
@@ -293,15 +293,15 @@ class Container extends Resource
     
     	$version=$this->getCurrentVersion($dir);
     
-    	if (is_a($resource,'Page'))
+    	if ($resource instanceof Page)
     	{
     		return $this->getPage($resource->id,$version);
     	}
-    	else if (is_a($resource,'Block'))
+    	else if ($resource instanceof Block)
     	{
     		return $this->getBlock($resource->id,$version);
     	}
-    	else if (is_a($resource,'Template'))
+    	else if ($resource instanceof Template)
     	{
     		return $this->getTemplate($resource->id,$version);
     	}
@@ -329,7 +329,7 @@ class Container extends Resource
 	
 	function getResourceDir($resource)
 	{
-		if ((is_a($resource,'File'))||(!$this->isVersioned()))
+		if (($resource instanceof File)||(!$this->isVersioned()))
 		{
 			return $this->getResourceBaseDir($resource);
 		}
@@ -354,7 +354,7 @@ class Container extends Resource
 		return false;
 	}
 	
-	function &loadFile($id,$version = false)
+	function loadFile($id,$version = false)
 	{
 		return parent::loadFile($id,false);
 	}
