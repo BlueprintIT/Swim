@@ -29,8 +29,8 @@ $viewurl->method='view';
 $viewurl->resource='';
 
 $pageselect = new Request();
-$pageselect->method='pageselect';
-$pageselect->resource='';
+$pageselect->method='view';
+$pageselect->resource='internal/page/pageselect';
 
 $expurl = new Request();
 $expurl->method='view';
