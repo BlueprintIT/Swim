@@ -25,6 +25,9 @@ error_reporting(E_ALL);
 // Load the preferences engine
 require_once $bootstrap.'/logging.php';
 
+LoggerManager::setLogLevel('',SWIM_LOG_INFO);
+LoggerManager::setLogLevel('swim.utils.shutdown',SWIM_LOG_WARN);
+
 //LoggerManager::setLogLevel('php',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.locking',SWIM_LOG_ALL);
@@ -41,9 +44,6 @@ require_once $bootstrap.'/logging.php';
 
 // Load the preferences engine
 require_once $bootstrap.'/prefs.php';
-
-LoggerManager::setLogLevel('',SWIM_LOG_INFO);
-LoggerManager::setLogLevel('swim.utils.shutdown',SWIM_LOG_WARN);
 
 $_STATE=STATE_STARTUP;
 // Include various utils

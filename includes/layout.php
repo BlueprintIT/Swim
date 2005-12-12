@@ -79,9 +79,29 @@ class Layout
 
 class BlockLayout extends Layout
 {
+  var $type;
+  
   function BlockLayout($id,$clone=null)
   {
     $this->Layout($id,$clone);
+    if ($clone!==null)
+    {
+      $this->type = $clone->type;
+    }
+  }
+  
+  function load($element)
+  {
+    if ($element->hasAttribute('type'))
+    {
+      $this->type=$element->getAttribute('type');
+    }
+    parent::load($element);
+  }
+  
+  function getType()
+  {
+    return $this->type;
   }
 }
 

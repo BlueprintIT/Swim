@@ -4,7 +4,7 @@ class FileBrowser extends FileSelectorBlock
 {
   function getStoreResource($request)
   {
-    if ($request->query['type']!='global')
+    if ((!isset($request->query['type']))||($request->query['type']!='global'))
     {
       $page = Resource::decodeResource($request);
       return $page->getFile('attachments');

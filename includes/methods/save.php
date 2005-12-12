@@ -13,6 +13,45 @@
  * $Revision$
  */
 
+function save_apply($resource,$name,$value)
+{
+  if (substr($name,0,5)=='pref:')
+  {
+    $name=substr($name,5);
+    $resource->prefs->setPref($name,$value);
+    $resource->savePreferences();
+  }
+  else if (substr($name,0,5)=='file:')
+  {
+    $name=substr($name,5);
+    $file=$resource->openFileWrite($name);
+    fwrite($file,$value);
+    $resource->closeFile($file);
+  }
+  else if (substr($name,0,6)=='block:')
+  {
+    $name=substr($name,6);
+    $pos=strpos($name,':');
+    if ($pos>0)
+    {
+      $block=substr($name,0,$pos);
+      $name=substr($name,$pos+1);
+      if ($resource instanceof Page)
+      {
+        $newr = $resource->getReferencedBlock($block);
+      }
+      else
+      {
+        $newr = $resource->getResource('block',$block);
+      }
+      if ($newr!==null)
+      {
+        save_apply($newr,$name,$value);
+      }
+    }
+  }
+}
+
 function method_save($request)
 {
   global $_USER;
@@ -57,24 +96,15 @@ function method_save($request)
                 }
               }
             }
-            else if (substr($name,0,5)=='pref:')
-            {
-              $name=substr($name,5);
-              $working->prefs->setPref($name,$value);
-            }
-            else if (substr($name,0,5)=='file:')
-            {
-              $name=substr($name,5);
-              $file=$working->openFileWrite($name);
-              fwrite($file,$value);
-              $working->closeFile($file);
-            }
             else if ($name=='layout')
             {
               $working->setLayout($value);
             }
+            else
+            {
+              save_apply($working,$name,$value);
+            }
           }
-          $working->savePreferences();
           if (!isset($redirect))
           {
             if (isset($request->query['default']))
