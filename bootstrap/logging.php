@@ -142,7 +142,7 @@ class FileLogOutput extends LogOutput
 		$this->LogOutput();
 		$this->filename=$filename;
 		$this->pattern="[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])\n";
-		$this->tracePattern="[$[txtlevel]] $[logger]: $[function]$[arglist] ($[file]:$[line])\n";
+		$this->tracePattern="$[logger]: $[function]$[arglist] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
@@ -161,7 +161,7 @@ class PageLogOutput extends LogOutput
 	{
 		$this->LogOutput();
 		$this->pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
-		$this->tracePattern="<b>[$[txtlevel]]</b> $[logger]: $[function]$[arglist] ($[file]:$[line])\n";
+		$this->tracePattern="$[logger]: $[function]$[arglist] ($[file]:$[line])<br />\n";
 	}
 	
 	function internalOutput($text)

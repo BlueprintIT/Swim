@@ -13,20 +13,6 @@
  * $Revision$
  */
 
-function logTest($id,$desc,$comparison)
-{
-  global $log;
-  
-  if ($comparison)
-  {
-    $log->debug('Passed test '.$id.': '.$desc);
-  }
-  else
-  {
-    $log->error('Failed test '.$id.': '.$desc);
-  }
-}
-
 $container=getContainer('global');
 $cont2=getContainer('global');
 

@@ -13,6 +13,20 @@
  * $Revision$
  */
 
+function logTest($id,$desc,$comparison)
+{
+  global $log;
+  
+  if ($comparison)
+  {
+    $log->debug('Passed test '.$id.': '.$desc);
+  }
+  else
+  {
+    $log->error('Failed test '.$id.': '.$desc);
+  }
+}
+
 function run_test($file)
 {
   global $_PREFS,$log;

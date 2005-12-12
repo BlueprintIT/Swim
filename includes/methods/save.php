@@ -67,7 +67,7 @@ function method_save($request)
               $name=substr($name,5);
               $file=$working->openFileWrite($name);
               fwrite($file,$value);
-              $resource->closeFile($file);
+              $working->closeFile($file);
             }
           }
           $working->savePreferences();
