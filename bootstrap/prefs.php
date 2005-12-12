@@ -19,14 +19,25 @@ class Preferences
 	var $parent;
 	var $delegate;
 	
-	function Preferences()
+	function Preferences($clone=null)
 	{
+    if ($clone!==null)
+    {
+      $this->preferences=$clone->preferences;
+      $this->parent=$clone->parent;
+      $this->delegate=$clone->delegate;
+    }
 	}
 	
 	function setParent($parprefs)
 	{
 		$this->parent=$parprefs;
 	}
+  
+  function getParent()
+  {
+    return $this->parent;
+  }
 	
 	function setDelegate($overprefs)
 	{
@@ -57,6 +68,51 @@ class Preferences
 		return $result;
 	}
 	
+  function addPreferences($prefs, $overwrite=true)
+  {
+    foreach ($prefs->preferences as $name => $key)
+    {
+      if ($overwrite || (!isset($this->preferences[$name])))
+      {
+        $this->preferences[$name]=$key;
+      }
+    }
+  }
+  
+  function loadFromDOM($element,$branch = '',$merge = false)
+  {
+    if (!$merge)
+    {
+      $this->preferences=array();
+    }
+    if (strlen($branch)>0)
+    {
+      $branch.='.';
+    }
+    $el=$element->firstChild;
+    while ($el!==null)
+    {
+      if (($el->nodeType==XML_ELEMENT_NODE)&&($el->tagName=='preference'))
+      {
+        $name=$el->getAttribute('name');
+        $value=$el->getAttribute('value');
+        if (substr($name,0,strlen($branch))==$branch)
+        {
+          if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
+          {
+            $value=true;
+          }
+          else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
+          {
+            $value=false;
+          }
+          $this->preferences[$name]=$value;
+        }
+      }
+      $el=$el->nextSibling;
+    }
+  }
+  
 	function loadPreferences($source,$branch = '',$merge = false)
 	{
   	if (!$merge)

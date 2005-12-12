@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<layouts default="default">
+  <pagelayout id="default">
+    <name>Default Layout</name>
+    <preferences>
+      <preference name="page.template" value="global/template/base"/>
+      <preference name="page.variables.title" value="New Page"/>
+    </preferences>
+    <blocklayout id="content" type="html">
+      <preferences>
+        <preference name="block.class" value="HtmlBlock"/>
+        <preference name="block.stylesheets" value="global/file/styles/content.css"/>
+      </preferences>
+    </blocklayout>
+  </pagelayout>
+
+  <pagelayout id="trimage" extends="default">
+    <name>Image in top right</name>
+    <blocklayout id="image" type="image">
+      <preferences>
+        <preference name="block.class" value="ImageBlock"/>
+      </preferences>
+    </blocklayout>
+  </pagelayout>
+</layouts>

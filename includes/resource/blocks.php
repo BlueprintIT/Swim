@@ -21,6 +21,17 @@ class Block extends Resource
 	function Block($container,$id,$version)
 	{
 		$this->Resource($container,$id,$version);
+    if ((isset($this->parent))&&($this->parent instanceof Page))
+    {
+      $layout = $this->parent->getLayout();
+      $blk = $layout->getBlockLayout($this->id);
+      if ($blk!=null)
+      {
+        $layprefs = new Preferences($blk->prefs);
+        $layprefs->setParent($this->prefs->getParent());
+        $this->prefs->setParent($layprefs);
+      }
+    }
 		$this->log=LoggerManager::getLogger('swim.block');
 	}
 	
@@ -147,12 +158,23 @@ function loadBlock($blockdir,$container,$id,$version=false)
 		if ($container->isWritable())
 			lockResourceRead($blockdir);
 	
-		$blockprefs = new Preferences();
-		$blockprefs->setParent($_PREFS);
+    $blockprefs = new Preferences();
+    $blockprefs->setParent($_PREFS);
+
+    if ($container instanceof Page)
+    {
+      $layout=$container->getLayout();
+      $blk=$layout->getBlockLayout($id);
+      if ($blk!=null)
+      {
+        $blockprefs->addPreferences($blk->prefs,false);
+      }
+    }
+    
 		if (is_readable($blockdir.'/resource.conf'))
 		{
 			$file=fopen($blockdir.'/resource.conf','r');
-			$blockprefs->loadPreferences($file,'block');
+			$blockprefs->loadPreferences($file,'block',true);
 			fclose($file);
 		}
 		$class=$blockprefs->getPref('block.class');

@@ -44,7 +44,6 @@ class FileSelectorBlock extends FileManagerBlock
 	{
     $size=getReadableFileSize($resource->getDir().'/'.$resource->id);
 		$path=$resource->getPath();
-		$path=substr($path,strlen($request->query['baseurl']));
 ?>
 <td><input type="radio" onclick="moveSelection(this)" onchange="moveSelection(this)" id="<?= $path ?>" name="file" value="/<?= $path ?>"></td>
 <td><anchor target="_blank" method="view" href="/<?= $resource->getPath() ?>"><?= basename($resource->id) ?></anchor></td>

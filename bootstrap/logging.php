@@ -23,9 +23,9 @@ define('SWIM_LOG_ALL',2000);
 
 class LogOutput
 {
-	var $pattern;
-	var $tracePattern;
-	var $level = SWIM_LOG_ALL;
+	protected $pattern;
+	protected $tracePattern;
+	private $level = SWIM_LOG_ALL;
 	
 	function LogOutput()
 	{
@@ -110,7 +110,7 @@ class LogOutput
 			$list=substr($list,0,-1);
 			$detail['arglist']='('.$list.')';
 		}
-		$detail['logger']=$logger->name;
+		$detail['logger']=$logger->getName();
 		return $detail;
 	}
 	
@@ -135,7 +135,7 @@ class LogOutput
 
 class FileLogOutput extends LogOutput
 {
-  var $filename;
+  private $filename;
   
 	function FileLogOutput($filename)
 	{
@@ -172,10 +172,10 @@ class PageLogOutput extends LogOutput
 
 class Logger
 {
-	var $name;
-	var $level;
-	var $parent;
-	var $output;
+	private $name;
+	private $level;
+	private $parent;
+	private $output;
 	
 	function Logger($parent,$name)
 	{
@@ -198,6 +198,11 @@ class Logger
 		unset($this->output);
 	}
 	
+  function getName()
+  {
+    return $this->name;
+  }
+  
 	function getLevel()
 	{
 		if (isset($this->level))
@@ -411,85 +416,82 @@ class Logger
 
 class LoggerManager
 {
-	var $level = SWIM_LOG_WARN;
-	var $loggers = array();
-	var $output;
+	private static $loggers = array();
+  private static $root;
 	
-	function LoggerManager()
+	static function init()
 	{
-		$this->output = new PageLogOutput();
+    self::$root = new Logger(null,'');
+    self::$root->setLevel(SWIM_LOG_WARN);
+		self::$root->setLogOutput(new PageLogOutput());
 	}
 	
 	static function loadPreferences()
 	{
 		global $_PREFS;
-		LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
+		self::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
 	}
 	
-	function getOutputter()
+	static function getOutputter()
 	{
-		return $this->output;
+		return self::$output;
 	}
 	
-	function getLevel()
+	static function getLevel()
 	{
-		return $this->level;
+		return self::$root->getLevel();
 	}
 	
-	function createLogger($name)
+	static function createLogger($name)
 	{
-		if (!isset($this->loggers[$name]))
+		if (!isset(self::$loggers[$name]))
 		{
-			$logger = new Logger($this,$name);
+			$logger = new Logger(self::$root,$name);
 
 			$bestcount=0;
-			$bestparent=$this;
-			foreach (array_keys($this->loggers) as $key)
+			$bestparent=self::$root;
+			foreach (array_keys(self::$loggers) as $key)
 			{
 				if (strlen($key)<strlen($name))
 				{
 					if ((strlen($key)>$bestcount)&&(substr($name,0,strlen($key))==$key))
 					{
 						$bestcount=strlen($key);
-						$bestparent=$this->loggers[$key];
+						$bestparent=self::$loggers[$key];
 					}
 				}
 				else if (strlen($key)>strlen($name))
 				{
 					if (substr($key,0,strlen($name))==$name)
 					{
-						$tlogger=$this->loggers[$key];
+						$tlogger=self::$loggers[$key];
 						$tlogger->setParent($logger);
 					}
 				}
 			}
 			$logger->setParent($bestparent);
-			$this->loggers[$name]=$logger;
+			self::$loggers[$name]=$logger;
 		}
 	}
 	
 	static function setLogLevel($prefix,$level)
 	{
-		global $_LOGMANAGER;
-		
 		if (strlen($prefix)>0)
 		{
-			$logger=LoggerManager::getLogger($prefix);
+			$logger=self::getLogger($prefix);
 			$logger->setLevel($level);
 		}
 		else
 		{
-			$_LOGMANAGER->level=$level;
+			self::$root->setLevel($level);
 		}
 	}
 	
 	static function clearLogLevel($prefix)
 	{
-		global $_LOGMANAGER;
-		
 		if (strlen($prefix)>0)
 		{
-			$logger=LoggerManager::getLogger($prefix);
+			$logger=self::getLogger($prefix);
 			$logger->clearLevel();
 		}
 		else
@@ -499,28 +501,24 @@ class LoggerManager
 	
 	static function setLogOutput($prefix,$output)
 	{
-		global $_LOGMANAGER;
-		
 		if (strlen($prefix)>0)
 		{
-			$logger=LoggerManager::getLogger($prefix);
-			$logger->setOutput($output);
+			$logger=self::getLogger($prefix);
+			$logger->setLogOutput($output);
 		}
 		else
 		{
-			$_LOGMANAGER->output=$output;
+			self::$root->setLogOutput($output);
 		}
 	}
 	
 	static function getLogger($name)
 	{
-		global $_LOGMANAGER;
-		
-		if (!isset($_LOGMANAGER->loggers[$name]))
+		if (!isset(self::$loggers[$name]))
 		{
-			$_LOGMANAGER->createLogger($name);
+			self::createLogger($name);
 		}
-		return $_LOGMANAGER->loggers[$name];
+		return self::$loggers[$name];
 	}
 	
 	static function shutdown()
@@ -528,7 +526,7 @@ class LoggerManager
 	}
 }
 
-$_LOGMANAGER = new LoggerManager();
+LoggerManager::init();
 
 function caught_error($type,$text,$file,$line)
 {

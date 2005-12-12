@@ -27,9 +27,17 @@ function method_create($request)
 			// TODO possibly a better security check here
 			if ($type=='page')
 			{
-				$container=getContainer('internal');
-				$page=$container->getPage('pageedit');
-				$page->display($request);
+        list($id,$pdir)=$container->createNewResource('page');
+        $new=$container->getPage($id);
+        $new->savePreferences();
+        $source = new Request();
+        $source->method='admin';
+        $source->resource=$new->getPath();
+        $chained = new Request();
+        $chained->method='edit';
+        $chained->resource=$new->getPath();
+        $chained->nested=$source;
+        redirect($chained);
 			}
 			else
 			{

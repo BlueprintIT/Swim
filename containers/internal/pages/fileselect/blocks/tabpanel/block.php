@@ -7,14 +7,14 @@ $global->query['type']='global';
 <tr>
   <td class="spacer"></td>
   <td<?
-if ($request->query['type']!='global')
+if ((!isset($request->query['type']))||($request->query['type']!='global'))
 {
   print(' class="selected"');
 }
 ?>><a href="<?= $page->encode() ?>">Page Files</a></td>
   <td class="spacer"></td>
   <td<?
-if ($request->query['type']=='global')
+if ((isset($request->query['type']))&&($request->query['type']=='global'))
 {
   print(' class="selected"');
 }

@@ -119,7 +119,7 @@ class Container extends Resource
 			{
 				if (!(substr($file,0,1)=='.'))
 				{
-					if ((is_dir($dir.'/'.$file))&&(is_numeric($file)))
+					if ((is_dir($dir.'/'.$file))&&((is_numeric($file))||($file=='base')))
 					{
 						if ($resource instanceof Page)
 						{
@@ -388,7 +388,7 @@ class Container extends Resource
 		list($id,$rdir)=parent::createNewResource($type,$id);
     if ($this->isVersioned())
     {
-    	$version=1;
+    	$version='base';
     	$pdir=$rdir.'/'.$version;
     	$vers=fopen($rdir.'/version','w');
     	fwrite($vers,$version);

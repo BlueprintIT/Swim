@@ -294,6 +294,10 @@ class Resource
 	function createNewResource($type, $id=false)
 	{
 		$this->lockWrite();
+    if (!is_dir($this->getDir().'/'.$type.'s'))
+    {
+      mkdir($this->getDir().'/'.$type.'s');
+    }
 		$rdir=$this->getDir().'/'.$type.'s/';
 		if ($id===false)
 		{
@@ -309,40 +313,6 @@ class Resource
 		return array($id,$rdir);
 	}
 	
-	function createResource($type,$layout,$id=false)
-	{
-		list($id,$pdir)=$this->createNewResource($type,$id);
-		if ($layout===false)
-		{
-			$layout=getLayout($this->prefs->getPref('layouts.default'));
-		}
-		if (is_object($layout))
-		{
-			$layoutdir=$layout->getDir();
-		}
-		else
-		{
-			$layoutdir=$this->prefs->getPref('storage.layouts').'/'.$layout;
-		}
-		lockResourceWrite($pdir);
-		recursiveCopy($layoutdir,$pdir,true);
-		unlockResource($pdir);
-
-		$newresource=$this->getResource($type,$id);
-
-		return $newresource;
-	}
-	
-	function createPage($layout, $id=false)
-	{
-		return $this->createResource('page',$layout,$id);
-	}
-	
-	function createBlock($layout, $id=false)
-	{
-		return $this->createResource('block',$layout,$id);
-	}
-
 	function hasResource($type,$id,$version = false)
 	{
 		return is_dir($this->getDir().'/'.$type.'s/'.$id);

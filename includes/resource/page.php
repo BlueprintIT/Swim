@@ -16,7 +16,36 @@
 class Page extends Resource
 {
 	var $blocks = array();
+  var $baseprefs;
 	
+  function Page($container, $id, $version)
+  {
+    $this->Resource($container, $id, $version);
+    $this->baseprefs=$this->prefs->getParent();
+    $this->applyLayout();
+  }
+  
+  function applyLayout()
+  {
+    $layout = $this->getLayout();
+    foreach ($layout->blocks as $block => $details)
+    {
+      if (!$this->hasResource('block',$block))
+      {
+        list($id,$pdir)=$this->createNewResource('block',$block);
+        if ($details->hasDefaultFiles())
+        {
+          lockResourceWrite($pdir);
+          recursiveCopy($details->getDefaultFileDir(),$pdir,true);
+          unlockResource($pdir);
+        }
+      }
+    }
+    $layprefs = new Preferences($layout->prefs);
+    $layprefs->setParent($this->baseprefs);
+    $this->prefs->setParent($layprefs);
+  }
+  
 	function getTotalModifiedDate()
 	{
 		$modified=$this->getModifiedDate();
@@ -121,6 +150,25 @@ class Page extends Resource
 		}
 	}
 	
+  function getLayout()
+  {
+    return LayoutManager::getPageLayout($this->prefs->getPref('page.layout'));
+  }
+  
+  function setLayout($id)
+  {
+    if ($id!=$this->prefs->getPref('page.layout'))
+    {
+      $newl = LayoutManager::getPageLayout($id);
+      if ($newl!==null)
+      {
+        $this->prefs->setPref('page.layout',$id);
+        $this->applyLayout();
+        $this->savePreferences();
+      }
+    }
+  }
+  
 	function getReferencedBlockUsage($block)
 	{
 		if (isset($block->parent))
