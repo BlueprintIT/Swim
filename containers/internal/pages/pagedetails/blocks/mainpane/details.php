@@ -3,6 +3,7 @@
 $edit = new Request();
 
 $page = Resource::decodeResource($request);
+
 $pageprefs = $page->prefs;
 $edit->query['version']=$page->version;
 $edit->method='edit';
@@ -96,6 +97,10 @@ if ($page->isCurrentVersion())
 <tr>
     <td style="vertical-align: top">Keywords:</td>
     <td style="vertical-align: top"><?= $pageprefs->getPref('page.variables.keywords','') ?></td>
+</tr>
+<tr>
+    <td style="vertical-align: top">Layout:</td>
+    <td style="vertical-align: top"><?= $page->getLayout()->getName() ?></td>
 </tr>
 <tr>
     <td style="vertical-align: top">Content:</td>
