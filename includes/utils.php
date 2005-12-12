@@ -76,7 +76,7 @@ function recursiveDelete($dir,$ignorelock=false)
 		$lockfiles=getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
-			if ($file[0]!='.')
+			if (($file!='.')&&($file!='..'))
 			{
 				if (((in_array($file,$lockfiles))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
 				{
@@ -114,7 +114,7 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 		$lockfiles=getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
-			if ($file[0]!='.')
+			if (($file!='.')&&($file!='..'))
 			{
 				if (((in_array($file,$lockfiles))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
 				{
