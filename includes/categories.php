@@ -84,21 +84,6 @@ class CategoryManager
     return $results;
   }
   
-  function getTextContent($element)
-  {
-    $text='';
-    $el=$element->firstChild;
-    while ($el!==null)
-    {
-      if ($el->nodeType==XML_TEXT_NODE)
-      {
-        $text.=$el->nodeValue;
-      }
-      $el=$el->nextSibling;
-    }
-    return $text;
-  }
-  
   function loadCategory($element, $category)
   {
     global $_STORAGE;
@@ -113,7 +98,7 @@ class CategoryManager
         if ($el->tagName=='link')
         {
           $this->log->debug('Adding link');
-          $name="'".storage_escape($this->getTextContent($el))."'";
+          $name="'".storage_escape($this->getDOMText($el))."'";
           $path="'".storage_escape($el->getAttribute('path'))."'";
           $this->log->debug('path => '.$path.' name => '.$name.' sortkey => '.$pos);
           $_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES ('.$path.','.$name.','.$category->id.','.$pos.');');
@@ -140,7 +125,7 @@ class CategoryManager
           {
             $id='NULL';
           }
-          $name=$this->getTextContent($el);
+          $name=$this->getDOMText($el);
           $ename="'".storage_escape($name)."'";
           $this->log->debug('id => '.$id.' name => '.$ename.' sortkey => '.$pos);
           $this->log->debug('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$ename.','.$category->id.','.$pos.');');

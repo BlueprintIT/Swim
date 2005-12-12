@@ -94,10 +94,10 @@ tinyMCE.init({
 <form action="<?= $upload->encodePath() ?>" method="POST">
 <?= $upload->getFormVars() ?>
 <input type="hidden" name="commit" value="<?= $commit->encode(); ?>">
-<input type="hidden" name="continue" value="<?= $request->encode(); ?>">
+<input type="hidden" name="default" value="<?= $request->encode(); ?>">
 <input type="hidden" name="cancel" value="<?= $cancel->encode(); ?>">
 <div class="header">
-<input type="submit" name="action:continue" value="Save Working Version">
+<input type="submit" name="action:default" value="Save Working Version">
 <input type="submit" name="action:commit" value="Save &amp; Commit">
 <input type="submit" name="action:cancel" value="Cancel">
 <h2>Page Editor</h2>
@@ -116,10 +116,30 @@ tinyMCE.init({
 	 paragraph of the page instead.</td> 
 </tr>
 <tr>
-	<td style="vertical-align: top"><label for="keywords">Keywords:</label></td>
-	<td style="vertical-align: top"><input style="width: 100%" type="input" id="keywords" name="pref:page.variables.keywords" value="<?= $pageprefs->getPref('page.variables.keywords','') ?>"></td>
-	<td style="vertical-align: top">Search engines may use these keywords when indexing this page. Many of the more popular search engines
-	 generally don't place very much weight on this.</td>
+  <td style="vertical-align: top"><label for="keywords">Keywords:</label></td>
+  <td style="vertical-align: top"><input style="width: 100%" type="input" id="keywords" name="pref:page.variables.keywords" value="<?= $pageprefs->getPref('page.variables.keywords','') ?>"></td>
+  <td style="vertical-align: top">Search engines may use these keywords when indexing this page. Many of the more popular search engines
+   generally don't place very much weight on this.</td>
+</tr>
+<tr>
+  <td style="vertical-align: top"><label for="layout">Layout:</label></td>
+  <td style="vertical-align: top"><select id="layout" onchange="this.form.submit()" name="layout">
+<?
+$current=$page->getLayout();
+$layouts = LayoutManager::getPageLayouts();
+foreach($layouts as $id => $layout)
+{
+?>    <option value="<?= $id ?>"<?
+
+  if ($current===$layout)
+    print(' selected="true"');
+  print('>'.$layout->getName()) 
+?></option>
+<?
+}
+?>
+</select></td>
+  <td style="vertical-align: top"></td>
 </tr>
 <?
 if (isset($contentfile))

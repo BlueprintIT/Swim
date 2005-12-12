@@ -22,9 +22,9 @@ function method_admin($request)
 
 	if ($_USER->isLoggedIn())
   {
-    if ($resource!==false)
+    if (($request->resource=='')||($resource!==false))
     {
-      if ($resource->isPage())
+      if (($request->resource=='')||($resource->isPage()))
       {
         $page = Resource::decodeResource('internal/page/pagedetails');
         $page->display($request);

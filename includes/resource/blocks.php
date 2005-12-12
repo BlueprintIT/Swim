@@ -198,7 +198,7 @@ function loadBlock($blockdir,$container,$id,$version=false)
 		}
 		else
 		{
-			trigger_error('Invalid block found at '.$blockdir);
+			$log->error('Invalid block found at '.$blockdir);
 			return false;
 		}
 	}

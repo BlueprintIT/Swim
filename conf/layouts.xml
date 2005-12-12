@@ -8,6 +8,7 @@
       <preference name="page.variables.title" value="New Page"/>
     </preferences>
     <blocklayout id="content" type="html">
+      <name>Page Content</name>
       <preferences>
         <preference name="block.class" value="HtmlBlock"/>
         <preference name="block.stylesheets" value="global/file/styles/content.css"/>
@@ -18,6 +19,7 @@
   <pagelayout id="trimage" extends="default">
     <name>Image in top right</name>
     <blocklayout id="image" type="image">
+      <name>Background Image</name>
       <preferences>
         <preference name="block.class" value="ImageBlock"/>
       </preferences>

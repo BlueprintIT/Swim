@@ -1,10 +1,9 @@
 <?
 
-$edit = new Request();
-
 $page = Resource::decodeResource($request);
-
 $pageprefs = $page->prefs;
+
+$edit = new Request();
 $edit->query['version']=$page->version;
 $edit->method='edit';
 $edit->nested=$request;

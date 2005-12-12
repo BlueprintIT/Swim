@@ -13,20 +13,29 @@
  * $Revision$
  */
 
-class BlockLayout
+class Layout
 {
+  var $id;
   var $prefs;
+  var $name;
   
-  function BlockLayout($clone=null)
+  function Layout($id,$clone=null)
   {
+    $this->id = $id;
     if ($clone!==null)
     {
+      $this->name = $clone->name;
       $this->prefs = new Preferences($clone->prefs);
     }
     else
     {
       $this->prefs = new Preferences();
     }
+  }
+
+  function getName()
+  {
+    return $this->name;
   }
   
   function hasDefaultFiles()
@@ -37,6 +46,10 @@ class BlockLayout
   function getDefaultFileDir()
   {
     return null;
+  }  
+  
+  function parseElement($element)
+  {
   }
   
   function load($element)
@@ -50,34 +63,41 @@ class BlockLayout
         {
           $this->prefs->loadFromDOM($el,'',true);
         }
+        else if ($el->tagName=='name')
+        {
+          $this->name=getDOMText($el);
+        }
+        else
+        {
+          $this->parseElement($el);
+        }
       }
       $el=$el->nextSibling;
     }
   }
 }
 
-class PageLayout
+class BlockLayout extends Layout
 {
-  var $id;
-  var $name;
+  function BlockLayout($id,$clone=null)
+  {
+    $this->Layout($id,$clone);
+  }
+}
+
+class PageLayout extends Layout
+{
   var $blocks = array();
-  var $prefs;
   
   function PageLayout($id,$clone=null)
   {
-    $this->id=$id;
+    $this->Layout($id,$clone);
     if ($clone!==null)
     {
-      $this->name = $clone->name;
-      $this->prefs = new Preferences($clone->prefs);
       foreach ($clone->blocks as $id => $block)
       {
-        $blocks[$id]=new BlockLayout($block);
+        $this->blocks[$id]=new BlockLayout($id,$block);
       }
-    }
-    else
-    {
-      $this->prefs = new Preferences();
     }
   }
   
@@ -93,42 +113,30 @@ class PageLayout
     }
   }
   
-  function load($element)
+  function parseElement($el)
   {
-    $el=$element->firstChild;
-    while ($el!==null)
+    if ($el->tagName=='blocklayout')
     {
-      if ($el->nodeType==XML_ELEMENT_NODE)
+      $id=$el->getAttribute('id');
+      if ($el->hasAttribute('ref'))
       {
-        if ($el->tagName=='blocklayout')
+        $this->blocks[$id] = new BlockLayout($id,LayoutManager::getBlockLayout($el->getAttribute('ref')));
+      }
+      else
+      {
+        if (isset($this->blocks[$id]))
         {
-          $id=$el->getAttribute('id');
-          if ($el->hasAttribute('ref'))
+          if ($el->hasAttribute('override'))
           {
-            $this->blocks[$id]=LayoutManager::getBlockLayout($el->getAttribute('ref'));
-          }
-          else
-          {
-            if (isset($this->blocks[$id]))
-            {
-              if ($el->hasAttribute('override'))
-              {
-                unset($this->blocks[$id]);
-              }
-            }
-            if (!isset($this->blocks[$id]))
-            {
-              $this->blocks[$id] = new BlockLayout();
-            }
-            $this->blocks[$id]->load($el);
+            unset($this->blocks[$id]);
           }
         }
-        else if ($el->tagName=='preferences')
+        if (!isset($this->blocks[$id]))
         {
-          $this->prefs->loadFromDOM($el,'',true);
+          $this->blocks[$id] = new BlockLayout($id);
         }
       }
-      $el=$el->nextSibling;
+      $this->blocks[$id]->load($el);
     }
   }
 }
@@ -157,7 +165,9 @@ class LayoutManager
             $id = $el->getAttribute('id');
             if ($el->hasAttribute('extends'))
             {
+              $log->debug('Creating page layout '.$id.' That extends another.');
               $base = self::getPageLayout($el->getAttribute('extends'));
+              $log->debug('Extends '.$base->getName());
               $layout = new PageLayout($id,$base);
             }
             else

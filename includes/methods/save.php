@@ -69,13 +69,21 @@ function method_save($request)
               fwrite($file,$value);
               $working->closeFile($file);
             }
+            else if ($name=='layout')
+            {
+              $working->setLayout($value);
+            }
           }
           $working->savePreferences();
-          if (isset($redirect))
+          if (!isset($redirect))
           {
-            header('Location: '.$redirect);
-            shutdown();
+            if (isset($request->query['default']))
+            {
+              $redirect='http://'.$_SERVER['HTTP_HOST'].$request->query['default'];
+            }
           }
+          header('Location: '.$redirect);
+          shutdown();
         }
         else
         {
