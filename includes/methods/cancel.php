@@ -28,6 +28,14 @@ function method_cancel($request)
 			{
 				$details->free();
 			}
+      if (($resource instanceof Page)&&(!isset($this->parent)))
+      {
+        $vers = array_keys($resource->getVersions());
+        if ((count($vers==1))&&($vers[0]=='base'))
+        {
+          $resource->delete();
+        }
+      }
 			redirect($request->nested);
 		}
 		else

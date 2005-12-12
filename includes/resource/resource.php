@@ -312,6 +312,38 @@ class Resource
 		$this->unlock();
 		return array($id,$rdir);
 	}
+  
+  function deleteResource($resource)
+  {
+    $this->lockWrite();
+    $type='';
+    if ($resource instanceof Page)
+    {
+      $type='page';
+    }
+    else if ($resource instanceof Block)
+    {
+      $type='block';
+    }
+    else if ($resource instanceof Block)
+    {
+      $type='template';
+    }
+    else if ($resource instanceof Block)
+    {
+      $type='file';
+    }
+    $dir = $this->getDir().'/'.$type.'s/'.$resource->id;
+    if (is_dir($dir))
+    {
+      recursiveDelete($dir);
+    }
+    else
+    {
+      unlink($dir);
+    }
+    $this->unlock();
+  }
 	
 	function hasResource($type,$id,$version = false)
 	{
@@ -428,18 +460,30 @@ class Resource
 		}
 	}
 	
-	function isCurrentVersion()
-	{
-		if (isset($this->parent))
-		{
-			return $this->parent->isCurrentVersion();
-		}
-		else
-		{
-			return $this->container->isCurrentResourceVersion($this);
-		}
-	}
-	
+  function isCurrentVersion()
+  {
+    if (isset($this->parent))
+    {
+      return $this->parent->isCurrentVersion();
+    }
+    else
+    {
+      return $this->container->isCurrentResourceVersion($this);
+    }
+  }
+  
+  function delete()
+  {
+    if (isset($this->parent))
+    {
+      $this->parent->deleteResource($this);
+    }
+    else
+    {
+      return $this->container->deleteResource($this);
+    }
+  }
+  
 	function makeCurrentVersion()
 	{
 		$this->log->debug('Making this the current version');
