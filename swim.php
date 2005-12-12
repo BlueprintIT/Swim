@@ -23,7 +23,7 @@ unset($source);
 
 require_once $bootstrap.'/bootstrap.php';
 
-LoggerManager::setLogLevel('php',SWIM_LOG_ALL);
+//LoggerManager::setLogLevel('php',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.user',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.locking',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.method.view',SWIM_LOG_ALL);
@@ -33,8 +33,7 @@ LoggerManager::setLogLevel('php',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.resource',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.preferences',SWIM_LOG_ALL);
 //LoggerManager::setLogLevel('swim.storage',SWIM_LOG_ALL);
-LoggerManager::setLogLevel('swim.categories',SWIM_LOG_ALL);
-LoggerManager::setLogLevel('swim.method.upload',SWIM_LOG_ALL);
+//LoggerManager::setLogLevel('swim.categories',SWIM_LOG_ALL);
 
 $log=LoggerManager::getLogger('swim');
 

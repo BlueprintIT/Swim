@@ -29,7 +29,7 @@ class CategoryManager
     $this->log = LoggerManager::getLogger('swim.categories.'.$namespace);
     $set=$_STORAGE->query('SELECT id,Category.name FROM Namespace,Category WHERE id=rootcategory;');
     $details = $set->current();
-    $this->root = new Category($this,$this,$details['id'],$details['Category.name']);
+    $this->root = new Category($this,null,$details['id'],$details['Category.name']);
     $this->cache[$this->root->id]=$this->root;
   }
   
@@ -42,8 +42,7 @@ class CategoryManager
   {
     if (!isset($this->cache[$id]))
     {
-      $parent=$this->getCategory($parent);
-      $this->cache[$id] = new Category($this,$parent,$id,$name);
+      $this->cache[$id] = new Category($this,$this->getCategory($parent),$id,$name);
     }
     return $this->cache[$id];
   }
@@ -73,7 +72,7 @@ class CategoryManager
     global $_STORAGE;
 
     $path="'".sqlite_escape_string($page->getPath())."'";
-    $set=$_STORAGE->query('SELECT id,parent,name FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE Page.path='.$path.';');
+    $set=$_STORAGE->query('SELECT id,parent,name FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE PageCategory.page='.$path.';');
     $results = array();
     while ($set->valid())
     {

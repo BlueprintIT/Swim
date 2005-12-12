@@ -523,7 +523,7 @@ class LoggerManager
 		return $_LOGMANAGER->loggers[$name];
 	}
 	
-	function shutdown()
+	static function shutdown()
 	{
 	}
 }

@@ -210,7 +210,7 @@ class CategoryMenuBlock extends Block
       {
         $root=$cats[0];
         $pos=$this->root;
-        while (($root->parent!=$cm)&&($pos<0))
+        while (($root->parent!==null)&&($pos<0))
         {
           $pos++;
           $root=$root->parent;
