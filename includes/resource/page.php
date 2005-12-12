@@ -28,16 +28,19 @@ class Page extends Resource
   function applyLayout()
   {
     $layout = $this->getLayout();
-    foreach ($layout->blocks as $block => $details)
+    if ($this->isWritable())
     {
-      if (!$this->hasResource('block',$block))
+      foreach ($layout->blocks as $block => $details)
       {
-        list($id,$pdir)=$this->createNewResource('block',$block);
-        if ($details->hasDefaultFiles())
+        if (!$this->hasResource('block',$block))
         {
-          lockResourceWrite($pdir);
-          recursiveCopy($details->getDefaultFileDir(),$pdir,true);
-          unlockResource($pdir);
+          list($id,$pdir)=$this->createNewResource('block',$block);
+          if ($details->hasDefaultFiles())
+          {
+            lockResourceWrite($pdir);
+            recursiveCopy($details->getDefaultFileDir(),$pdir,true);
+            unlockResource($pdir);
+          }
         }
       }
     }

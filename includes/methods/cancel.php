@@ -28,11 +28,15 @@ function method_cancel($request)
 			{
 				$details->free();
 			}
-      if (($resource instanceof Page)&&(!isset($this->parent)))
+      if (($resource instanceof Page)&&(!isset($resource->parent)))
       {
         $vers = array_keys($resource->getVersions());
         if ((count($vers==1))&&($vers[0]=='base'))
         {
+          if ($request->nested->resource==$resource->getPath())
+          {
+            $request->nested->resource='';
+          }
           $resource->delete();
         }
       }

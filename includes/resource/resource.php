@@ -337,6 +337,7 @@ class Resource
     if (is_dir($dir))
     {
       recursiveDelete($dir);
+      rmdir($dir);
     }
     else
     {
