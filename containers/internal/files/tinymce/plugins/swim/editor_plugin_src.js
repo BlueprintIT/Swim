@@ -28,37 +28,43 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
-	//alert(url);
+	alert(url);
 	var hostpart="http://"+tinyMCE.getParam('document_host','');
 	var base=tinyMCE.getParam('document_base_url','');
 	var view=tinyMCE.getParam('swim_view','');
 	
-	if (url.indexOf('tiny_mce')>0)
+	if (base.indexOf(hostpart)==0)
 	{
-		url=url.substring(url.indexOf('tiny_mce')+9);
+		base=base.substring(hostpart.length);
+	}
+
+	var basetemp = view+'version/temp/'+base.substring(view.length);
+		
+	if (url.indexOf('tinymce')>0)
+	{
+		url=url.substring(url.indexOf('tinymce')+8);
 	}
 	else if (url.indexOf(hostpart)==0)
 	{
 		url=url.substring(hostpart.length);
 	}
 	
-	if (base.indexOf(hostpart)==0)
-	{
-		base=base.substring(hostpart.length);
-	}
-	
-	//alert(url);
+	alert(url);
 	
 	if (url.indexOf(base)==0)
 	{
 		url=url.substring(base.length);
+	}
+	else if (url.indexOf(basetemp)==0)
+	{
+		url=url.substring(basetemp.length);
 	}
 	else if (url.indexOf(view)==0)
 	{
 		url=url.substring(view.length-1);
 	}
 	
-	//alert(url);
+	alert(url);
 	
 	if (!on_save)
 	{
@@ -71,9 +77,9 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 		}
 		else
 		{
-			url=hostpart+view+'version/temp/'+base.substring(view.length)+url;
+			url=hostpart+basetemp+url;
 		}
-		//alert(url);
+		alert(url);
 	}
 	return url;
 }

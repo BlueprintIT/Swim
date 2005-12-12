@@ -81,7 +81,7 @@ tinyMCE.init({
     theme_advanced_toolbar_align : "left",
     theme_advanced_blockformats : "h1,h2,p",
     theme_advanced_buttons1 : "cut,copy,paste,separator,undo,redo,separator,link,pagelink,unlink,image,separator,help",
-    theme_advanced_buttons2 : "formatselect,separator,numlist,bullist,separator,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bold,italic,underline",
+    theme_advanced_buttons2 : "formatselect,separator,numlist,bullist,separator,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bold,italic",
     theme_advanced_buttons3 : ""
 });
 </script>

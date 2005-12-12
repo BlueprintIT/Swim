@@ -78,6 +78,7 @@ class CategoryManager
     {
       $details=$set->current();
       $results[]=$this->getReadyCategory($details['id'],$details['parent'],$details['name']);
+      $this->log->debug('Found page '.$page->getPath().' in category '.$details['id']);
       $set->next();
     }
     return $results;
@@ -279,6 +280,7 @@ class Category
       $list[$details['sortkey']]=$details['link'];
       $set->next();
     }
+    ksort($list);
     return $list;
   }
   
