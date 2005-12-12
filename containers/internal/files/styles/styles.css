@@ -121,3 +121,29 @@ table {
 .categorytree .page {
   list-style-image: -swim-url('internal/file/images/page.gif');
 }
+
+.filetable {
+  margin-left: auto;
+  margin-right: auto;
+  border-collapse: collapse;
+  border: 1px solid black;
+  width: 90%;
+}
+
+.filetable td, .filetable th {
+  padding: 3px;
+}
+
+.filetable thead {
+  border-bottom: 1px solid black;
+}
+
+.filetable tbody tr {
+  border-bottom: 1px dashed black;
+  border-top: 1px dashed black;
+}
+
+.filetable tbody tr.selected {
+  background-color: Highlight;
+  color: HighlightText;
+}

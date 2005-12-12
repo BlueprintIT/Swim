@@ -42,12 +42,16 @@ class FileSelectorBlock extends FileManagerBlock
 	
 	function displayFileDetails($request,$resource,$description,$delete)
 	{
+    $size=getReadableFileSize($resource->getDir().'/'.$resource->id);
 		$path=$resource->getPath();
 		$path=substr($path,strlen($request->query['baseurl']));
 ?>
-	<td><input type="radio" name="file" value="<?= $path ?>"></td>
+<td><input type="radio" onclick="moveSelection(this)" onchange="moveSelection(this)" id="<?= $path ?>" name="file" value="/<?= $path ?>"></td>
+<td><anchor target="_blank" method="view" href="/<?= $resource->getPath() ?>"><?= basename($resource->id) ?></anchor></td>
+<td><label style="display: block; width: 100%" for="<?= $path ?>"><?= $description ?></label></td>
+<td><label style="display: block; width: 100%" for="<?= $path ?>"><?= $size ?></label></td>
+<td><a href="<?= $delete->encode() ?>">Delete</a></td>
 <?
-		parent::displayFileDetails($request,$resource,$description,$delete);
 	}
 	
 	function displayContent($parser,$attrs,$text)
@@ -57,17 +61,30 @@ class FileSelectorBlock extends FileManagerBlock
 ?>
 <script>
 
+var lastselected = null;
+
+function moveSelection(input)
+{
+  if (lastselected)
+  {
+    lastselected.parentNode.parentNode.className='';
+  }
+  input.parentNode.parentNode.className='selected';
+  lastselected=input;
+}
+
 function select()
 {
-	var inputs = document.getElementsByTagName("INPUT");
-	for (var i=0; i<inputs.length; i++)
-	{
-		if ((inputs[i].getAttribute("type")=="radio")&&(inputs[i].checked))
-		{
-			window.opener.document.getElementById('href').value=inputs[i].value;
-		}
+  if (lastselected)
+  {
+    var selected=lastselected.value;
+		window.opener.<?= $request->query['action'] ?>;
+    window.close();
 	}
-	window.close();
+  else
+  {
+    alert('You must select a file.');
+  }
 }
 
 function cancel()

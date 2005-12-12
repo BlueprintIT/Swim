@@ -78,10 +78,6 @@ class FileManagerBlock extends Block
 	{
 	}
 	
-	function displayAdminPanel($request,$data,$attrs)
-	{
-	}
-	
 	function displayContent($parser,$attrs,$text)
 	{
 		global $_USER;
@@ -190,12 +186,15 @@ class FileManagerBlock extends Block
 				if ($count==0)
 				{
 ?>
-<table style="width: 100%">
+<table class="filetable">
+<thead>
 <tr>
 <?
 					$this->displayTableHeader();
 ?>
 </tr>
+</thead>
+<tbody>
 <?
 				}
 				$count++;
@@ -221,17 +220,24 @@ class FileManagerBlock extends Block
 <?
 			}
 		}
-		if ($count==0)
-		{
+		if ($count>0)
+    {
 ?>
-No files stored.
+</tbody>
+<tfoot>
 <?
-		}
-		else
-		{
-			$this->displayTableFooter();
+      $this->displayTableFooter();
 ?>
+</tfoot>
 </table>
+<?
+    }
+    else
+		{
+?>
+</tbody>
+</table>
+<p>No files stored.</p>
 <?
 		}
 		$resource->unlock();

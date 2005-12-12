@@ -13,9 +13,10 @@ class LinkedCategoryTree extends PageTree
     
     print('<span>');
     $link = new Request();
-    $link->resource = $page->getPath();
-    $link->method='preview';
-    print('<a path="'.$page->getPath().'" onclick="return select(this);" target="preview" href="'.$link->encode().'">');
+    $link->resource = $request->resource;
+    $link->method=$request->method;
+    $link->query['page']=$page->getPath();
+    print('<a href="'.$link->encode().'">');
     parent::displayPageLabel($page);
     print('</a>');
     print('</span>');

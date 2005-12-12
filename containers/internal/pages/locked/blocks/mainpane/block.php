@@ -3,9 +3,9 @@
 $user=$request->data['details']->user->getUsername();
 $date=formatdate($request->data['details']->date);
 
-$takeover=$request;
+$takeover=new Request($request);
 $takeover->query['forcelock']='continue';
-$discard=$request;
+$discard=new Request($request);
 $discard->query['forcelock']='discard';
 	
 ?>

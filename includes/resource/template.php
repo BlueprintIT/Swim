@@ -59,16 +59,6 @@ class Template extends Resource
 		{
 			$modified=max($modified,$stat);
 		}
-		$stat=$this->getFileModifiedDate('template.admin.html');
-		if ($stat!==false)
-		{
-			$modified=max($modified,$stat);
-		}
-		$stat=$this->getFileModifiedDate('template.admin.xml');
-		if ($stat!==false)
-		{
-			$modified=max($modified,$stat);
-		}
 		$this->modified=$modified;
 		return $modified;
 	}
@@ -335,31 +325,6 @@ class Template extends Resource
 			unset($parser->data['block']);
 			unset($parser->data['blockid']);
 		}
-		else if ($parser->data['mode']=='admin')
-		{
-			$parser->startBuffer();
-?>
-	<div id="<?= $attrs['id'] ?>admin" class="adminpanel">
-<?
-		if ($parser->data['page']->canChangeReferencedBlock($attrs['id']))
-		{
-			if ((!isset($attrs['canchange']))||($attrs['canchange']=='true'))
-			{
-				$format='';
-				if (isset($attrs['format']))
-				{
-					$format=' query:format="'.$attrs['format'].'"';
-				}
-?>
-		<anchor query:reference="<?= $attrs['id'] ?>"<?= $format ?> method="change" nest="true" href="/internal/page/listblocks"><image class="icon" src="/global/file/images/edit.gif"/>Select</anchor>
-<?
-			}
-		}
-?>
-	</div>
-<?
-			$parser->endBuffer();
-		}
 		return true;
 	}
 	
@@ -545,10 +510,10 @@ class Template extends Resource
 		}
 	}
 	
-	function internalDisplay($request,$page,$mode)
+	function internalDisplay($request,$page)
 	{
-		$xmlpref='template.'.$mode.'.xml';
-		$htmlpref='template.'.$mode.'.html';
+		$xmlpref='template.normal.xml';
+		$htmlpref='template.normal.html';
     $pagecontent = $page->prefs->getPref('page.contenttype','text/html');
     if ((substr($pagecontent,-4)=='+xml')||(substr($pagecontent,-4)=='/xml')||($request->isXHTML()))
 		{
@@ -587,7 +552,7 @@ class Template extends Resource
 		// Parse the template and display
 		$parser = new TemplateParser();
 		$parser->addEmptyTag("img");
-		$parser->data=array('page'=>$page,'template'=>$this,'request'=>$request,'mode'=>$mode,'head'=>'');
+		$parser->data=array('page'=>$page,'template'=>$this,'request'=>$request,'head'=>'');
 		$parser->addObserver('head',$this);
 		$parser->addObserver('html',$this);
 		$parser->addObserver('block',$this);
@@ -613,7 +578,7 @@ class Template extends Resource
 	
 	function display($request,$page)
 	{
-		$this->internalDisplay($request,$page,'normal');
+		$this->internalDisplay($request,$page);
 	}
 }
 

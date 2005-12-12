@@ -34,7 +34,12 @@ $pageselect->resource='internal/page/pageselect';
 
 $expurl = new Request();
 $expurl->method='view';
-$expurl->resource=$block->getPath().'/file/';
+$expurl->resource=$page->getPath().'/file/';
+
+$browser = new Request();
+$browser->method='fileselect';
+$browser->resource = $page->getPath();
+$browser->query['version']=$page->version;
 
 if ($block->prefs->isPrefSet('block.stylesheets'))
 {
@@ -76,6 +81,7 @@ tinyMCE.init({
     document_base_url : "<?= $expurl->encode() ?>",
     swim_view : "<?= $viewurl->encode() ?>",
     swim_pagebrowser : "<?= $pageselect->encode() ?>",
+    swim_browser : "<?= $browser->encode() ?>",
     inline_styles : true,
     theme_advanced_toolbar_location : "top",
     theme_advanced_toolbar_align : "left",

@@ -102,10 +102,6 @@ class Block extends Resource
 		else
 		{
 			ob_start();
-			if (($parser->data['mode']=='admin')&&((!isset($attrs['panel']))||($attrs['panel']!='false')))
-			{
-				$this->displayAdminPanel($request,$parser->data,$attrs);
-			}
 			$this->displayIntro($attrs);
 			$this->displayContent($parser,$attrs,$text);
 			$this->displayOutro($attrs);
@@ -160,13 +156,13 @@ function loadBlock($blockdir,$container,$id,$version=false)
 			fclose($file);
 		}
 		$class=$blockprefs->getPref('block.class');
-		if ($blockprefs->isPrefSet('block.classfile'))
+		if (($blockprefs->isPrefSet('block.classfile'))&&(is_readable($blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile'))))
 		{
 			require_once $blockprefs->getPref('storage.blocks.classes').'/'.$blockprefs->getPref('block.classfile');
 		}
-		else if (is_readable($blockdir.'/block.class'))
+		else if (is_readable($blockdir.'/block.class.php'))
 		{
-			require_once $blockdir.'/block.class';
+			require_once $blockdir.'/block.class.php';
 		}
 	
 		if ($container->isWritable())

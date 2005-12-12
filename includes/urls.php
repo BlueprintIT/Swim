@@ -171,10 +171,17 @@ class Request
 	var $xml = false;
 	var $data = array();
 	
-	function Request()
-	{
-		$this->log=LoggerManager::getLogger('swim.request');
-	}
+  function Request($clone=null)
+  {
+    $this->log=LoggerManager::getLogger('swim.request');
+    if ($clone!==null)
+    {
+      $this->resource=$clone->resource;
+      $this->method=$clone->method;
+      $this->query=$clone->query;
+      $this->nested=$clone->nested;
+    }
+  }
 	
   function isXHTML()
   {

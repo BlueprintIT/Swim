@@ -1,0 +1,33 @@
+body {
+	padding-top: 130px;
+	padding-bottom: 10px;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+#banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#banner h1 {
+  margin: 10px;
+  border: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  text-align: center;
+  font-size: 25pt;
+  font-weight: normal;
+  height: 70px;
+}
+
+#banner img {
+  vertical-align: -18px;
+}
+
+#tabpanel {
+  position: absolute;
+  top: 90px;
+  left: 0;
+}

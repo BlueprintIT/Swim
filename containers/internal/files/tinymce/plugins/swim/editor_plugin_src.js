@@ -15,12 +15,8 @@ tinyMCE.importPluginLanguagePack('swim', 'en'); // <- Add a comma separated list
 
 function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 {
-	var newwin = win.open(tinyMCE.getParam('swim_browser',''),'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=630,height=400');
-	if (newwin)
-	{
-		newwin.targetField=field_name;
-	}
-	else
+	var newwin = win.open(tinyMCE.getParam('swim_browser','')+'&action=document.forms[0].elements['+"'"+field_name+"'"+'].value=selected','swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=630,height=400');
+	if (!newwin)
 	{
 		alert("You must disable popup blocking to use this file browser.");
 	}
@@ -28,17 +24,19 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
-	//alert(url);
 	var hostpart="http://"+tinyMCE.getParam('document_host','');
 	var base=tinyMCE.getParam('document_base_url','');
 	var view=tinyMCE.getParam('swim_view','');
-	
 	if (base.indexOf(hostpart)==0)
 	{
 		base=base.substring(hostpart.length);
 	}
 
-	var basetemp = view+'version/temp/'+base.substring(view.length);
+	//alert(base);
+	//alert(view);
+	
+	var page='/'+base.substring(view.length);	
+	var basetemp = view+'version/temp'+page;
 		
 	if (url.indexOf('tinymce')>0)
 	{
@@ -58,6 +56,10 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 	else if (url.indexOf(basetemp)==0)
 	{
 		url=url.substring(basetemp.length);
+	}
+	else if (url.indexOf(page)==0)
+	{
+		url=url.substring(page.length);
 	}
 	else if (url.indexOf(view)==0)
 	{
@@ -79,8 +81,21 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 		{
 			url=hostpart+basetemp+url;
 		}
-		//alert(url);
 	}
+	else
+	{
+		if (url.substring(0,1)=='/')
+		{
+		}
+		else if (url.indexOf('://')>0)
+		{
+		}
+		else
+		{
+			url=page+url;
+		}
+	}
+	//alert(url);
 	return url;
 }
 

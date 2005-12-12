@@ -1,42 +1,8 @@
-<?
-$page = Resource::decodeResource($request);
-?>
 <script>
-var selectedpage = '';
-
-function select(link)
-{
-  var els = document.getElementsByTagName("a");
-  for (var i=0; i<els.length; i++)
-  {
-    if (els[i].getAttribute('path')==selectedpage)
-    {
-      els[i].parentNode.className=null;
-    }
-  }
-  selectedpage=link.getAttribute('path');
-  els = document.getElementsByTagName("a");
-  for (var i=0; i<els.length; i++)
-  {
-    if (els[i].getAttribute('path')==selectedpage)
-    {
-      els[i].parentNode.className='selected';
-    }
-  }
-  return true;
-}
-
 function submit()
 {
-  if (selectedpage)
-  {
-    window.opener.tinyMCE.insertLink('/'+selectedpage,"");
-    window.close();
-  }
-  else
-  {
-    alert("You must select a page first.");
-  }
+  window.opener.tinyMCE.insertLink('/<?= $request->query['page'] ?>');
+  window.close();
 }
 </script>
 <div class="header">
@@ -44,4 +10,4 @@ function submit()
 <button onclick="window.close()">Cancel</button>
 <h2>Preview</h2>
 </div>
-<iframe class="body" name="preview" src=""></iframe>
+<block id="" class="body" src="<?= $request->query['page'] ?>/block/content"/>
