@@ -17,9 +17,9 @@ function storage_init()
 {
   global $_PREFS,$_STORAGE;
   
+  // TODO Add in some locking using a transaction and test for tables here
   $log = LoggerManager::getLogger('swim.storage');
   $log->debug('Starting SQLite storage engine: '.sqlite_libversion());
-  lockResourceWrite($_PREFS->getPref('storage.security'));
   $create=false;
   if (!is_file($_PREFS->getPref('storage.config').'/storage.db'))
   {
@@ -50,7 +50,11 @@ function storage_init()
     }
     fclose($file);
   }
-  unlockResource($_PREFS->getPref('storage.security'));
+}
+
+function storage_escape($text)
+{
+  return sqlite_escape_string($text);
 }
 
 storage_init();

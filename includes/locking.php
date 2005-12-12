@@ -37,6 +37,48 @@ function getLockFiles()
  	}
 }
 
+function &storageRead($log,$dir)
+{
+  global $_STORAGE;
+  
+  return true;
+}
+
+function &storageWrite($log,$dir)
+{
+  global $_STORAGE;
+  
+  return true;
+}
+
+function &storageUpgrade($log,$dir,&$lock)
+{
+  global $_STORAGE;
+  
+  return true;
+}
+
+function storageUnlock($log,$dir,&$lock,$type)
+{
+  global $_STORAGE;
+  
+  if ($type==LOCK_WRITE)
+  {
+    $_STORAGE->queryExec("DELETE FROM DirLock WHERE dir='".storage_escape($dir)."';");
+  }
+  else
+  {
+    $_STORAGE->queryExec('BEGIN TRANSACTION;');
+    $_STORAGE->queryExec("UPDATE DirLock SET count=count-1 WHERE dir='".storage_escape($dir)."';");
+    $count = $_STORAGE->singleQuery("SELECT count FROM DirLock WHERE dir='".storage_escape($dir)."';");
+    if ($count==0)
+    {
+      $_STORAGE->queryExec("DELETE FROM DirLock WHERE dir='".storage_escape($dir)."';");
+    }
+    $_STORAGE->queryExec('COMMIT TRANSACTION;');
+  }
+}
+
 function &flockRead($log,$dir)
 {
 	global $_PREFS;
@@ -276,9 +318,13 @@ function &getReadLock($log,$dir)
 	  $lock=&flockRead($log,$dir);
  	}
   else if ($type=='mkdir')
- 	{
-	  $lock=&mkdirRead($log,$dir);
- 	}
+  {
+    $lock=&mkdirRead($log,$dir);
+  }
+  else if ($type=='storage')
+  {
+    $lock=&storageRead($log,$dir);
+  }
  	else if ($type=='none')
  	{
  		$lock=true;
@@ -303,9 +349,13 @@ function &getWriteLock($log,$dir)
 	  $lock=&flockWrite($log,$dir);
  	}
   else if ($type=='mkdir')
- 	{
-	  $lock=&mkdirWrite($log,$dir);
- 	}
+  {
+    $lock=&mkdirWrite($log,$dir);
+  }
+  else if ($type=='storage')
+  {
+    $lock=&storageWrite($log,$dir);
+  }
  	else if ($type=='none')
  	{
  		$lock=true;
@@ -330,9 +380,13 @@ function &upgradeLock($log,$dir,&$lock)
 	  $lock=&flockUpgrade($log,$dir,$lock);
  	}
   else if ($type=='mkdir')
- 	{
-	  $lock=&mkdirUpgrade($log,$dir,$lock);
- 	}
+  {
+    $lock=&mkdirUpgrade($log,$dir,$lock);
+  }
+  else if ($type=='storage')
+  {
+    $lock=&storageUpgrade($log,$dir,$lock);
+  }
  	else if ($type=='none')
  	{
  	}
@@ -355,9 +409,13 @@ function unLock($log,$dir,&$lock,$type)
 	  flockUnlock($log,$dir,$lock,$type);
  	}
   else if ($ltype=='mkdir')
- 	{
-	  mkdirUnlock($log,$dir,$lock,$type);
- 	}
+  {
+    mkdirUnlock($log,$dir,$lock,$type);
+  }
+  else if ($ltype=='storage')
+  {
+    storageUnlock($log,$dir,$lock,$type);
+  }
  	else if ($ltype=='none')
  	{
  	}

@@ -26,5 +26,12 @@ CREATE TABLE LinkCategory (
 	UNIQUE(category,sortkey)
 );
 
+CREATE TABLE DirLock (
+	dir TEXT PRIMARY KEY,
+	type INTEGER,
+	count INTEGER,
+	time TIMESTAMP
+);
+
 INSERT INTO Category (name) VALUES ("Website");
 INSERT INTO Namespace (name,rootcategory) VALUES ("website",last_insert_rowid());

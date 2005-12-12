@@ -15,6 +15,7 @@
 
 // Include all the support routines
 
-require $host->getPref('storage.includes').'/locking.php';
+require $_PREFS->getPref('storage.includes').'/storage/sqlite.php';
+require $_PREFS->getPref('storage.includes').'/locking.php';
 
 ?>

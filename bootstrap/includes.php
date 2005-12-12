@@ -15,7 +15,6 @@
 
 // Include all the support routines
 
-require $_PREFS->getPref('storage.includes').'/storage/sqlite.php';
 require $_PREFS->getPref('storage.includes').'/security.php';
 require $_PREFS->getPref('storage.includes').'/resource/resource.php';
 require $_PREFS->getPref('storage.includes').'/resource/container.php';

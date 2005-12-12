@@ -71,7 +71,7 @@ class CategoryManager
   {
     global $_STORAGE;
 
-    $path="'".sqlite_escape_string($page->getPath())."'";
+    $path="'".storage_escape($page->getPath())."'";
     $set=$_STORAGE->query('SELECT id,parent,name FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE PageCategory.page='.$path.';');
     $results = array();
     while ($set->valid())
@@ -113,8 +113,8 @@ class CategoryManager
         if ($el->tagName=='link')
         {
           $this->log->debug('Adding link');
-          $name="'".sqlite_escape_string($this->getTextContent($el))."'";
-          $path="'".sqlite_escape_string($el->getAttribute('path'))."'";
+          $name="'".storage_escape($this->getTextContent($el))."'";
+          $path="'".storage_escape($el->getAttribute('path'))."'";
           $this->log->debug('path => '.$path.' name => '.$name.' sortkey => '.$pos);
           $_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES ('.$path.','.$name.','.$category->id.','.$pos.');');
           $this->log->debug('Insert complete - '.$_STORAGE->changes());
@@ -123,7 +123,7 @@ class CategoryManager
         else if ($el->tagName=='page')
         {
           $this->log->debug('Adding page');
-          $path="'".sqlite_escape_string($el->getAttribute('path'))."'";
+          $path="'".storage_escape($el->getAttribute('path'))."'";
           $this->log->debug('path => '.$path.' sortkey => '.$pos);
           $_STORAGE->queryExec('INSERT INTO PageCategory (page,category,sortkey) VALUES ('.$path.','.$category->id.','.$pos.');');
           $this->log->debug('Insert complete - '.$_STORAGE->changes());
@@ -141,7 +141,7 @@ class CategoryManager
             $id='NULL';
           }
           $name=$this->getTextContent($el);
-          $ename="'".sqlite_escape_string($name)."'";
+          $ename="'".storage_escape($name)."'";
           $this->log->debug('id => '.$id.' name => '.$ename.' sortkey => '.$pos);
           $this->log->debug('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$ename.','.$category->id.','.$pos.');');
           $_STORAGE->queryExec('INSERT INTO Category (id,name,parent,sortkey) VALUES ('.$id.','.$ename.','.$category->id.','.$pos.');');
