@@ -4,3 +4,11 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* /swim.php [L]
+
+<Files access>
+	Deny from all
+</Files>
+
+<Files .*>
+	Deny from all
+</Files>
