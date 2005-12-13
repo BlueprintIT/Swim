@@ -228,6 +228,19 @@ class Preferences
 	  }
 	  return false;
 	}
+  
+  function isPrefInherited($pref)
+  {
+    if (isset($this->preferences[$pref]))
+    {
+      return false;
+    }
+    if (isset($this->parent))
+    {
+      return $this->parent->isPrefSet($pref);
+    }
+    return false;
+  }
 }
 
 function saveSitePreferences()

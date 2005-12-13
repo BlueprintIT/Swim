@@ -200,23 +200,28 @@ class Page extends Resource
 		return $result;
 	}
 	
+  function getReferencedBlockFromPref($id,$blockpref)
+  {
+    if ($this->prefs->isPrefSet($blockpref.'.version'))
+    {
+      $version=$this->prefs->getPref($blockpref.'.version');
+    }
+    else
+    {
+      $version=false;
+    }
+    $block=Resource::decodeResource($this->prefs->getPref($blockpref.'.resource'),$version);
+    $this->blocks[$id]=$block;
+  }
+  
 	function getReferencedBlock($id)
 	{
 		if (!isset($this->blocks[$id]))
 		{
 			$blockpref='page.blocks.'.$id;
-			if ($this->prefs->isPrefSet($blockpref.'.resource'))
+			if (($this->prefs->isPrefSet($blockpref.'.resource'))&&(!$this->prefs->isPrefInherited($blockpref.'.resource')))
 			{
-				if ($this->prefs->isPrefSet($blockpref.'.version'))
-				{
-					$version=$this->prefs->getPref($blockpref.'.version');
-				}
-				else
-				{
-					$version=false;
-				}
-				$block=Resource::decodeResource($this->prefs->getPref($blockpref.'.resource'),$version);
-				$this->blocks[$id]=$block;
+        $this->getReferencedBlockFromPref($id,$blockpref);
 			}
 			else if ($this->hasResource('block',$id))
 			{
@@ -230,6 +235,10 @@ class Page extends Resource
 					$this->blocks[$id]=false;
 				}
 			}
+      else if ($this->prefs->isPrefSet($blockpref.'.resource'))
+      {
+        $this->getReferencedBlockFromPref($id,$blockpref);
+      }
 			else
 			{
 				$this->blocks[$id]=false;
