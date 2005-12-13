@@ -96,14 +96,14 @@ function method_save($request)
                 }
               }
             }
-            else if ($name=='layout')
-            {
-              $working->setLayout($value);
-            }
             else
             {
               save_apply($working,$name,$value);
             }
+          }
+          if (isset($request->query['layout']))
+          {
+            $working->setLayout($request->query['layout']);
           }
           if (!isset($redirect))
           {
