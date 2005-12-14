@@ -281,7 +281,8 @@ class Request
 	{
 		global $_PREFS;
 		
-		$path='';
+		$log=LoggerManager::getLogger('swim.request');
+    $path='';
 		$query=decodeQuery($_SERVER['QUERY_STRING']);
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
@@ -289,10 +290,21 @@ class Request
 			if (isset($_SERVER[$pathvar]))
 			{
 				$path=$_SERVER[$pathvar];
+        $log->debug('Decoding path '.$path);
+        if (strpos($path,'?'))
+        {
+          $path=substr($path,0,strpos($path,'?'));
+          $log->debug('Removed query '.$path);
+        }
 				$pathstart=$_PREFS->getPref('url.pathstart','');
 				if (substr($path,0,strlen($pathstart))==$pathstart)
 				{
 					$path=substr($path,strlen($pathstart));
+          if ($path=='/index.php')
+          {
+            $path='';
+          }
+          $log->debug('Reduced to path '.$path);
 				}
 				else
 				{

@@ -1,9 +1,10 @@
 Options +FollowSymLinks 
 
 RewriteEngine on 
+RewriteBase /Swim
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* /swim.php [L]
+RewriteRule .* swim.php [L]
 
 <Files access>
 	Deny from all
