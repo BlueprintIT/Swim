@@ -17,10 +17,21 @@ function method_login($request)
 {
 	global $_PREFS;
 	
-	$user=login($request->query['swim_username'],$request->query['swim_password']);
+	$user=UserManager::login($request->query['swim_username'],$request->query['swim_password']);
 	if ($user!==false)
 	{
-		redirect($request->nested);
+    if (isset($request->nested))
+    {
+  		redirect($request->nested);
+    }
+    else if (isset($request->query['goto']))
+    {
+      redirect($request->query['goto']);
+    }
+    else
+    {
+      displayServerError($request);
+    }
 	}
 	else
 	{

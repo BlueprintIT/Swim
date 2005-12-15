@@ -1,43 +1,36 @@
 #include global/file/styles/styles.css
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overflow: hidden;
+}
+
 body {
-	font-family: defaultfont;
+  overflow: hidden;
+  margin: 0;
+  color: defaultcolor;
+  font-family: defaultfont;
 	font-size: 1em;
 	font-weight: normal;
-	color: black;
 	text-align: justify;
 }
 
 h1 {
-	font-size: 1.5em;
-	font-weight: bold;
+	font-size: 2em;
+	font-weight: normal;
 	color: h1color;
-	font-family: titlefont;
+	font-family: h1font;
 }
 
 h2 {
 	font-size: 1.2em;
 	font-weight: bold;
 	color: h2color;
-	font-family: titlefont;
+	font-family: h2font;
 }
 
-p {
-	font-family: paragraphfont;
-}
-
-p.info {
-	color: blue;
-}
-
-p.warning {
-	color: red;
-}
-
-ul, ol {
-	font-family: paragraphfont;
-}
-
-li {
+p, ul, ol, li, td {
 	font-family: paragraphfont;
 }
 

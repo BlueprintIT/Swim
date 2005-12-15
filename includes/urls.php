@@ -37,6 +37,14 @@ function encodeQuery($query)
   return substr($result,1);
 }
 
+function cleanVariable($text)
+{
+  $text = preg_replace("/<script.*?script>/si", "", "$text");
+  $text = preg_replace("/<script.*>/si", "", "$text");
+  $text = preg_replace("/<\/script>/si", "", "$text");
+  return $text;
+}
+
 function extractVariable(&$array,$name,$value)
 {
 	$spos=strpos($name,'[');
@@ -64,7 +72,7 @@ function extractVariable(&$array,$name,$value)
 	}
 	else
 	{
-		$array[$name]=$value;
+		$array[$name]=cleanVariable($value);
 	}
 }
 
@@ -155,8 +163,19 @@ function decodePostQuery()
 
 function redirect($request)
 {
-	$url=$request->encode();
-	$url='http://'.$_SERVER['HTTP_HOST'].$url;
+  if ($request instanceof Request)
+  {
+  	$url=$request->encode();
+  	$url='http://'.$_SERVER['HTTP_HOST'].$url;
+  }
+  else
+  {
+    $url=$request;
+    if (strpos($url,'://')===false)
+    {
+      $url='http://'.$_SERVER['HTTP_HOST'].$url;
+    }
+  }
 	header('Location: '.$url);
 	shutdown();
 }
@@ -211,7 +230,16 @@ class Request
 		
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
-	  	$url=$_PREFS->getPref('url.pagegen').'/'.$this->method;
+      $url=$_PREFS->getPref('url.pagegen').'/';
+      if ($this->method=='view')
+      {
+        $resource = Resource::decodeResource($this);
+        if (($resource!==false)&&($resource->isPage())&&($resource->container->id=='global'))
+        {
+          // TODO Make a search engine optimised url here
+        }
+      }
+	  	$url=$url.$this->method;
 	  	if (isset($this->resource))
 	  	{
 	  		$url.='/'.$this->resource;

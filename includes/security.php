@@ -21,161 +21,66 @@ define('PERMISSION_DEFAULT',PERMISSION_ALLOWED);
 define('PERMISSION_READ',0);
 define('PERMISSION_WRITE',1);
 
-function lockSecurityRead()
-{
-	global $_PREFS;
-	lockResourceRead($_PREFS->getPref('storage.security'));
-	return true;
-}
-
-function lockSecurityWrite()
-{
-	global $_PREFS;
-	lockResourceWrite($_PREFS->getPref('storage.security'));
-	return true;
-}
-
-function unlockSecurity()
-{
-	global $_PREFS;
-	unlockResource($_PREFS->getPref('storage.security'));
-}
-
-function login($username,$password)
-{
-	global $_USER;
-	
-	$newuser = new User($username);
-	if ($newuser->userExists())
-	{
-		if (md5($password)==$newuser->account['password'])
-		{
-			$newuser->logged=true;
-			$_USER=$newuser;
-			$_SESSION['Swim.User']=$_USER;
-			
-			return $_USER;
-		}
-	}
-	return false;
-}
-
-function logout()
-{
-	global $_USER;
-	
-	$_USER->become('guest');
-}
-
 class User
 {
 	var $user;
+  var $name;
+  var $password;
+  var $exists = false;
 	var $groups = array();
-	var $account = array();
 	var $log;
 	var $logged = false;
 	
 	function User($username=false)
 	{
+    global $_STORAGE;
+    
 		$this->log = LoggerManager::getLogger('swim.user');
 		if ($username!==false)
 		{
-			$this->become($username);
+      $this->log->debug('Creating user '.$username);
+      $this->user=$username;
+      $results = $_STORAGE->query("SELECT * FROM User WHERE id='".storage_escape($username)."';");
+      if ($results->valid())
+      {
+        $this->log->debug('User is valid');
+        $details=$results->current();
+        $this->exists=true;
+        $this->name=$details['name'];
+        $this->password=$details['password'];
+        
+        $results = $_STORAGE->query("SELECT access FROM UserAccess WHERE user='".storage_escape($username)."';");
+        while ($results->valid())
+        {
+          $details=$results->current();
+          $this->log->debug('Found group '.$details['access']);
+          $this->groups[]=$details['access'];
+          $results->next();
+        }
+      }
 		}
 		else
 		{
 			$this->user='guest';
 			$this->groups=array();
-			$this->account=array();
 		}
-	}
-	
-	function __sleep()
-	{
-		unset($this->log);
-		return array('user','groups','account','logged');
-	}
-	
-	function __wakeup()
-	{
-		$this->log = LoggerManager::getLogger('swim.user');
 	}
 	
 	function setPassword($password)
 	{
-		$this->account['password']=md5($password);
+    global $_STORAGE;
+    
+    $_STORAGE->queryExec("UPDATE User set password='".storage_escape(md5($password))."' WHERE id='".storage_escape($this->user)."';");
 	}
-	
-	function store()
-	{
-		global $_PREFS;
-		$file = $_PREFS->getPref('security.database');
-    if (is_writable($file))
-    {
-			if (lockSecurityWrite())
-			{
-				$lines = array();
-	      $source=fopen($file,'r');
-	      while (!feof($source))
-	      {
-	        $line=trim(fgets($source));
-        	$details=explode(':',$line);
-        	if ($details[0]!=$this->username)
-        	{
-        		$lines[]=$line;
-        	}
-	      }
-	      fclose($source);
-	      $source=fopen($file,'w');
-	      foreach ($lines as $line)
-	      {
-	      	fwrite($source,$line."\n");
-	      }
-	      $line=$this->account['username'].':'.$this->account['password'].':'.$this->account['groups'].':'.$this->account['name'];
-	      fwrite($source,$line."\n");
-	      fclose($source);
-	      unlockSecurity();
-      }
-  	}
-	}
-	
-	function loadFromDescriptor($line)
-	{
-		$this->logged=false;
-  	$details=explode(':',$line);
-		$this->user=$details[0];
-  	$this->account = array('username'=>$details[0],'password'=>$details[1],'groups'=>$details[2],'name'=>$details[3]);
-  	$this->groups = explode(',',$this->account['groups']);
-	}
-	
-	function become($username)
-	{
-		global $_PREFS;
-		
-		$file = $_PREFS->getPref('security.database');
-    if (is_readable($file))
-    {
-			if (lockSecurityRead())
-			{
-	      $source=fopen($file,'r');
-	      while (!feof($source))
-	      {
-	        $line=trim(fgets($source));
-	        if (substr($line,0,strlen($username)+1)==$username.':')
-	        {
-	        	$this->loadFromDescriptor($line);
-	        	break;
-	        }
-	      }
-	      fclose($source);
-	      unlockSecurity();
-      }
-  	}
-	}
+  
+  function login($password)
+  {
+    return (md5($password)==$this->password);
+  }
 	
 	function userExists()
 	{
-		return count($this->account)>0;
+		return $this->exists;
 	}
 	
 	function getUsername()
@@ -257,40 +162,35 @@ class User
 		
 	function addGroup($group)
 	{
+    global $_STORAGE;
+    
 		if (!in_array($group,$this->groups))
 		{
 			$this->groups[]=$group;
-			if (strlen($this->account['groups'])>0)
-			{
-				$this->account['groups'].=',';
-			}
-			$this->account['groups'].=$group;
+      $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".storage_escape($this->user)."','".storage_escape($group)."');");
 		}
 	}
 	
 	function removeGroup($group)
 	{
+    global $_STORAGE;
+    
 		$nwgroups=array();
-		$this->account['groups']='';
 		foreach ($this->groups as $grp)
 		{
 			if ($grp!=$group)
 			{
 				$newgroups[]=$grp;
-				$this->account['groups'].=','.$grp;
 			}
 		}
-		if (strlen($this->account['groups'])>0)
-		{
-			$this->account['groups']=substr($this->account['groups'],1);
-		}
 		$this->groups=$nwgroups;
+    $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($this->user)."' AND access='".storage_escape($group)."';");
 	}
 	
 	function clearGroups()
 	{
 		$this->groups=array();
-		$this->account['groups']='';
+    $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($user->getUsername())."';");
 	}
 	
 	function inGroup($group)
@@ -405,6 +305,11 @@ class User
 	{
 		global $_PREFS;
 		
+    if ($this->inGroup('root'))
+    {
+      return PERMISSION_ALLOWED;
+    }
+    
 		$resource->lockRead();
 		if (($resource->isFile())&&(strlen($resource->id)>0))
 		{
@@ -485,76 +390,62 @@ class User
 	}
 }
 
-function createUser($username)
+class UserManager
 {
-	$user = new User($username);
-	if ($user->user==$username)
-	{
-		return false;
-	}
-	$user->user=$username;
-	$user->account['username']=$username;
-	return $user;
-}
-
-function deleteUser($user)
-{
-	global $_PREFS;
-	
-	$file = $_PREFS->getPref('security.database');
-	if (is_writable($file))
-	{
-		$users=array();
-		lockSecurityWrite();
-	  $lines=array();
-	  $source=fopen($file,'r');
-	  while (!feof($source))
-	  {
-      $line=trim(fgets($source));
-    	$details=explode(':',$line);
-    	if ($details[0]!=$user->getUsername())
-    	{
-    		$lines[]=$line;
-    	}
-    }
-    fclose($source);
-    $source=fopen($file,'w');
-    foreach ($lines as $line)
+  static function login($username,$password)
+  {
+    global $_USER;
+    
+    $newuser = new User($username);
+    if (($newuser->userExists())&&($newuser->login($password)))
     {
-    	fwrite($source,$line."\n");
+      $_SESSION['Swim.User']=$username;
+      $_USER=$newuser;
+      return $newuser;
     }
-    fclose($source);
-	  unlockSecurity();
-	}
-}
-
-function getAllUsers()
-{
-	global $_PREFS;
-	$file = $_PREFS->getPref('security.database');
-	if (is_readable($file))
-	{
-		$users=array();
-		lockSecurityRead();
-	  $source=fopen($file,'r');
-	  while (!feof($source))
-	  {
-	    $line=trim(fgets($source));
-	    if (strlen($line)>0)
-	    {
-		    $user = new User();
-		    $user->loadFromDescriptor($line);
-		    $users[$user->getUsername()]=$user;
-		    unset($user);
-	    }
-	  }
-		unlockSecurity();
-		return $users;
-	}
-	else
-	{
-		return array();
-	}
+    return false;
+  }
+  
+  static function logout()
+  {
+    global $_USER;
+    
+    $_USER = new User();
+    unset($_SESSION['Swim.User']);
+  }
+  
+  static function createUser($username)
+  {
+    global $_STORAGE;
+    
+    $_STORAGE->queryExec("INSERT INTO User (id) VALUES ('".storage_escape($username)."');");
+  	$user = new User($username);
+  	return $user;
+  }
+  
+  static function deleteUser($user)
+  {
+  	global $_STORAGE;
+  	
+    $_STORAGE->queryExec("DELETE FROM User WHERE id='".storage_escape($user->getUsername())."';");
+    $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($user->getUsername())."';");
+  }
+  
+  static function getAllUsers()
+  {
+    global $_STORAGE;
+    
+    $users=array();
+    $result = $_STORAGE->query("SELECT id FROM User;");
+    while ($result->valid())
+    {
+      $id = $result->current();
+      $user = new User($id[0]);
+      $users[$user->getUsername()]=$user;
+      $result->next();
+    }
+    return $users;
+  }
 }
 
 // Start up the session
@@ -564,12 +455,12 @@ session_start();
 
 if (isset($_SESSION['Swim.User']))
 {
-	$_USER=$_SESSION['Swim.User'];
+	$_USER = new User($_SESSION['Swim.User']);
+  $_USER->logged=true;
 }
 else
 {
-	$_USER = new User('guest');
-	$_SESSION['Swim.User']=$_USER;
+	$_USER = new User();
 }
 
 ?>

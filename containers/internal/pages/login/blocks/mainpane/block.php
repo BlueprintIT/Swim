@@ -2,7 +2,14 @@
 
 $newrequest = new Request();
 $newrequest->method='login';
-$newrequest->nested=$request->nested;
+if (isset($request->nested))
+{
+  $newrequest->nested=$request->nested;
+}
+else if (isset($request->query['goto']))
+{
+  $newrequest->query['goto']=$request->query['goto'];
+}
 
 ?>
 <div class="header">
