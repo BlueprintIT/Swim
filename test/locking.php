@@ -15,32 +15,32 @@
 
 $dir=$_PREFS->getPref('storage.test');
 
-lockResourceRead($dir);
-lockResourceWrite($dir);
-lockResourceRead($dir);
-unlockResource($dir);
-unlockResource($dir);
-unlockResource($dir);
-lockResourceWrite($dir);
-lockResourceRead($dir);
-unlockResource($dir);
-unlockResource($dir);
+LockManager::lockResourceRead($dir);
+LockManager::lockResourceWrite($dir);
+LockManager::lockResourceRead($dir);
+LockManager::unlockResource($dir);
+LockManager::unlockResource($dir);
+LockManager::unlockResource($dir);
+LockManager::lockResourceWrite($dir);
+LockManager::lockResourceRead($dir);
+LockManager::unlockResource($dir);
+LockManager::unlockResource($dir);
 
 $log->info('The following should show a single warning about an attempt to unlock an unlocked resource.');
-unlockResource($dir);
+LockManager::unlockResource($dir);
 
 $log->info('Upon test completion a warning should display about a remaining lock on a resource.');
-lockResourceRead($dir);
+LockManager::lockResourceRead($dir);
 
-$lock=&mkdirRead($log,$dir);
-$lock=&mkdirRead($log,$dir);
-mkdirUnlock($log,$dir,$lock,LOCK_READ);
+$mkdir = new MkdirLocker();
+$lock=&$mkdir->getReadLock($log,$dir);
+$lock=&$mkdir->getReadLock($log,$dir);
+$mkdir->unlock($log,$dir,$lock,LOCK_READ);
 $log->info('This should pause until the stale lock file is removed.');
-$lock=&mkdirWrite($log,$dir);
-mkdirUnlock($log,$dir,$lock,LOCK_WRITE);
-$lock=&mkdirRead($log,$dir);
-mkdirUpgrade($log,$dir,$lock);
-mkdirUnlock($log,$dir,$lock,LOCK_WRITE);
+$lock=&$mkdir->getWriteLock($log,$dir);
+$mkdir->unlock($log,$dir,$lock,LOCK_WRITE);
+$lock=&$mkdir->getReadLock($log,$dir);
+$mkdir->unlock($log,$dir,$lock,LOCK_READ);
 
 $file = fopen($dir.'/locktest','w');
 logTest('5','Flock shared',flock($file,LOCK_SH));

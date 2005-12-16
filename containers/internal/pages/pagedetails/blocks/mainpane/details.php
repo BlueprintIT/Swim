@@ -10,9 +10,15 @@ $edit->nested=$request;
 
 $edit->resource=$request->resource;
 
+$create = new Request();
+$create->method='create';
+$create->resource='global/page';
 
 ?>
 <div class="header">
+<form method="GET" action="<?= $create->encodePath() ?>">
+<input type="submit" value="Create Page">
+</form>
 <form action="<?= $edit->encodePath() ?>" method="GET">
 <?= $edit->getFormVars() ?>
 <?

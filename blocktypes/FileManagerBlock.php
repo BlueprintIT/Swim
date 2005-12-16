@@ -178,7 +178,7 @@ class FileManagerBlock extends Block
 		
 		$list=opendir($dir);
 		$count=0;
-		$lockfiles=getLockFiles();
+		$lockfiles=LockManager::getLockFiles();
 		while (($file=readdir($list))!==false)
 		{
 			if (($file[0]!='.')&&($file!='access')&&(!in_array($file,$lockfiles)))

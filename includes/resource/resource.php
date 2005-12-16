@@ -63,30 +63,30 @@ class WorkingDetails
 	
 	function clean()
 	{
-		lockResourceWrite($this->dir);
+		LockManager::lockResourceWrite($this->dir);
 		$this->internalClean();
-		unlockResource($this->dir);
+		LockManager::unlockResource($this->dir);
 	}
 	
 	function takeOver()
 	{
 		global $_USER;
 		
-		lockResourceWrite($this->dir);
+		LockManager::lockResourceWrite($this->dir);
 		$this->user=$_USER;
 		$this->internalSave();
-		unlockResource($this->dir);
+		LockManager::unlockResource($this->dir);
 	}
 	
 	function takeOverClean()
 	{
 		global $_USER;
 		
-		lockResourceWrite($this->dir);
+		LockManager::lockResourceWrite($this->dir);
 		$this->user=$_USER;
 		$this->internalClean();
 		$this->internalSave();
-		unlockResource($this->dir);
+		LockManager::unlockResource($this->dir);
 	}
 	
 	function free()
@@ -94,10 +94,10 @@ class WorkingDetails
 		global $_PREFS;
 		
 		$this->log->debug('Freeing working version');
-		lockResourceWrite($this->dir);
+		LockManager::lockResourceWrite($this->dir);
 		$this->internalClean();
 		unlink($this->dir.'/'.$_PREFS->getPref('locking.templockfile'));
-		unlockResource($this->dir);
+		LockManager::unlockResource($this->dir);
 		return true;
 	}
 	
@@ -105,7 +105,7 @@ class WorkingDetails
 	{
 		global $_PREFS;
 		
-		lockResourceWrite($this->dir);
+		LockManager::lockResourceWrite($this->dir);
 		if (is_readable($this->dir.'/'.$_PREFS->getPref('locking.templockfile')))
 		{
 			$this->blank=false;
@@ -123,7 +123,7 @@ class WorkingDetails
 		{
 			$this->internalSave();
 		}
-		unlockResource($this->dir);
+		LockManager::unlockResource($this->dir);
 	}
 	
 	function internalSave()
@@ -139,9 +139,9 @@ class WorkingDetails
 	
 	function saveDetails()
 	{
-		lockResourceWrite($this->dir);
+		LockManager::lockResourceWrite($this->dir);
 		$this->internalSave();
-		unlockResource($this->dir);
+		LockManager::unlockResource($this->dir);
 	}
 }
 
@@ -387,7 +387,7 @@ class Resource
 		$resources=array();
 		$dir=$this->getDir().'/'.$type.'s';
 		$dir=opendir($dir);
-		$locknames=getLockFiles();
+		$locknames=LockManager::getLockFiles();
 		while (false !== ($entry=readdir($dir)))
 		{
 			if (($entry[0]!='.')&&(!in_array($entry,$locknames)))
@@ -596,7 +596,7 @@ class Resource
 		$this->log->debug('lockRead - '.$this->id);
 		if ($this->isWritable())
 		{
-			lockResourceRead($this->getDir());
+			LockManager::lockResourceRead($this->getDir());
 		}
 	}
 	
@@ -605,7 +605,7 @@ class Resource
 		$this->log->debug('lockWrite - '.$this->id);
 		if ($this->isWritable())
 		{
-			lockResourceWrite($this->getDir());
+			LockManager::lockResourceWrite($this->getDir());
 		}
 		else
 		{
@@ -618,7 +618,7 @@ class Resource
 		$this->log->debug('unlock - '.$this->id);
 		if ($this->isWritable())
 		{
-				unlockResource($this->getDir());
+			LockManager::unlockResource($this->getDir());
 		}
 	}
 	

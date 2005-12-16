@@ -231,7 +231,7 @@ class User
 		{
 			if ($lock)
 			{
-				lockResourceRead($dir);
+				LockManager::lockResourceRead($dir);
 			}
 			$access=fopen($dir.'/access','r');
 			do
@@ -295,7 +295,7 @@ class User
 			fclose($access);
 			if ($lock)
 			{
-				unlockResource($dir);
+				LockManager::unlockResource($dir);
 			}
 		}
 		return $perm;

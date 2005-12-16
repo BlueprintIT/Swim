@@ -26,11 +26,11 @@
 		{
 			recursiveMkDir($dir);
 			$user=$this->getStoreUser($request);
-			lockResourceWrite($dir);
+			LockManager::lockResourceWrite($dir);
 			$access=fopen($dir.'/access','w');
 			fwrite($access,'DENY:DENY'."\n");
 			fwrite($access,'*:group(admin),user('.$user.')::group(admin),user('.$user.'):'."\n");
-			unlockResource($dir);
+			LockManager::unlockResource($dir);
 		}
 		return $dir;
 	}
@@ -46,7 +46,7 @@
 		}
 		$dir=checkForDir($request);
 		$id=$parser->data['blockid'];
-		lockResourceRead($dir);
+		LockManager::lockResourceRead($dir);
 
 		$descriptions=array();
 		if (is_readable($dir.'/.descriptions'))
@@ -70,8 +70,8 @@
 			{
 				if (!is_readable($dir.'/'.$file['name']))
 				{
-					lockResourceWrite($dir);
-					unlockResource($dir);
+					LockManager::lockResourceWrite($dir);
+					LockManager::unlockResource($dir);
 					move_uploaded_file($file['tmp_name'],$dir.'/'.$file['name']);
 					if (isset($request->query[$id.':description']))
 					{
@@ -107,8 +107,8 @@
 			$file=$request->query[$id.':file'];
 			if (is_readable($dir.'/'.$file))
 			{
-				lockResourceWrite($dir);
-				unlockResource($dir);
+				LockManager::lockResourceWrite($dir);
+				LockManager::unlockResource($dir);
 				unlink($dir.'/'.$file);
 				if (isset($descriptions[$file]))
 				{
@@ -126,7 +126,7 @@
 		
 		$list=opendir($dir);
 		$count=0;
-		$lockfiles=getLockFiles();
+		$lockfiles=LockManager::getLockFiles();
 		while (($file=readdir($list))!==false)
 		{
 			if (($file[0]!='.')&&($file!='access')&&(!in_array($file,$lockfiles)))
@@ -184,7 +184,7 @@ No files stored.
 </table>
 <?
 		}
-		unlockResource($dir);
+		LockManager::unlockResource($dir);
 		$upload = new Request();
 		$upload->resource=$request->resource;
 		$upload->method=$request->method;

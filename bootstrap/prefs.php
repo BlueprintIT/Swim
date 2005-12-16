@@ -248,11 +248,11 @@ function saveSitePreferences()
 	global $_PREFS;
 	
 	$confdir=$host->getPref('storage.config');
-	lockResourceWrite($confdir);
+	LockManager::lockResourceWrite($confdir);
 	$file=fopen($_PREFS->getPref('storage.config').'/site.conf','w');
 	$_PREFS->savePreferences($file);
 	fclose($file);
-	unlockResource($confdir);
+	LockManager::unlockResource($confdir);
 }
 
 $default = new Preferences();
@@ -276,7 +276,7 @@ LoggerManager::loadPreferences();
 require_once $bootstrap.'/baseincludes.php';
 
 $confdir=$host->getPref('storage.config');
-lockResourceRead($confdir);
+LockManager::lockResourceRead($confdir);
 unset($_PREFS);
 $_PREFS = new Preferences();
 if (is_readable($host->getPref('storage.config').'/site.conf'))
@@ -286,7 +286,7 @@ if (is_readable($host->getPref('storage.config').'/site.conf'))
 	fclose($file);
 }
 $_PREFS->setParent($host);
-unlockResource($confdir);
+LockManager::unlockResource($confdir);
 
 $default->setDelegate($_PREFS);
 

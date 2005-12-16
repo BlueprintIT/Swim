@@ -37,9 +37,9 @@ class Page extends Resource
           list($id,$pdir)=$this->createNewResource('block',$block);
           if ($details->hasDefaultFiles())
           {
-            lockResourceWrite($pdir);
+            LockManager::lockResourceWrite($pdir);
             recursiveCopy($details->getDefaultFileDir(),$pdir,true);
-            unlockResource($pdir);
+            LockManager::unlockResource($pdir);
           }
         }
       }

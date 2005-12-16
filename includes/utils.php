@@ -21,7 +21,7 @@ function shutdown()
 	{
 		$log->debug('Shutdown started');
 		$_STATE=STATE_SHUTDOWN;
-		shutdownLocking();
+		LockManager::shutdown();
 		LoggerManager::shutdown();
 		$_STATE=STATE_COMPLETE;
 		exit;
@@ -73,7 +73,7 @@ function recursiveDelete($dir,$ignorelock=false)
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
-		$lockfiles=getLockFiles();
+		$lockfiles=LockManager::getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
 			if (($file!='.')&&($file!='..'))
@@ -111,7 +111,7 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{
-		$lockfiles=getLockFiles();
+		$lockfiles=LockManager::getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
 			if (($file!='.')&&($file!='..'))

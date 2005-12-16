@@ -77,7 +77,7 @@ class Container extends Resource
     	{
     		if ($this->isWritable())
     		{
-    			lockResourceRead($dir);
+    			LockManager::lockResourceRead($dir);
     		}
     
     		$vers=fopen($dir.'/version','r');
@@ -86,7 +86,7 @@ class Container extends Resource
     
     		if ($this->isWritable())
     		{
-    			unlockResource($dir);
+    			LockManager::unlockResource($dir);
     		}
     		
     		return $version;
@@ -175,7 +175,7 @@ class Container extends Resource
 	{
 		$dir=$this->getResourceBaseDir($resource);
 		
-		lockResourceWrite($dir);
+		LockManager::lockResourceWrite($dir);
 		
 		$newest=-1;
 		if ($res=@opendir($dir))
@@ -206,14 +206,14 @@ class Container extends Resource
 		
 		mkdir($dir.'/'.$next);
 	
-		unlockResource($dir);
+		LockManager::unlockResource($dir);
 		
 		$source=$resource->getDir();
 		$target=$dir.'/'.$next;
 		$resource->lockRead();
-		lockResourceWrite($target);
+		LockManager::lockResourceWrite($target);
 		recursiveCopy($source,$target,true);
-		unlockResource($target);
+		LockManager::unlockResource($target);
 		$resource->unlock();
 
 		if ($resource instanceof Page)
@@ -237,9 +237,9 @@ class Container extends Resource
 		if ($details->isNew())
 		{
 			$resource->lockRead();
-			lockResourceWrite($details->getDir());
+			LockManager::lockResourceWrite($details->getDir());
 			recursiveCopy($source,$details->getDir(),true);
-			unlockResource($details->getDir());
+			LockManager::unlockResource($details->getDir());
 			$resource->unlock();
 			$details->blank=false;
 		}
@@ -277,11 +277,11 @@ class Container extends Resource
 
 		if (($this->isWritable())&&($this->isVersioned()))
 		{
-			lockResourceWrite($dir);
+			LockManager::lockResourceWrite($dir);
     	$vers=fopen($dir.'/version','w');
     	fwrite($vers,$resource->version);
     	fclose($vers);
-			unlockResource($dir);
+			LockManager::unlockResource($dir);
 		}
 	}
 	
