@@ -20,6 +20,8 @@ define('PERMISSION_DEFAULT',PERMISSION_ALLOWED);
 
 define('PERMISSION_READ',0);
 define('PERMISSION_WRITE',1);
+define('PERMISSION_EDIT',2);
+define('PERMISSION_DELETE',3);
 
 class User
 {
@@ -112,6 +114,51 @@ class User
       $this->log->warn('Attempt to change non-existant user.');
     }
 	}
+  
+  function hasPermission($perm,$access)
+  {
+    global $_STORAGE;
+    
+    if ($this->inGroup('root'))
+    {
+      return true;
+    }
+    
+    switch ($access)
+    {
+      case PERMISSION_READ:
+        $type='read';
+        break;
+      case PERMISSION_WRITE:
+        $type='write';
+        break;
+      case PERMISSION_EDIT:
+        $type='edit';
+        break;
+      case PERMISSION_DELETE:
+        $type='remove';
+        break;
+      default:
+        return false;
+    }
+    $results = $_STORAGE->query("SELECT Permission.".$type." FROM UserAccess JOIN Permission ON UserAccess.access=Permission.access WHERE section='".storage_escape($perm)."';");
+    $result = 0;
+    while ($results->valid())
+    {
+      $id=$results->current();
+      if ($id[0]<0)
+      {
+        return false;
+      }
+      $result+=$id[0];
+      $results->next();
+    }
+    if ($result>0)
+    {
+      return true;
+    }
+    return false;
+  }
 
 	function hasPrivilege($priv)
 	{
@@ -417,14 +464,18 @@ class User
 	{
 		//return true;
 		$this->log->debug('Checking canRead');
-		return $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
+  	return $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
 	}
 	
 	function canWrite($resource)
 	{
 		//return true;
 		$this->log->debug('Checking canWrite');
-		return $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
+    if (($resource->isWritable())&&($this->hasPermission('documents',PERMISSION_WRITE)))
+    {
+  		return $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
+    }
+    return false;
 	}
 }
 

@@ -22,9 +22,8 @@ function method_create($request)
 	$container=getContainer($container);
 	if ($container!==false)
 	{
-		if ($container->isWritable())
+		if (($container->isWritable())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
 		{
-			// TODO possibly a better security check here
 			if ($type=='page')
 			{
         list($id,$pdir)=$container->createNewResource('page');

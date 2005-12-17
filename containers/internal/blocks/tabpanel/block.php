@@ -27,11 +27,30 @@ function display_tab($type,$section,$url,$title)
 
 ?>
 <tr>
+<?
+if ($_USER->hasPermission('documents',PERMISSION_READ))
+{
+?>
   <td class="spacer"></td>
-<? display_tab($type,'content',$admin->encode(),'Page management'); ?>
+<?
+  display_tab($type,'content',$admin->encode(),'Page management');
+}
+
+if (true)
+{
+?>
   <td class="spacer"></td>
-<? display_tab($type,'cart',$prefs->getPref('url.base').'/cart/admin','E-commerce'); ?>
+<?
+  display_tab($type,'cart',$prefs->getPref('url.base').'/cart/admin','E-commerce');
+}
+
+if ($_USER->hasPermission('users',PERMISSION_READ))
+{
+?>
   <td class="spacer"></td>
-<? display_tab($type,'users',$users->encode(),'User management'); ?>
+<?
+  display_tab($type,'users',$users->encode(),'User management');
+}
+?>
   <td class="remainder"></td>
 </tr>

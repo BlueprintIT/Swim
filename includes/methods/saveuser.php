@@ -18,7 +18,7 @@ function method_saveuser($request)
 {
   global $_USER;
   
-  if ($_USER->isLoggedIn())
+  if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_WRITE)))
   {
     if (!isset($request->query['cancel']))
     {
@@ -26,7 +26,7 @@ function method_saveuser($request)
       {
         $id = $request->query['username'];
         $user = new User($id);
-        if (!$user->userExists)
+        if (!$user->userExists())
         {
           $user = UserManager::createUser($id);
         }

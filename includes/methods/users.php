@@ -18,7 +18,7 @@ function method_users($request)
 {
   global $_USER;
   
-  if ($_USER->isLoggedIn())
+  if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_READ)))
   {
     $page = Resource::decodeResource('internal/page/users');
     $page->display($request);

@@ -18,7 +18,7 @@ function method_deleteuser($request)
 {
   global $_USER;
   
-  if ($_USER->isLoggedIn())
+  if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_DELETE)))
   {
     $user = new User($request->resource);
     if (!UserManager::deleteUser($user))

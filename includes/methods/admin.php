@@ -18,9 +18,10 @@ function method_admin($request)
 {
 	global $_USER;
 	
-	$resource=Resource::decodeResource($request);
+  if ($request->resource!='')
+  	$resource=Resource::decodeResource($request);
 
-	if ($_USER->isLoggedIn())
+	if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_READ)))
   {
     if (($request->resource=='')||($resource!==false))
     {
