@@ -26,6 +26,12 @@ body {
   vertical-align: -18px;
 }
 
+#admin {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+}
+
 #tabpanel {
   position: absolute;
   top: 90px;

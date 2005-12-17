@@ -17,18 +17,18 @@ $create->resource='global/page';
 ?>
 <div class="header">
 <form method="GET" action="<?= $create->encodePath() ?>">
-<input type="submit" value="Create Page">
+<input type="submit" value="Create new Page">
 </form>
 <form action="<?= $edit->encodePath() ?>" method="GET">
 <?= $edit->getFormVars() ?>
 <?
 if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
 {
-  ?><input type="submit" value="Edit"><?
+  ?><input type="submit" value="Edit this Page"><?
 }
 else
 {
-  ?><input type="submit" value="Edit" disabled="true"><?
+  ?><input type="submit" value="Edit this Page" disabled="true"><?
 }?>
 </form>
 <h2>Page Details</h2>

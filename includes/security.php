@@ -77,7 +77,7 @@ class User
   {
     return (md5($password)==$this->password);
   }
-	
+  
 	function userExists()
 	{
 		return $this->exists;
@@ -87,15 +87,30 @@ class User
 	{
 		return $this->user;
 	}
+  
+  function getGroups()
+  {
+    return $this->groups;
+  }
+  
+  function getName()
+  {
+    return $this->name;
+  }
 	
-	function getName()
-	{
-		return $this->account['name'];
-	}
-
 	function setName($value)
 	{
-		$this->account['name']=$value;
+    global $_STORAGE;
+    
+    if ($this->exists)
+    {
+      $_STORAGE->queryExec("UPDATE User set name='".storage_escape($value)."' WHERE id='".storage_escape($this->user)."';");
+      $this->name=$value;
+    }
+    else
+    {
+      $this->log->warn('Attempt to change non-existant user.');
+    }
 	}
 
 	function hasPrivilege($priv)
@@ -164,33 +179,56 @@ class User
 	{
     global $_STORAGE;
     
-		if (!in_array($group,$this->groups))
-		{
-			$this->groups[]=$group;
-      $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".storage_escape($this->user)."','".storage_escape($group)."');");
-		}
+    if ($this->exists)
+    {
+  		if (!in_array($group,$this->groups))
+  		{
+  			$this->groups[]=$group;
+        $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".storage_escape($this->user)."','".storage_escape($group)."');");
+  		}
+    }
+    else
+    {
+      $this->log->warn('Attempt to change non-existant user.');
+    }
 	}
 	
 	function removeGroup($group)
 	{
     global $_STORAGE;
     
-		$nwgroups=array();
-		foreach ($this->groups as $grp)
-		{
-			if ($grp!=$group)
-			{
-				$newgroups[]=$grp;
-			}
-		}
-		$this->groups=$nwgroups;
-    $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($this->user)."' AND access='".storage_escape($group)."';");
+    if ($this->exists)
+    {
+  		$nwgroups=array();
+  		foreach ($this->groups as $grp)
+  		{
+  			if ($grp!=$group)
+  			{
+  				$newgroups[]=$grp;
+  			}
+  		}
+  		$this->groups=$nwgroups;
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($this->user)."' AND access='".storage_escape($group)."';");
+    }
+    else
+    {
+      $this->log->warn('Attempt to change non-existant user.');
+    }
 	}
 	
 	function clearGroups()
 	{
-		$this->groups=array();
-    $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($user->getUsername())."';");
+    global $_STORAGE;
+    
+    if ($this->exists)
+    {
+  		$this->groups=array();
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($this->getUsername())."';");
+    }
+    else
+    {
+      $this->log->warn('Attempt to change non-existant user.');
+    }
 	}
 	
 	function inGroup($group)
@@ -390,6 +428,47 @@ class User
 	}
 }
 
+class Group
+{
+  var $id;
+  var $name;
+  var $description;
+  
+  function Group($id)
+  {
+    global $_STORAGE;
+    
+    $this->id = $id;
+    $results = $_STORAGE->query("SELECT * FROM Access WHERE id='".storage_escape($id)."';");
+    if ($results->valid())
+    {
+      $details=$results->current();
+      $this->valid=true;
+      $this->name = $details['name'];
+      $this->description = $details['description'];
+    }
+    else
+    {
+      $this->valid=false;
+    }
+  }
+  
+  function getID()
+  {
+    return $this->id;
+  }
+  
+  function getName()
+  {
+    return $this->name;
+  }
+  
+  function getDescription()
+  {
+    return $this->description;
+  }
+}
+
 class UserManager
 {
   static function login($username,$password)
@@ -427,8 +506,12 @@ class UserManager
   {
   	global $_STORAGE;
   	
-    $_STORAGE->queryExec("DELETE FROM User WHERE id='".storage_escape($user->getUsername())."';");
-    $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($user->getUsername())."';");
+    if ($user->userExists())
+    {
+      $_STORAGE->queryExec("DELETE FROM User WHERE id='".storage_escape($user->getUsername())."';");
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($user->getUsername())."';");
+    }
+    return true;
   }
   
   static function getAllUsers()
@@ -445,6 +528,22 @@ class UserManager
       $result->next();
     }
     return $users;
+  }
+  
+  static function getGroups()
+  {
+    global $_STORAGE;
+    
+    $groups=array();
+    $result = $_STORAGE->query("SELECT id FROM Access WHERE id<>'root';");
+    while ($result->valid())
+    {
+      $id = $result->current();
+      $group = new Group($id[0]);
+      $groups[$group->getID()]=$group;
+      $result->next();
+    }
+    return $groups;
   }
 }
 

@@ -3,6 +3,9 @@
 $admin = new Request();
 $admin->method='admin';
 
+$users = new Request();
+$users->method='users';
+
 $page = $parser->data['page'];
 $type = $page->prefs->getPref('page.admin.section');
 
@@ -29,6 +32,6 @@ function display_tab($type,$section,$url,$title)
   <td class="spacer"></td>
 <? display_tab($type,'cart',$prefs->getPref('url.base').'/cart/admin','E-commerce'); ?>
   <td class="spacer"></td>
-<? display_tab($type,'users','','User management'); ?>
+<? display_tab($type,'users',$users->encode(),'User management'); ?>
   <td class="remainder"></td>
 </tr>

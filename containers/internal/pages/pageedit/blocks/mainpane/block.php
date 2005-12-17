@@ -33,8 +33,8 @@ include 'image.php';
 <input type="hidden" name="default" value="<?= $request->encode(); ?>">
 <input type="hidden" name="cancel" value="<?= $cancel->encode(); ?>">
 <div class="header">
-<input type="submit" name="action:default" value="Save Working Version">
 <input type="submit" name="action:commit" value="Save &amp; Commit">
+<input type="submit" name="action:default" value="Save Working Version">
 <input type="submit" name="action:cancel" value="Cancel">
 <h2>Page Editor</h2>
 </div>

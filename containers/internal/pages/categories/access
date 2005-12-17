@@ -1,2 +1,2 @@
-ALLOW:DENY
+DENY:DENY
 *:group(admin):::

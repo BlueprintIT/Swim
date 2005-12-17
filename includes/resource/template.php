@@ -354,7 +354,10 @@ class Template extends Resource
 		{
 			$method=$parser->data['request']->method;
 		}
-		$request=$this->generateRequest($parser->data,$attrs['href'],$method);
+    $href = '';
+    if (isset($attrs['href']))
+      $href = $attrs['href'];
+		$request=$this->generateRequest($parser->data,$href,$method);
 		if (isset($attrs['nest']))
 		{
 			$request->nested=$parser->data['request'];
