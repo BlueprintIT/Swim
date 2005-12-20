@@ -125,29 +125,34 @@ class CategoryMenuBlock extends Block
   
   function displayListItems($category,$depth,$showroot=true)
   {
-    if ($showroot)
-    {
-      print('<ul class="menupopup ');
-      if ($this->orientation=='horizontal')
-      {
-        print('horizmenu');
-      }
-      else
-      {
-        print('vertmenu');
-      }
-      print('">'."\n");
-    }
+    $items = $category->items();
     
-    foreach ($category->items() as $item)
+    if (count($items)>0)
     {
-      print('<li class="menuitem level'.($depth+1).'">'."\n");
-      $this->displayItem($item,$depth);
-      print('</li>'."\n");
+      if ($showroot)
+      {
+        print('<ul class="menupopup ');
+        if ($this->orientation=='horizontal')
+        {
+          print('horizmenu');
+        }
+        else
+        {
+          print('vertmenu');
+        }
+        print('">'."\n");
+      }
+      
+      foreach ($items as $item)
+      {
+        print('<li class="menuitem level'.($depth+1).'">'."\n");
+        $this->displayItem($item,$depth);
+        print('</li>'."\n");
+      }
+      
+      if ($showroot)
+        print('</ul>');
     }
-    
-    if ($showroot)
-      print('</ul>');
   }
   
   function displayItems($category,$depth,$showroot=true)
