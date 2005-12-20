@@ -1,44 +1,41 @@
 #include global/file/styles/styles.css
-table#menu {
-	border-collapse: collapse;
-	z-index: 10;
+#menubar {
+  background-image: -swim-url('global/file/images/menucorner.gif');
+  background-position: top left;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  padding-left: 29px;
 }
 
-table#menu tr {
-	height: auto;
+#mainmenu {
+  height: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0px 0px !important;
 }
 
-table#menu td {
-	width: -swim-calc(100/6)%;
-	border-top: 0;
-	border-bottom: 0;
-	border-left: 1px white solid;
-	border-right: 0;
-	padding: 0;
-	margin: 0;
-	background-color: menubackground;
-	color: stdblue;
-	font-weight: bold;
-	font-family: borderfont;
+#mainmenu tr {
+  background-color: brightred;
+  height: 100%;
+  border: 0px none;
+}
+
+#mainmenu td {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-bottom: 0px;
+  padding-top: 0px;
+  margin: 0;
+  height: 100%;
 	font-size: 0.8em;
+	vertical-align: middle;
+	color: white;
 }
 
-table#menu td a, table#menu td a:visited {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	height: 100%;
-	width: 100%;
-	text-decoration: none;
-	color: stdblue;
+#mainmenu td.level1.menufocus {
+  background-color: seagreen;
 }
 
-table#menu td a:hover, table#menu td a:visited:hover {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	height: 100%;
-	width: 100%;
-	text-decoration: none;
-	color: stdblue;
+#mainmenu td.level1 a, #mainmenu td.level1 a:hover, #mainmenu td.level1 a:visited {
+  color: white;
+  text-decoration: none;
 }

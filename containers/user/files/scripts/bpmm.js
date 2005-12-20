@@ -1,4 +1,11 @@
-menuManager = {
+/*
+ * Blueprint Menu Manager
+ *
+ * Copyright Blueprint IT Ltd.
+ *
+ */
+
+var menuManager = {
 	
 	popupDelay: 200,
 	hideDelay: 200,

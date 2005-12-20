@@ -1,19 +1,27 @@
 #define bannerheight 105
-#define menuheight 20
+#define menuheight 25
 #define footerheight 192
+#define bannermenugap 3
+#define menucontentgap 3
 
-#define defaultfont Arial, Helvetica, sans-serif
+#define defaultfont "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif
 #define defaultcolor black;
 
-#define narrowfont 'Arial Narrow', Helvetica, sans-serif
+#define narrowfont "Trebuchet MS", Verdana, "Arial Narrow", Helvetica, sans-serif
 
 #define pagebackground rgb(255,255,255)
 
 #define seagreen rgb(0,100,82)
 #define deepred rgb(168,45,73)
+#define brightred rgb(223,0,43)
+#define bordergrey rgb(135,138,141)
 
-#define h1color deepred;
+#define h1color deepred
 #define h1font narrowfont
-#define h2color black;
+#define h2color black
 #define h2font defaultfont
 #define paragraphfont defaultfont
+
+#define linkcolor seagreen
+#define linkvisited deepred
+#define linkhover seagreen

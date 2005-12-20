@@ -1,3 +1,10 @@
+/*
+ * Cross browser functions
+ *
+ * Copyright Blueprint IT Ltd.
+ *
+ */
+
 // Wraps an element giving functions for position and display control
 function ElementWrapper(element)
 {
@@ -229,10 +236,7 @@ ElementWrapper.prototype = {
 				return parseFloat(filter.substring(pos+14,filter.length))/100.0;
 			}
 		}
-		else
-		{
-			return 1;
-		}
+		return 1;
 	},
 	
 	setOpacity: function(value)

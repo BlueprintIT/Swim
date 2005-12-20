@@ -1,6 +1,6 @@
 #include global/file/styles/styles.css
 body {
-  padding-top: -swim-calc(bannerheight+menuheight)px;
+  padding-top: -swim-calc(bannerheight+bannermenugap+menuheight+menucontentgap)px;
   padding-bottom: -swim-calc(footerheight)px;
   padding-left: 0px;
   padding-right: 0px;
@@ -14,7 +14,7 @@ body {
   width: 100%;
   height: -swim-calc(bannerheight)px;
   background-position: top left;
-  background-image: -swim-url('global/file/images/banner.png');
+  background-image: -swim-url('global/file/images/banner.jpg');
   background-repeat: no-repeat;
 }
 
@@ -37,7 +37,7 @@ body {
 #menubar {
   position: absolute;
   right: 0;
-  top: -swim-calc(bannerheight);
+  top: -swim-calc(bannerheight+bannermenugap);
   height: -swim-calc(menuheight)px;
 }
   
@@ -45,7 +45,7 @@ body {
   position: absolute;
   left: 0;
   bottom: -swim-calc(footerheight)px;
-  width: 350px;
+  width: 250px;
 }
 
 #content {
@@ -61,7 +61,20 @@ body {
   right: 0;
   width: 100%;
   height: -swim-calc(footerheight)px;
-  background-image: -swim-url('global/file/images/wave.png');
+  background-image: -swim-url('global/file/images/wave.gif');
   background-position: bottom right;
   background-repeat: no-repeat;
+  z-index: -1;
+}
+
+#footer p {
+  position: absolute;
+  bottom: 110px;
+  right: 40px;
+  color: white;
+  font-size: 1.6em;
+}
+
+#footer img {
+  vertical-align: center;
 }

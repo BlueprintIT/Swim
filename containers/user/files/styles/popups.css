@@ -1,53 +1,50 @@
 #include global/file/styles/styles.css
-*.menupopup {
+.menupopup {
 	display: none;
 	position: absolute;
 	margin: 0;
 	padding: 0;
+	z-index: 1;
+  white-space: nowrap;
 }
 
-*.menuitem {
-	white-space: nowrap;
+.level1 ul {
+  background-color: white;
+  border-top: 1px solid bordergrey;
+  border-left: 1px solid bordergrey;
+  border-right: 1px solid bordergrey;
 }
 
-a.itemfocus, a.itemfocus:hover, a.itemfocus:visited, a.itemfocus:visited:hover {
-	color: menuhighlight !important;
+.level1 li {
+  position: static;
+  margin: 0px !important;
+  padding: 3px;
+  display: block;
+  color: bordergrey;
+  border-top: 0px none;
+  border-left: 0px none;
+  border-right: 0px none;
+  border-bottom: 1px solid bordergrey;
 }
 
-div.popoutright, div.popoutdown {
-	display: none;
+.level1 li.menufocus {
+  background-color: brightred;
+  color: white !important;
 }
 
-td.menuitem {
-	background-color: menubackground;
-	padding-left: 18px !important;
-	background-position: 0px 5px;
+.level1 li a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 5px;
 }
 
-td.menufocus {
-	background-repeat: no-repeat;
-	background-image: -swim-url('global/file/images/bullet.gif') !important;
+.level1 ul li a, .level1 ul li a:visited {
+  font-weight: normal !important;
+  color: bordergrey !important;
 }
 
-ul.menupopup {
-	background-color: menubackground;
-	border-top: white 1px solid;
-	border-left: white 1px solid;
-	border-right: white 1px solid;
-}
-
-ul.menupopup li.menuitem {
-	display: block;
-	padding: 2px !important;
-	padding-left: 18px !important;
-	margin: 0 !important;
-	border-bottom: 1px white solid;
-	background-position: 0px 45% !important;
-	background-image: none !important;
-	font-family: menufont;
-}
-
-ul.menupopup li.menufocus {
-	background-repeat: no-repeat;
-	background-image: -swim-url('global/file/images/bullet.gif') !important;
+.level1 ul a.itemfocus, .level1 ul a.itemfocus:visited, .level1 ul a.itemfocus:hover {
+  font-weight: normal !important;
+  color: white !important;
 }
