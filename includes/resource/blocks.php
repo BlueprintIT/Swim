@@ -69,8 +69,14 @@ class Block extends Resource
 		if (isset($attrs['class']))
 		{
 			$class.=' '.$attrs['class'];
+      unset($attrs['class']);
 		}
-		$attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
+    $attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
+    unset($attrs['id']);
+    foreach ($attrs as $attr => $value)
+    {
+      $attrlist.=' '.$attr.'="'.$value.'"';
+    }
 		print('<'.$this->getType().' '.$attrlist.'>');
 	}
 	

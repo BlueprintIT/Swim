@@ -22,11 +22,13 @@ function method_upload($request)
 
 	$resource=Resource::decodeResource($request);
   
+  $log->debug('upload');
+  
 	if ($resource!==false)
 	{
     if ($resource->isFile())
 		{
-			$log->debug('Checking write access');
+			$log->debug('Checking file write access');
 			if ($_USER->canWrite($resource))
 			{
 				if (!($resource->parent instanceof Container))
@@ -41,6 +43,7 @@ function method_upload($request)
 						{
 							header($_SERVER["SERVER_PROTOCOL"]." 409 Conflict");
 							print("Someone else has locked this resource.");
+              $log->debug('Working file not mine');
 							return;
 						}
 					}
@@ -98,7 +101,7 @@ function method_upload($request)
     if ((count($parts)==2)&&($parts[0]=='categories'))
     {
       $log->debug('Uploading category database');
-      if ($_USER->inGroup('admin'))
+      if ($_USER->hasPermission('documents',PERMISSION_WRITE))
       {
         $cm = getCategoryManager($parts[1]);
         if ($_SERVER['REQUEST_METHOD']=='PUT')
@@ -127,15 +130,16 @@ function method_upload($request)
       }
       else
       {
+        $log->debug('No write permission');
         header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
-        print("You only have access to edit working versions.");
+        print("You don't have permission to edit categories.");
         return;
       }
     }
     else
     {
-      $log->warn('Nowhere to uplaod to');
       displayNotFound($request);
+      return;
     }
   }
 }

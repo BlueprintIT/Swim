@@ -40,10 +40,17 @@ $edit->resource='internal/page/siteedit';
 $edit->nested=$request;
 ?>
 <div class="header">
+<?
+if ($_USER->hasPermission('documents',PERMISSION_WRITE))
+{
+?>
 <form method="GET" action="<?= $edit->encodePath() ?>">
 <?= $edit->getFormVars(); ?>
 <input type="submit" value="Edit">
 </form>
+<?
+}
+?>
 <h2>Structure</h2>
 </div>
 <div class="body">
