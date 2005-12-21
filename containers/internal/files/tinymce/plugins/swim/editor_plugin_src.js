@@ -15,7 +15,17 @@ tinyMCE.importPluginLanguagePack('swim', 'en'); // <- Add a comma separated list
 
 function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 {
-	var newwin = win.open(tinyMCE.getParam('swim_browser','')+'&action=document.forms[0].elements['+"'"+field_name+"'"+'].value=selected','swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=630,height=400');
+	var url = tinyMCE.getParam('swim_browser','');
+	if (url.indexOf('?')>0)
+	{
+		url=url+'&';
+	}
+	else
+	{
+		url=url+'?';
+	}
+	url=url+'action=document.forms[0].elements['+"'"+field_name+"'"+'].value=selected';
+	var newwin = win.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=630,height=400');
 	if (!newwin)
 	{
 		alert("You must disable popup blocking to use this file browser.");
@@ -86,6 +96,10 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 	{
 		if (url.substring(0,1)=='/')
 		{
+			if (tinyMCE.getParam('swim_external',false))
+			{
+				url=view+url.substring(1);
+			}
 		}
 		else if (url.indexOf('://')>0)
 		{

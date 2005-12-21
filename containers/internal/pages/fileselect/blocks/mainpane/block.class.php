@@ -7,13 +7,11 @@ class FileBrowser extends FileSelectorBlock
     if ((!isset($request->query['type']))||($request->query['type']!='global'))
     {
       $page = Resource::decodeResource($request);
-      return $page->getFile('attachments');
+      if ($page!==false)
+        return $page->getFile('attachments');
     }
-    else
-    {
-      $container = getContainer('global');
-      return $container->getFile('attachments');
-    }
+    $container = getContainer('global');
+    return $container->getFile('attachments');
   }
 
   function displayTableHeader()
