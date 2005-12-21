@@ -91,11 +91,13 @@ $select->resource=$request->resource;
         </select>
 </form>
 <?
-$revert = new Request();
-$revert->query['version']=$page->version;
-$revert->method='revert';
-$revert->resource=$request->resource;
-$revert->nested=$request;
+if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
+{
+  $revert = new Request();
+  $revert->query['version']=$page->version;
+  $revert->method='revert';
+  $revert->resource=$request->resource;
+  $revert->nested=$request;
 ?>
 <form style="display: inline" method="POST" action="<?= $revert->encodePath() ?>">
 <?= $revert->getFormVars() ?>
@@ -106,6 +108,9 @@ if ($page->isCurrentVersion())
 }
 ?>>
 </form>
+<?
+}
+?>
 </td>
 </tr>
 <tr>

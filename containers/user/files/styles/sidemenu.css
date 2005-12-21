@@ -5,7 +5,7 @@
   background-image: -swim-url('global/file/images/menuicon.gif');
   background-position: left center;
   background-repeat: no-repeat;
-  padding-left: 70px;
+  padding-left: 55px;
   padding-top: 20px;
   padding-bottom: 20px;
   margin-top: 10px;
@@ -13,6 +13,7 @@
   border-bottom: 1px solid pagebackground;
   font-size: 1.2em;
   color: seagreen;
+  text-align: left;
 }
 
 #sidemenu a, #sidemenu a:visited, #sidemenu a:hover {
@@ -32,6 +33,7 @@ li.level1 a, li.level1 a:hover, li.level1 a:visited {
 
 #sidemenu li.level1.menufocus {
   border-bottom-color: bordergrey !important;
+  background-image: -swim-url('global/file/images/menuiconhover.gif');
   color: deepred;
 }
 

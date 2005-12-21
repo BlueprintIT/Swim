@@ -26,6 +26,16 @@ body {
   vertical-align: -18px;
 }
 
+#banner #compliance {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+}
+
+#banner #compliance img {
+  float: left;
+}
+
 #admin {
   position: absolute;
   bottom: 15px;

@@ -104,6 +104,7 @@ table {
 
 .categorytree a, .categorytree a:hover, .categorytree a:visited {
   color: WindowText;
+  text-decoration: none;
 }
 
 .categorytree .selected a, .categorytree .selected a:hover, .categorytree .selected a:visited {
