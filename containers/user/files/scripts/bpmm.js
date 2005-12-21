@@ -210,7 +210,7 @@ var menuManager = {
 
 		startAnimateIn: function(item)
 		{
-			item.posel.setDisplay('block');
+			item.setVisible(true);
 			item.state=3;
 		},
 		
@@ -220,7 +220,7 @@ var menuManager = {
 		
 		startAnimateOut: function(item)
 		{
-			item.posel.setDisplay('none');
+			item.setVisible(false);
 			item.state=0;
 		},
 		
@@ -238,7 +238,7 @@ var menuManager = {
 		{
 			item.clippos=0;
 			item.posel.getAssignedStyle().clip='rect(auto, auto, '+item.clippos+'px, auto)';
-			item.posel.setDisplay("block");
+			item.setVisible(true);
 			item.state=2;
 			item.timer=menuManager.startTimer(item,this.delay);
 		},
@@ -276,7 +276,7 @@ var menuManager = {
 			{
 				item.clippos=0;
 				item.posel.getAssignedStyle().clip='rect(auto, auto, 0px, auto)';
-				item.posel.setDisplay('none');
+				item.setVisible(false);
 				item.state=0;
 			}
 			else
@@ -295,7 +295,7 @@ var menuManager = {
 		startAnimateIn: function(item)
 		{
 			item.posel.setOpacity(0);
-			item.posel.setDisplay("block");
+			item.setVisible(true);
 			item.state=2;
 			item.timer=menuManager.startTimer(item,this.delay);
 		},
@@ -338,7 +338,7 @@ var menuManager = {
 			if (next<=0)
 			{
 				item.posel.setOpacity(0);
-				item.posel.setDisplay("none");
+				item.setVisible(false);
 				item.state=0;
 			}
 			else
@@ -419,6 +419,7 @@ function Menu(item,orientation,element)
 	
 		this.parentItem=item;
 		this.parentItem.submenu=this;
+		this.parentItem.posel.getAssignedStyle().position='relative';
 	}
 	else
 	{
@@ -448,6 +449,19 @@ Menu.prototype = {
 		this.posel.setTop(y);
 	},
 
+	setVisible: function(value)
+	{
+	  if (value)
+	  {
+  	  this.posel.setDisplay("block");
+  	  this.parentItem.setMenuPosition();
+  	}
+  	else
+  	{
+  	  this.posel.setDisplay("none");
+  	}
+	},
+	
 	onTimer: function()
 	{
 		switch (this.state)
@@ -473,7 +487,7 @@ Menu.prototype = {
 		{
 			case 0:
 			case 1:
-				this.parentItem.setMenuPosition();
+				//this.parentItem.setMenuPosition();
 				this.animator=menuManager.animator;
 				this.animator.startAnimateIn(this);
 				break;
@@ -728,14 +742,42 @@ MenuItem.prototype = {
 	{
 		if (this.submenu)
 		{
+			var style = this.submenu.posel.getAssignedStyle();
+
+		  var docwrap = new ElementWrapper(document.body);
+		  var bwidth = docwrap.getWidth();
+		  var bheight = docwrap.getHeight();
 			if (this.parentMenu.orientation==menuManager.HORIZONTAL)
 			{
-				//alert(this.posel.getTop()+' '+this.posel.getHeight());
-				this.submenu.setPosition(this.posel.getLeft(),this.posel.getTop()+this.posel.getHeight());
+			  var left = this.posel.getLeft();
+			  var top = this.posel.getTop()+this.posel.getHeight();
+			  var width = this.submenu.posel.getWidth();
+
+        style.top=this.posel.getHeight();
+			  if ((left+width)>bwidth)
+			  {
+			    style.right='0';
+			  }
+			  else
+		    {
+		      style.left='0';
+		    }
 			}
 			else
 			{
-				this.submenu.setPosition(this.posel.getLeft()+this.posel.getWidth(),this.posel.getTop());
+			  var left = this.posel.getLeft()+this.posel.getWidth();
+			  var top = this.posel.getTop();
+			  var width = this.submenu.posel.getWidth();
+			  
+			  style.top='0';
+			  if ((left+width)>bwidth)
+			  {
+			    style.right='100%';
+			  }
+			  else
+			  {
+			    style.left='100%';
+			  }
 			}
 		}
 	}

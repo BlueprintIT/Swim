@@ -21,6 +21,7 @@
   padding: 3px;
   display: block;
   color: bordergrey;
+  background-image: none !important;
   border-top: 0px none;
   border-left: 0px none;
   border-right: 0px none;
@@ -44,7 +45,7 @@
   color: bordergrey !important;
 }
 
-.level1 ul a.itemfocus, .level1 ul a.itemfocus:visited, .level1 ul a.itemfocus:hover {
+.level1 ul li a.itemfocus, .level1 ul li a.itemfocus:visited, .level1 ul li a.itemfocus:hover {
   font-weight: normal !important;
   color: white !important;
 }

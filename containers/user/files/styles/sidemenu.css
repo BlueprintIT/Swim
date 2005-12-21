@@ -38,6 +38,6 @@ li.level1 a, li.level1 a:hover, li.level1 a:visited {
 }
 
 li.level1.menufocus a, li.level1.menufocus a:hover, li.level1.menufocus a:visited {
-  color: deepred !important;
+  color: deepred;
   font-weight: bold;
 }

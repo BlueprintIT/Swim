@@ -69,16 +69,7 @@ class CategoryMenuBlock extends Block
   {
     if ($showroot)
     {
-      print('<table class="menupopup ');
-      if ($this->orientation=='horizontal')
-      {
-        print('horizmenu');
-      }
-      else
-      {
-        print('vertmenu');
-      }
-      print('">'."\n");
+      print('<table class="menupopup vertmenu">'."\n");
     }
     
     foreach ($category->items() as $item)
@@ -98,16 +89,7 @@ class CategoryMenuBlock extends Block
   {
     if ($showroot)
     {
-      print('<table class="menupopup ');
-      if ($this->orientation=='horizontal')
-      {
-        print('horizmenu');
-      }
-      else
-      {
-        print('vertmenu');
-      }
-      print('">'."\n");
+      print('<table class="menupopup horizmenu">'."\n");
     }
     
     print('<tr>'."\n");
@@ -131,16 +113,7 @@ class CategoryMenuBlock extends Block
     {
       if ($showroot)
       {
-        print('<ul class="menupopup ');
-        if ($this->orientation=='horizontal')
-        {
-          print('horizmenu');
-        }
-        else
-        {
-          print('vertmenu');
-        }
-        print('">'."\n");
+        print('<ul class="menupopup vertmenu">'."\n");
       }
       
       foreach ($items as $item)

@@ -1,7 +1,7 @@
 #include global/file/styles/styles.css
 #menubar {
   background-image: -swim-url('global/file/images/menucorner.gif');
-  background-position: top left;
+  background-position: bottom left;
   background-repeat: no-repeat;
   background-color: transparent;
   padding-left: 29px;
