@@ -230,7 +230,7 @@ ElementWrapper.prototype = {
 		{
 			menuManager.log(style.filter);
 			var filter=style.filter;
-			var pos = filter.indexOf('alpha(opacity=');
+			var pos = filter.indexOf('Alpha(Opacity=');
 			if (pos>=0)
 			{
 				return parseFloat(filter.substring(pos+14,filter.length))/100.0;
@@ -244,7 +244,7 @@ ElementWrapper.prototype = {
 		var style = this.getAssignedStyle();
 		style.opacity=value;
 		style.MozOpacity=value;
-		style.filter='alpha(opacity='+value*100+')';
+		style.filter='Alpha(Opacity='+parseInt(value*100)+')';
 	},
 	
 	getDisplay: function()

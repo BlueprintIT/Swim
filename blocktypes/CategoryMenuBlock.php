@@ -95,9 +95,9 @@ class CategoryMenuBlock extends Block
     print('<tr>'."\n");
     foreach ($category->items() as $item)
     {
-      print('<td class="menuitem level'.($depth+1).'">'."\n");
+      print('<td class="menuitem level'.($depth+1).'"><span>'."\n");
       $this->displayItem($item,$depth);
-      print('</td>'."\n");
+      print('</span></td>'."\n");
     }
     print('</tr>'."\n");
     

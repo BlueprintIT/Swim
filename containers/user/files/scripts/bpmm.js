@@ -419,7 +419,8 @@ function Menu(item,orientation,element)
 	
 		this.parentItem=item;
 		this.parentItem.submenu=this;
-		this.parentItem.posel.getAssignedStyle().position='relative';
+		var pos = new ElementWrapper(element.parentNode);
+		pos.getAssignedStyle().position='relative';
 	}
 	else
 	{
