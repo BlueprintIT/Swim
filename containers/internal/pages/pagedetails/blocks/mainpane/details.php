@@ -14,6 +14,12 @@ $create = new Request();
 $create->method='create';
 $create->resource='global/page';
 
+$delete = new Request();
+$delete->resource=$page->getPath();
+$delete->method='delete';
+$delete->nested = new Request();
+$delete->nested->resource='admin';
+
 ?>
 <div class="header">
 <?
@@ -27,18 +33,21 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <?
 }
 ?>
-<form action="<?= $edit->encodePath() ?>" method="GET">
-<?= $edit->getFormVars() ?>
 <?
 if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
 {
-  ?><input type="submit" value="Edit this Page"><?
-}
-else
-{
-  ?><input type="submit" value="Edit this Page" disabled="true"><?
-}?>
+?>
+<form action="<?= $edit->encodePath() ?>" method="GET">
+<?= $edit->getFormVars() ?>
+<input type="submit" value="Edit this Page">
 </form>
+<form onsubmit="return confirm('This will delete this page, continue?');" action="<?= $delete->encodePath() ?>" method="GET">
+<?= $delete->getFormVars() ?>
+<input type="submit" value="Delete this Page">
+</form>
+<?
+}
+?>
 <h2>Page Details</h2>
 </div>
 <div class="body">

@@ -87,6 +87,8 @@ function decodeQuery($query)
 		{
 			$name=urldecode(substr($var,0,$pos));
 			$value=urldecode(substr($var,$pos+1));
+      if (get_magic_quotes_gpc())
+        $value=stripslashes($value);
 			extractVariable($result,$name,$value);
 		}
 	}
