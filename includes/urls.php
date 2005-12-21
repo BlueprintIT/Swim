@@ -78,6 +78,7 @@ function extractVariable(&$array,$name,$value)
 
 function decodeQuery($query)
 {
+  $log=LoggerManager::getLogger('swim.urls.decode');
 	$result=array();
 	$vars=explode('&',$query);
 	foreach ($vars as $var)
@@ -88,7 +89,9 @@ function decodeQuery($query)
 			$name=urldecode(substr($var,0,$pos));
 			$value=urldecode(substr($var,$pos+1));
       if (get_magic_quotes_gpc())
+      {
         $value=stripslashes($value);
+      }
 			extractVariable($result,$name,$value);
 		}
 	}
@@ -150,7 +153,15 @@ function decodePostQuery()
 	  	}
 	  	else if ($ct=='multipart/form-data')
 	  	{
-//	  		$query=readMultiPartPost($in);
+        $query=array();
+        foreach ($_POST as $name => $value)
+        {
+          if (get_magic_quotes_gpc())
+          {
+            $value=stripslashes($value);
+          }
+          extractVariable($query,$name,$value);
+        }
 	  	}
 			fclose($in);
 	  }
