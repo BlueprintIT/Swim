@@ -18,6 +18,9 @@
 
   <pagelayout id="trimage" extends="default">
     <name>Image in top right</name>
+    <preferences>
+      <preference name="page.template" value="global/template/topright"/>
+    </preferences>
     <blocklayout id="image" type="image">
       <name>Background Image</name>
       <preferences>

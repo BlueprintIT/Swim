@@ -7,7 +7,7 @@
 		<if hasVar="keywords"><meta name="keywords" content="<var name="keywords"/>">
 		</if><if hasVar="description"><meta name="description" content="<var name="description"/>">
 		</if><stylesheet src="/global/file/styles/global.css"/>
-		<stylesheet src="/global/file/styles/menulayout.css"/>
+		<stylesheet src="/global/file/styles/calloutlayout.css"/>
 		<title><var name="title"/></title>
 	</head>
 	<body>
@@ -22,7 +22,10 @@
 		</div>
 		<block id="sidemenu"/>
 		<div id="body">
-			<block id="content"/>
+			<div id="main">
+				<block id="image"/>
+				<block id="content"/>
+			</div>
 		</div>
 		<div id="footer">
 		  <p>Contact <image alt="telephone" src="/global/file/images/telephone.gif"/> +44(0)1639 894111</p>

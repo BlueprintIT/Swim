@@ -45,6 +45,11 @@ a:hover, a:visited:hover {
 	color: linkhover;
 }
 
+form {
+  margin: 0;
+  padding: 0;
+}
+
 div.button {
   text-align: center;
   height: 34px;

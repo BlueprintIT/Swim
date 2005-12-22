@@ -39,7 +39,7 @@ include 'image.php';
 <h2>Page Editor</h2>
 </div>
 <div class="body">
-<table style="width: 100%; table-layout: fixed; border-spacing: 5px;">
+<table style="table-layout: fixed; border-spacing: 5px;">
 <tr>
 	<td style="vertical-align: top"><label for="title">Title:</label></td>
 	<td style="vertical-align: top; width: 45%"><input style="width: 100%" type="input" id="title" name="pref:page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
