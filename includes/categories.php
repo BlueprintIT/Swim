@@ -19,6 +19,7 @@ class CategoryManager
   var $namespace;
   var $root;
   var $cache;
+  var $modified;
   
   function CategoryManager($namespace)
   {
@@ -27,10 +28,17 @@ class CategoryManager
     $this->cache=array();
     $this->namespace=$namespace;
     $this->log = LoggerManager::getLogger('swim.categories.'.$namespace);
-    $set=$_STORAGE->query('SELECT id,Category.name FROM Namespace,Category WHERE id=rootcategory;');
+    $name = "'".storage_escape($this->namespace)."'";
+    $set=$_STORAGE->query('SELECT id,Category.name,date FROM Namespace,Category WHERE id=rootcategory AND Namespace.name='.$name.';');
     $details = $set->current();
+    $this->modified=$details['date'];
     $this->root = new Category($this,null,$details['id'],$details['Category.name']);
     $this->cache[$this->root->id]=$this->root;
+  }
+  
+  function getModifiedDate()
+  {
+    return $this->modified;
   }
   
   function getRootCategory()
@@ -153,6 +161,9 @@ class CategoryManager
     $this->cache=array();
     $this->cache[$this->root->id]=$this->root;
     $this->loadCategory($document->documentElement,$this->root);
+    $this->modified=time();
+    $name = "'".storage_escape($this->namespace)."'";
+    $_STORAGE->queryExec('UPDATE Namespace set date='.$this->modified.' WHERE name='.$name.';');
     $_STORAGE->queryExec('COMMIT TRANSACTION;');
     $this->log->debug('Transaction committed - '.$_STORAGE->lastError());
   }

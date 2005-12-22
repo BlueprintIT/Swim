@@ -21,7 +21,6 @@ class Container extends Resource
 	var $pages = array();
 	var $blocks = array();
 	var $working = array();
-	var $writable;
 	var $visible;
   var $versioned;
 	
@@ -44,7 +43,6 @@ class Container extends Resource
 				fclose($file);
 			}
 		}
-		$this->writable=$this->prefs->getPref('container.writable',true);
     $this->visible=$this->prefs->getPref('container.visible',true);
     $this->versioned=$this->prefs->getPref('container.versioned',true);
 	}
@@ -320,11 +318,6 @@ class Container extends Resource
 	function isVisible()
 	{
 		return $this->visible;
-	}
-	
-	function isWritable()
-	{
-		return $this->writable;
 	}
 	
 	function getResourceDir($resource)

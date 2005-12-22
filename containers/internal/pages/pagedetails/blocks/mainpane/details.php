@@ -34,7 +34,7 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 }
 ?>
 <?
-if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
+if ($_USER->canWrite($page))
 {
 ?>
 <form action="<?= $edit->encodePath() ?>" method="GET">

@@ -1,5 +1,6 @@
 CREATE TABLE Namespace (
 	name TEXT PRIMARY KEY,
+	date INTEGER,
 	rootcategory INTEGER
 );
 

@@ -155,6 +155,7 @@ class Resource
 	var $modified;
 	var $log;
 	var $working;
+  var $writable;
 	
 	var $resources = array();
 
@@ -206,8 +207,14 @@ class Resource
 				$this->log->debug('Resource configuration not found');
 			}
 		}
+    $this->writable=$this->prefs->getPref('resource.writable',true);
 	}
 	
+  function isWritable()
+  {
+    return $this->writable;
+  }
+  
 	function savePreferences()
 	{
 		$this->prefs->setPref('resource.modified',time());
@@ -561,11 +568,6 @@ class Resource
 		return $this->dir;
 	}
 
-	function isWritable()
-	{
-		return $this->container->isWritable();
-	}
-	
 	function isVisible()
 	{
 		return $this->container->isVisible();

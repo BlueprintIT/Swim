@@ -48,13 +48,6 @@ body {
   width: 250px;
 }
 
-#content {
-  height: 100%;
-  overflow: auto;
-  padding-right: 10px;
-  padding-left: 370px;
-}
-  
 #footer {
   position: absolute;
   bottom: 0;
@@ -64,12 +57,7 @@ body {
   background-image: -swim-url('global/file/images/wave.gif');
   background-position: bottom right;
   background-repeat: no-repeat;
-}
-
-#footer #buttons {
-  position: absolute;
-  bottom: 30px;
-  right: 40px;
+  z-index: -1;
 }
 
 #footer p {
@@ -82,4 +70,24 @@ body {
 
 #footer img {
   vertical-align: center;
+}
+
+.txtCopyright {
+  display: none;
+}
+
+#sidepanel {
+  margin: 10px;
+  float: right;
+  width: 200px;
+}
+
+#body {
+  height: 100%;
+  overflow: auto;
+}
+
+.boxContent {
+  padding-right: 10px;
+  padding-left: 370px;
 }

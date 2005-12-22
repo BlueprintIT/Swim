@@ -30,6 +30,12 @@ class CategoryMenuBlock extends Block
       $this->orientation=$this->prefs->getPref('block.orientation');
   }
   
+  function getModifiedDate()
+  {
+    $cm = getCategoryManager('website');
+    return $cm->getModifiedDate();
+  }
+  
   function getType()
   {
     if ($this->prefs->isPrefSet('block.type'))

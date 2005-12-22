@@ -82,7 +82,7 @@ foreach ($layout->blocks as $id => $blk)
   if ($id!='content')
   {
     $block = $page->getReferencedBlock($id);
-    if ($block!==null)
+    if (($block!==null)&&($_USER->canWrite($block)))
     {
 ?>
 <tr>
@@ -100,7 +100,7 @@ foreach ($layout->blocks as $id => $blk)
 }
 ?>
 <?
-if (isset($contentfile))
+if ((isset($contentfile))&&($_USER->canWrite($content)))
 {
 ?>
 <tr>

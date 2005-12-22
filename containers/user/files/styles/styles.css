@@ -23,5 +23,5 @@
 #define paragraphfont defaultfont
 
 #define linkcolor seagreen
-#define linkvisited deepred
-#define linkhover seagreen
+#define linkvisited seagreen
+#define linkhover deepred
