@@ -3,6 +3,7 @@
 #define footerheight 192
 #define bannermenugap 3
 #define menucontentgap 3
+#define cartpanewidth 200
 
 #define defaultfont "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif
 #define defaultcolor black;

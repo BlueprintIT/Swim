@@ -69,7 +69,7 @@ body {
 }
 
 #footer img {
-  vertical-align: center;
+  vertical-align: middle;
 }
 
 .txtCopyright {
@@ -77,9 +77,18 @@ body {
 }
 
 #sidepanel {
-  margin: 10px;
-  float: right;
+  position: absolute;
+  top: -swim-calc(bannerheight+bannermenugap+menuheight+menucontentgap)px;
+  right: 20px;
+}
+
+.panel {
   width: 200px;
+}
+
+.panel .button {
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 #body {
@@ -87,7 +96,7 @@ body {
   overflow: auto;
 }
 
-.boxContent {
-  padding-right: 10px;
+#content {
+  padding-right: -swim-calc(30+200)px;
   padding-left: 370px;
 }

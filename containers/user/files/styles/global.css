@@ -44,3 +44,30 @@ a:visited {
 a:hover, a:visited:hover {
 	color: linkhover;
 }
+
+div.button {
+  text-align: center;
+  height: 34px;
+  background-image: -swim-url('global/file/images/buttonback.gif');
+  background-repeat: repeat-x;
+  background-position: right center;
+  position: relative;
+  padding-left: 34px;
+}
+
+div.button img {
+  margin-right: 10px;
+  margin-left: 0;
+  padding: 0;
+  border: 0px none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+div.button a, div.button a:hover, div.button a:visited {
+  color: white;
+  text-decoration: none;
+  padding-top: 7px;
+  display: block;
+}
