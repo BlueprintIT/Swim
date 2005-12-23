@@ -390,24 +390,27 @@ class Resource
 	
 	function getResources($type)
 	{
-		$this->lockRead();
 		$resources=array();
 		$dir=$this->getDir().'/'.$type.'s';
-		$dir=opendir($dir);
-		$locknames=LockManager::getLockFiles();
-		while (false !== ($entry=readdir($dir)))
-		{
-			if (($entry[0]!='.')&&(!in_array($entry,$locknames)))
-			{
-				$resource=$this->getResource($type,$entry);
-				if ($resource!==false)
-				{
-					$resources[]=$resource;
-				}
-			}
-		}
-		closedir($dir);
-		$this->unlock();
+    if (is_dir($dir))
+    {
+      $this->lockRead();
+  		$dir=opendir($dir);
+  		$locknames=LockManager::getLockFiles();
+  		while (false !== ($entry=readdir($dir)))
+  		{
+  			if (($entry[0]!='.')&&(!in_array($entry,$locknames)))
+  			{
+  				$resource=$this->getResource($type,$entry);
+  				if ($resource!==false)
+  				{
+  					$resources[]=$resource;
+  				}
+  			}
+  		}
+  		closedir($dir);
+  		$this->unlock();
+    }
 		return $resources;
 	}
 
@@ -760,7 +763,7 @@ class Resource
 		
 		if (strlen($resource)==0)
 		{
-			$log->warn('No resource to decode');
+			$log->debug('No resource to decode');
 			return false;
 		}
 

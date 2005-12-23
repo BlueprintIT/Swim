@@ -1,7 +1,17 @@
+<?
+if (isset($request->query['page']))
+{
+  $page=$request->query['page'];
+}
+else
+{
+  $page=$_PREFS->getPref('method.view.defaultresource');
+}
+?>
 <script>
 function submit()
 {
-  window.opener.tinyMCE.insertLink('/<?= $request->query['page'] ?>');
+  window.opener.tinyMCE.insertLink('/<?= $page ?>');
   window.close();
 }
 </script>
@@ -10,4 +20,4 @@ function submit()
 <button onclick="window.close()">Cancel</button>
 <h2>Preview</h2>
 </div>
-<block id="" class="body" src="<?= $request->query['page'] ?>/block/content"/>
+<block id="" class="body" src="<?= $page ?>/block/content"/>

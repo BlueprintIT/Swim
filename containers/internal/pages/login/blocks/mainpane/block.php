@@ -16,7 +16,7 @@ else if (isset($request->query['goto']))
 <h2>Please log in</h2>
 </div>
 <div class="body">
-<h3><?= $request->query['message'] ?></h3>
+<h3><? if (isset($request->query['message'])) echo $request->query['message']; ?></h3>
 <?
 	if ($_USER->isLoggedIn())
 	{
