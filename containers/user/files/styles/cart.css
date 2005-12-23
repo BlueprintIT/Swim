@@ -18,7 +18,7 @@ body {
   background-repeat: no-repeat;
 }
 
-#title {
+h1#title {
   position: absolute;
   top: 5px;
   left: 10px;
