@@ -45,6 +45,7 @@ class Container extends Resource
 		}
     $this->visible=$this->prefs->getPref('container.visible',true);
     $this->versioned=$this->prefs->getPref('container.versioned',true);
+    $this->writable=$this->prefs->getPref('resource.writable',true);
 	}
 	
 	function getDir()
@@ -281,6 +282,14 @@ class Container extends Resource
     	fclose($vers);
 			LockManager::unlockResource($dir);
 		}
+    else if ($this->isWritable())
+    {
+      $this->log->warn("Attempt to alter version on an unversioned resource.");
+    }
+    else
+    {
+      $this->log->warn("Attempt to alter version on an unwritable resource.");
+    }
 	}
 	
 	function getCurrentResourceVersion($resource)

@@ -1,5 +1,13 @@
 #include internal/file/styles/styles.css
 
+a, a:visited {
+	color: blue;
+}
+
+a:hover, a:visited:hover {
+	color: purple;
+}
+
 #tabpanel {
   border-collapse: collapse;
   table-layout: fixed;
