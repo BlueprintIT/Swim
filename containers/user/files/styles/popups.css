@@ -41,8 +41,9 @@
 }
 
 .level1 ul li a, .level1 ul li a:visited {
-  font-weight: normal !important;
-  color: bordergrey !important;
+  font-weight: normal;
+  color: bordergrey;
+  text-decoration: none;
 }
 
 .level1 ul li a.itemfocus, .level1 ul li a.itemfocus:visited, .level1 ul li a.itemfocus:hover {

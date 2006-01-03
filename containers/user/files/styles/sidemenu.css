@@ -2,18 +2,21 @@
 
 #sidemenu li.level1 {
   list-style-type: none;
-  background-image: -swim-url('global/file/images/menuicon.gif');
-  background-position: left center;
-  background-repeat: no-repeat;
-  padding-left: 55px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-left: 0px;
   margin-top: 10px;
   margin-bottom: 10px;
   border-bottom: 1px solid pagebackground;
-  font-size: 1.2em;
-  color: seagreen;
   text-align: left;
+}
+
+#sidemenu a.level1 {
+  padding-left: 55px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 1.2em;
+  background-image: -swim-url('global/file/images/menuicon.gif');
+  background-position: left center;
+  background-repeat: no-repeat;
 }
 
 #sidemenu a, #sidemenu a:visited, #sidemenu a:hover {
@@ -23,21 +26,20 @@
   height: 100%;
 }
 
-#sidemenu li.level2 {
-  font-size: 0.8em;
-}
-
-li.level1 a, li.level1 a:hover, li.level1 a:visited {
+#sidemenu a.level1, #sidemenu a.level1:hover, #sidemenu a.level1:visited {
   color: seagreen;
 }
 
-#sidemenu li.level1.menufocus {
-  border-bottom-color: bordergrey !important;
+#sidemenu li.level1.menufocus a.level1 {
   background-image: -swim-url('global/file/images/menuiconhover.gif');
   color: deepred;
 }
 
-li.level1.menufocus a, li.level1.menufocus a:hover, li.level1.menufocus a:visited {
+#sidemenu li.level1.menufocus {
+  border-bottom-color: bordergrey !important;
+}
+
+li.level1.menufocus a.level1, li.level1.menufocus a.level1:hover, li.level1.menufocus a.level1:visited {
   color: deepred;
   font-weight: bold;
 }

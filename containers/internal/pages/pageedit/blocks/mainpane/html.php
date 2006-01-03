@@ -22,6 +22,7 @@ if ($content->prefs->isPrefSet('block.stylesheets'))
 {
     $styles=explode(',',$content->prefs->getPref('block.stylesheets'));
     $styles[]='global/file/styles/global.css';
+    $styles[]='internal/file/styles/editor.css';
     $list = '';
     foreach ($styles as $s)
     {

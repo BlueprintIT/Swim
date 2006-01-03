@@ -44,3 +44,7 @@ a:hover, a:visited:hover {
   background-color: transparent;
   border-bottom: none;
 }
+
+.mceEditorArea {
+  overflow: auto;
+}

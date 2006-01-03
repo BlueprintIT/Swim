@@ -29,7 +29,7 @@ body {
   background-repeat: no-repeat;
   width: 250px;
   text-align: left;
-  font-size: 3em;
+  font-size: 2em;
   font-weight: normal;
   color: seagreen;
 }
@@ -67,6 +67,10 @@ body {
   background-color: pagebackground;
   margin-left: 10px;
   margin-bottom: 10px;
+}
+
+#body {
+  height: 100%;
 }
 
 #content {

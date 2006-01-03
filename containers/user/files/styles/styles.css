@@ -16,10 +16,11 @@
 #define deepred rgb(168,45,73)
 #define brightred rgb(223,0,43)
 #define bordergrey rgb(135,138,141)
+#define apple rgb(10,34,10)
 
 #define h1color deepred
 #define h1font narrowfont
-#define h2color black
+#define h2color apple
 #define h2font defaultfont
 #define paragraphfont defaultfont
 

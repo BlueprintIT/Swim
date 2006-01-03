@@ -35,7 +35,7 @@
   background-color: seagreen;
 }
 
-#mainmenu td.level1 a, #mainmenu td.level1 a:hover, #mainmenu td.level1 a:visited {
+#mainmenu a.level1, #mainmenu a.level1:hover, #mainmenu a.level1:visited {
   color: white;
   text-decoration: none;
 }

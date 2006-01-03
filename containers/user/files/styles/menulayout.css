@@ -29,7 +29,7 @@ body {
   background-repeat: no-repeat;
   width: 250px;
   text-align: left;
-  font-size: 3em;
+  font-size: 2em;
   font-weight: normal;
   color: seagreen;
 }
@@ -52,6 +52,10 @@ body {
   left: 0;
   bottom: -swim-calc(footerheight)px;
   width: 250px;
+}
+
+#body {
+  height: 100%;
 }
 
 #content {

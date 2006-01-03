@@ -161,7 +161,7 @@ class CategoryMenuBlock extends Block
       $page = $item->getDefaultPage();
       if ($page!==null)
       {
-        print('<anchor href="/'.$page->getPath().'">'.$item->name.'</anchor>');
+        print('<anchor class="category level'.($depth+1).'" href="/'.$page->getPath().'">'.$item->name.'</anchor>');
       }
       else
       {
@@ -172,11 +172,11 @@ class CategoryMenuBlock extends Block
     }
     else if ($item instanceof Page)
     {
-      print('<anchor href="/'.$item->getPath().'">'.$item->prefs->getPref('page.variables.title').'</anchor>');
+      print('<anchor class="page level'.($depth+1).'" href="/'.$item->getPath().'">'.$item->prefs->getPref('page.variables.title').'</anchor>');
     }
     else
     {
-      print('<a target="_blank" href="'.$item.'">'.$item.'</a>');
+      print('<a class="link level'.($depth+1).'" target="_blank" href="'.$item.'">'.$item.'</a>');
     }
   }
   
