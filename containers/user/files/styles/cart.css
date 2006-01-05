@@ -44,8 +44,17 @@ h1#title {
 #sidemenu {
   position: absolute;
   left: 0;
+  bottom: -swim-calc(footerheight+currencyheight)px;
+  width: 250px;
+}
+
+#currency {
+  position: absolute;
+  left: 0;
+  padding-left: 40px;
   bottom: -swim-calc(footerheight)px;
   width: 250px;
+  height: -swim-calc(currencyheight)px;
 }
 
 #footer {

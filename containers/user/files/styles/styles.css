@@ -4,6 +4,7 @@
 #define bannermenugap 3
 #define menucontentgap 3
 #define cartpanewidth 200
+#define currencyheight 20
 
 #define defaultfont "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif
 #define defaultcolor black;
@@ -17,6 +18,7 @@
 #define brightred rgb(223,0,43)
 #define bordergrey rgb(135,138,141)
 #define apple rgb(10,34,10)
+#define darkblue rgb(43,60,128)
 
 #define h1color deepred
 #define h1font narrowfont
