@@ -84,7 +84,7 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 		{
 			url=hostpart+view+url.substring(1);
 		}
-		else if (url.indexOf('://')>0)
+		else if (url.indexOf(':')>0)
 		{
 		}
 		else
@@ -101,7 +101,7 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 				url=view+url.substring(1);
 			}
 		}
-		else if (url.indexOf('://')>0)
+		else if (url.indexOf(':')>0)
 		{
 		}
 		else
