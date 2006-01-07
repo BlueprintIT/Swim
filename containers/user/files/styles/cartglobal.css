@@ -1,0 +1,346 @@
+#include global/file/styles/styles.css
+.panel {
+  background-image: -swim-url('global/file/images/panelborder.gif');
+  background-repeat: repeat-y;
+  margin-bottom: 10px;
+}
+
+.panelTitle {
+  padding: 5px;
+  color: white;
+  font-size: 85%;
+  padding-left: 10px;
+  background-color: seagreen;
+  background-image: -swim-url('global/file/images/paneltitle.gif');
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+.panelContent {
+  padding: 5px;
+  padding-top: 15px;
+  font-size: 70%;
+  background-color: transparent;
+  background-image: -swim-url('global/file/images/paneltop.gif');
+  background-repeat: no-repeat;
+  background-position: top left;
+}
+
+.panelFooter {
+  height: 12px;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  background-image: -swim-url('global/file/images/panelfooter.gif');
+  background-repeat: no-repeat;
+  background-position: bottom left;
+}
+
+.product {
+  border: 2px solid seagreen;
+  display: relative;
+  padding-left: 100px;
+  -moz-border-radius: 5px;
+}
+
+.price {
+  color: darkblue;
+  font-weight: bold;
+}
+
+.product .thumbnail {
+  float: left;
+  height: 100%;
+  display: absolute;
+  top: 0;
+  left: 0;
+}
+
+.subcategory {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+  
+.textbox {
+	background-color: #FFFFFF;
+	border: 1px solid #7F9DB9;
+	font-size: 11px;
+	color: #0E51A3;
+}
+
+.textboxDisabled {
+	background-color: #FFFFFF;
+	border: none;
+	font-size: 11px;
+	color: #000000;
+}
+
+.submit {	
+	color: #FFFFFF;
+	background-color: brightred;
+	font-weight: bold;
+	border: 0px none;
+}
+
+.submit:hover .submit:active {
+  background-color: seagreen;
+}
+
+a.txtButton, a.txtButton:visited {
+	color: #FFFFFF;
+	background-color: brightred;
+	padding: 3px;
+	text-align: center;
+	text-decoration: none;
+}
+
+a.txtButton:hover {
+	color: #FFFFFF;
+  background-color: seagreen;
+	text-align: center;
+	text-decoration: none;
+}
+
+.txtOldPrice {
+	text-decoration: line-through;
+}
+
+.txtSale {
+ 	color: #FF0000;
+}
+
+.txtOutOfStock {
+	color: #FF0000;
+}
+
+.basketlist thead {
+  border: 1px solid seagreen;
+}
+
+.basketlist thead td {
+  background-color: seagreen;
+  color: white;
+  font-weight: bold;
+}
+
+.basketlist tbody td {
+  padding: 10px;
+}
+
+.basketlist {
+  border-collapse: collapse;
+}
+
+.basketlist tbody {
+  border: 1px solid seagreen;
+}
+
+li.bullet {
+	list-style-type: square;
+	font-size: 70%;
+	color: #000000;	
+}
+
+li.bulletLrg {
+	list-style-type: square;
+	font-size: 100%;
+	color: #000000;	
+}
+
+li.num {
+	font-size: 70%;
+	color: #000000;		
+}
+
+li.account {
+	list-style-type: square;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.txtCopy {
+	font-size: 70%;
+	color: #05549E;
+}
+
+.txtSiteDocs, a.txtSiteDocs {
+	font-size: 11px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+a.txtSiteDocs:hover {
+	font-size: 11px;
+	color: #FFFFFF;
+	text-decoration: underline;
+}
+
+.txtContentTitle {
+	font-size: 120%;
+	font-weight: bold;
+	color: #05549E;
+	padding-bottom: 4px;
+}
+.txtBoxSave {
+	color: #F90707;
+	padding-left: 16px;
+}
+
+.tblList {
+	border: 1px solid #BFCCC7;
+}
+
+.tdListTitle {
+	background-color: #BFCCC7;
+	font-weight: bold;
+	color: #0E51A3;
+	border-bottom: 1px solid #BFCCC7;
+}
+
+.tdEven {
+	background-color: #FFFFFF;
+}
+
+.tdOdd {
+	background-color: #EBEDFE;
+}
+
+.txtCartPrice {
+	float: right;
+	color: #FF0000;
+	padding-right: 3px;
+}
+
+.txtCart {
+	font-size: 70%;
+	color: #0E51A3;	
+}
+
+.cartTotal {
+	border-top: 1px dashed #CCCCCC;
+	padding-top: 2px;
+	margin-top: 3px;
+}
+
+a.txtCartProduct:active, a.txtCartProduct:link, a.txtCartProduct:visited {
+	text-decoration: none;
+	color: #0E51A3;
+}
+
+a.txtCartProduct:hover {
+	text-decoration: none;
+	color: #FF3300;
+}
+
+a.txtviewCart:active, a.txtviewCart:link, a.txtviewCart:visited {
+	font-size: 70%;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #FF9900;
+	text-decoration: none;
+	font-weight: bold;
+	padding: 2px;
+	border: 1px solid #000000;
+}
+
+a.txtviewCart:hover {
+	background-color: #66CC33;
+	color: #FFFFFF;
+}
+
+.cartProgress {
+	font-weight: normal;
+	color: #666666;
+	padding: 4px;
+	border: 1px solid #CCCCCC;
+	width: 350px;
+	margin: auto;
+}
+
+.txtcartProgressCurrent {
+	color: #61A2DF;
+	font-weight: bold;
+}
+
+.quickBuy {
+	text-align: center;
+	color: #666666;
+}
+
+.tdcartTitle {
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #999999;
+	border-bottom: 1px solid #666666;
+}
+
+.tdcartEven {
+	background-color: #EBEDFE;	
+}
+
+.tdcartOdd {
+	background-color: #FFFFFF;
+}
+
+.tdCartSubTotal {
+	padding-top: 10px;
+	border-top: 1px solid #666666;
+}
+
+a.txtCheckout {
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #66CC33;
+	text-decoration: none;
+	font-weight: bold;
+	padding: 2px;
+	border: 1px solid #000000;
+}
+
+a.txtUpdate {
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #FF9900;
+	text-decoration: none;
+	font-weight: bold;
+	padding: 2px;
+	border: 1px solid #000000;
+}
+
+.txtStockWarn {
+	font-size: 70%;
+	color: #FF0000;
+}
+
+.txtError {
+	font-weight: bold;
+	color: #050F72;
+	background-color: #FFCECE;
+	border: 1px solid #FF0000;
+	padding-top: 2px;
+	padding-right: 2px;
+	padding-bottom: 2px;
+	padding-left: 2px;
+}
+
+.txtCopyright, a.txtCopyright {
+	text-align: center;
+	font-size: 9px;
+	color: #6B6B6B;
+}
+
+a.txtCopyright:hover {
+	text-decoration: none;
+}
+
+.dropDown {
+	width: 120px;
+}
+
+.txtCat {
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+}

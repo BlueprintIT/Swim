@@ -11,19 +11,22 @@
 		<title><var name="title"/></title>
 	</head>
 	<body>
-		<div id="buttons">
-			<div class="button" style="width: 100px;"><anchor target="_blank" template="global/template/print"><image src="/global/file/images/print.gif"/>Print</anchor></div>
-		</div>
 		<div id="header">
 		</div>
 		<h1 id="title"><var name="title"/></h1>
 		<div id="body">
 			<div id="main">
-				<block id="image"/>
+				<div id="callout">
+					<block id="image"/>
+					<image id="overlay" src="/global/file/images/callout.gif"/>
+				</div>
 				<block id="content"/>
 			</div>
 		</div>
 		<div id="footer">
+			<div id="buttons">
+				<div class="button"><anchor class="print" target="_blank" template="global/template/print">Print</anchor></div>
+			</div>
 		  <p>Contact <image alt="telephone" src="/global/file/images/telephone.gif"/> +44(0)1639 894111</p>
 		</div>
 		<div id="menubar">

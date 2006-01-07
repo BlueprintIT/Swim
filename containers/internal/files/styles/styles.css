@@ -11,6 +11,10 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+p, div, td, li {
+  font-size: small;
+}
+
 table {
   font-size: inherit;
 }
@@ -102,8 +106,13 @@ table {
   color: HighlightText;
 }
 
-.categorytree a, .categorytree a:hover, .categorytree a:visited {
+.categorytree a, .categorytree a:visited {
   color: WindowText;
+  text-decoration: none;
+}
+
+.categorytree a:hover, .categorytree a:visited:hover {
+  color: Highlight;
   text-decoration: none;
 }
 

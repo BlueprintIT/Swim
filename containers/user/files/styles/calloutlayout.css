@@ -34,12 +34,6 @@ body {
   color: seagreen;
 }
 
-#buttons {
-  position: absolute;
-  top: -swim-calc(bannerheight+bannermenugap);
-  left: 300px;
-}
-
 #menubar {
   position: absolute;
   right: 0;
@@ -61,12 +55,30 @@ body {
   padding-left: 370px;
 }
 
-#image {
-  border: 2px seagreen solid;
+#callout {
   float: right;
-  background-color: pagebackground;
   margin-left: 10px;
   margin-bottom: 10px;
+  width: 275px;
+  height: 275px;
+  position: relative;
+  background-color: pagebackground;
+}
+
+#overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 277px;
+  height: 277px;
+}
+
+#image {
+  position: absolute;
+  top: 1;
+  right: 1;
+  width: 275px;
+  height: 275px;
 }
 
 #body {
@@ -75,10 +87,10 @@ body {
 
 #content {
   margin-left: 50px;
-  margin-right: 50px;
-  margin-top: 50px;
+  margin-right: 156px;
+  margin-top: 69px;
   padding: 10px;
-  border: 2px seagreen solid;
+  background-color: greenback;
 }
   
 #footer {
@@ -90,6 +102,12 @@ body {
   background-image: -swim-url('global/file/images/wave.gif');
   background-position: bottom right;
   background-repeat: no-repeat;
+}
+
+#buttons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
 #footer p {
