@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
 <layouts default="default">
-  <pagelayout id="default">
-    <name>Default Layout</name>
+  <pagelayout id="base">
+    <name>Basic Layout</name>
     <preferences>
       <preference name="page.template" value="global/template/base"/>
       <preference name="page.variables.title" value="New Page"/>
@@ -14,6 +14,14 @@
         <preference name="block.stylesheets" value="global/file/styles/content.css"/>
       </preferences>
     </blocklayout>
+  </pagelayout>
+
+  <pagelayout id="default" extends="base">
+    <name>Default Layout</name>
+    <preferences>
+      <preference name="page.template" value="global/template/menu"/>
+      <preference name="page.variables.title" value="New Page"/>
+    </preferences>
   </pagelayout>
 
   <pagelayout id="trimage" extends="default">

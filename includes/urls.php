@@ -217,7 +217,7 @@ class Request
 	
   function isXHTML()
   {
-    if (strpos($_SERVER['HTTP_ACCEPT'],'application/xhtml+xml')!==false)
+    if ((isset($_SERVER['HTTP_ACCEPT']))&&(strpos($_SERVER['HTTP_ACCEPT'],'application/xhtml+xml')!==false))
     {
       return true;
     }

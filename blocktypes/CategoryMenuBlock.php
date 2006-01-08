@@ -71,6 +71,20 @@ class CategoryMenuBlock extends Block
     Block::displayIntro($attrs);
   }
   
+  function displayTableItem($item,$depth)
+  {
+    print('<td class="menuitem level'.($depth+1).'"><span>'."\n");
+    $this->displayItem($item,$depth);
+    print('</span></td>'."\n");
+  }
+  
+  function displayVerticalTableItem($item,$depth)
+  {
+    print('<tr>'."\n");
+    $this->displayTableItem($item,$depth);
+    print('</tr>'."\n");
+  }
+  
   function displayVerticalTableItems($category,$depth,$showroot=true)
   {
     if ($showroot)
@@ -80,15 +94,16 @@ class CategoryMenuBlock extends Block
     
     foreach ($category->items() as $item)
     {
-      print('<tr>'."\n");
-      print('<td class="menuitem level'.($depth+1).'">'."\n");
-      $this->displayItem($item,$depth);
-      print('</td>'."\n");
-      print('</tr>'."\n");
+      $this->displayVerticalTableItem($item,$depth);
     }
     
     if ($showroot)
       print('</table>');
+  }
+  
+  function displayHorizontalTableItem($item,$depth)
+  {
+    $this->displayTableItem($item,$depth);
   }
   
   function displayHorizontalTableItems($category,$depth,$showroot=true)
@@ -101,14 +116,19 @@ class CategoryMenuBlock extends Block
     print('<tr>'."\n");
     foreach ($category->items() as $item)
     {
-      print('<td class="menuitem level'.($depth+1).'"><span>'."\n");
-      $this->displayItem($item,$depth);
-      print('</span></td>'."\n");
+      $this->displayHorizontalTableItem($item,$depth);
     }
     print('</tr>'."\n");
     
     if ($showroot)
       print('</table>');
+  }
+  
+  function displayListItem($item,$depth)
+  {
+    print('<li class="menuitem level'.($depth+1).'">'."\n");
+    $this->displayItem($item,$depth);
+    print('</li>'."\n");
   }
   
   function displayListItems($category,$depth,$showroot=true)
@@ -124,9 +144,7 @@ class CategoryMenuBlock extends Block
       
       foreach ($items as $item)
       {
-        print('<li class="menuitem level'.($depth+1).'">'."\n");
-        $this->displayItem($item,$depth);
-        print('</li>'."\n");
+        $this->displayListItem($item,$depth);
       }
       
       if ($showroot)
