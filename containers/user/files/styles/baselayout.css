@@ -1,0 +1,53 @@
+#include global/file/styles/styles.css
+body {
+  padding-top: -swim-calc(bannerheight+bannermenugap)px;
+  padding-bottom: -swim-calc(footerheight)px;
+  padding-left: 0px;
+  padding-right: 0px;
+  background-color: pagebackground;
+}
+
+#header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: -swim-calc(bannerheight)px;
+  background-position: top left;
+  background-image: -swim-url('global/file/images/banner.jpg');
+  background-repeat: no-repeat;
+}
+
+#body {
+  height: 100%;
+}
+
+#content {
+  height: 100%;
+  overflow: auto;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+  
+#footer {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: -swim-calc(footerheight)px;
+  background-image: -swim-url('global/file/images/wave.gif');
+  background-position: bottom right;
+  background-repeat: no-repeat;
+}
+
+#footer p {
+  position: absolute;
+  bottom: 110px;
+  right: 40px;
+  color: white;
+  font-size: 1.6em;
+}
+
+#footer img {
+  vertical-align: middle;
+}
