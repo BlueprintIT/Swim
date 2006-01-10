@@ -71,7 +71,8 @@ div.button a, div.button a:visited {
   padding-right: 2px;
 }
 
-div.button a:hover, div.button a:hover:visited {
+div.button a:hover, div.button a:visited:hover {
+  background-image: -swim-url('global/file/images/buttonbackhover.gif');
   color: white;
   text-decoration: none;
 }
@@ -81,8 +82,8 @@ div.button a.basket, div.button a.basket:visited {
   padding-left: 36px;
 }
 
-div.button a.basket:hover, div.button a.basket:hover:visited {
-  background-image: -swim-url('global/file/images/basketbutton.gif');
+div.button a.basket:hover, div.button a.basket:visited:hover {
+  background-image: -swim-url('global/file/images/basketbuttonhover.gif');
 }
 
 div.button a.print, div.button a.print:visited {
@@ -90,6 +91,6 @@ div.button a.print, div.button a.print:visited {
   padding-left: 36px;
 }
 
-div.button a.print:hover, div.button a.print:hover:visited {
-  background-image: -swim-url('global/file/images/printbutton.gif');
+div.button a.print:hover, div.button a.print:visited:hover {
+  background-image: -swim-url('global/file/images/printbuttonhover.gif');
 }

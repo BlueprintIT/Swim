@@ -9,6 +9,7 @@
     </preferences>
     <blocklayout id="content" type="html">
       <name>Page Content</name>
+      <description>Holds the main content of the page</description>
       <preferences>
         <preference name="block.class" value="HtmlBlock"/>
         <preference name="block.stylesheets" value="global/file/styles/content.css"/>
@@ -31,6 +32,7 @@
     </preferences>
     <blocklayout id="image" type="image">
       <name>Background Image</name>
+      <description>This image is places in the corner of the page, it should be 275x275.</description>
       <preferences>
         <preference name="block.class" value="ImageBlock"/>
       </preferences>

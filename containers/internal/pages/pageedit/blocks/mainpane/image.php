@@ -6,10 +6,10 @@ function imageBrowser(element)
 </script>
 <?
 
-function block_image($id,$block)
+function block_image($id,$block,$layout)
 {
 ?>
-  <td style="vertical-align: top" colspan="2"><input id="<?= $id ?>" name="block:<?= $id ?>:pref:block.image.src" type="text" value="<?
+  <td style="vertical-align: top"><input id="<?= $id ?>" name="block:<?= $id ?>:pref:block.image.src" type="text" value="<?
 if ($block->prefs->isPrefSet('block.image.src'))
 {
   print($block->prefs->getPref('block.image.src'));
@@ -19,6 +19,7 @@ else
   print('[No image selected]');
 }
 ?>"> <button onclick="imageBrowser('<?= $id ?>')">Select...</button></td>
+  <td style="vertical-align: top"><?= $layout->getDescription(); ?></td>
 <?
 }
 

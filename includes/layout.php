@@ -17,7 +17,8 @@ class Layout
 {
   var $id;
   var $prefs;
-  var $name;
+  var $name = '';
+  var $description = '';
   
   function Layout($id,$clone=null)
   {
@@ -25,6 +26,7 @@ class Layout
     if ($clone!==null)
     {
       $this->name = $clone->name;
+      $this->description = $clone->description;
       $this->prefs = new Preferences($clone->prefs);
     }
     else
@@ -36,6 +38,11 @@ class Layout
   function getName()
   {
     return $this->name;
+  }
+  
+  function getDescription()
+  {
+    return $this->description;
   }
   
   function hasDefaultFiles()
@@ -66,6 +73,10 @@ class Layout
         else if ($el->tagName=='name')
         {
           $this->name=getDOMText($el);
+        }
+        else if ($el->tagName=='description')
+        {
+          $this->description=getDOMText($el);
         }
         else
         {

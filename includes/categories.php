@@ -13,6 +13,18 @@
  * $Revision$
  */
 
+class Link
+{
+  var $name;
+  var $address;
+  
+  function Link($name,$address)
+  {
+    $this->name=$name;
+    $this->address=$address;
+  }
+}
+
 class CategoryManager
 {
   var $log;
@@ -239,10 +251,11 @@ class Category
     {
       return Resource::decodeResource($id);
     }
-    $id=$_STORAGE->singleQuery('SELECT link FROM LinkCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
-    if ($id!==false)
+    $result=$_STORAGE->query('SELECT name,link FROM LinkCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
+    if ($result->valid())
     {
-      return $id;
+      $details = $set->current();
+      return new Link($details['name'],$details['link']);
     }
   }
   
@@ -269,23 +282,23 @@ class Category
       $list[$details['sortkey']]=Resource::decodeResource($details['page']);
       $set->next();
     }
-    $set=$_STORAGE->query('SELECT link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
+    $set=$_STORAGE->query('SELECT name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->current();
-      $list[$details['sortkey']]=$details['link'];
+      $list[$details['sortkey']] = new Link($details['name'],$details['link']);
       $set->next();
     }
     ksort($list);
     return $list;
   }
   
-  function getDefaultPage()
+  function getDefaultItem()
   {
     $items = $this->items();
     foreach($items as $item)
     {
-      if ($item instanceof Page)
+      if (($item instanceof Page)||($item instanceof Link))
       {
         return $item;
       }
@@ -294,7 +307,7 @@ class Category
     {
       if ($item instanceof Category)
       {
-        $page=$item->getDefaultPage();
+        $page=$item->getDefaultItem();
         if ($page!==null)
           return $page;
       }
@@ -351,7 +364,7 @@ class CategoryTree
   
   function displayLinkLabel($link)
   {
-    print(htmlspecialchars($link));
+    print(htmlspecialchars($link->name));
   }
   
   function displayItemStartTag($item,$indent)
@@ -387,7 +400,7 @@ class CategoryTree
     {
       $this->displayPageLabel($item);
     }
-    else
+    else if ($item instanceof Link)
     {
       $this->displayLinkLabel($item);
     }

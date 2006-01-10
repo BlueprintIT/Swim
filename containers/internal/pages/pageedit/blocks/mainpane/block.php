@@ -74,7 +74,7 @@ foreach($layouts as $id => $l)
 }
 ?>
 </select></td>
-  <td style="vertical-align: top"></td>
+  <td style="vertical-align: top">The layout determines what the page contains and how it is organised.</td>
 </tr>
 <?
 foreach ($layout->blocks as $id => $blk)
@@ -90,7 +90,7 @@ foreach ($layout->blocks as $id => $blk)
 <?
       if ($blk->getType()=='image')
       {
-        block_image($id,$block);
+        block_image($id,$block,$blk);
       }
 ?>
 </tr>

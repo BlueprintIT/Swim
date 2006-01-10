@@ -1,6 +1,8 @@
 #include global/file/styles/styles.css
+#define contentgap 50
+
 body {
-  padding-top: -swim-calc(bannerheight+bannermenugap+menuheight+menucontentgap)px;
+  padding-top: -swim-calc(bannerheight+bannermenugap+menuheight+contentgap)px;
   padding-bottom: -swim-calc(footerheight)px;
   padding-left: 0px;
   padding-right: 0px;
@@ -51,7 +53,7 @@ body {
 #main {
   height: 100%;
   overflow: auto;
-  padding-right: 10px;
+  padding-right: contentgappx;
   padding-left: 370px;
 }
 
@@ -86,7 +88,7 @@ body {
 }
 
 #content {
-  margin-left: 50px;
+  margin-left: 10px;
   margin-right: 156px;
   margin-top: 69px;
   padding: 10px;
@@ -106,7 +108,7 @@ body {
 
 #buttons {
   position: absolute;
-  top: 20px;
+  top: 60px;
   left: 20px;
 }
 

@@ -199,9 +199,9 @@ class Template extends Resource
 		print($element);
 	}
 	
-	function displayApplet($parser,$tag,$attrs,$text)
-	{
-		$this->log->debug('Displaying applet');
+  function displayApplet($parser,$tag,$attrs,$text)
+  {
+    $this->log->debug('Displaying applet');
     $dims="";
     if (isset($attrs['width']))
       $dims.=' width="'.$attrs['width'].'"';
@@ -209,26 +209,51 @@ class Template extends Resource
       $dims.=' height="'.$attrs['height'].'"';
     if (isset($attrs['style']))
       $dims.=' style="'.$attrs['style'].'"';
-		$class=$attrs['class'];
-		$classpath=$attrs['classpath'];
-		$codebase=$this->generateURL($parser,$attrs['codebase']);
-		print('<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"'.$dims."\n\t");
-		print('codebase="http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0">'."\n\t");
-		$this->displayElement($parser,'param',array('name'=>'type','value'=>'application/x-java-applet;version=1.4'),'',false); print("\n\t");
-		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class.'.class'),'',false); print("\n\t");
-		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t");
-		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
-		print($text);
-		print('<comment><object type="application/x-java-applet;version=1.4"'.$dims.'">'."\n\t\t");
-		$this->displayElement($parser,'param',array('name'=>'code','value'=>$class),'',false); print("\n\t\t");
-		$this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t\t");
-		$this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
-		print($text);
-		print('</object></comment>'."\n");
-		print('</object>');
-		return true;
-	}
-	
+    $class=$attrs['class'];
+    $classpath=$attrs['classpath'];
+    $codebase=$this->generateURL($parser,$attrs['codebase']);
+    print('<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"'.$dims."\n\t");
+    print('codebase="http://java.sun.com/products/plugin/autodl/jinstall-1_4-windows-i586.cab#Version=1,4,0,0">'."\n\t");
+    $this->displayElement($parser,'param',array('name'=>'type','value'=>'application/x-java-applet;version=1.4'),'',false); print("\n\t");
+    $this->displayElement($parser,'param',array('name'=>'code','value'=>$class.'.class'),'',false); print("\n\t");
+    $this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t");
+    $this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
+    print($text);
+    print('<comment><object type="application/x-java-applet;version=1.4"'.$dims.'">'."\n\t\t");
+    $this->displayElement($parser,'param',array('name'=>'code','value'=>$class),'',false); print("\n\t\t");
+    $this->displayElement($parser,'param',array('name'=>'codebase','value'=>$codebase),'',false); print("\n\t\t");
+    $this->displayElement($parser,'param',array('name'=>'archive','value'=>$attrs['classpath']),'',false); print("\n\t");
+    print($text);
+    print('</object></comment>'."\n");
+    print('</object>');
+    return true;
+  }
+  
+  function displayFlash($parser,$tag,$attrs,$text)
+  {
+    $this->log->debug('Displaying flash');
+    $dims="";
+    if (isset($attrs['width']))
+      $dims.=' width="'.$attrs['width'].'"';
+    if (isset($attrs['height']))
+      $dims.=' height="'.$attrs['height'].'"';
+    if (isset($attrs['style']))
+      $dims.=' style="'.$attrs['style'].'"';
+    $class=$attrs['class'];
+    $classpath=$attrs['classpath'];
+    $movie=$this->generateURL($parser,$attrs['movie']);
+    print('<object type="application/x-shockwave-flash" data="'.$movie.'"'.$dims.'>'."\n\t");
+    print('<param name="movie" value="'.$movie.'">'."\n\t");
+    print('<param name="loop" value="false">'."\n\t");
+    print('<param name="quality" value="high">'."\n\t");
+    print('<param name="bgcolor" value="#ffffff">'."\n\t");
+    print('<param name="wmode" value="transparent">'."\n\t");
+    print($text);
+    print('</object>'."\n\t");
+
+    return true;
+  }
+  
 	function displayEditLink($parser,$tag,$attrs,$text)
 	{
 		$request = new Request();
@@ -479,6 +504,10 @@ class Template extends Resource
 		{
 			return $this->displayApplet($parser,$tag,$attrs,$text);
 		}
+    else if ($tag=='flash')
+    {
+      return $this->displayFlash($parser,$tag,$attrs,$text);
+    }
 		else if ($tag=='image')
 		{
 			return $this->displayImage($parser,$tag,$attrs,$text);
@@ -487,10 +516,10 @@ class Template extends Resource
 		{
 			return $this->displayImage($parser,$tag,$attrs,$text);
 		}
-		else if ($tag=='anchor')
-		{
-			return $this->displayAnchor($parser,$tag,$attrs,$text);
-		}
+    else if ($tag=='anchor')
+    {
+      return $this->displayAnchor($parser,$tag,$attrs,$text);
+    }
 		else if ($tag=='editlink')
 		{
 			return $this->displayEditLink($parser,$tag,$attrs,$text);
@@ -562,7 +591,8 @@ class Template extends Resource
 		$parser->addObserver('var',$this);
 		$parser->addObserver('stylesheet',$this);
 		$parser->addObserver('script',$this);
-		$parser->addObserver('applet',$this);
+    $parser->addObserver('applet',$this);
+    $parser->addObserver('flash',$this);
 		$parser->addObserver('image',$this);
 		//$parser->addObserver('img',$this);
 		$parser->addObserver('anchor',$this);

@@ -25,9 +25,9 @@ class XMLTree extends CategoryTree
     {
       print($indent.'<page path="'.$item->getPath().'">');
     }
-    else
+    else if ($item instanceof Link)
     {
-      print($indent.'<link path="'.$item.'">');
+      print($indent.'<link path="'.$item->address.'">');
     }
   }
   

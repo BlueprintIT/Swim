@@ -2,7 +2,7 @@
 .panel {
   background-image: -swim-url('global/file/images/panelborder.gif');
   background-repeat: repeat-y;
-  margin-bottom: 10px;
+  margin-top: -swim-calc(menuheight+10)px;
 }
 
 .panelTitle {
@@ -107,11 +107,11 @@ a.txtButton:hover {
 }
 
 .txtSale {
- 	color: #FF0000;
+ 	color: brightred;
 }
 
 .txtOutOfStock {
-	color: #FF0000;
+	color: deepred;
 }
 
 .basketlist thead {
