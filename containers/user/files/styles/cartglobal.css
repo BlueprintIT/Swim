@@ -114,26 +114,21 @@ a.txtButton:hover {
 	color: deepred;
 }
 
-.basketlist thead {
+table.standard {
+  border-collapse: collapse;
   border: 1px solid seagreen;
+  background-color: greenback;
 }
 
-.basketlist thead td {
+table.standard thead td {
   background-color: seagreen;
   color: white;
   font-weight: bold;
 }
 
-.basketlist tbody td {
+table.standard td {
   padding: 10px;
-}
-
-.basketlist {
-  border-collapse: collapse;
-}
-
-.basketlist tbody {
-  border: 1px solid seagreen;
+  background-color: greenback;
 }
 
 li.bullet {
@@ -271,8 +266,8 @@ a.txtviewCart:hover {
 .tdcartTitle {
 	font-weight: bold;
 	color: #FFFFFF;
-	background-color: #999999;
-	border-bottom: 1px solid #666666;
+	background-color: seagreen;
+	border-bottom: 1px solid seagreen;
 }
 
 .tdcartEven {
