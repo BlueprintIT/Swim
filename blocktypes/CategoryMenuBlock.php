@@ -179,7 +179,14 @@ class CategoryMenuBlock extends Block
       $page = $item->getDefaultItem();
       if ($page!==null)
       {
-        $this->displayItem($page,$depth);
+        if ($page instanceof Page)
+        {
+          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'">'.$item->name.'</anchor>');
+        }
+        else if ($page instanceof Link)
+        {
+          print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'">'.$item->name.'</a>');
+        }
       }
       else
       {

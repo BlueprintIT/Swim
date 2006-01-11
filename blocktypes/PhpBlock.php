@@ -43,7 +43,7 @@ class PhpBlock extends Block
 
 	function displayContent($parser,$attrs,$text)
 	{
-		global $_USER;
+		global $_USER,$_PREFS;
 		
 		$request=$parser->data['request'];
 		$prefs=$this->prefs;

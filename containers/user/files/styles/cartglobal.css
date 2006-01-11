@@ -38,7 +38,7 @@
 
 .product {
   border: 2px solid seagreen;
-  display: relative;
+  position: relative;
   padding-left: 100px;
   -moz-border-radius: 5px;
 }
@@ -51,7 +51,7 @@
 .product .thumbnail {
   float: left;
   height: 100%;
-  display: absolute;
+  position: absolute;
   top: 0;
   left: 0;
 }

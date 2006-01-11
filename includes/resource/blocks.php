@@ -64,25 +64,29 @@ class Block extends Resource
 			{
 				print('<stylesheet src="/'.$style.'"/>');
 			}
-		}		
-		$class='block';
-		if (isset($attrs['class']))
-		{
-			$class.=' '.$attrs['class'];
-      unset($attrs['class']);
 		}
-    $attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
-    unset($attrs['id']);
-    foreach ($attrs as $attr => $value)
+    if (!isset($attrs['notag']))
     {
-      $attrlist.=' '.$attr.'="'.$value.'"';
+  		$class='block';
+  		if (isset($attrs['class']))
+  		{
+  			$class.=' '.$attrs['class'];
+        unset($attrs['class']);
+  		}
+      $attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
+      unset($attrs['id']);
+      foreach ($attrs as $attr => $value)
+      {
+        $attrlist.=' '.$attr.'="'.$value.'"';
+      }
+  		print('<'.$this->getType().' '.$attrlist.'>');
     }
-		print('<'.$this->getType().' '.$attrlist.'>');
 	}
 	
 	function displayOutro($attrs)
 	{
-		print('</'.$this->getType().'>');
+    if (!isset($attrs['notag']))
+  		print('</'.$this->getType().'>');
 	}
 	
 	function canEdit($request,$data,$attrs)

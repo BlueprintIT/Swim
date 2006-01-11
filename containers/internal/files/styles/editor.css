@@ -1,3 +1,7 @@
-html,body {
-  overflow: visible !important;
+html {
+  overflow: auto !important;
+}
+
+body {
+  overflow: auto !important;
 }
