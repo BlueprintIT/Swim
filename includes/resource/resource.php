@@ -300,6 +300,10 @@ class Resource
 	
 	function createNewResource($type, $id=false)
 	{
+    if (!is_dir($this->getDir()))
+    {
+      $this->log->errortrace("Resource dir does not exist - ".$this->getPath());
+    }
 		$this->lockWrite();
     if (!is_dir($this->getDir().'/'.$type.'s'))
     {

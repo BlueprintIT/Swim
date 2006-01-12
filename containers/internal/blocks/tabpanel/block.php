@@ -52,5 +52,9 @@ if ($_USER->hasPermission('users',PERMISSION_READ))
   display_tab($type,'users',$users->encode(),'User management');
 }
 ?>
+  <td class="spacer"></td>
+<?
+  display_tab($type,'stats','http://www.dragonfeeds.com/stats','Website statistics');
+?>
   <td class="remainder"></td>
 </tr>

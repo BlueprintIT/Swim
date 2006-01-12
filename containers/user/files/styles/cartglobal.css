@@ -43,6 +43,13 @@
   -moz-border-radius: 5px;
 }
 
+.productshort {
+  border: 2px solid rgb(0,100,82);
+  background-color: rgb(219,234,229);
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
 .price {
   color: darkblue;
   font-weight: bold;
@@ -117,7 +124,6 @@ a.txtButton:hover {
 table.standard {
   border-collapse: collapse;
   border: 1px solid seagreen;
-  background-color: greenback;
 }
 
 table.standard thead td {
@@ -127,8 +133,7 @@ table.standard thead td {
 }
 
 table.standard td {
-  padding: 10px;
-  background-color: greenback;
+  padding: 3px;
 }
 
 li.bullet {
