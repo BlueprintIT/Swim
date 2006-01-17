@@ -158,7 +158,7 @@ class FileManagerBlock extends Block
 				{
 					$resource->lockWrite();
 					$resource->unlock();
-					unlink($dir.'/'.$file);
+          $this->log->warn('Deleting '.$dir.'/'.$file);
 					if (isset($descriptions[$file]))
 					{
 						unset($descriptions[$file]);

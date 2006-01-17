@@ -187,6 +187,7 @@ class Category
   var $name;
   var $id;
   var $manager;
+  var $list;
   
   function Category($manager,$parent,$id,$name)
   {
@@ -211,6 +212,8 @@ class Category
       $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
       $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey-1 WHERE parent='.$this->id.' AND sortkey>'.$pos.';');
     }
+    if (isset($this->list))
+      unset($this->list);
   }
   
   function clean()
@@ -232,31 +235,20 @@ class Category
   
   function count()
   {
-    global $_STORAGE;
-    
-    $count=$_STORAGE->singleQuery('SELECT COUNT() FROM Category WHERE parent='.$this->id.';');
-    $count+=$_STORAGE->singleQuery('SELECT COUNT() FROM LinkCategory WHERE category='.$this->id.';');
-    $count+=$_STORAGE->singleQuery('SELECT COUNT() FROM PageCategory WHERE category='.$this->id.';');
+    if (isset($this->list))
+    {
+      $this->list=$this->items();
+    }
+    return count($this->list);
   }
   
   function item($pos)
   {
-    $id=$_STORAGE->singleQuery('SELECT id FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
-    if ($id!==false)
+    if (isset($this->list))
     {
-      return $this->manager->getCategory($id);
+      $this->list=$this->items();
     }
-    $id=$_STORAGE->singleQuery('SELECT page FROM PageCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
-    if ($id!==false)
-    {
-      return Resource::decodeResource($id);
-    }
-    $result=$_STORAGE->query('SELECT name,link FROM LinkCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
-    if ($result->valid())
-    {
-      $details = $set->current();
-      return new Link($details['name'],$details['link']);
-    }
+    return $this->list[$pos];
   }
   
   function items()
@@ -264,6 +256,21 @@ class Category
     global $_STORAGE;
     
     $list=array();
+    $set=$_STORAGE->query('SELECT page,sortkey FROM PageCategory WHERE category='.$this->id.' ORDER BY sortkey;');
+    while ($set->valid())
+    {
+      $details = $set->current();
+      $page=Resource::decodeResource($details['page']);
+      if ($page!==false)
+      {
+        $list[$details['sortkey']]=$page;
+      }
+      else
+      {
+        $this->remove($details['sortkey']);
+      }
+      $set->next();
+    }
     $set=$_STORAGE->query('SELECT id,name,sortkey FROM Category WHERE parent='.$this->id.';');
     while ($set->valid())
     {
@@ -273,13 +280,6 @@ class Category
         $this->manager->cache[$details['id']] = new Category($this->manager,$this,$details['id'],$details['name']);
       }
       $list[$details['sortkey']]=$this->manager->cache[$details['id']];
-      $set->next();
-    }
-    $set=$_STORAGE->query('SELECT page,sortkey FROM PageCategory WHERE category='.$this->id.';');
-    while ($set->valid())
-    {
-      $details = $set->current();
-      $list[$details['sortkey']]=Resource::decodeResource($details['page']);
       $set->next();
     }
     $set=$_STORAGE->query('SELECT name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
