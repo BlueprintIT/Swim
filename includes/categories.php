@@ -262,7 +262,6 @@ class Category
     while ($set->valid())
     {
       $details = $set->current();
-      $this->log->info("Found page ".$details['page']);
       $page=Resource::decodeResource($details['page']);
       if ($page!==false)
       {

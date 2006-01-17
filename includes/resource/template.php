@@ -239,8 +239,8 @@ class Template extends Resource
       $dims.=' height="'.$attrs['height'].'"';
     if (isset($attrs['style']))
       $dims.=' style="'.$attrs['style'].'"';
-    $class=$attrs['class'];
-    $classpath=$attrs['classpath'];
+    if (isset($attrs['class']))
+      $dims=' class="'.$attrs['class'].'"';
     $movie=$this->generateURL($parser,$attrs['movie']);
     print('<object type="application/x-shockwave-flash" data="'.$movie.'"'.$dims.'>'."\n\t");
     print('<param name="movie" value="'.$movie.'">'."\n\t");
