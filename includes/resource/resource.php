@@ -385,7 +385,7 @@ class Resource
 			}
 			else
 			{
-				return false;
+				$resource=false;
 			}
 			$this->resources[$path]=$resource;
 		}
@@ -713,7 +713,11 @@ class Resource
 
 	function decodeRelativeResource($parts,$version=false)
 	{
-		if (count($parts)>=2)
+    if (count($parts)==0)
+    {
+      return $this;
+    }
+		else if (count($parts)>=2)
 		{
       $log=LoggerManager::getLogger('swim.resource');
       
@@ -740,7 +744,7 @@ class Resource
         }                
 			}
 		}
-		return $this;
+		return false;
 	}
 	
 	static function decodeResource($request,$version=false)

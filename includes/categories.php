@@ -187,6 +187,7 @@ class Category
   var $name;
   var $id;
   var $manager;
+  var $log;
   var $list;
   
   function Category($manager,$parent,$id,$name)
@@ -195,6 +196,7 @@ class Category
     $this->manager=$manager;
     $this->id=$id;
     $this->name=$name;
+    $this->log=$manager->log;
   }
   
   function remove($pos)
@@ -260,6 +262,7 @@ class Category
     while ($set->valid())
     {
       $details = $set->current();
+      $this->log->info("Found page ".$details['page']);
       $page=Resource::decodeResource($details['page']);
       if ($page!==false)
       {
@@ -267,6 +270,7 @@ class Category
       }
       else
       {
+        $this->log->warn("Removing missing page from category ".$details['page']);
         $this->remove($details['sortkey']);
       }
       $set->next();
