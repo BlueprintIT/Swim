@@ -1,5 +1,5 @@
 # Catalan message file (Temu-BCN temujinnn@hotmail.com)
-# $Revision$ - $Date$
+# $Revision: 1.4 $ - $Date: 2004/01/25 15:49:31 $
 message0=Desconegut
 message1=Desconegut (Adreça IP desconeguda)
 message2=Altres

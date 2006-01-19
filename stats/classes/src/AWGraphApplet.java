@@ -1,6 +1,6 @@
 /*
  * @(#)AWGraphApplet.java
- * $Revision$ - $Author$ - $Date$
+ * $Revision: 1.6 $ - $Author: eldy $ - $Date: 2004/01/07 22:32:03 $
  *
  */
 
@@ -35,7 +35,7 @@ public class AWGraphApplet extends Applet
         special = getParameter("special");
         if (special == null) { special = ""; }
 
-        Log("Applet "+VERSION+" ($Revision$) init");
+        Log("Applet "+VERSION+" ($Revision: 1.6 $) init");
 
         String s = getParameter("b_fontsize");
         if (s != null) { b_fontsize = Integer.parseInt(s); }

@@ -1,5 +1,5 @@
 # Chinese (simplified) message file
-# $Revision$ - $Date$
+# $Revision: 1.9 $ - $Date: 2004/02/27 19:50:21 $
 PageCode=gb2312
 message0=无法得知
 message1=无法得知(不能反解网域名称)

@@ -1,5 +1,5 @@
 # Italian message file
-# $Revision$ - $Date$
+# $Revision: 1.15 $ - $Date: 2005/02/16 18:54:24 $
 # PaniC! - panic@freemail.it 
 # Francesco Potorti - pot@gnu.org
 # iDave - idave@idave.it

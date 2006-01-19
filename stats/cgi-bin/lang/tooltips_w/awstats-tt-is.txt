@@ -1,5 +1,5 @@
 <!-- Icelandic tooltips message file (jonelias@hi.is, throstur@bylur.net) -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.2 $ - $Date: 2004/09/19 11:06:05 $ -->
 <div class="CTooltip" id="tt1">
 Nıtt innlit er skilgreint sem hver nır gestur (sem skoğar síğu) sem var ekki tengdur viğ vefsvæği şitt síğustu <b>#VisitTimeOut# mínúturnar</b>
 </div>

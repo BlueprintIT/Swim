@@ -1,6 +1,6 @@
 # Finnish message file (skyde@welho.com)
 # Original by (zebi@kanetti.com)
-# $Revision$ - $Date$
+# $Revision: 1.3 $ - $Date: 2004/06/07 11:09:33 $
 message0=Tuntematon
 message1=Tuntematon (Selvittämätön IP)
 message2=Muut

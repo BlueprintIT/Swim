@@ -1,6 +1,6 @@
 # Czech message file (js@cvut.cz)
 # win->iso conversion and czech corrections (one@one.cz)
-# $Revision$ - $Date$
+# $Revision: 1.12 $ - $Date: 2004/07/11 12:03:49 $
 PageCode=iso-8859-2
 message0=Neznámý
 message1=Neznámý (nepøelo¾ená IP)

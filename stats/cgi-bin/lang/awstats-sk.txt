@@ -1,5 +1,5 @@
 # Slovak message file (lecram@lecram.sk)
-# $Revision$ - $Date$
+# $Revision: 1.4 $ - $Date: 2004/08/20 01:01:54 $
 PageCode=windows-1250
 message0=Neznámy
 message1=Neznámy (nepreložená IP)

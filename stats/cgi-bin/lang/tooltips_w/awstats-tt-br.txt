@@ -1,5 +1,5 @@
 <!-- Brazilian Portuguese tooltips message file (urban@ite.net.br) -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.2 $ - $Date: 2004/12/30 18:19:06 $ -->
 <div class="CTooltip" id="tt1">
 Uma nova visita &eacute; definida como cada novo <b>visitante entrando</b>
 (vendo ou navegando por uma p&aacute;gina) que n&atilde;o estava conectado a

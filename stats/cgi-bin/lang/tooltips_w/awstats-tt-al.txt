@@ -1,5 +1,5 @@
 <!-- Shpjeguesi Shqip. Ju lutem më kontaktoni për korrigjime (artonberisha@radiokosova.net, http://www.radiokosova.net) -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 <div class="CTooltip" id="tt1">
 Vizita është përkufizuar si <b>vizitor</b> risi (Shfletimin apo Shiqimin e faqes) të cilët nuk e kan vizituar faqen që nga <b>#VisitTimeOut# min</b>.
 </div>

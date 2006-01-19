@@ -1,6 +1,6 @@
 # Greek message file
 # Current maintainer: "Giannis Stoilis" <i18ngr@hellug.gr>
-# $Revision$ - $Date$
+# $Revision: 1.8 $ - $Date: 2004/09/04 16:32:54 $
 #
 # Revision: 1.8 - Date: 2004/09/02 21:26:00
 # By: Thomas Venieris <mot@mediaweb.gr>

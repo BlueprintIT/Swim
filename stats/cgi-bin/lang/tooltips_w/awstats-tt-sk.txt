@@ -1,5 +1,5 @@
 <!--SK by lecram@lecram.sk (please contact if something wrong)-->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 
 <div class="CTooltip" id="tt1">
 Noví návštevníci su definovaní ako ka¾dý <b>prichádzajuci</b> (prehliadajúci si alebo prechádzajúci), kto

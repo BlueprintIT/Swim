@@ -1,5 +1,5 @@
 # Russian message file
-# $Revision$ - $Date$
+# $Revision: 1.12 $ - $Date: 2005/04/21 17:03:43 $
 PageCode=windows-1251
 message0=Неизвестный
 message1=Неизвестный

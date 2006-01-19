@@ -1,5 +1,5 @@
 # Bosnian message file (vljubovic@smartnet.ba)
-# $Revision$ - $Date$
+# $Revision: 1.3 $ - $Date: 2002/08/29 13:48:37 $
 PageCode=iso-8859-2
 message0=Nepoznat
 message1=nepoznatih (IP adresa nije razrije¹ena)

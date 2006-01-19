@@ -12,7 +12,7 @@
 # Defines
 #-------------------------------------------------------
 use vars qw/ $REVISION $VERSION /;
-$REVISION='$Revision$'; $REVISION =~ /\s(.*)\s/; $REVISION=$1;
+$REVISION='$Revision: 1.6 $'; $REVISION =~ /\s(.*)\s/; $REVISION=$1;
 $VERSION="1.1 (build $REVISION)";
 
 use vars qw / $DIR $PROG $Extension $DEBUG $DEBUGFILE $REPLOG $DEBUGRESET $SITE $REPCONF /;

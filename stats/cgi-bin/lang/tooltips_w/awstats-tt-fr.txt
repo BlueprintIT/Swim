@@ -1,5 +1,5 @@
 <!-- French tooltips message file (eldy@users.sourceforge.net) -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.2 $ - $Date: 2004/03/04 13:05:51 $ -->
 <div class="CTooltip" id="tt1">
 On considère une nouvelle visite pour <b>chaque arrivée</b> d'un visiteur consultant une page et ne s'étant pas connecté dans les dernières <b>#VisitTimeOut# mn</b>.
 </div>

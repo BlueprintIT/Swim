@@ -1,5 +1,5 @@
 <!-- Catalan tooltips message file (temujinnn@hotmail.com) -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 <div class="CTooltip" id="tt1">
 Es considera una nova visita per <b>cada nou visitant</b> que consulta una pàgina i que hagi accedit al lloc en els últims <b>#VisitTimeOut# mins.</b>.
 </div>

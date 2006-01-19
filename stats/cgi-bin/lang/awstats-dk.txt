@@ -1,5 +1,5 @@
 # Danish message file by Ole Stanstrup (revised and amended by soren@dacafe.com)
-# $Revision$ - $Date$
+# $Revision: 1.14 $ - $Date: 2004/08/04 22:34:58 $
 message0=Ukendt
 message1=Ukendt (uopl&oslash;st IP-adresse)
 message2=Andre

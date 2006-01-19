@@ -1,5 +1,5 @@
 <!-- Finnish tooltips message file (zebi@kanetti.com) -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 <div class="CTooltip" id="tt1">
 Tässä uudeksi vierailuksi on laskettu sivustolle <b>saapunut vierailija</b> (sivuja selannut), joka ei ole ollut yhteydessä sivustoon viimeisen <b>#VisitTimeOut# minuutin aikana</b>.
 </div>

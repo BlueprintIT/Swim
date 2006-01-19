@@ -1,5 +1,5 @@
 # Swedish message file
-# $Revision$ - $Date$
+# $Revision: 1.13 $ - $Date: 2004/09/14 13:01:31 $
 message0=Ok&auml;nd
 message1=Ok&auml;nda (ip-adress ej uppslagen)
 message2=&Ouml;vriga

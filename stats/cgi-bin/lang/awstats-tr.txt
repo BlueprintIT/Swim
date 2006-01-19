@@ -1,5 +1,5 @@
 # Turkish message file by giray@pultar.org
-# $Revision$ - $Date$
+# $Revision: 1.3 $ - $Date: 2002/08/29 13:48:37 $
 message0=Bilinmeyen
 message1=Bilinmeyen (çözülemeyen ip)
 message2=Diðerleri

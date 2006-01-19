@@ -1,5 +1,5 @@
 # Slovenian message file (lado@prim-nov.si)
-# $Revision$ - $Date$
+# $Revision: 1.1 $ - $Date: 2004/06/04 21:35:11 $
 PageCode=windows-1250
 message0=Neznanih
 message1=Neznanih (nepoznan IP)

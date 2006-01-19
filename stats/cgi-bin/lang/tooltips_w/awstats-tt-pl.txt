@@ -1,5 +1,5 @@
 <!-- Polish tooltips message file -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 <div class="CTooltip" id="tt1">
 Wizyty ka¿dego <b>nowego go¶cia</b>, który ogl±da³ stronê i nie ³±czy³ siê z ni± przez ostatnie <b>#VisitTimeOut# mn</b>.
 </div>

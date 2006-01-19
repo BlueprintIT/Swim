@@ -1,5 +1,5 @@
 # Vargjet e mesazheve në Shqip. Ju lutem më kontaktoni për korrigjime (artonberisha@radiokosova.net, http://www.radiokosova.net)
-# $Revision$ - $Date$
+# $Revision: 1.1 $ - $Date: 2002/11/06 10:10:37 $
 message0=Panjohur
 message1=Panjohur (IP e Pazgjidhur)
 message2=Tjera

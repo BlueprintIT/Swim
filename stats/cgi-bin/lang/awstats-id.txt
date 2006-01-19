@@ -1,5 +1,5 @@
 # Indonesian message file (oleh Steven Haryanto)
-# $Revision$ - $Date$
+# $Revision: 1.6 $ - $Date: 2002/10/29 19:14:33 $
 message0=Tidak Diketahui
 message1=Tidak Diketahui (IP tidak teresolve)
 message2=Lainnya

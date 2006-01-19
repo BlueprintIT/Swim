@@ -1,5 +1,5 @@
 <!--CZ by js@fsid.cvut.cz (please contact if something wrong)-->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 <div class="CTooltip" id="tt1">
 Noví náv¹tìvníci jsou definováni jako ka¾dý <b>pøicházející</b> (prohlí¾ející si neboprocházející), kdo 
 se na stránky nepøipojil posledních <b>#VisitTimeOut# min</b>.

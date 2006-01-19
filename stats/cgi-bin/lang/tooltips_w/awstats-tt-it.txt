@@ -1,5 +1,5 @@
 <!-- Italian tooltips message file -->
-<!-- $Revision$ - $Date$ -->
+<!-- $Revision: 1.1 $ - $Date: 2004/02/07 16:14:10 $ -->
 <div class="CTooltip" id="tt1">
 Si considera una nuova visita per <b>ogni arrivo</b> di un visitatore che visualizza o consulta una pagina e non si &egrave; connesso negli ultimi <b>#VisitTimeOut# minuti</b>.
 </div>

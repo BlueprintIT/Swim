@@ -1,5 +1,5 @@
 # Estonian message file Andrei Kolu(antik@nek.ee)
-# $Revision$ - $Date$
+# $Revision: 1.2 $ - $Date: 2003/04/11 23:37:06 $
 message0=Tundmatu
 message1=Tundmatut (domeeninimeta ip-d)
 message2=Teised

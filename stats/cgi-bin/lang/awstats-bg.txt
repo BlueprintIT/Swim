@@ -1,5 +1,5 @@
 # Bulgarian message file translated by Aryan(aryan@bgns.net)
-# $Revision$ - $Date$
+# $Revision: 1.3 $ - $Date: 2003/11/21 01:07:33 $
 PageCode=windows-1251
 message0=Непознати
 message1=Непознати (непреобразувани ip-адреси)

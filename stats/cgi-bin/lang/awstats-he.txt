@@ -1,5 +1,5 @@
 # Hebrew message file (shimi@shimi.net)
-# $Revision$ - $Date$
+# $Revision: 1.2 $ - $Date: 2003/11/21 01:06:18 $
 PageCode=iso-8859-8-i
 PageDir=rtl
 message0=לא ידוע
