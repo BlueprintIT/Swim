@@ -1,4 +1,40 @@
 #include global/file/styles/styles.css
+
+@media print {
+  #header {
+    display: none !important;
+  }
+  
+  h1#title {
+    display: none !important;
+  }
+  
+  #menubar {
+    display: none !important;
+  }
+  
+  #sidemenu {
+    display: none !important;
+  }
+  
+  #sidepanel {
+    display: none !important;
+  }
+
+  #content {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+  }
+  
+  #buttons {
+    display: none !important;
+  }
+  
+  body {
+    padding-top: 0px;
+  }
+}
+
 body {
   padding-top: -swim-calc(bannerheight+bannermenugap+menuheight+menucontentgap)px;
   padding-bottom: -swim-calc(footerheight)px;
