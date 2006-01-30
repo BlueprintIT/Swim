@@ -20,6 +20,8 @@ function method_view($request)
 	
 	$resource=Resource::decodeResource($request);
 	$log=LoggerManager::getLogger("swim.method.view");
+  
+  checkSecurity($request, $resource->prefs->getPref('security.required'), $resource->prefs->getPref('security.allowed'));
 
 	if ($resource!==false)
 	{

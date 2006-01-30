@@ -17,6 +17,8 @@ function method_create($request)
 {
 	global $_USER;
 	
+  checkSecurity($request, true, true);
+  
 	list($container,$type)=explode('/',$request->resource);
 	
 	$container=getContainer($container);

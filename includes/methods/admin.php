@@ -18,6 +18,8 @@ function method_admin($request)
 {
 	global $_USER;
 	
+  checkSecurity($request, true, true);
+  
   if ($request->resource!='')
   	$resource=Resource::decodeResource($request);
 

@@ -56,6 +56,8 @@ function method_save($request)
 {
   global $_USER;
   
+  checkSecurity($request, true, true);
+  
   $resource=Resource::decodeResource($request);
   $log=LoggerManager::getLogger("swim.method.save");
 

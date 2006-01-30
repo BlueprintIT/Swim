@@ -17,6 +17,8 @@ function method_edit($request)
 {
 	global $_USER;
 	
+  checkSecurity($request, true, true);
+  
 	$log=LoggerManager::getLogger('swim.method.edit');
 	$resource = Resource::decodeResource($request);
 

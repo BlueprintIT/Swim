@@ -17,6 +17,8 @@ function method_login($request)
 {
 	global $_PREFS;
 	
+  checkSecurity($request, true, true);
+  
 	$user=UserManager::login($request->query['swim_username'],$request->query['swim_password']);
 	if ($user!==false)
 	{

@@ -1,6 +1,7 @@
 <?
 
 $newrequest = new Request();
+$newrequest->protocol='https';
 $newrequest->method='login';
 if (isset($request->nested))
 {

@@ -18,6 +18,8 @@ function method_displayLogin($request)
 {
 	global $_PREFS;
 	
+  checkSecurity($request, true, true);
+  
 	$version=false;
 	$container = getContainer('internal');
 	$page = $container->getPage($_PREFS->getPref('method.login.page'),$version);

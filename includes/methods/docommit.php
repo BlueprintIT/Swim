@@ -17,6 +17,8 @@ function method_docommit($request)
 {
 	global $_USER,$_PREFS;
 	
+  checkSecurity($request, true, true);
+  
 	$resource = Resource::decodeResource($request);
 
 	if ($resource!==false)

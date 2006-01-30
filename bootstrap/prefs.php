@@ -270,18 +270,25 @@ if (is_readable($bootstrap.'/host.conf'))
 }
 $host->setParent($default);
 $default->setDelegate($host);
+$confdir = $host->getPref('storage.config');
+
+if (is_readable($confdir.'/host.conf'))
+{
+  $file=fopen($confdir.'/host.conf','r');
+  $host->loadPreferences($file, '', true);
+  fclose($file);
+}
 
 $_PREFS=$host;
 LoggerManager::loadPreferences();
 require_once $bootstrap.'/baseincludes.php';
 
-$confdir=$host->getPref('storage.config');
 LockManager::lockResourceRead($confdir);
 unset($_PREFS);
 $_PREFS = new Preferences();
-if (is_readable($host->getPref('storage.config').'/site.conf'))
+if (is_readable($confdir.'/site.conf'))
 {
-	$file=fopen($host->getPref('storage.config').'/site.conf','r');
+	$file=fopen($confdir.'/site.conf','r');
 	$_PREFS->loadPreferences($file);
 	fclose($file);
 }

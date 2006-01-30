@@ -176,26 +176,49 @@ function decodePostQuery()
 
 function redirect($request)
 {
+  $protocol='http';
+  if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
+    $protocol='https';
+
   if ($request instanceof Request)
   {
   	$url=$request->encode();
-  	$url='http://'.$_SERVER['HTTP_HOST'].$url;
   }
   else
-  {
+  {      
     $url=$request;
-    if (strpos($url,'://')===false)
-    {
-      $url='http://'.$_SERVER['HTTP_HOST'].$url;
-    }
+  }
+  if (strpos($url,'://')===false)
+  {
+    $url=$protocol.'://'.$_SERVER['HTTP_HOST'].$url;
   }
 	header('Location: '.$url);
 	shutdown();
 }
 
+function checkSecurity($request, $required, $allowed)
+{
+  global $_PREFS;
+  
+  if ($_PREFS->getPref('security.sslenabled')==false)
+    $allowed=false;
+
+  if (($request->protocol=='https')&&(!$allowed))
+  {
+    $request->protocol='http';
+    redirect($request);
+  }
+  if (($request->protocol=='http')&&($required)&&($allowed))
+  {
+    $request->protocol='https';
+    redirect($request);
+  }
+}
+
 class Request
 {
 	var $resource;
+  var $protocol;
 	var $method;
 	var $query = array();
 	var $log;
@@ -205,13 +228,22 @@ class Request
 	
   function Request($clone=null)
   {
+    global $_PREFS;
+    
     $this->log=LoggerManager::getLogger('swim.request');
     if ($clone!==null)
     {
+      $this->protocol=$clone->protocol;
       $this->resource=$clone->resource;
       $this->method=$clone->method;
       $this->query=$clone->query;
       $this->nested=$clone->nested;
+    }
+    else
+    {
+      $this->protocol='http';
+      if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on')&&($_PREFS->getPref('security.sslenabled')))
+        $this->protocol='https';
     }
   }
 	
@@ -241,6 +273,20 @@ class Request
 	{
 		global $_PREFS;
 		
+    $host='';
+    $thisprotocol=$this->protocol;
+    if (!$_PREFS->getPref('security.sslenabled'))
+      $thisprotocol='http';
+      
+    $protocol='http';
+    if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
+      $protocol='https';
+
+    if ($thisprotocol!=$protocol)
+    {
+      $host=$thisprotocol.'://'.$_SERVER['HTTP_HOST'];
+    }
+    
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
       $url=$_PREFS->getPref('url.pagegen').'/';
@@ -257,11 +303,11 @@ class Request
 	  	{
 	  		$url.='/'.$this->resource;
 	  	}
-	    return $url;
+	    return $host.$url;
 	  }
 	  else
 	  {
-	    return $_PREFS->getPref('url.pagegen');
+	    return $host.$_PREFS->getPref('url.pagegen');
 	  }
 	}
 	
@@ -358,14 +404,18 @@ class Request
 			$postvars = decodePostQuery();
 			$query=array_merge($query,$postvars);
 		}
-		return Request::decode($path,$query);
+    $protocol='http';
+    if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
+      $protocol='https';
+		return Request::decode($path,$query,$protocol);
 	}
 	
-	static function decode($path,$query)
+	static function decode($path,$query,$protocol = 'http')
 	{
 		global $_PREFS;
 
 		$request = new Request();
+    $request->protocol=$protocol;
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
 	  	// Site is setup to use path info to choose page
