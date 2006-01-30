@@ -54,7 +54,7 @@ if ($_USER->hasPermission('users',PERMISSION_READ))
 ?>
   <td class="spacer"></td>
 <?
-  display_tab($type,'stats','http://www.dragonfeeds.com/stats','Website statistics');
+  display_tab($type,'stats','/stats','Website statistics');
 ?>
   <td class="remainder"></td>
 </tr>

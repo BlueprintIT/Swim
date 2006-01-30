@@ -19,6 +19,8 @@ require $_PREFS->getPref('storage.includes').'/xml.php';
 require $_PREFS->getPref('storage.includes').'/security.php';
 require $_PREFS->getPref('storage.includes').'/layout.php';
 require $_PREFS->getPref('storage.includes').'/resource/resource.php';
+require $_PREFS->getPref('storage.includes').'/resource/working.php';
+require $_PREFS->getPref('storage.includes').'/resource/file.php';
 require $_PREFS->getPref('storage.includes').'/resource/container.php';
 require $_PREFS->getPref('storage.includes').'/resource/page.php';
 require $_PREFS->getPref('storage.includes').'/resource/template.php';

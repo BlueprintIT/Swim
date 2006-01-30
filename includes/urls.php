@@ -200,16 +200,39 @@ function checkSecurity($request, $required, $allowed)
 {
   global $_PREFS;
   
-  if ($_PREFS->getPref('security.sslenabled')==false)
-    $allowed=false;
+  $log=LoggerManager::getLogger('swim.security');
+  
+  if ($log->isDebugEnabled())
+  {
+    $text = 'Check security - allowed: ';
+    if ($allowed)
+      $text.='true';
+    else
+      $text.='false';
+    $text.=', required: ';
+    if ($required)
+      $text.='true';
+    else
+      $text.='false';
+    $log->debug($text);
+  }
+  
+  if (($request->protocol=='https')&&($_PREFS->getPref('security.sslenabled')==false)&&($allowed))
+  {
+    $log->warn('SSL requested but not enabled');
+    $request->protocol='http';
+    redirect($request);
+  }
 
   if (($request->protocol=='https')&&(!$allowed))
   {
+    $log->debug('SSL requested but not allowed');
     $request->protocol='http';
     redirect($request);
   }
   if (($request->protocol=='http')&&($required)&&($allowed))
   {
+    $log->debug('SSL required but not requested');
     $request->protocol='https';
     redirect($request);
   }
