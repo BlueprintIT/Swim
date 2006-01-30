@@ -35,7 +35,9 @@ else if (isset($request->query['goto']))
 ?>
 <form action='<?= $newrequest->encodePath() ?>' method='POST'>
 <table>
+<? if (isset($request->query['message'])) { ?>
 <input type="hidden" name="message" value="<?= $request->query['message'] ?>">
+<? } ?>
 <?= $newrequest->getFormVars() ?>	<input type='hidden' name='swim_action' value='login'>
 <tr>
 <td>Username:</td><td><input type='text' name='swim_username' value=''></td>
