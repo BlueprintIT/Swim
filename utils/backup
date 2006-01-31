@@ -1,0 +1,28 @@
+#! /bin/sh
+
+cd ~/public_html
+
+if [ "$1" ]; then
+	BASE=$1
+else
+	BASE=`date +backups/backup-%Y%m%d-%H%M`
+fi
+
+TEMP_FILE=$BASE.tar
+TARGET=$BASE.tar.gz
+
+rm -f $TARGET
+rm -f $TEMP_FILE
+
+find containers/user \( -name temp -o -name .svn -o -name dir.lock \) -prune -o -print | tar -cf $TEMP_FILE --exclude=.htaccess --no-recursion -T -
+tar -rf $TEMP_FILE --ignore-failed-read bootstrap/host.conf >/dev/null 2>/dev/null
+tar -rf $TEMP_FILE --ignore-failed-read --exclude=.htaccess conf
+
+find onlinestore/language -name home.inc.php | tar -rf $TEMP_FILE --exclude=.htaccess --no-recursion -T -
+tar -rf $TEMP_FILE --ignore-failed-read --exclude=.htaccess onlinestore/includes/global.inc.php
+
+mysqldump -a -c --add-drop-table -u${USER}_swim -pswim361 ${USER}_cubecart >database.sql
+tar -rf $TEMP_FILE database.sql
+rm -f database.sql
+
+gzip $TEMP_FILE
