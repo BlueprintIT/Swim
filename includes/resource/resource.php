@@ -53,22 +53,21 @@ class Resource
 
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($this->container->prefs);
-		if (!($this instanceof File))
+
+		$this->log->debug('Opening resource configuration');
+		$file=$this->openFileRead('resource.conf');
+		if ($file!==false)
 		{
-			$this->log->debug('Opening resource configuration');
-			$file=$this->openFileRead('resource.conf');
-			if ($file!==false)
-			{
-				$this->log->debug('Loading preferences');
-				$this->prefs->loadPreferences($file);
-				$this->log->debug('Closing configuration');
-				$this->closeFile($file);
-			}
-			else
-			{
-				$this->log->debug('Resource configuration not found');
-			}
+			$this->log->debug('Loading preferences');
+			$this->prefs->loadPreferences($file);
+			$this->log->debug('Closing configuration');
+			$this->closeFile($file);
 		}
+		else
+		{
+			$this->log->debug('Resource configuration not found');
+		}
+
     $this->writable=$this->prefs->getPref('resource.writable',true);
 	}
 	

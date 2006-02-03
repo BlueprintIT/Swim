@@ -124,9 +124,12 @@ class File extends Resource
     }
   }
   
-  function openFileRead()
+  function openFileRead($name = null)
   {
-    return parent::openFileRead($this->id);
+    if ($name==null)
+      $name=$this->id;
+      
+    return parent::openFileRead($name);
   }
   
   function openFileWrite($append=false)
