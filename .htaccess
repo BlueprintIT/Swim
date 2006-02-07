@@ -1,10 +1,12 @@
 Options +FollowSymLinks 
 
 RewriteEngine on 
-RewriteBase /Swim
+RewriteBase /Swim/
 
-RewriteRule ^onlinestore(.*) addons/cubecart$1
-RewriteRule ^stats(.*) addons/stats$1
+RewriteRule ^onlinestore$ redirect.php
+RewriteRule ^onlinestore/(.*) site/addons/cubecart/$1
+RewriteRule ^stats$ redirect.php
+RewriteRule ^stats/(.*) site/addons/stats$1
 
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d
