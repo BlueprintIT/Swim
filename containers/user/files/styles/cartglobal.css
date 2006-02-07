@@ -3,6 +3,7 @@
   background-image: -swim-url('global/file/images/panelborder.gif');
   background-repeat: repeat-y;
   margin-top: -swim-calc(menuheight+10)px;
+  background-color: pagebackground;
 }
 
 .panelTitle {
@@ -17,8 +18,10 @@
 }
 
 .panelContent {
-  padding: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
   padding-top: 15px;
+  padding-bottom: 0px;
   font-size: 80%;
   background-color: transparent;
   background-image: -swim-url('global/file/images/paneltop.gif');
