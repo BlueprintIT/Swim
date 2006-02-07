@@ -41,28 +41,8 @@ if (true)
 ?>
   <td class="spacer"></td>
 <?
-  display_tab($type,'cart',$prefs->getPref('url.base').'/onlinestore/admin','E-commerce');
-}
-
-if (true)
-{
-?>
-  <td class="spacer"></td>
-<?
-  display_tab($type,'cart','https://ukvps.protx.com/vspadmin/','Protx VSP Admin');
-}
-
-if ($_USER->hasPermission('users',PERMISSION_READ))
-{
-?>
-  <td class="spacer"></td>
-<?
   display_tab($type,'users',$users->encode(),'User management');
 }
-?>
-  <td class="spacer"></td>
-<?
-  display_tab($type,'stats','/stats','Website statistics');
 ?>
   <td class="remainder"></td>
 </tr>

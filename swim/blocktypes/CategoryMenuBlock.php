@@ -181,11 +181,11 @@ class CategoryMenuBlock extends Block
       {
         if ($page instanceof Page)
         {
-          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'">'.$item->name.'</anchor>');
+          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'"><span>'.$item->name.'</span></anchor>');
         }
         else if ($page instanceof Link)
         {
-          print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'">'.$item->name.'</a>');
+          print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'"><span>'.$item->name.'</span></a>');
         }
       }
       else
@@ -197,11 +197,11 @@ class CategoryMenuBlock extends Block
     }
     else if ($item instanceof Page)
     {
-      print('<anchor class="page level'.($depth+1).'" href="/'.$item->getPath().'">'.$item->prefs->getPref('page.variables.title').'</anchor>');
+      print('<anchor class="page level'.($depth+1).'" href="/'.$item->getPath().'"><span>'.$item->prefs->getPref('page.variables.title').'</span></anchor>');
     }
     else if ($item instanceof Link)
     {
-      print('<a class="link level'.($depth+1).'" target="_blank" href="'.$item->address.'">'.$item->name.'</a>');
+      print('<a class="link level'.($depth+1).'" target="_blank" href="'.$item->address.'"><span>'.$item->name.'</span></a>');
     }
   }
   
