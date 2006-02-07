@@ -544,8 +544,8 @@ class Template extends Resource
 	
 	function internalDisplay($request,$page)
 	{
-		$xmlpref='template.normal.xml';
-		$htmlpref='template.normal.html';
+		$xmlpref='template.file.xml';
+		$htmlpref='template.file.html';
     $pagecontent = $page->prefs->getPref('page.contenttype','text/html');
     if ((substr($pagecontent,-4)=='+xml')||(substr($pagecontent,-4)=='/xml')||($request->isXHTML()))
 		{

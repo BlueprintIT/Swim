@@ -249,6 +249,7 @@ class Page extends Resource
 	
 	function getReferencedTemplate()
 	{
+    $this->log->debug("Referenced template is ".$this->prefs->getPref('page.template'));
 		$template=Resource::decodeResource($this->prefs->getPref('page.template'));
 		return $template;
 	}

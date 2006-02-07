@@ -2,6 +2,10 @@ Options +FollowSymLinks
 
 RewriteEngine on 
 RewriteBase /Swim
+
+RewriteRule ^onlinestore(.*) addons/cubecart$1
+RewriteRule ^stats(.*) addons/stats$1
+
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* swim.php [L]

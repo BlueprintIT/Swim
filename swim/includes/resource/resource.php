@@ -50,6 +50,7 @@ class Resource
 				$this->dir=$this->parent->getDir().'/'.$this->getTypeName().'s/'.$this->id;
 			}
 		}
+    $this->log->debug("Resource dir is ".$this->dir);
 
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($this->container->prefs);
