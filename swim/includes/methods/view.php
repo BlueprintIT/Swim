@@ -21,10 +21,10 @@ function method_view($request)
 	$resource=Resource::decodeResource($request);
 	$log=LoggerManager::getLogger("swim.method.view");
   
-  checkSecurity($request, $resource->prefs->getPref('security.sslrequired'), $resource->prefs->getPref('security.sslallowed'));
-
 	if ($resource!==false)
 	{
+    checkSecurity($request, $resource->prefs->getPref('security.sslrequired'), $resource->prefs->getPref('security.sslallowed'));
+  
     if ($resource->isFile())
 		{
 			if ($_SERVER['REQUEST_METHOD']=='GET')
