@@ -79,7 +79,7 @@ function method_upload($request)
 							{
 								$url='http://'.$_SERVER['HTTP_HOST'].$request->query[$type];
 								header('Location: '.$url);
-								shutdown();
+								SwimEngine::shutdown();
 							}
 						}
 					}

@@ -115,7 +115,7 @@ function method_save($request)
             }
           }
           header('Location: '.$redirect);
-          shutdown();
+          SwimEngine::shutdown();
         }
         else
         {

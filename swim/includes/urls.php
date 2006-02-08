@@ -193,7 +193,7 @@ function redirect($request)
     $url=$protocol.'://'.$_SERVER['HTTP_HOST'].$url;
   }
 	header('Location: '.$url);
-	shutdown();
+	SwimEngine::shutdown();
 }
 
 function checkSecurity($request, $required, $allowed)
