@@ -53,7 +53,7 @@ function initContentTypes()
 	fclose($file);
 }
 
-$_TYPEMAP = new Preferences();
+$GLOBALS['_TYPEMAP'] = new Preferences();
 initContentTypes();
 
 ?>

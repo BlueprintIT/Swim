@@ -15,26 +15,22 @@
 
 define('STATE_BOOTSTRAP',0);
 define('STATE_STARTUP',1);
-define('STATE_PROCESSING',2);
-define('STATE_SHUTDOWN',3);
-define('STATE_COMPLETE',4);
+define('STATE_ADDONS',2);
+define('STATE_STARTED',3);
+define('STATE_PROCESSING',4);
+define('STATE_SHUTDOWN',5);
+define('STATE_COMPLETE',6);
 
 $_STATE=STATE_BOOTSTRAP;
-error_reporting(E_ALL);
 
-// Load the preferences engine
+// Load the logging engine
 require_once $bootstrap.'/logging.php';
+error_reporting(E_ALL);
 
 LoggerManager::setLogLevel('',SWIM_LOG_INFO);
 LoggerManager::setLogLevel('swim.utils.shutdown',SWIM_LOG_WARN);
 
 // Load the preferences engine
 require_once $bootstrap.'/prefs.php';
-
-$_STATE=STATE_STARTUP;
-// Include various utils
-require_once $bootstrap.'/includes.php';
-require_once $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
-unset($bootstrap);
 
 ?>

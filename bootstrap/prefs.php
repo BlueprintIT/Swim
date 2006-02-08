@@ -15,9 +15,9 @@
 	
 class Preferences
 {
-	var $preferences = array();
-	var $parent;
-	var $delegate;
+	private $preferences = array();
+	private $parent;
+	private $delegate;
 	
 	function Preferences($clone=null)
 	{

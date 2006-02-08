@@ -165,6 +165,10 @@ class LockManager
     global $_PREFS;
     
     $type = $_PREFS->getPref('locking.type','none');
+    
+    if ($type!='none')
+      require_once $_PREFS->getPref('storage.includes').'/locking/'.$type.'.php';
+
     if ($type=='flock')
     {
       self::$locker = new FlockLocker();
@@ -206,10 +210,6 @@ class LockManager
   	self::$locks=array();
   }
 }
-
-include $_PREFS->getPref('storage.includes').'/locking/storage.php';
-include $_PREFS->getPref('storage.includes').'/locking/flock.php';
-include $_PREFS->getPref('storage.includes').'/locking/mkdir.php';
 
 LockManager::init();
 

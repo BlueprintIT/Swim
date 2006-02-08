@@ -111,6 +111,7 @@ class LogOutput
 			$detail['arglist']='('.$list.')';
 		}
 		$detail['logger']=$logger->getName();
+    $detail['uid']=LoggerManager::getUID();
 		return $detail;
 	}
 	
@@ -141,7 +142,7 @@ class FileLogOutput extends LogOutput
 	{
 		$this->LogOutput();
 		$this->filename=$filename;
-		$this->pattern="[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])\n";
+		$this->pattern="[$[txtlevel] $[uid]] $[logger]: $[text] ($[file]:$[line])\n";
 		$this->tracePattern="$[logger]: $[function]$[arglist] ($[file]:$[line])\n";
 	}
 	
@@ -418,13 +419,31 @@ class LoggerManager
 {
 	private static $loggers = array();
   private static $root;
+  private static $uids = array();
 	
 	static function init()
 	{
     self::$root = new Logger(null,'');
     self::$root->setLevel(SWIM_LOG_WARN);
 		self::$root->setLogOutput(new PageLogOutput());
+    self::pushState();
 	}
+  
+  static function getUID()
+  {
+    return self::$uids[count(self::$uids)-1];
+  }
+  
+  static function pushState()
+  {
+    $uid=rand(1000,9999);
+    array_push(self::$uids, $uid);
+  }
+  
+  static function popState()
+  {
+    array_pop(self::$uids);
+  }
 	
 	static function loadPreferences()
 	{

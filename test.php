@@ -58,8 +58,9 @@ while (is_link($source))
 }
 $bootstrap=dirname($source).'/bootstrap';
 unset($source);
-
 require_once $bootstrap.'/bootstrap.php';
+unset($bootstrap);
+SwimEngine::ensureStarted();
 
 LoggerManager::setLogOutput("",new PageLogOutput());
 LoggerManager::setLogLevel('test',SWIM_LOG_INFO);

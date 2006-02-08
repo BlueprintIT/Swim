@@ -20,19 +20,9 @@ while (is_link($source))
 }
 $bootstrap=dirname($source).'/bootstrap';
 unset($source);
-
 require_once $bootstrap.'/bootstrap.php';
+unset($bootstrap);
 
-$log=LoggerManager::getLogger('swim');
-
-$log->debug('Request start');
-$_STATE=STATE_PROCESSING;
-
-$request=Request::decodeCurrentRequest();
-
-callMethod($request);
-
-$log->debug('Request end');
-//shutdown();
+SwimEngine::processCurrentRequest();
 
 ?>

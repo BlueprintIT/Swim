@@ -30,5 +30,6 @@ require $_PREFS->getPref('storage.includes').'/urls.php';
 require $_PREFS->getPref('storage.includes').'/parser.php';
 require $_PREFS->getPref('storage.includes').'/mimetypes.php';
 require $_PREFS->getPref('storage.includes').'/categories.php';
+require $_PREFS->getPref('storage.blocks.classes').'/blocks.php';
 
 ?>

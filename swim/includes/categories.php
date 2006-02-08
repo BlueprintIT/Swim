@@ -480,6 +480,6 @@ function getCategoryManager($space)
   return $_CATMAN[$space];
 }
 
-$_CATMAN = array();
+$GLOBALS['_CATMAN'] = array();
 
 ?>

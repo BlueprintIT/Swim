@@ -17,5 +17,6 @@
 
 require $_PREFS->getPref('storage.includes').'/storage/sqlite.php';
 require $_PREFS->getPref('storage.includes').'/locking/locking.php';
+require $_PREFS->getPref('storage.includes').'/engine.php';
 
 ?>

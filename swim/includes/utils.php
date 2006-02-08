@@ -13,31 +13,6 @@
  * $Revision$
  */
 
-function shutdown()
-{
-	global $_STATE;
-	$log=LoggerManager::getLogger('swim.utils.shutdown');
-	if ($_STATE<STATE_SHUTDOWN)
-	{
-		$log->debug('Shutdown started');
-		$_STATE=STATE_SHUTDOWN;
-		LockManager::shutdown();
-		LoggerManager::shutdown();
-		$_STATE=STATE_COMPLETE;
-		exit;
-	}
-	else if ($_STATE==STATE_SHUTDOWN)
-	{
-		$log->warntrace('Shutdown called during shutdown phase.');
-	}
-	else
-	{
-		$log->debug('Shutdown called after shutdown complete (shutdown handler fallback).');
-	}
-}
-
-register_shutdown_function('shutdown');
-
 function getReadableFileSize($path)
 {
 	$units = array('bytes','KB','MB','GB','TB');
@@ -175,7 +150,7 @@ function displayLogin($request,$message)
 	$newrequest->method='displayLogin';
 	$newrequest->nested=$request;
 	$newrequest->query['message']=$message;
-	callMethod($newrequest);
+	SwimEngine::processRequest($newrequest);
 }
 
 function displayGeneralError($request,$message)
@@ -277,30 +252,6 @@ function setCacheInfo($date,$etag=false)
 			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
 			shutdown();
 		}
-	}
-}
-
-function callMethod($request)
-{
-	global $_PREFS;
-	
-	$methodfile=$request->method.".php";
-	$methodfunc='method_'.$request->method;
-	if (is_readable($_PREFS->getPref('storage.methods').'/'.$methodfile))
-	{
-		require_once($_PREFS->getPref('storage.methods').'/'.$methodfile);
-		if (function_exists($methodfunc))
-		{
-			$methodfunc($request);
-		}
-		else
-		{
-			displayServerError($request);
-		}
-	}
-	else
-	{
-		displayNotFound($request);
 	}
 }
 

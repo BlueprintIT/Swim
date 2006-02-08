@@ -55,15 +55,22 @@ class Resource
 		$this->prefs = new Preferences();
 		$this->prefs->setParent($this->container->prefs);
 
-		$this->log->debug('Opening resource configuration');
-		$file=$this->openFileRead('resource.conf');
-		if ($file!==false)
-		{
-			$this->log->debug('Loading preferences');
-			$this->prefs->loadPreferences($file);
-			$this->log->debug('Closing configuration');
-			$this->closeFile($file);
-		}
+    if ($this->fileExists('resource.conf'))
+    {
+  		$this->log->debug('Opening resource configuration');
+  		$file=$this->openFileRead('resource.conf');
+  		if ($file!==false)
+  		{
+  			$this->log->debug('Loading preferences');
+  			$this->prefs->loadPreferences($file);
+  			$this->log->debug('Closing configuration');
+  			$this->closeFile($file);
+  		}
+      else
+      {
+        $this->log->warn('Error opening resource configuration');
+      }
+    }
 		else
 		{
 			$this->log->debug('Resource configuration not found');
@@ -391,9 +398,9 @@ class Resource
 	{
 		if (!isset($this->modified))
 		{
-			if (isset($this->prefs->preferences['resource.modified']))
+			if ($this->prefs->isPrefSet('resource.modified'))
 			{
-				$this->modified=$this->prefs->preferences['resource.modified'];
+				$this->modified=$this->prefs->getPref('resource.modified');
 			}
 			
 			if (is_readable($this->getDir().'/resource.conf'))
@@ -529,7 +536,7 @@ class Resource
 			$file=fopen($this->getDir().'/'.$filename,'r');
 			if ($file===false)
 			{
-				$this->log->warn('Failed to open '.$filename);
+				$this->log->warn('Failed to open '.$this->getDir().'/'.$filename);
 				$this->unlock();
 			}
 			return $file;

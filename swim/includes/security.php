@@ -605,12 +605,12 @@ session_start();
 
 if (isset($_SESSION['Swim.User']))
 {
-	$_USER = new User($_SESSION['Swim.User']);
-  $_USER->logged=true;
+	$GLOBALS['_USER'] = new User($_SESSION['Swim.User']);
+  $GLOBALS['_USER']->logged=true;
 }
 else
 {
-	$_USER = new User();
+	$GLOBALS['_USER'] = new User();
 }
 
 ?>

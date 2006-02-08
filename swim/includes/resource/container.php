@@ -421,7 +421,7 @@ function getAllContainers()
 	return $containers;
 }
 
-$_CONTAINERS = array();
+$GLOBALS['_CONTAINERS'] = array();
 
 function getContainer($id)
 {
