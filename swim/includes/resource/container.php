@@ -5,7 +5,7 @@
  *
  * Containers hold the pages, blocks, templates and files that the website can serve
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$

@@ -5,7 +5,7 @@
  *
  * SWIM unit tests
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$
@@ -60,6 +60,8 @@ $bootstrap=dirname($source).'/bootstrap';
 unset($source);
 require_once $bootstrap.'/bootstrap.php';
 unset($bootstrap);
+SwimEngine::startup();
+AddonManager::disable();
 SwimEngine::ensureStarted();
 
 LoggerManager::setLogOutput("",new PageLogOutput());

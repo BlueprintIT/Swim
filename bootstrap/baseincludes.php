@@ -5,7 +5,7 @@
  *
  * Includes to be loaded at the earliest opportunity.
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$

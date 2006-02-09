@@ -5,13 +5,15 @@
  *
  * Tests for resource caches
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$
  * $Date$
  * $Revision$
  */
+
+require_once $_PREFS->getPref('storage.includes').'/locking/mkdir.php';
 
 $dir=$_PREFS->getPref('storage.test');
 

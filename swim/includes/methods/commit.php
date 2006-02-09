@@ -5,7 +5,7 @@
  *
  * Commits block edits
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$

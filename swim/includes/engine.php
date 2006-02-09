@@ -5,7 +5,7 @@
  *
  * SWIM engine code
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$
@@ -43,6 +43,7 @@ class SwimEngine
       $log->debug('Loading addons.');
   
       $_STATE=STATE_ADDONS;
+      AddonManager::loadAddons();
       $_STATE=STATE_STARTED;
     }
   }
@@ -117,6 +118,7 @@ class SwimEngine
     {
       $log->debug('Engine shutdown');
       $_STATE=STATE_SHUTDOWN;
+      AddonManager::shutdown();
       LockManager::shutdown();
       LoggerManager::shutdown();
       $_STATE=STATE_COMPLETE;

@@ -5,7 +5,7 @@
  *
  * Defines a block that displays a dynamic menu structure based on the site structure.
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$

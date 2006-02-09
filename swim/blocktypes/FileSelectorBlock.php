@@ -5,7 +5,7 @@
  *
  * Defines a block that allows file selection in a given directory.
  *
- * Copyright Blueprint IT Ltd. 2005
+ * Copyright Blueprint IT Ltd. 2006
  *
  * $HeadURL$
  * $LastChangedBy$
