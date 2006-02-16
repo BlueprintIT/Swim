@@ -61,11 +61,12 @@ tinyMCE.init({
     swim_pagebrowser : "<?= $pageselect->encode() ?>",
     swim_browser : "<?= $browser->encode() ?>",
     inline_styles : true,
+    theme_advanced_styles : "Tight=tight;Cream=creamback;Grey=greyback",
     theme_advanced_toolbar_location : "top",
     theme_advanced_toolbar_align : "left",
     theme_advanced_blockformats : "h1,h2,p",
     theme_advanced_buttons1 : "cut,copy,paste,separator,undo,redo,separator,link,pagelink,unlink,image,separator,help",
-    theme_advanced_buttons2 : "formatselect,separator,numlist,bullist,separator,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bold,italic",
+    theme_advanced_buttons2 : "formatselect,styleselect,separator,numlist,bullist,separator,outdent,indent,separator,justifyleft,justifycenter,justifyright,justifyfull,separator,bold,italic",
     theme_advanced_buttons3 : "tablecontrols"
 });
 </script>

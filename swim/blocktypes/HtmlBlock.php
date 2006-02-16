@@ -20,20 +20,14 @@ class HtmlBlock extends Block
 		$this->Block($container,$id,$version);
 	}
 	
-	function getBlockEditor($request)
-	{
-		$request->data['file']=$this->prefs->getPref('block.htmlblock.filename','block.html');
-		$container=getContainer('internal');
-		$page=$container->getPage('htmledit');
-		return $page;
-	}
-	
 	function displayContent($parser,$attrs,$text)
 	{
 		$name=$this->prefs->getPref('block.htmlblock.filename','block.html');
-    if (is_readable($this->getDir().'/'.$name))
+    if ($this->fileIsReadable($name))
     {
-  		readfile($this->getDir().'/'.$name);
+      $file = $this->openFileRead($name);
+      fpassthru($file);
+      $this->closeFile($file);
     }
 		return true;
 	}

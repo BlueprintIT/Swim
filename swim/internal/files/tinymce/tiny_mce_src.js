@@ -4,7 +4,7 @@
  * $Date$
  *
  * @author Moxiecode
- * @copyright Copyright © 2004, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ? 2004, Moxiecode Systems AB, All rights reserved.
  */
 
 function TinyMCE() {
@@ -4960,7 +4960,7 @@ TinyMCEControl.prototype.onAdd = function(replace_element, form_element_name, ta
             + '<title>blank_page</title>'
             + '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'
             + '</head>'
-            + '<body class="mceContentBody">'
+            + '<body id="content" class="mceContentBody">'
             + '</body>'
             + '</html>';
 
