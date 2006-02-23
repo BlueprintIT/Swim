@@ -12,6 +12,6 @@ $cancel = $commit;
  <param name="swim.base" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $prefs->getPref('url.pagegen') ?>">
  <param name="resource" value="internal/page/categories">
  <param name="upload" value="categories/website">
- <param name="commit" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $commit->encode() ?>">
- <param name="cancel" value="http://<?= $_SERVER['HTTP_HOST'] ?><?= $cancel->encode() ?>">
+ <param name="commit" value="<?= $commit->encode() ?>">
+ <param name="cancel" value="<?= $cancel->encode() ?>">
 </applet>
