@@ -16,7 +16,7 @@ body {
   width: 100%;
   height: -swim-calc(bannerheight)px;
   background-position: top left;
-  background-image: -swim-url('global/file/images/banner.jpg');
+  background-image: -swim-url('global/file/images/header.jpg');
   background-repeat: no-repeat;
 }
 
