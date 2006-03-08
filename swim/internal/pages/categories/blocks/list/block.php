@@ -51,15 +51,17 @@ class XMLTree extends CategoryTree
 
   <tree>
 <?
-$cm = getCategoryManager('website');
-$tree = new XMLTree($cm->getRootCategory());
+$cont = $_PREFS->getPref('container.default');
+if (isset($request->query['container']))
+  $cont = $request->query['container'];
+$container = getContainer($cont);
+$tree = new XMLTree($container->getRootCategory());
 $tree->showRoot=false;
 $tree->display('  ');
 ?>
   </tree>
   <pages>
 <?
-$container = getContainer('global');
 $pages = $container->getResources('page');
 foreach ($pages as $page)
 {

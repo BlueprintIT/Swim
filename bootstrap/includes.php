@@ -15,6 +15,7 @@
 
 // Include all the support routines
 
+require $_PREFS->getPref('storage.includes').'/cache.php';
 require $_PREFS->getPref('storage.includes').'/xml.php';
 require $_PREFS->getPref('storage.includes').'/security.php';
 require $_PREFS->getPref('storage.includes').'/layout.php';

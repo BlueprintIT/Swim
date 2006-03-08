@@ -42,7 +42,7 @@ class User
 		{
       $this->log->debug('Creating user '.$username);
       $this->user=$username;
-      $results = $_STORAGE->query("SELECT * FROM User WHERE id='".storage_escape($username)."';");
+      $results = $_STORAGE->query("SELECT * FROM User WHERE id='".$_STORAGE->escape($username)."';");
       if ($results->valid())
       {
         $this->log->debug('User is valid');
@@ -51,7 +51,7 @@ class User
         $this->name=$details['name'];
         $this->password=$details['password'];
         
-        $results = $_STORAGE->query("SELECT access FROM UserAccess WHERE user='".storage_escape($username)."';");
+        $results = $_STORAGE->query("SELECT access FROM UserAccess WHERE user='".$_STORAGE->escape($username)."';");
         while ($results->valid())
         {
           $details=$results->current();
@@ -72,7 +72,7 @@ class User
 	{
     global $_STORAGE;
     
-    $_STORAGE->queryExec("UPDATE User set password='".storage_escape(md5($password))."' WHERE id='".storage_escape($this->user)."';");
+    $_STORAGE->queryExec("UPDATE User set password='".$_STORAGE->escape(md5($password))."' WHERE id='".$_STORAGE->escape($this->user)."';");
 	}
   
   function login($password)
@@ -106,7 +106,7 @@ class User
     
     if ($this->exists)
     {
-      $_STORAGE->queryExec("UPDATE User set name='".storage_escape($value)."' WHERE id='".storage_escape($this->user)."';");
+      $_STORAGE->queryExec("UPDATE User set name='".$_STORAGE->escape($value)."' WHERE id='".$_STORAGE->escape($this->user)."';");
       $this->name=$value;
     }
     else
@@ -141,7 +141,7 @@ class User
       default:
         return false;
     }
-    $results = $_STORAGE->query("SELECT Permission.".$type." FROM UserAccess JOIN Permission ON UserAccess.access=Permission.access WHERE section='".storage_escape($perm)."';");
+    $results = $_STORAGE->query("SELECT Permission.".$type." FROM UserAccess JOIN Permission ON UserAccess.access=Permission.access WHERE section='".$_STORAGE->escape($perm)."';");
     $result = 0;
     while ($results->valid())
     {
@@ -231,7 +231,7 @@ class User
   		if (!in_array($group,$this->groups))
   		{
   			$this->groups[]=$group;
-        $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".storage_escape($this->user)."','".storage_escape($group)."');");
+        $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".$_STORAGE->escape($this->user)."','".$_STORAGE->escape($group)."');");
   		}
     }
     else
@@ -255,7 +255,7 @@ class User
   			}
   		}
   		$this->groups=$nwgroups;
-      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($this->user)."' AND access='".storage_escape($group)."';");
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".$_STORAGE->escape($this->user)."' AND access='".$_STORAGE->escape($group)."';");
     }
     else
     {
@@ -270,7 +270,7 @@ class User
     if ($this->exists)
     {
   		$this->groups=array();
-      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($this->getUsername())."';");
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".$_STORAGE->escape($this->getUsername())."';");
     }
     else
     {
@@ -490,7 +490,7 @@ class Group
     global $_STORAGE;
     
     $this->id = $id;
-    $results = $_STORAGE->query("SELECT * FROM Access WHERE id='".storage_escape($id)."';");
+    $results = $_STORAGE->query("SELECT * FROM Access WHERE id='".$_STORAGE->escape($id)."';");
     if ($results->valid())
     {
       $details=$results->current();
@@ -548,7 +548,7 @@ class UserManager
   {
     global $_STORAGE;
     
-    $_STORAGE->queryExec("INSERT INTO User (id) VALUES ('".storage_escape($username)."');");
+    $_STORAGE->queryExec("INSERT INTO User (id) VALUES ('".$_STORAGE->escape($username)."');");
   	$user = new User($username);
   	return $user;
   }
@@ -559,8 +559,8 @@ class UserManager
   	
     if ($user->userExists())
     {
-      $_STORAGE->queryExec("DELETE FROM User WHERE id='".storage_escape($user->getUsername())."';");
-      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".storage_escape($user->getUsername())."';");
+      $_STORAGE->queryExec("DELETE FROM User WHERE id='".$_STORAGE->escape($user->getUsername())."';");
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".$_STORAGE->escape($user->getUsername())."';");
     }
     return true;
   }

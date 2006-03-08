@@ -30,7 +30,10 @@ class LinkedCategoryTree extends PageTree
 <div class="body">
 <ul class="categorytree">
 <?
-$cm = getCategoryManager('website');
+$cont = $_PREFS->getPref('container.default');
+if (isset($request->query['container']))
+  $cont = $request->query['container'];
+$cm = getContainer($cont);
 $tree = new LinkedCategoryTree($cm->getRootCategory());
 $tree->display();
 ?>

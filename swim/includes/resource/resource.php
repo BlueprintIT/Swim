@@ -68,7 +68,7 @@ class Resource
   		}
       else
       {
-        $this->log->warn('Error opening resource configuration');
+        $this->log->warn('Error opening resource configuration '.$this->getDir());
       }
     }
 		else

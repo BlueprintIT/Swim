@@ -15,6 +15,8 @@
 
 class SwimEngine
 {
+  private static $requests = array();
+  
   static function startup()
   {
     global $_PREFS, $_STATE;
@@ -56,6 +58,11 @@ class SwimEngine
       self::loadAddons();
   }
   
+  static function getCurrentRequest()
+  {
+    return self::$requests[count(self::$requests)-1];
+  }
+  
   static function processRequest($request)
   {
     global $_STATE, $_PREFS;
@@ -66,6 +73,7 @@ class SwimEngine
     $log=LoggerManager::getLogger('swim.engine');
     
     LoggerManager::pushState();
+    array_push(self::$requests, $request);
     $log->debug('processing');
     
     if ($_STATE>STATE_PROCESSING)
@@ -97,6 +105,7 @@ class SwimEngine
     
     $_STATE=$prevstate;
     $log->debug('processing complete');
+    array_pop(self::$requests);
     LoggerManager::popState();
   }
   

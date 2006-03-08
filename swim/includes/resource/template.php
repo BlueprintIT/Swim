@@ -335,10 +335,12 @@ class Template extends Resource
 	{
 		if (isset($attrs['src']))
 		{
+      $this->log->debug('Loading block '.$attrs['src']);
 			$block=Resource::decodeResource($attrs['src']);
 		}
 		else if (isset($attrs['id']))
 		{
+      $this->log->debug('Loading page block '.$attrs['id']);
 			$page=$parser->data['page'];
 			$block=$page->getReferencedBlock($attrs['id']);
 		}

@@ -9,7 +9,9 @@ class LinkedCategoryTree extends PageTree
   
   function displayPageLabel($page)
   {
-    global $request,$pages;
+    global $pages;
+    
+    $request = SwimEngine::getCurrentRequest();
     
     if ($request->resource==$page->getPath())
     {
@@ -56,7 +58,10 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <div class="body">
 <ul class="categorytree">
 <?
-$cm = getCategoryManager('website');
+$cont = $_PREFS->getPref('container.default');
+if (isset($request->query['container']))
+  $cont = $request->query['container'];
+$cm = getContainer($cont);
 $tree = new LinkedCategoryTree($cm->getRootCategory());
 $tree->display();
 ?>

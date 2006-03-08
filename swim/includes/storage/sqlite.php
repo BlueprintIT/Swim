@@ -13,6 +13,63 @@
  * $Revision$
  */
 
+class SqliteStorage
+{
+  private $db;
+  private $log;
+  
+  public function SqliteStorage($filename)
+  {
+    $this->log = LoggerManager::getLogger('swim.storage');
+    $this->db = sqlite_factory($filename);
+    $this->log->debug('Loaded database from '.$filename);
+  }
+  
+  public function escape($text)
+  {
+    return sqlite_escape_string($text);
+  }
+  
+  public function query($query)
+  {
+    $this->log->debug('query: '.$query);
+    return $this->db->query($query);
+  }
+  
+  public function queryExec($query)
+  {
+    $this->log->debug('queryExec: '.$query);
+    return $db->queryExec($query);
+  }
+  
+  public function arrayQuery($query)
+  {
+    $this->log->debug('arrayQuery: '.$query);
+    return $this->db->arrayQuery($query);
+  }
+  
+  public function singleQuery($query)
+  {
+    $this->log->debug('singleQuery: '.$query);
+    return $this->db->singleQuery($query);
+  }
+  
+  public function lastInsertRowid()
+  {
+    return $this->db->lastInsertRowid();
+  }
+  
+  public function changes()
+  {
+    return $this->db->changes();
+  }
+  
+  public function lastError()
+  {
+    return $this->db->lastError();
+  }
+}
+
 function storage_init()
 {
   global $_PREFS,$_STORAGE;
@@ -25,7 +82,7 @@ function storage_init()
   {
     $create=true;
   }
-  $_STORAGE = sqlite_factory($_PREFS->getPref('storage.config').'/storage.db');
+  $_STORAGE = new SqliteStorage($_PREFS->getPref('storage.config').'/storage.db');
   if ($create)
   {
     $log->debug('Initialising database');
@@ -50,11 +107,6 @@ function storage_init()
     }
     fclose($file);
   }
-}
-
-function storage_escape($text)
-{
-  return sqlite_escape_string($text);
 }
 
 storage_init();

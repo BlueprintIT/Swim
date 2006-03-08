@@ -19,6 +19,7 @@ define('SWIM_LOG_ERROR',2);
 define('SWIM_LOG_WARN',3);
 define('SWIM_LOG_INFO',4);
 define('SWIM_LOG_DEBUG',5);
+define('SWIM_LOG_TRACE',5);
 define('SWIM_LOG_ALL',2000);
 
 class LogOutput
@@ -379,16 +380,26 @@ class Logger
 		$this->logtrace(SWIM_LOG_INFO,$text);
 	}
 	
-	function debug($text)
-	{
-		$this->log(SWIM_LOG_DEBUG,$text);
-	}
-	
-	function debugtrace($text)
-	{
-		$this->logtrace(SWIM_LOG_DEBUG,$text);
-	}
-	
+  function debug($text)
+  {
+    $this->log(SWIM_LOG_DEBUG,$text);
+  }
+  
+  function debugtrace($text)
+  {
+    $this->logtrace(SWIM_LOG_DEBUG,$text);
+  }
+  
+  function trace($text)
+  {
+    $this->log(SWIM_LOG_TRACE,$text);
+  }
+  
+  function tracetrace($text)
+  {
+    $this->logtrace(SWIM_LOG_TRACE,$text);
+  }
+  
 	function isFatalEnabled()
 	{
 		return $this->getLevel()>=SWIM_LOG_FATAL;
@@ -408,11 +419,16 @@ class Logger
 	{
 		return $this->getLevel()>=SWIM_LOG_INFO;
 	}
-	
-	function isDebugEnabled()
-	{
-		return $this->getLevel()>=SWIM_LOG_DEBUG;
-	}
+  
+  function isDebugEnabled()
+  {
+    return $this->getLevel()>=SWIM_LOG_DEBUG;
+  }
+  
+  function isTraceEnabled()
+  {
+    return $this->getLevel()>=SWIM_LOG_TRACE;
+  }
 }
 
 class LoggerManager
@@ -490,6 +506,7 @@ class LoggerManager
 			}
 			$logger->setParent($bestparent);
 			self::$loggers[$name]=$logger;
+      $logger->trace('Logger created');
 		}
 	}
 	

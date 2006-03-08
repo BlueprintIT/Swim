@@ -103,7 +103,7 @@ function method_upload($request)
       $log->debug('Uploading category database');
       if ($_USER->hasPermission('documents',PERMISSION_WRITE))
       {
-        $cm = getCategoryManager($parts[1]);
+        $cm = getContainer($parts[1]);
         if ($_SERVER['REQUEST_METHOD']=='PUT')
         {
           $doc = new DOMDocument();

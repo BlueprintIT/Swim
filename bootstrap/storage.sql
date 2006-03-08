@@ -1,5 +1,5 @@
-CREATE TABLE Namespace (
-	name TEXT PRIMARY KEY,
+CREATE TABLE Container (
+	id TEXT PRIMARY KEY,
 	date INTEGER,
 	rootcategory INTEGER
 );
@@ -56,7 +56,7 @@ CREATE TABLE Permission (
 );
 
 INSERT INTO Category (name) VALUES ("Website");
-INSERT INTO Namespace (name,rootcategory) VALUES ("website",last_insert_rowid());
+INSERT INTO Container (id,rootcategory) VALUES ("id",last_insert_rowid());
 INSERT INTO User (id,password,name) VALUES ('blueprintit','ab9debd6b50c6d5b64c64f2c93a74580','Blueprint IT');
 INSERT INTO Access (id,name,description) VALUES ('root',NULL,NULL);
 INSERT INTO Access (id,name,description) VALUES ('admin','Full Access','Provides full control over the website.');
