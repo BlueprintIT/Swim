@@ -31,7 +31,7 @@ class XsltBlock extends Block
         $this->closeFile($file);
         return $content;
       }
-      return false;
+      return null;
     }
     else
     {
@@ -42,7 +42,7 @@ class XsltBlock extends Block
         fclose($file);
         return $content;
       }
-      return false;
+      return null;
     }
   }
   
@@ -50,7 +50,7 @@ class XsltBlock extends Block
   {
     $name=$this->prefs->getPref('block.xsltblock.xml','block.xml');
     $content = $this->readFile($name);
-    if ($content===false)
+    if ($content===null)
     {
       $this->log->warn('Unable to load XML');
       return true;
@@ -60,7 +60,7 @@ class XsltBlock extends Block
     
     $name=$this->prefs->getPref('block.xsltblock.stylesheet','block.xslt');
     $content = $this->readFile($name);
-    if ($content===false)
+    if ($content===null)
     {
       $this->log->warn('Unable to load XSLT');
       return true;

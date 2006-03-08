@@ -61,7 +61,7 @@ function method_save($request)
   $resource=Resource::decodeResource($request);
   $log=LoggerManager::getLogger("swim.method.save");
 
-  if ($resource!==false)
+  if ($resource!==null)
   {
     if (($resource->isPage())||($resource->isBlock()))
     {

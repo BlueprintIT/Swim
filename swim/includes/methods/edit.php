@@ -22,7 +22,7 @@ function method_edit($request)
 	$log=LoggerManager::getLogger('swim.method.edit');
 	$resource = Resource::decodeResource($request);
 
-	if ($resource!==false)
+	if ($resource!==null)
 	{
 		if ($_USER->canWrite($resource))
 		{

@@ -20,7 +20,7 @@ function method_login($request)
   checkSecurity($request, true, true);
   
 	$user=UserManager::login($request->query['swim_username'],$request->query['swim_password']);
-	if ($user!==false)
+	if ($user!==null)
 	{
     if (isset($request->nested))
     {

@@ -21,7 +21,7 @@ function method_view($request)
 	$resource=Resource::decodeResource($request);
 	$log=LoggerManager::getLogger("swim.method.view");
   
-	if ($resource!==false)
+	if ($resource!==null)
 	{
     checkSecurity($request, $resource->prefs->getPref('security.sslrequired'), $resource->prefs->getPref('security.sslallowed'));
   
@@ -146,18 +146,18 @@ function method_view($request)
 		{
 			if ($_USER->canRead($resource))
 			{
-				$template=false;
+				$template=null;
 				setDefaultCache();
 				$modified=$resource->getTotalModifiedDate();
 				if (isset($request->query['template']))
 				{
 					$template=Resource::decodeResource($request->query['template']);
-					if ($template!==false)
+					if ($template!==null)
 					{
 						$modified=max($modified,$template->getModifiedDate());
 					}
 				}
-				if ($template===false)
+				if ($template===null)
 				{
 					$template=$resource->getReferencedTemplate();
 				}

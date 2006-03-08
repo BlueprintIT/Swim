@@ -9,7 +9,7 @@ class FileBrowser extends FileSelectorBlock
     if ((!isset($request->query['type']))||($request->query['type']!='global'))
     {
       $page = Resource::decodeResource($request);
-      if ($page!==false)
+      if ($page!==null)
         return $page->getFile('attachments');
     }
     $container = getContainer($_PREFS->getPref('container.default'));

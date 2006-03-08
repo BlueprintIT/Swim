@@ -107,7 +107,7 @@ class Category
     {
       $details = $set->current();
       $page=Resource::decodeResource($details['page']);
-      if ($page!==false)
+      if ($page!==null)
       {
         $list[$details['sortkey']]=$page;
       }
@@ -122,11 +122,13 @@ class Category
     while ($set->valid())
     {
       $details = $set->current();
-      if (!isset($this->container->cache[$details['id']]))
+      $cat = ObjectCache::getItem('category', $details['id']);
+      if ($cat===null)
       {
-        $this->container->cache[$details['id']] = new Category($this->container,$this,$details['id'],$details['name']);
+        $cat = new Category($this->container,$this,$details['id'],$details['name']);
+        ObjectCache::setItem('category', $details['id'], $cat);
       }
-      $list[$details['sortkey']]=$this->container->cache[$details['id']];
+      $list[$details['sortkey']]=$cat;
       $set->next();
     }
     $set=$_STORAGE->query('SELECT name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');

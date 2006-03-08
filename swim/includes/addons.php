@@ -13,6 +13,76 @@
  * $Revision$
  */
 
+define('ADMIN_PRIORITY_CONTENT',0);
+define('ADMIN_PRIORITY_SECURITY',10);
+define('ADMIN_PRIORITY_ADDON',20);
+define('ADMIN_PRIORITY_EXTERNAL',30);
+
+class AdminSection
+{
+  public function getName()
+  {
+  }
+  
+  public function getPriority()
+  {
+  }
+  
+  public function getURL()
+  {
+  }
+  
+  public function isAvailable()
+  {
+    return true;
+  }
+  
+  public function isSelected($request)
+  {
+  }
+}
+
+class ExternalAdminSection extends AdminSection
+{
+  private $url;
+  
+  public function ExternalAdminSection($name, $url)
+  {
+    $this->name = $name;
+    $this->url = $url;
+  }
+  
+  public function getName()
+  {
+    return $this->name;
+  }
+  
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_EXTERNAL;
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->method='view';
+    $request->resource='internal/page/external';
+    $request->query['url']=$this->url;
+
+    return $request->encode();
+  }
+  
+  public function isSelected($request)
+  {
+    if ($request->method!='view')
+      return false;
+    if ($request->path!='internal/page/external')
+      return false;
+      
+    return true;
+  }
+}
+
 class Addon
 {
   function getID()
@@ -31,6 +101,31 @@ class Addon
   
   function shutdown()
   {
+  }
+}
+
+class AdminManager
+{
+  public static $log;
+  public static $sections = array();
+  
+  public static function addSection($section)
+  {
+    if (!isset(self::$log))
+      self::$log = LoggerManager::getLogger('swim.adminmanager');
+      
+    self::$log->debug('Adding admin section '.$section->getName());
+    
+    $pos = 0;
+    while ($pos<count(self::$sections))
+    {
+      if (self::$sections[$pos]->getPriority()>$section->getPriority())
+      {
+        array_splice(self::$sections, $pos, 0, array($section));
+        return;
+      }
+    }
+    array_push(self::$sections, $section);
   }
 }
 

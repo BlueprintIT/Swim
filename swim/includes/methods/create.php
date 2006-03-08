@@ -22,7 +22,7 @@ function method_create($request)
 	list($container,$type)=explode('/',$request->resource);
 	
 	$container=getContainer($container);
-	if ($container!==false)
+	if ($container!==null)
 	{
 		if (($container->isWritable())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
 		{

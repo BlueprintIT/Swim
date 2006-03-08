@@ -598,6 +598,39 @@ class UserManager
   }
 }
 
+class UserAdminSection extends AdminSection
+{
+  public function getName()
+  {
+    return 'User management';
+  }
+  
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_SECURITY;
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->method='users';
+    return $request->encode();
+  }
+  
+  public function isAvailable()
+  {
+    return true;
+  }
+  
+  public function isSelected($request)
+  {
+    if ($request->method == 'users')
+      return true;
+      
+    return false;
+  }
+}
+
 // Start up the session
 session_name('SwimSession');
 session_start();
@@ -612,5 +645,7 @@ else
 {
 	$GLOBALS['_USER'] = new User();
 }
+
+AdminManager::addSection(new UserAdminSection());
 
 ?>

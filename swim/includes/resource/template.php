@@ -344,7 +344,7 @@ class Template extends Resource
 			$page=$parser->data['page'];
 			$block=$page->getReferencedBlock($attrs['id']);
 		}
-		if ($block!==false)
+		if ($block!==null)
 		{
 			$parser->data['blockid']=$attrs['id'];
 			$parser->data['block']=$block;

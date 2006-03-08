@@ -494,11 +494,11 @@ class Container extends Resource
       $dir = $dir.'/'.$version;
     }
 		$block = loadBlock($dir,$this,$id,$version);
-		if (($block!==false)&&($block->exists()))
+		if (($block!==null)&&($block->exists()))
 		{
 			return $block;
 		}
-		return false;
+		return null;
 	}
 	
 	function loadFile($id,$version = false)
@@ -523,7 +523,7 @@ class Container extends Resource
 			$version=$this->getCurrentVersion($this->getDir().'/'.$type.'s/'.$id);
 			if ($version===false)
 			{
-				return false;
+				return null;
 			}
 		}
 		return parent::getResource($type,$id,$version);
@@ -545,6 +545,61 @@ class Container extends Resource
     }
 		return array($id,$pdir);
 	}
+}
+
+class ContainerAdminSection
+{
+  private $container;
+  
+  public function ContainerAdminSection($container)
+  {
+    $this->container = $container;
+  }
+  
+  public function getName()
+  {
+    $cat = $this->container->getRootCategory();
+    return $cat->name;
+  }
+  
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_CONTENT;
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->method='admin';
+    $request->resource=$this->container->id;
+    return $request->encode();
+  }
+  
+  public function isAvailable()
+  {
+    global $_USER;
+
+    if (!$_USER->hasPermission('documents',PERMISSION_READ))
+      return false;
+    return isset($this->container->rootcategory);
+  }
+  
+  public function isSelected($request)
+  {
+    global $_PREFS;
+    
+    if (($request->method!='admin')&&($request->method!='edit'))
+      return false;
+    
+    $resource = Resource::decodeResource($request);
+    if ($resource===null)
+      return $this->container->id == $_PREFS->getPref('container.default');
+    
+    if (($resource===$this->container)||($resource->container===$this->container))
+      return true;
+    
+    return false;
+  }
 }
 
 function getAllContainers()
@@ -571,12 +626,29 @@ function getContainer($id)
 	global $_PREFS;
 	
   $container = ObjectCache::getItem('container',$id);
-	if (($container === null)&&($_PREFS->isPrefSet('container.'.$id.'.basedir')))
+	if (($container===null)&&($_PREFS->isPrefSet('container.'.$id.'.basedir')))
 	{
 		$container = new Container($id);
     ObjectCache::setItem('container', $id, $container);
 	}
 	return $container;
 }
+
+function containerAdminInit()
+{
+  global $_STORAGE;
+  
+  $set=$_STORAGE->query('SELECT id FROM Container;');
+  while ($set->valid())
+  {
+    $details = $set->current();
+    $container = getContainer($details['id']);
+    if ($container!==null)
+      AdminManager::addSection(new ContainerAdminSection($container));
+    $set->next();
+  }
+}
+
+containerAdminInit();
 
 ?>

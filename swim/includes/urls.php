@@ -311,7 +311,7 @@ class Request
       if ($this->method=='view')
       {
         $resource = Resource::decodeResource($this);
-        if (($resource!==false)&&($resource->isPage())&&($resource->container->id=='global'))
+        if (($resource!==null)&&($resource->isPage())&&($resource->container->id=='global'))
         {
           // TODO Make a search engine optimised url here
         }

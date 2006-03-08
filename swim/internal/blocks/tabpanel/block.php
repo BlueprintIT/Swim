@@ -1,17 +1,8 @@
 <?
 
-$admin = new Request();
-$admin->method='admin';
-
-$users = new Request();
-$users->method='users';
-
-$page = $parser->data['page'];
-$type = $page->prefs->getPref('page.admin.section');
-
-function display_tab($type,$section,$url,$title)
+function display_tab($title,$url,$selected)
 {
-  if ($type==$section)
+  if ($selected)
   {
 ?>
   <td class="selected"><?= $title ?></td>
@@ -28,20 +19,15 @@ function display_tab($type,$section,$url,$title)
 ?>
 <tr>
 <?
-if ($_USER->hasPermission('documents',PERMISSION_READ))
+foreach (AdminManager::$sections as $section)
 {
+  if ($section->isAvailable())
+  {
 ?>
   <td class="spacer"></td>
 <?
-  display_tab($type,'content',$admin->encode(),'Page management');
-}
-
-if (true)
-{
-?>
-  <td class="spacer"></td>
-<?
-  display_tab($type,'users',$users->encode(),'User management');
+    display_tab($section->getName(), $section->getUrl(), $section->isSelected($request));
+  }
 }
 ?>
   <td class="remainder"></td>

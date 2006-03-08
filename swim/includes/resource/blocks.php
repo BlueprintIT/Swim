@@ -209,13 +209,13 @@ function loadBlock($blockdir,$container,$id,$version=false)
 		else
 		{
 			$log->warn('Invalid block found at '.$blockdir);
-			return false;
+			return null;
 		}
 	}
 	else
 	{
 		$log->warn('Passed invalid block dir '.$blockdir);
-		return false;
+		return null;
 	}
 }
 

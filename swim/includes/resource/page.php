@@ -65,7 +65,7 @@ class Page extends Resource
 				if ($cont!='page')
 				{
 					$block=$this->getReferencedBlock($blk);
-					if ($block!==false)
+					if ($block!==null)
 					{
 						$modified=max($modified,$block->getModifiedDate());
 					}
@@ -97,13 +97,13 @@ class Page extends Resource
 		else
 		{
 			$block=$this->getReferencedBlock($id);
-			return $block!==false;
+			return $block!==null;
 		}
 	}
 	
 	function setReferencedBlock($id,$block)
 	{
-		if ($block===false)
+		if ($block===null)
 		{
 			$this->prefs->unsetPref('page.blocks.'.$id.'.resource');
 			$this->prefs->unsetPref('page.blocks.'.$id.'.version');
@@ -136,7 +136,7 @@ class Page extends Resource
 	function canChangeReferencedBlock($id)
 	{
 		$block=$this->getReferencedBlock($id);
-		if ($block!==false)
+		if ($block!==null)
 		{
 			if (isset($block->parent))
 			{
@@ -226,13 +226,13 @@ class Page extends Resource
 			else if ($this->hasResource('block',$id))
 			{
 				$block=$this->getBlock($id);
-				if ($block!==false)
+				if ($block!==null)
 				{
 					$this->blocks[$id]=$block;
 				}
 				else
 				{
-					$this->blocks[$id]=false;
+					$this->blocks[$id]=null;
 				}
 			}
       else if ($this->prefs->isPrefSet($blockpref.'.resource'))
@@ -241,7 +241,7 @@ class Page extends Resource
       }
 			else
 			{
-				$this->blocks[$id]=false;
+				$this->blocks[$id]=null;
 			}
 		}
 		return $this->blocks[$id];

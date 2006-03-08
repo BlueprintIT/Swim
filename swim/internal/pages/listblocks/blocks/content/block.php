@@ -79,7 +79,7 @@ addEvent(window,"load",displaypreview,false);
 		$form=$block->prefs->getPref('block.format');
 ?>
 				<option value="<?= $block->getPath() ?>"<?
-		if (($current!==false)&&($block->getPath()==$current->getPath()))
+		if (($current!==null)&&($block->getPath()==$current->getPath()))
 		{
 			print(' selected="selected"');
 		}

@@ -19,8 +19,6 @@ class Resource
 	var $working;
   var $writable;
 	
-	var $resources = array();
-
 	var $dir;
 	
 	function Resource($container, $id, $version)
@@ -119,7 +117,7 @@ class Resource
 		{
 			return $block;
 		}
-		return false;
+		return null;
 	}
 	
 	function loadTemplate($id,$version = false)
@@ -129,7 +127,7 @@ class Resource
 		{
 			return $template;
 		}
-		return false;
+		return null;
 	}
 	
 	function loadPage($id,$version = false)
@@ -139,7 +137,7 @@ class Resource
 		{
 			return $page;
 		}
-		return false;
+		return null;
 	}
 	
 	function loadFile($id,$version = false)
@@ -234,7 +232,8 @@ class Resource
 	function getResource($type,$id,$version = false)
 	{
 		$path=$type.'/'.$id.':'.$version;
-		if (!isset($this->resources[$path]))
+    $resource = ObjectCache::getItem('resource', $path);
+		if ($resource===null)
 		{
 			if ($type=='block')
 			{
@@ -252,13 +251,9 @@ class Resource
 			{
 				$resource=$this->loadFile($id,$version);
 			}
-			else
-			{
-				$resource=false;
-			}
-			$this->resources[$path]=$resource;
+      ObjectCache::setItem('resource', $path, $resource);
 		}
-		return $this->resources[$path];
+		return $resource;
 	}
 	
 	function getResources($type)
@@ -275,7 +270,7 @@ class Resource
   			if (($entry[0]!='.')&&(!in_array($entry,$locknames)))
   			{
   				$resource=$this->getResource($type,$entry);
-  				if ($resource!==false)
+  				if ($resource!==null)
   				{
   					$resources[]=$resource;
   				}
@@ -454,10 +449,15 @@ class Resource
 		return $this instanceof File;
 	}
 
-	function isPage()
-	{
-		return $this instanceof Page;
-	}
+  function isPage()
+  {
+    return $this instanceof Page;
+  }
+
+  function isContainer()
+  {
+    return $this instanceof Container;
+  }
 
 	function isBlock()
 	{
@@ -603,7 +603,7 @@ class Resource
 			else
 			{
 				$resource=$this->getResource($type,$id,$version);
-				if ($resource!==false)
+				if ($resource!==null)
 				{
 					return $resource->decodeRelativeResource(array_slice($parts,2));
 				}
@@ -613,7 +613,7 @@ class Resource
         }                
 			}
 		}
-		return false;
+		return null;
 	}
 	
 	static function decodeResource($request,$version=false)
@@ -641,7 +641,7 @@ class Resource
 		if (strlen($resource)==0)
 		{
 			$log->debug('No resource to decode');
-			return false;
+			return null;
 		}
 
 		$parts = explode('/',$resource);
@@ -653,8 +653,8 @@ class Resource
 		
 		$log->debug('Creating resource version '.$version);
 		
-		if (count($parts)<=1)
-			return false;
+		if (count($parts)<1)
+			return null;
 		
 		$container=getContainer($parts[0]);
     if ($container!==null)
@@ -663,7 +663,7 @@ class Resource
     }
     else
     {
-      return false;
+      return null;
     }
 	}
 }

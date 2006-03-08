@@ -133,7 +133,7 @@ function displayLocked($request,$details,$resource)
 	$request->data['resource']=$resource;
 	$container = getContainer('internal');
 	$page=$container->getPage('locked');
-	if ($page!==false)
+	if ($page!==null)
 	{
 		$page->display($request);
 	}
@@ -159,7 +159,7 @@ function displayGeneralError($request,$message)
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
 	$page = Resource::decodeResource($_PREFS->getPref('errors.general.page'));
 	$request->query['message']=$message;
-	if ($page!==false)
+	if ($page!==null)
 	{
 		$page->display($request);
 	}
@@ -174,7 +174,7 @@ function displayNotFound($request)
 	global $_PREFS;
  	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
 	$page = Resource::decodeResource($_PREFS->getPref('errors.notfound.page'));
-	if ($page!==false)
+	if ($page!==null)
 	{
 		$page->display($request);
 	}
@@ -189,7 +189,7 @@ function displayServerError($request)
 	global $_PREFS;
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
 	$page = Resource::decodeResource($_PREFS->getPref('errors.server.page'));
-	if ($page!==false)
+	if ($page!==null)
 	{
 		$page->display($request);
 	}

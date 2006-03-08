@@ -25,9 +25,9 @@ function method_admin($request)
 
 	if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_READ)))
   {
-    if (($request->resource=='')||($resource!==false))
+    if (($request->resource=='')||($resource!==null))
     {
-      if (($request->resource=='')||($resource->isPage()))
+      if (($resource===null)||($resource->isPage())||($resource->isContainer()))
       {
         $page = Resource::decodeResource('internal/page/pagedetails');
         $page->display($request);

@@ -26,7 +26,7 @@ class CSSHandler
 	function processInclude($content)
 	{
 		$resource=Resource::decodeResource($content);
-		if (($resource!==false)&&($resource->exists()))
+		if (($resource!==null)&&($resource->exists()))
 		{
 			$this->parse($resource);
 		}

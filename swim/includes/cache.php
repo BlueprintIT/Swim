@@ -16,6 +16,7 @@
 class ObjectCache
 {
   private static $cache = array();
+  private static $log;
   
   public static function getItem($type, $key)
   {
@@ -28,6 +29,13 @@ class ObjectCache
   
   public static function setItem($type, $key, $object)
   {
+    if (!isset(self::$log))
+      self::$log = LoggerManager::getLogger('swim.cache');
+    
+    if (isset(self::$cache[$type]) && isset(self::$cache[$type][$key]))
+    {
+      self::$log->warn('Overwriting cache entry '.$type.' '.$key);
+    }
     self::$cache[$type][$key]=$object;
   }
 }

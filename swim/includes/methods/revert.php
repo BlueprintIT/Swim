@@ -21,7 +21,7 @@ function method_revert($request)
   
 	$resource = Resource::decodeResource($request);
 
-	if ($resource!==false)
+	if ($resource!==null)
 	{
 		if ($_USER->canWrite($resource))
 		{

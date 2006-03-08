@@ -37,7 +37,7 @@ class TemplateBlock extends HtmlBlock
 	{
 		$name=$this->prefs->getPref('block.templateblock.'.$this->getFormat().'.template',$this->prefs->getPref('block.templateblock.template'));
 		$resource = Resource::decodeResource($name);
-		if (($resource!==false)&&($resource->isFile()))
+		if (($resource!==null)&&($resource->isFile()))
 		{
 			$resource->outputFile();
 		}

@@ -7,7 +7,7 @@ $resource = Resource::decodeResource($request);
 ?>
 <tr>
 <?
-if ($resource!==false)
+if ($resource!==null)
 {
 ?>
   <td class="spacer"></td>
@@ -22,7 +22,7 @@ if ((!isset($request->query['type']))||($request->query['type']!='global'))
 ?>
   <td class="spacer"></td>
   <td<?
-if (($resource===false)||(isset($request->query['type']))&&($request->query['type']=='global'))
+if (($resource===null)||(isset($request->query['type']))&&($request->query['type']=='global'))
 {
   print(' class="selected"');
 }

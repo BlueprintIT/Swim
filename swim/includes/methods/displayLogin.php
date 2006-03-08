@@ -23,7 +23,7 @@ function method_displayLogin($request)
 	$version=false;
 	$container = getContainer('internal');
 	$page = $container->getPage($_PREFS->getPref('method.login.page'),$version);
-	if ($page!==false)
+	if ($page!==null)
 	{
 		header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
 		$page->display($request);

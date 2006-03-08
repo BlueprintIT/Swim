@@ -20,7 +20,7 @@ function method_preview($request)
 	
 	$resource=Resource::decodeResource($request);
 
-	if ($resource!==false)
+	if ($resource!==null)
 	{
 		if ($_USER->canRead($resource))
 		{
