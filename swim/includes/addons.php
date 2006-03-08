@@ -42,6 +42,49 @@ class AdminSection
   }
 }
 
+class AddonAdminSection extends AdminSection
+{
+  private $url;
+  
+  public function AddonAdminSection($name, $url)
+  {
+    $this->name = $name;
+    $this->url = $url;
+  }
+  
+  public function getName()
+  {
+    return $this->name;
+  }
+  
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_ADDON;
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->method='view';
+    $request->resource='internal/page/external';
+    $request->query['url']=$this->url;
+
+    return $request->encode();
+  }
+  
+  public function isSelected($request)
+  {
+    if ($request->method!='view')
+      return false;
+    if ($request->resource!='internal/page/external')
+      return false;
+    if ($request->query['url']!=$this->url)
+      return false;
+      
+    return true;
+  }
+}
+
 class ExternalAdminSection extends AdminSection
 {
   private $url;
@@ -64,22 +107,12 @@ class ExternalAdminSection extends AdminSection
   
   public function getURL()
   {
-    $request = new Request();
-    $request->method='view';
-    $request->resource='internal/page/external';
-    $request->query['url']=$this->url;
-
-    return $request->encode();
+    return $this->url;
   }
   
   public function isSelected($request)
   {
-    if ($request->method!='view')
-      return false;
-    if ($request->path!='internal/page/external')
-      return false;
-      
-    return true;
+    return false;
   }
 }
 
@@ -124,6 +157,7 @@ class AdminManager
         array_splice(self::$sections, $pos, 0, array($section));
         return;
       }
+      $pos++;
     }
     array_push(self::$sections, $section);
   }
