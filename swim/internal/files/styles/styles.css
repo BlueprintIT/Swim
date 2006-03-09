@@ -79,57 +79,31 @@ table {
   border: none 0px;
 }
 
-.categorytree {
-  margin-left: 20px;
-  margin-right: 0;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding: 0;
-}
+/* first or middle sibling, no children */
+.ygtvtn.page { background-image: url(../images/pagetn.gif) !important; width:34px !important; }
+.ygtvtn.link { background-image: url(../images/linktn.gif) !important; width:34px !important; }
 
-.categorytree ul {
-  padding-left: 20px;
-  padding-right: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  margin: 0;
-}
+/* last sibling, no children */
+.ygtvln.page { background-image: url(../images/pageln.gif) !important; width:34px !important; }
+.ygtvln.link { background-image: url(../images/linkln.gif) !important; width:34px !important; }
 
-.categorytree li {
-  vertical-align: middle;
-  text-align: left;
-  padding: 1px;
-}
-
-.categorytree .selected {
+#categorytree .selected {
   background-color: Highlight;
   color: HighlightText;
 }
 
-.categorytree a, .categorytree a:visited {
+#categorytree a, .categorytree a:visited {
   color: WindowText;
   text-decoration: none;
 }
 
-.categorytree a:hover, .categorytree a:visited:hover {
+#categorytree a:hover, .categorytree a:visited:hover {
   color: Highlight;
   text-decoration: none;
 }
 
-.categorytree .selected a, .categorytree .selected a:hover, .categorytree .selected a:visited {
+#categorytree .selected a, .categorytree .selected a:hover, .categorytree .selected a:visited {
   color: HighlightText;
-}
-
-.categorytree .category {
-  list-style-image: -swim-url('internal/file/images/category.gif');
-}
-
-.categorytree .link {
-  list-style-image: -swim-url('internal/file/images/link.gif');
-}
-
-.categorytree .page {
-  list-style-image: -swim-url('internal/file/images/page.gif');
 }
 
 .filetable {

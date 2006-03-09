@@ -315,4 +315,141 @@ class PageTree extends CategoryTree
   }
 }
 
+class YahooPageTree extends CategoryTree
+{
+  var $id;
+  var $categorys = array();
+  var $pages;
+  
+  function YahooPageTree($id, $root)
+  {
+    $this->CategoryTree($root);
+    $this->id = $id;
+  }
+  
+  function getItemLabel($item)
+  {
+    if ($item instanceof Category)
+    {
+      return $item->name;
+    }
+    else if ($item instanceof Page)
+    {
+      return $item->prefs->getPref('page.variables.title');
+    }
+    else if ($item instanceof Link)
+    {
+      return $item->name;
+    }
+  }
+  
+  function getItemIconClass($item)
+  {
+    if ($item instanceof Category)
+    {
+      return "category";
+    }
+    else if ($item instanceof Page)
+    {
+      return "page";
+    }
+    else if ($item instanceof Link)
+    {
+      return "link";
+    }
+    return "";
+  }
+  
+  function getItemLabelClass($item)
+  {
+    return "";
+  }
+  
+  function getItemLink($item)
+  {
+    return false;
+  }
+  
+  function displayCategoryContentStartTag($category,$indent)
+  {
+  }
+  
+  function displayCategoryContentEndTag($category,$indent)
+  {
+  }
+  
+  function displayItem($item,$indent)
+  {
+    if ($item instanceof Page)
+    {
+      unset($this->pages[$item->getPath()]);
+    }
+
+    $label = $this->getItemLabel($item);
+    $icon = $this->getItemIconClass($item);
+    $style = $this->getItemLabelClass($item);
+    $link = $this->getItemLink($item);
+    $data = "{ label: '".$label."'";
+    if ($link !== false)
+      $data.=", href: '".$link."'";
+    if ($icon != false)
+      $data.=", iconClass: '".$icon."'";
+    if ($style != false)
+      $data.=", labelClass: '".$style."'";
+    $data.=" }";
+
+    $node = $this->categorys[count($this->categorys)-1];
+    if ($item instanceof Category)
+    {
+      $newnode = "cat".$item->id;
+      print("  var ".$newnode." = new BlueprintIT.widget.StyledTextNode(".$data.", ".$node.", true);\n");
+      array_push($this->categorys, $newnode);
+      $this->displayCategoryContent($item,$indent.$this->padding);
+      array_pop($this->categorys);
+    }
+    else
+    {
+      print("  new BlueprintIT.widget.StyledTextNode(".$data.", ".$node.", false);\n");
+    }
+  }
+  
+  function display($indent='')
+  {
+    $container = $this->root->container;
+    $list=$container->getResources('page');
+    $this->pages=array();
+    foreach ($list as &$page)
+    {
+      $this->pages[$page->getPath()]=$page->prefs->getPref('page.variables.title','');
+    }
+    asort($this->pages);
+?>
+<script type="text/javascript">
+function display_<?= $this->id ?>_tree(event) {
+  var tree = new YAHOO.widget.TreeView("<?= $this->id ?>");
+  var root = tree.getRoot();
+<?
+    array_push($this->categorys, "root");
+    parent::display($indent);
+    if (count($this->pages)>0)
+    {
+      print("  var unused = new BlueprintIT.widget.StyledTextNode('Uncategorised pages', root, true);\n");
+      array_push($this->containers, "unused");
+      foreach (array_keys($this->pages) as $path)
+      {
+        $page=Resource::decodeResource($path);
+        print($indent.$this->padding.$this->padding.'<li class="page">');
+        $this->displayItem($page);
+      }
+    }
+?>
+  tree.draw();
+}
+
+YAHOO.util.Event.addListener(window, "load", display_<?= $this->id ?>_tree);
+</script>
+<?
+  }
+}
+
 ?>

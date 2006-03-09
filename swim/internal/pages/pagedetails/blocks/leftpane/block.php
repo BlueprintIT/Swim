@@ -1,38 +1,32 @@
+<stylesheet src="/internal/file/yahoo/css/folders/tree.css"/>
+<script src="/internal/file/yahoo/YAHOO.js"/>
+<script src="/internal/file/yahoo/event.js"/>
+<script src="/internal/file/yahoo/treeview.js"/>
+<script src="/internal/file/scripts/treeview.js"/>
 <?
 
-class LinkedCategoryTree extends PageTree
+class LinkedCategoryTree extends YahooPageTree
 {
-  function LinkedCategoryTree($root)
+  function LinkedCategoryTree($id, $root)
   {
-    $this->PageTree($root);
+    $this->YahooPageTree($id, $root);
   }
   
-  function displayPageLabel($page)
+  function getItemLink($page)
   {
-    global $pages;
-    
-    $request = SwimEngine::getCurrentRequest();
-    
-    if ($request->resource==$page->getPath())
+    if ($page instanceof Page)
     {
-      print('<span class="selected">');
+      $request = SwimEngine::getCurrentRequest();
+      
+      if ($request->resource!=$page->getPath())
+      {
+        $link = new Request();
+        $link->resource = $page->getPath();
+        $link->method='admin';
+        return $link->encode();
+      }
     }
-    else
-    {
-      $link = new Request();
-      $link->resource = $page->getPath();
-      $link->method='admin';
-      print('<a href="'.$link->encode().'">');
-    }
-    parent::displayPageLabel($page);
-    if ($request->resource==$page->getPath())
-    {
-      print('</span>');
-    }
-    else
-    {
-      print('</a>');
-    }
+    return parent::getItemLink($page);
   }
 }
 
@@ -71,10 +65,10 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <h2>Structure</h2>
 </div>
 <div class="body">
-<ul class="categorytree">
+<div id="categorytree">
 <?
-$tree = new LinkedCategoryTree($cont->getRootCategory());
+$tree = new LinkedCategoryTree("categorytree", $cont->getRootCategory());
 $tree->display();
 ?>
-</ul>
+</div>
 </div>
