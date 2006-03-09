@@ -602,7 +602,7 @@ class UserAdminSection extends AdminSection
 {
   public function getName()
   {
-    return 'User management';
+    return 'User Management';
   }
   
   public function getPriority()
@@ -619,7 +619,9 @@ class UserAdminSection extends AdminSection
   
   public function isAvailable()
   {
-    return true;
+    global $_USER;
+    
+    return $_USER->hasPermission('users',PERMISSION_READ);
   }
   
   public function isSelected($request)

@@ -51,10 +51,11 @@ class XMLTree extends CategoryTree
 
   <tree>
 <?
-$cont = $_PREFS->getPref('container.default');
-if (isset($request->query['container']))
-  $cont = $request->query['container'];
-$container = getContainer($cont);
+$container = Resource::decodeResource(substr($request->resource,0,-11));
+if (($container === null) || (!$container->isContainer()))
+{
+  $container = getContainer($_PREFS->getPref('container.default'));
+}
 $tree = new XMLTree($container->getRootCategory());
 $tree->showRoot=false;
 $tree->display('  ');

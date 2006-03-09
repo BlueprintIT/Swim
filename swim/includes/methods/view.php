@@ -174,6 +174,19 @@ function method_view($request)
 			displayGeneralError($request,'You can only view pages or files.');
 		}
 	}
+  else if (substr($request->resource,-11)=='/categories')
+  {
+    $resource = Resource::decodeResource(substr($request->resource,0,-11));
+    if (($resource!==null) && ($resource->isContainer()))
+    {
+      $page = Resource::decodeResource('internal/page/categories');
+      $page->display($request);
+    }
+    else
+    {
+      displayNotFound($request);
+    }
+  }
 	else
 	{
 		displayNotFound($request);
