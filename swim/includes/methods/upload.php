@@ -98,12 +98,12 @@ function method_upload($request)
   else
   {
     $parts=split('/',$request->resource,2);
-    if ((count($parts)==2)&&($parts[0]=='categories'))
+    if ((count($parts)==2)&&($parts[1]=='categories'))
     {
       $log->debug('Uploading category database');
       if ($_USER->hasPermission('documents',PERMISSION_WRITE))
       {
-        $cm = getContainer($parts[1]);
+        $cm = getContainer($parts[0]);
         if ($_SERVER['REQUEST_METHOD']=='PUT')
         {
           $doc = new DOMDocument();

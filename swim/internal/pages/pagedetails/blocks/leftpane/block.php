@@ -36,9 +36,24 @@ class LinkedCategoryTree extends PageTree
   }
 }
 
+$cont = getContainer($_PREFS->getPref('container.default'));
+$resource = Resource::decodeResource($request);
+if ($resource!==null)
+{
+  if ($resource->isContainer())
+  {
+    $cont = $resource;
+  }
+  else
+  {
+    $cont = $resource->container;
+  }
+}
+
 $edit = new Request();
 $edit->method='view';
 $edit->resource='internal/page/siteedit';
+$edit->query['container']=$cont->id;
 $edit->nested=$request;
 ?>
 <div class="header">
@@ -58,11 +73,7 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <div class="body">
 <ul class="categorytree">
 <?
-$cont = $_PREFS->getPref('container.default');
-if (isset($request->query['container']))
-  $cont = $request->query['container'];
-$cm = getContainer($cont);
-$tree = new LinkedCategoryTree($cm->getRootCategory());
+$tree = new LinkedCategoryTree($cont->getRootCategory());
 $tree->display();
 ?>
 </ul>
