@@ -1,7 +1,7 @@
 Options +FollowSymLinks 
 
 RewriteEngine on 
-RewriteBase /Swim/
+RewriteBase /
 
 RewriteRule ^onlinestore$ redirect.php
 RewriteRule ^onlinestore/(.*) site/addons/cubecart/$1
