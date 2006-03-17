@@ -155,14 +155,14 @@ class Page extends Resource
 	
   function getLayout()
   {
-    return LayoutManager::getPageLayout($this->prefs->getPref('page.layout'));
+    return $this->container->layouts->getPageLayout($this->prefs->getPref('page.layout'));
   }
   
   function setLayout($id)
   {
     if ($id!=$this->prefs->getPref('page.layout'))
     {
-      $newl = LayoutManager::getPageLayout($id);
+      $newl = $this->container->layouts->getPageLayout($id);
       if ($newl!==null)
       {
         $this->prefs->setPref('page.layout',$id);

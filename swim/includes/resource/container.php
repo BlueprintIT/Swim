@@ -26,6 +26,7 @@ class Container extends Resource
 
   var $rootcategory;
   var $modified;
+  var $layouts;
 	
 	function Container($id)
 	{
@@ -47,6 +48,8 @@ class Container extends Resource
 				fclose($file);
 			}
 		}
+    
+    $this->layouts = new LayoutCollection($this->getDir(), LayoutManager::getRootCollection());
 
     $this->visible=$this->prefs->getPref('container.visible',true);
     $this->versioned=$this->prefs->getPref('container.versioned',true);

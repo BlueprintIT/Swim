@@ -19,10 +19,12 @@ class Layout
   var $prefs;
   var $name = '';
   var $description = '';
+  var $collection;
   
-  function Layout($id,$clone=null)
+  function Layout($id, $collection, $clone=null)
   {
     $this->id = $id;
+    $this->collection = $collection;
     if ($clone!==null)
     {
       $this->name = $clone->name;
@@ -92,9 +94,9 @@ class BlockLayout extends Layout
 {
   var $type;
   
-  function BlockLayout($id,$clone=null)
+  function BlockLayout($id, $collection, $clone=null)
   {
-    $this->Layout($id,$clone);
+    $this->Layout($id, $collection, $clone);
     if ($clone!==null)
     {
       $this->type = $clone->type;
@@ -120,9 +122,9 @@ class PageLayout extends Layout
 {
   var $blocks = array();
   
-  function PageLayout($id,$clone=null)
+  function PageLayout($id, $collection, $clone=null)
   {
-    $this->Layout($id,$clone);
+    $this->Layout($id, $collection, $clone);
     if ($clone!==null)
     {
       foreach ($clone->blocks as $id => $block)
@@ -151,7 +153,7 @@ class PageLayout extends Layout
       $id=$el->getAttribute('id');
       if ($el->hasAttribute('ref'))
       {
-        $this->blocks[$id] = new BlockLayout($id,LayoutManager::getBlockLayout($el->getAttribute('ref')));
+        $this->blocks[$id] = new BlockLayout($id,$this->collection->getBlockLayout($el->getAttribute('ref')));
       }
       else
       {
@@ -172,19 +174,26 @@ class PageLayout extends Layout
   }
 }
 
-class LayoutManager
+class LayoutCollection
 {
-  private static $pages = array();
-  private static $blocks = array();
+  private $pages = array();
+  private $blocks = array();
+  private $parent = null;
+  private $log;
   
-  static function init()
+  function LayoutCollection($dir, $parent = null)
   {
-    global $_PREFS;
-    
-    $log=LoggerManager::getLogger('swim.layout');
-    $log->debug('Layout startup.');
+    $this->parent = $parent;
+    $this->log=LoggerManager::getLogger('swim.layout');
+    $this->log->debug('Layout startup.');
+    $this->loadLayouts($dir);
+  }
+  
+  public function loadLayouts($dir)
+  {
+    $file = $dir.'/layouts.xml';
     $doc = new DOMDocument();
-    if ($doc->load($_PREFS->getPref('storage.config').'/layouts.xml'))
+    if ((is_readable($file))&&($doc->load($file)))
     {
       $el=$doc->documentElement->firstChild;
       while ($el!==null)
@@ -196,16 +205,16 @@ class LayoutManager
             $id = $el->getAttribute('id');
             if ($el->hasAttribute('extends'))
             {
-              $log->debug('Creating page layout '.$id.' That extends another.');
-              $base = self::getPageLayout($el->getAttribute('extends'));
-              $log->debug('Extends '.$base->getName());
-              $layout = new PageLayout($id,$base);
+              $this->log->debug('Creating page layout '.$id.' That extends another.');
+              $base = $this->getPageLayout($el->getAttribute('extends'));
+              $this->log->debug('Extends '.$base->getName());
+              $layout = new PageLayout($id, $this, $base);
             }
             else
             {
-              $layout = new PageLayout($id);
+              $layout = new PageLayout($id, $this);
             }
-            self::$pages[$id]=$layout;
+            $this->pages[$id]=$layout;
             $layout->load($el);
           }
           else if ($el->tabName=='blocklayout')
@@ -213,14 +222,14 @@ class LayoutManager
             $id = $el->getAttribute('id');
             if ($el->hasAttribute('extends'))
             {
-              $base = self::getBlockLayout($el->getAttribute('extends'));
-              $layout = new BlockLayout($id,$base);
+              $base = $this->getBlockLayout($el->getAttribute('extends'));
+              $layout = new BlockLayout($id, $this, $base);
             }
             else
             {
-              $layout = new BlockLayout($id);
+              $layout = new BlockLayout($id, $this);
             }
-            self::$blocks[$id]=$layout;
+            $this->blocks[$id]=$layout;
             $layout->load($el);
           }
         }
@@ -229,20 +238,31 @@ class LayoutManager
     }
     else
     {
-      $log->error('Unable to load layouts template');
+      $this->log->error('Unable to load layouts template');
     }
   }
   
-  static function getPageLayouts()
+  public function getPageLayouts()
   {
-    return self::$pages;
+    if ($this->parent ===null)
+    {
+      return $this->pages;
+    }
+    else
+    {
+      return array_merge($this->parent->getPageLayouts(), $this->pages);
+    }
   }
   
-  static function getPageLayout($id)
+  public function getPageLayout($id)
   {
-    if (isset(self::$pages[$id]))
+    if (isset($this->pages[$id]))
     {
-      return self::$pages[$id];
+      return $this->pages[$id];
+    }
+    else if ($this->parent !== null)
+    {
+      return $this->parent->getPageLayout($id);
     }
     else
     {
@@ -250,21 +270,49 @@ class LayoutManager
     }
   }
   
-  static function getBlockLayouts()
+  public function getBlockLayouts()
   {
-    return self::$blocks;
+    if ($this->parent ===null)
+    {
+      return $this->blocks;
+    }
+    else
+    {
+      return array_merge($this->parent->getBlockLayouts(), $this->blocks);
+    }
   }
   
-  static function getBlockLayout($id)
+  public function getBlockLayout($id)
   {
-    if (isset(self::$blocks[$id]))
+    if (isset($this->blocks[$id]))
     {
-      return self::$blocks[$id];
+      return $this->blocks[$id];
+    }
+    else if ($this->parent !== null)
+    {
+      return $this->parent->getBlockLayout($id);
     }
     else
     {
       return null;
     }
+  }
+}
+
+class LayoutManager
+{
+  private static $root;
+  
+  static function init()
+  {
+    global $_PREFS;
+    
+    self::$root = new LayoutCollection($_PREFS->getPref('storage.config'));
+  }
+  
+  static function getRootCollection()
+  {
+    return self::$root;
   }
 }
 

@@ -61,7 +61,7 @@ include 'image.php';
   <td style="vertical-align: top"><label for="layout">Layout:</label></td>
   <td style="vertical-align: top"><select id="layout" onchange="this.form.submit()" name="layout">
 <?
-$layouts = LayoutManager::getPageLayouts();
+$layouts = $page->container->layouts->getPageLayouts();
 foreach($layouts as $id => $l)
 {
 ?>    <option value="<?= $id ?>"<?
