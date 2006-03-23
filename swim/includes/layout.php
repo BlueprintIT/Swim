@@ -118,9 +118,47 @@ class BlockLayout extends Layout
   }
 }
 
+class PageVariable
+{
+  var $preference;
+  var $name;
+  var $description;
+  var $type;
+  
+  function PageVariable()
+  {
+  }
+  
+  function load($element)
+  {
+    $this->preference = $element->getAttribute('preference');
+    $el=$element->firstChild;
+    while ($el!==null)
+    {
+      if ($el->nodeType==XML_ELEMENT_NODE)
+      {
+        if ($el->tagName=='name')
+        {
+          $this->name = getDOMText($el);
+        }
+        else if ($el->tagName=='description')
+        {
+          $this->description = getDOMText($el);
+        }
+        else if ($el->tagName=='type')
+        {
+          $this->type = getDOMText($el);
+        }
+      }
+      $el = $el->nextSibling;
+    }
+  }
+}
+
 class PageLayout extends Layout
 {
   var $blocks = array();
+  var $variables = array();
   
   function PageLayout($id, $collection, $clone=null)
   {
@@ -129,7 +167,7 @@ class PageLayout extends Layout
     {
       foreach ($clone->blocks as $id => $block)
       {
-        $this->blocks[$id]=new BlockLayout($id,$block);
+        $this->blocks[$id]=new BlockLayout($id, $collection, $block);
       }
     }
   }
@@ -153,7 +191,7 @@ class PageLayout extends Layout
       $id=$el->getAttribute('id');
       if ($el->hasAttribute('ref'))
       {
-        $this->blocks[$id] = new BlockLayout($id,$this->collection->getBlockLayout($el->getAttribute('ref')));
+        $this->blocks[$id] = new BlockLayout($id, $this->collection, $this->collection->getBlockLayout($el->getAttribute('ref')));
       }
       else
       {
@@ -166,10 +204,24 @@ class PageLayout extends Layout
         }
         if (!isset($this->blocks[$id]))
         {
-          $this->blocks[$id] = new BlockLayout($id);
+          $this->blocks[$id] = new BlockLayout($id, $this->collection);
         }
       }
       $this->blocks[$id]->load($el);
+    }
+    else if ($el->tagName=='variables')
+    {
+      $node = $el->firstChild;
+      while ($node!==null)
+      {
+        if (($node->nodeType==XML_ELEMENT_NODE) && ($node->tagName=='variable'))
+        {
+          $var = new PageVariable();
+          $var->load($node);
+          $this->variables[$var->preference]=$var;
+        }
+        $node = $node->nextSibling;
+      }
     }
   }
 }
@@ -238,7 +290,7 @@ class LayoutCollection
     }
     else
     {
-      $this->log->error('Unable to load layouts template');
+      $this->log->debug('Layout template does not exist');
     }
   }
   

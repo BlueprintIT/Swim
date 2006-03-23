@@ -41,23 +41,6 @@ include 'image.php';
 <div class="body">
 <table style="table-layout: fixed; border-spacing: 5px;">
 <tr>
-	<td style="vertical-align: top"><label for="title">Title:</label></td>
-	<td style="vertical-align: top; width: 45%"><input style="width: 100%" type="input" id="title" name="pref:page.variables.title" value="<?= $pageprefs->getPref('page.variables.title','New Page') ?>"></td>
-	<td style="vertical-align: top; width: 45%">The page title is displayed in the browser title bar.</td>
-</tr>
-<tr>
-	<td style="vertical-align: top"><label for="description">Description:</label></td>
-	<td style="vertical-align: top"><textarea style="width: 100%; height: 50px;" id="description" name="pref:page.variables.description"><?= $pageprefs->getPref('page.variables.description','') ?></textarea></td>
-	<td style="vertical-align: top">The page description is displayed by many search engines. If left blank search engines will normally display the first
-	 paragraph of the page instead.</td> 
-</tr>
-<tr>
-  <td style="vertical-align: top"><label for="keywords">Keywords:</label></td>
-  <td style="vertical-align: top"><input style="width: 100%" type="input" id="keywords" name="pref:page.variables.keywords" value="<?= $pageprefs->getPref('page.variables.keywords','') ?>"></td>
-  <td style="vertical-align: top">Search engines may use these keywords when indexing this page. Many of the more popular search engines
-   generally don't place very much weight on this.</td>
-</tr>
-<tr>
   <td style="vertical-align: top"><label for="layout">Layout:</label></td>
   <td style="vertical-align: top"><select id="layout" onchange="this.form.submit()" name="layout">
 <?
@@ -77,6 +60,26 @@ foreach($layouts as $id => $l)
   <td style="vertical-align: top">The layout determines what the page contains and how it is organised.</td>
 </tr>
 <?
+foreach ($layout->variables as $pref => $variable)
+{
+?>
+<tr>
+	<td style="vertical-align: top"><label for="pref:<?= $pref ?>"><?= $variable->name ?>:</label></td>
+	<td style="vertical-align: top; width: 45%"><?
+if ($variable->type == 'text')
+{
+  ?><input style="width: 100%" type="input" id="pref:<?= $pref ?>" name="pref:<?= $pref ?>" value="<?= $pageprefs->getPref($pref) ?>"><?
+}
+else if ($variable->type == 'multiline')
+{
+  ?><textarea style="width: 100%; height: 50px;" id="pref:<?= $pref ?>" name="pref:<?= $pref ?>"><?= $pageprefs->getPref($pref) ?></textarea><?
+}
+?></td>
+	<td style="vertical-align: top; width: 45%"><?= $variable->description ?></td>
+</tr>
+<?
+}
+
 foreach ($layout->blocks as $id => $blk)
 {
   if ($id!='content')

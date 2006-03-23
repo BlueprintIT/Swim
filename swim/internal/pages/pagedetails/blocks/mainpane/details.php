@@ -2,6 +2,7 @@
 
 $page = Resource::decodeResource($request);
 $pageprefs = $page->prefs;
+$layout=$page->getLayout();
 
 $edit = new Request();
 $edit->query['version']=$page->version;
@@ -114,28 +115,27 @@ if ($page->isCurrentVersion())
 </td>
 </tr>
 <tr>
-    <td style="vertical-align: top">Title:</td>
-    <td style="vertical-align: top"><?= $pageprefs->getPref('page.variables.title','New Page') ?></td>
+  <td style="vertical-align: top">Layout:</td>
+  <td style="vertical-align: top"><?= $layout->getName() ?></td>
 </tr>
+<?
+foreach ($layout->variables as $pref => $variable)
+{
+?>
 <tr>
-    <td style="vertical-align: top">Description:</td>
-    <td style="vertical-align: top"><?= $pageprefs->getPref('page.variables.description','') ?></td>
+  <td style="vertical-align: top"><?= $variable->name ?>:</td>
+  <td style="vertical-align: top"><?= $pageprefs->getPref($pref) ?></td>
 </tr>
+<?
+}
+?>
 <tr>
-    <td style="vertical-align: top">Keywords:</td>
-    <td style="vertical-align: top"><?= $pageprefs->getPref('page.variables.keywords','') ?></td>
-</tr>
-<tr>
-    <td style="vertical-align: top">Layout:</td>
-    <td style="vertical-align: top"><?= $page->getLayout()->getName() ?></td>
-</tr>
-<tr>
-    <td style="vertical-align: top">Content:</td>
-    <td style="vertical-align: top">
+  <td style="vertical-align: top">Content:</td>
+  <td style="vertical-align: top">
 <?
 $block=$page->getReferencedBlock('content');
 ?><block id="content" src="version/<?= $page->version ?>/<?= $block->getPath() ?>"/>
-    </td>
+  </td>
 </tr>
 </table>
 </div>
