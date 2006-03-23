@@ -47,6 +47,8 @@ include 'image.php';
 $layouts = $page->container->layouts->getPageLayouts();
 foreach($layouts as $id => $l)
 {
+  if ($l->hidden == false)
+  {
 ?>    <option value="<?= $id ?>"<?
 
   if ($layout===$l)
@@ -54,6 +56,7 @@ foreach($layouts as $id => $l)
   print('>'.$l->getName()) 
 ?></option>
 <?
+  }
 }
 ?>
 </select></td>

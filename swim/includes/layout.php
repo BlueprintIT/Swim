@@ -159,6 +159,7 @@ class PageLayout extends Layout
 {
   var $blocks = array();
   var $variables = array();
+  var $hidden = false;
   
   function PageLayout($id, $collection, $clone=null)
   {
@@ -224,6 +225,15 @@ class PageLayout extends Layout
       }
     }
   }
+
+  function load($element)
+  {
+    if ($element->hasAttribute('hidden'))
+    {
+      $this->hidden=$element->getAttribute('hidden');
+    }
+    parent::load($element);
+  }  
 }
 
 class LayoutCollection
