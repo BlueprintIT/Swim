@@ -39,7 +39,7 @@ class SqliteStorage
   public function queryExec($query)
   {
     $this->log->debug('queryExec: '.$query);
-    return $db->queryExec($query);
+    return $this->db->queryExec($query);
   }
   
   public function arrayQuery($query)

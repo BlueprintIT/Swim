@@ -1371,7 +1371,7 @@ if (!YAHOO.util.DragDropMgr) {
          */
         this.handleMouseMove = function(e) {
             if (! this.dragCurrent) {
-                return;
+                return null;
             }
 
             // var button = e.which || e.button;
@@ -1399,6 +1399,7 @@ if (!YAHOO.util.DragDropMgr) {
             }
 
             this.stopEvent(e);
+            return null;
         };
 
         /**
@@ -1874,6 +1875,7 @@ if (!YAHOO.util.DragDropMgr) {
                 return document.defaultView.getComputedStyle(el, null).
                     getPropertyValue(styleProp);
             }
+            return null;
         };
 
         /**
