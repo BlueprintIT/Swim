@@ -40,11 +40,15 @@ include 'image.php';
 </div>
 <div class="body">
 <table style="table-layout: fixed; border-spacing: 5px;">
+<?
+$layouts = $page->container->layouts->getPageLayouts();
+if (count($layouts)>0)
+{
+?>
 <tr>
   <td style="vertical-align: top"><label for="layout">Layout:</label></td>
   <td style="vertical-align: top"><select id="layout" onchange="this.form.submit()" name="layout">
 <?
-$layouts = $page->container->layouts->getPageLayouts();
 foreach($layouts as $id => $l)
 {
   if ($l->hidden == false)
@@ -63,6 +67,8 @@ foreach($layouts as $id => $l)
   <td style="vertical-align: top">The layout determines what the page contains and how it is organised.</td>
 </tr>
 <?
+}
+
 foreach ($layout->variables as $pref => $variable)
 {
 ?>

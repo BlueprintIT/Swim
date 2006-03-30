@@ -16,23 +16,34 @@
 class CSSHandler
 {
 	var $defines = array();
-	var $base;
+	var $resource;
+	var $path;
 	
 	function CSSHandler($resource)
 	{
-		$this->base=$resource;
+		$this->resource=$resource;
+	}
+	
+	function evaluatePath($path)
+	{
+		if (substr($path,0,1) == '/')
+			return substr($path,1);
+		$path = $this->path.'/'.$path;
+		return preg_replace('@[^/]*/../@', '', $path);
 	}
 	
 	function processInclude($content)
 	{
-		$resource=Resource::decodeResource($content);
+		$path = $this->evaluatePath($content);
+		$resource=Resource::decodeResource($path);
 		if (($resource!==null)&&($resource->exists()))
 		{
 			$this->parse($resource);
 		}
 		else
 		{
-			print("/* WARNING could not include ".$content." */\n");
+			print("/* WARNING could not include ".$path." */\n");
+			print("/* Base path ".$this->path." */\n");
 		}
 	}
 	
@@ -49,7 +60,14 @@ class CSSHandler
 	
 	function evaluateUrl($content)
 	{
-		$content=substr($content,1,-1);
+		$first = substr($content,0,1);
+		$last = substr($content,-1);
+		if (($first == $last) && (($first == '"') || ($first == "'")))
+		{
+			$content=substr($content,1,-1);
+			$first = substr($content,0,1);
+		}
+		$content = $this->evaluatePath($content);
 		$request = new Request();
 		$request->method='view';
 		$request->resource=$content;
@@ -150,9 +168,14 @@ class CSSHandler
 		}
 	}
 	
-	function output()
+	function output($request)
 	{
-		$this->parse($this->base);
+		$this->path = dirname($request->resource);
+		foreach ($request->query as $name => $value)
+		{
+			$this->defines[$name] = $value;
+		}
+		$this->parse($this->resource);
 	}
 }
 
@@ -167,10 +190,10 @@ class CSSHandlerFactory
 		return new CSSHandler($resource);
 	}
 	
-	function output($resource)
+	function output($request, $resource)
 	{
 		$handler = $this->getHandler($resource);
-		$handler->output();
+		$handler->output($request);
 	}
 }
 

@@ -85,6 +85,8 @@ class Page extends Resource
 	function display($request)
 	{
 		$template=$this->getReferencedTemplate();
+		if ($template===null)
+			$this->log->errorTrace("Null template");
 		$template->display($request,$this);
 	}
 	
