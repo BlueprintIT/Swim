@@ -89,7 +89,7 @@ class Page extends Resource
 	{
 		$template=$this->getReferencedTemplate();
 		if ($template===null)
-			$this->log->errorTrace("Null template");
+			$this->log->errorTrace("Null template for ".$request->resource);
 		$template->display($request,$this);
 	}
 	

@@ -24,7 +24,7 @@ function method_upload($request)
   
   $log->debug('upload');
   
-	if ($resource!==false)
+	if ($resource!==null)
 	{
     if ($resource->isFile())
 		{
@@ -87,11 +87,13 @@ function method_upload($request)
 			}
 			else
 			{
+				$log->debug('Inaccessible file '.$request->resource);
 				displayLogin($request,'You must log in to write to this resource.');
 			}
 		}
 		else
 		{
+			$log->debug('Attempt to upload non-file');
 			displayGeneralError($request,'You can only upload files.');
 		}
 	}
@@ -111,7 +113,7 @@ function method_upload($request)
           {
             $log->debug('XML successfully loaded');
             $log->debug($doc->saveXML());
-            $cm->load($doc);
+            $cm->loadCategories($doc);
             header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
             print("Resource accepted");
             return;
@@ -138,6 +140,7 @@ function method_upload($request)
     }
     else
     {
+    	$log->warn('Unknown upload to '.$request->resource);
       displayNotFound($request);
       return;
     }

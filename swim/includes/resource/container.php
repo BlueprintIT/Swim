@@ -186,8 +186,8 @@ class Container extends Resource
     global $_STORAGE;
     $_STORAGE->queryExec('BEGIN TRANSACTION;');
     $this->log->debug('Wiping categories');
-    $items = $this->root->clean();
-    $this->loadCategory($document->documentElement,$this->root);
+    $items = $this->rootcategory->clean();
+    $this->loadCategory($document->documentElement,$this->rootcategory);
     $this->modified=time();
     $name = "'".$_STORAGE->escape($this->id)."'";
     $_STORAGE->queryExec('UPDATE Container set date='.$this->modified.' WHERE name='.$name.';');
