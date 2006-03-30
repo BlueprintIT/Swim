@@ -147,7 +147,7 @@ foreach ($layout->variables as $pref => $variable)
   <td style="vertical-align: top">
 <?
 $block=$page->getReferencedBlock('content');
-?><block id="content" src="version/<?= $page->version ?>/<?= $block->getPath() ?>"/>
+?><block id="content" src="/version/<?= $page->version ?>/<?= $block->getPath() ?>"/>
   </td>
 </tr>
 </table>

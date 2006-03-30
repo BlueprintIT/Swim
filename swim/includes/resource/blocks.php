@@ -32,6 +32,7 @@ class Block extends Resource
 	        $layprefs = new Preferences($blk->prefs);
 	        $layprefs->setParent($this->prefs->getParent());
 	        $this->prefs->setParent($layprefs);
+	        $layprefs->setDelegate($this->prefs);
 	      }
 	    }
     }

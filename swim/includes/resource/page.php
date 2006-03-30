@@ -50,6 +50,7 @@ class Page extends Resource
     $layprefs = new Preferences($layout->prefs);
     $layprefs->setParent($this->baseprefs);
     $this->prefs->setParent($layprefs);
+    $layprefs->setDelegate($this->prefs);
   }
   
 	function getTotalModifiedDate()
