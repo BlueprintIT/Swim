@@ -1,7 +1,21 @@
 <?
+$cont = getContainer($_PREFS->getPref('container.default'));
+$resource = Resource::decodeResource($request);
+if ($resource!==null)
+{
+  if ($resource->isContainer())
+  {
+    $cont = $resource;
+  }
+  else
+  {
+    $cont = $resource->container;
+  }
+}
+
 $create = new Request();
 $create->method='create';
-$create->resource='global/page';
+$create->resource=$cont->id.'/page';
 ?>
 <div class="header">
 <?

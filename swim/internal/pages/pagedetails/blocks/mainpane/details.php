@@ -1,6 +1,19 @@
 <?
 
+$cont = getContainer($_PREFS->getPref('container.default'));
 $page = Resource::decodeResource($request);
+if ($page!==null)
+{
+  if ($page->isContainer())
+  {
+    $cont = $page;
+  }
+  else
+  {
+    $cont = $page->container;
+  }
+}
+
 $pageprefs = $page->prefs;
 $layout=$page->getLayout();
 
@@ -13,7 +26,7 @@ $edit->resource=$request->resource;
 
 $create = new Request();
 $create->method='create';
-$create->resource='global/page';
+$create->resource=$cont->id.'/page';
 
 $delete = new Request();
 $delete->resource=$page->getPath();
