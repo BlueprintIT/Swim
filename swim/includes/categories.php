@@ -80,7 +80,7 @@ class Category
   
   function count()
   {
-    if (isset($this->list))
+    if (!isset($this->list))
     {
       $this->list=$this->items();
     }
@@ -398,7 +398,14 @@ class YahooPageTree extends CategoryTree
     if ($item instanceof Category)
     {
       $newnode = "cat".$item->id;
-      print("  var ".$newnode." = new BlueprintIT.widget.StyledTextNode(".$data.", ".$node.", true);\n");
+      if ($item->count()>0)
+      {
+	      print("  var ".$newnode." = new BlueprintIT.widget.StyledTextNode(".$data.", ".$node.", true);\n");
+	    }
+	    else
+	    {
+	      print("  var ".$newnode." = new BlueprintIT.widget.StyledTextNode(".$data.", ".$node.", false);\n");
+	    }
       array_push($this->categorys, $newnode);
       $this->displayCategoryContent($item,$indent.$this->padding);
       array_pop($this->categorys);
