@@ -58,7 +58,7 @@ class Container extends Resource
     $set=$_STORAGE->query('SELECT Category.id,Category.name,date FROM Container,Category WHERE Category.id=rootcategory AND Container.id='.$name.';');
     if ($set->valid())
     {
-      $details = $set->current();
+      $details = $set->fetch();
       $this->modified=$details['date'];
       $this->rootcategory = new Category($this,null,$details['Category.id'],$details['Category.name']);
       ObjectCache::setItem('category', $this->rootcategory->id, $this->rootcategory);
@@ -96,7 +96,7 @@ class Container extends Resource
       $set=$_STORAGE->query('SELECT id,parent,name FROM Category WHERE id='.$id.';');
       if ($set->valid())
       {
-        $details = $set->current();
+        $details = $set->fetch();
         $category = new Category($this,$this->getCategory($details['parent']),$details['id'],$details['name']);
         ObjectCache::setItem('category', $id, $category);
       }
@@ -113,10 +113,9 @@ class Container extends Resource
     $results = array();
     while ($set->valid())
     {
-      $details=$set->current();
+      $details=$set->fetch();
       $results[]=$this->getReadyCategory($details['id'],$details['parent'],$details['name']);
       $this->log->debug('Found page '.$page->getPath().' in category '.$details['id']);
-      $set->next();
     }
     return $results;
   }
@@ -644,11 +643,10 @@ function containerAdminInit()
   $set=$_STORAGE->query('SELECT id FROM Container;');
   while ($set->valid())
   {
-    $details = $set->current();
+    $details = $set->fetch();
     $container = getContainer($details['id']);
     if ($container!==null)
       AdminManager::addSection(new ContainerAdminSection($container));
-    $set->next();
   }
 }
 

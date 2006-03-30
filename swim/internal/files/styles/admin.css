@@ -1,4 +1,4 @@
-#include internal/file/styles/styles.css
+#include styles.css
 
 a, a:visited {
 	color: blue;

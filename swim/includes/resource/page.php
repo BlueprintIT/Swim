@@ -28,6 +28,9 @@ class Page extends Resource
   function applyLayout()
   {
     $layout = $this->getLayout();
+    if ($layout == null)
+    	return;
+    	
     if ($this->isWritable())
     {
       foreach ($layout->blocks as $block => $details)

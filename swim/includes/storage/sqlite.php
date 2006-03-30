@@ -13,14 +13,74 @@
  * $Revision$
  */
 
-class SqliteStorage
+class SqliteStorageResult extends StorageResult
+{
+	private $result;
+	
+	function SqliteStorageResult($result)
+	{
+		$this->StorageResult();
+		$this->result = $result;
+	}
+
+	public function fetch()
+	{
+		return $this->result->fetch();
+	}
+	
+	public function fetchObject()
+	{
+		return $this->result->fetchObject();
+	}
+	
+	public function numFields()
+	{
+    return $this->result->numFields();
+	}
+	
+	public function fieldName($index)
+	{
+    return $this->result->fieldName($index);
+	}
+	
+	public function current()
+	{
+		return $this->current();
+	}
+	
+	public function key()
+	{
+		parent::key();
+	}
+	
+	public function numRows()
+	{
+    return $this->result->numRows();
+	}
+	
+	public function seek($pos)
+	{
+    return $this->result->seek($pos);
+	}
+	
+	public function valid()
+	{
+		return $this->result->valid();
+	}
+}
+
+class SqliteStorage extends StorageConnection
 {
   private $db;
-  private $log;
   
   public function SqliteStorage($filename)
   {
-    $this->log = LoggerManager::getLogger('swim.storage');
+  	$this->StorageConnection();
+	  if (!is_file($filename))
+	  {
+	    $this->new=true;
+	  }
+  	$this->log->debug('Starting SQLite storage engine: '.sqlite_libversion());
     $this->db = sqlite_factory($filename);
     $this->log->debug('Loaded database from '.$filename);
   }
@@ -33,7 +93,10 @@ class SqliteStorage
   public function query($query)
   {
     $this->log->debug('query: '.$query);
-    return $this->db->query($query);
+    $result = $this->db->query($query);
+    if ($result && $result !== TRUE)
+	    return new SqliteStorageResult($result);
+	  return $result;
   }
   
   public function queryExec($query)
@@ -41,19 +104,7 @@ class SqliteStorage
     $this->log->debug('queryExec: '.$query);
     return $this->db->queryExec($query);
   }
-  
-  public function arrayQuery($query)
-  {
-    $this->log->debug('arrayQuery: '.$query);
-    return $this->db->arrayQuery($query);
-  }
-  
-  public function singleQuery($query)
-  {
-    $this->log->debug('singleQuery: '.$query);
-    return $this->db->singleQuery($query);
-  }
-  
+
   public function lastInsertRowid()
   {
     return $this->db->lastInsertRowid();
@@ -69,46 +120,5 @@ class SqliteStorage
     return $this->db->lastError();
   }
 }
-
-function storage_init()
-{
-  global $_PREFS,$_STORAGE;
-  
-  // TODO Add in some locking using a transaction and test for tables here
-  $log = LoggerManager::getLogger('swim.storage');
-  $log->debug('Starting SQLite storage engine: '.sqlite_libversion());
-  $create=false;
-  if (!is_file($_PREFS->getPref('storage.config').'/storage.db'))
-  {
-    $create=true;
-  }
-  $_STORAGE = new SqliteStorage($_PREFS->getPref('storage.config').'/storage.db');
-  if ($create)
-  {
-    $log->debug('Initialising database');
-    $file = fopen($_PREFS->getPref('storage.bootstrap').'/storage.sql','r');
-    $query='';
-    while (!feof($file))
-    {
-      $line=rtrim(fgets($file));
-      $query.=$line;
-      if (substr($query,-1)==';')
-      {
-        if (!$_STORAGE->queryExec($query))
-        {
-          $log->error('Error running query '.$query.' '.$_STORAGE->lastError());
-        }
-        $query='';
-      }
-      else
-      {
-        $query.=' ';
-      }
-    }
-    fclose($file);
-  }
-}
-
-storage_init();
 
 ?>

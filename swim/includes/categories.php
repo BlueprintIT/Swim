@@ -71,10 +71,9 @@ class Category
     $result = $_STORAGE->query('SELECT id,parent,name FROM Category WHERE parent='.$this->id.';');
     while ($result->valid())
     {
-      $id=$result->current();
+      $id=$result->fetch();
       $cat=$this->container->getReadyCategory($id[0],$id[1],$id[2]);
       $cat->clean();
-      $result->next();
     }
     $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.';');
   }
@@ -105,7 +104,7 @@ class Category
     $set=$_STORAGE->query('SELECT page,sortkey FROM PageCategory WHERE category='.$this->id.' ORDER BY sortkey;');
     while ($set->valid())
     {
-      $details = $set->current();
+      $details = $set->fetch();
       $page=Resource::decodeResource($details['page']);
       if ($page!==null)
       {
@@ -116,12 +115,11 @@ class Category
         $this->log->warn("Removing missing page from category ".$details['page']);
         $this->remove($details['sortkey']);
       }
-      $set->next();
     }
     $set=$_STORAGE->query('SELECT id,name,sortkey FROM Category WHERE parent='.$this->id.';');
     while ($set->valid())
     {
-      $details = $set->current();
+      $details = $set->fetch();
       $cat = ObjectCache::getItem('category', $details['id']);
       if ($cat===null)
       {
@@ -129,14 +127,12 @@ class Category
         ObjectCache::setItem('category', $details['id'], $cat);
       }
       $list[$details['sortkey']]=$cat;
-      $set->next();
     }
     $set=$_STORAGE->query('SELECT name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
-      $details = $set->current();
+      $details = $set->fetch();
       $list[$details['sortkey']] = new Link($details['name'],$details['link']);
-      $set->next();
     }
     ksort($list);
     return $list;
@@ -431,15 +427,15 @@ function display_<?= $this->id ?>_tree(event) {
 <?
     array_push($this->categorys, "root");
     parent::display($indent);
+    array_pop($this->categorys);
     if (count($this->pages)>0)
     {
       print("  var unused = new BlueprintIT.widget.StyledTextNode('Uncategorised pages', root, true);\n");
-      array_push($this->containers, "unused");
+      array_push($this->categorys, "unused");
       foreach (array_keys($this->pages) as $path)
       {
         $page=Resource::decodeResource($path);
-        print($indent.$this->padding.$this->padding.'<li class="page">');
-        $this->displayItem($page);
+        $this->displayItem($page,$indent);
       }
     }
 ?>

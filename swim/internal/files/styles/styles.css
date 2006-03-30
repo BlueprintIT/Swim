@@ -80,12 +80,12 @@ table {
 }
 
 /* first or middle sibling, no children */
-.ygtvtn.page { background-image: url(../images/pagetn.gif) !important; width:34px !important; }
-.ygtvtn.link { background-image: url(../images/linktn.gif) !important; width:34px !important; }
+.ygtvtn.page { background-image: -swim-url(../images/pagetn.gif) !important; width:34px !important; }
+.ygtvtn.link { background-image: -swim-url(../images/linktn.gif) !important; width:34px !important; }
 
 /* last sibling, no children */
-.ygtvln.page { background-image: url(../images/pageln.gif) !important; width:34px !important; }
-.ygtvln.link { background-image: url(../images/linkln.gif) !important; width:34px !important; }
+.ygtvln.page { background-image: -swim-url(../images/pageln.gif) !important; width:34px !important; }
+.ygtvln.link { background-image: -swim-url(../images/linkln.gif) !important; width:34px !important; }
 
 #categorytree .selected {
   background-color: Highlight;

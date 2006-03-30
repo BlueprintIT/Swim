@@ -46,7 +46,7 @@ class User
       if ($results->valid())
       {
         $this->log->debug('User is valid');
-        $details=$results->current();
+        $details=$results->fetch();
         $this->exists=true;
         $this->name=$details['name'];
         $this->password=$details['password'];
@@ -54,10 +54,9 @@ class User
         $results = $_STORAGE->query("SELECT access FROM UserAccess WHERE user='".$_STORAGE->escape($username)."';");
         while ($results->valid())
         {
-          $details=$results->current();
+          $details=$results->fetch();
           $this->log->debug('Found group '.$details['access']);
           $this->groups[]=$details['access'];
-          $results->next();
         }
       }
 		}
@@ -145,13 +144,12 @@ class User
     $result = 0;
     while ($results->valid())
     {
-      $id=$results->current();
+      $id=$results->fetch();
       if ($id[0]<0)
       {
         return false;
       }
       $result+=$id[0];
-      $results->next();
     }
     if ($result>0)
     {
@@ -493,7 +491,7 @@ class Group
     $results = $_STORAGE->query("SELECT * FROM Access WHERE id='".$_STORAGE->escape($id)."';");
     if ($results->valid())
     {
-      $details=$results->current();
+      $details=$results->fetch();
       $this->valid=true;
       $this->name = $details['name'];
       $this->description = $details['description'];
@@ -573,10 +571,9 @@ class UserManager
     $result = $_STORAGE->query("SELECT id FROM User;");
     while ($result->valid())
     {
-      $id = $result->current();
+      $id = $result->fetch();
       $user = new User($id[0]);
       $users[$user->getUsername()]=$user;
-      $result->next();
     }
     return $users;
   }
@@ -589,10 +586,9 @@ class UserManager
     $result = $_STORAGE->query("SELECT id FROM Access WHERE id<>'root';");
     while ($result->valid())
     {
-      $id = $result->current();
+      $id = $result->fetch();
       $group = new Group($id[0]);
       $groups[$group->getID()]=$group;
-      $result->next();
     }
     return $groups;
   }
