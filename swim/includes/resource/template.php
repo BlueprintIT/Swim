@@ -346,11 +346,25 @@ class Template extends Resource
 		}
 		if ($block!==null)
 		{
+			if (isset($parser->data['block']))
+				array_push($parser->data['stack'], array('id' => $parser->data['blockid'], 'block', $parser->data['block']));
+			
 			$parser->data['blockid']=$attrs['id'];
 			$parser->data['block']=$block;
+			
 			$result=$block->display($parser,$attrs,$text);
-			unset($parser->data['block']);
-			unset($parser->data['blockid']);
+			
+			$details = array_pop($parser->data['stack']);
+			if ($details !=null)
+			{
+				$parser->data['blockid']=$details['id'];
+				$parser->data['block']=$details['block'];
+			}
+			else
+			{
+				unset($parser->data['block']);
+				unset($parser->data['blockid']);
+			}
 		}
 		return true;
 	}
@@ -463,6 +477,7 @@ class Template extends Resource
 			}
 		}
 		$page=$parser->data['page'];
+		$this->log->debug('Displaying variable '.$name.' for '.$page->id);
 		if ($page->prefs->isPrefSet($name))
 		{
 			print($page->prefs->getPref($name));
@@ -586,7 +601,7 @@ class Template extends Resource
 		// Parse the template and display
 		$parser = new TemplateParser();
 		$parser->addEmptyTag("img");
-		$parser->data=array('page'=>$page,'template'=>$this,'request'=>$request,'head'=>'');
+		$parser->data=array('page'=>$page,'template'=>$this,'request'=>$request,'head'=>'', 'stack'=>array());
 		$parser->addObserver('head',$this);
 		$parser->addObserver('html',$this);
 		$parser->addObserver('block',$this);

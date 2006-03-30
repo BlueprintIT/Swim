@@ -66,7 +66,7 @@ class Block extends Resource
 			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
 			foreach ($styles as $style)
 			{
-				print('<stylesheet src="/'.$style.'"/>');
+				print('<stylesheet src="'.$style.'"/>');
 			}
 		}
     if (!isset($attrs['notag']))
@@ -126,14 +126,19 @@ class Block extends Resource
 		}
 		else
 		{
+	    $this->registerObservers($parser);
 			ob_start();
 			$this->displayIntro($attrs);
+	    $text=ob_get_contents();
+	    ob_clean();
+	    $parser->parseText($text);
 			$this->displayContent($parser,$attrs,$text);
+	    $text=ob_get_contents();
+	    ob_clean();
+	    $parser->parseText($text);
 			$this->displayOutro($attrs);
 	    $text=ob_get_contents();
 	    ob_end_clean();
-	    $this->log->debug('Re-parsing content');
-	    $this->registerObservers($parser);
 	    $parser->parseText($text);
 	    $this->unregisterObservers($parser);
 		}

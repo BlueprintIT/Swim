@@ -20,14 +20,6 @@ class TemplateBlock extends HtmlBlock
 		$this->HtmlBlock($container,$id,$version);
 	}
 	
-	function getBlockEditor($request)
-	{
-		$request->data['file']=$request->query['file'];
-		$container=getContainer('internal');
-		$page=$container->getPage('htmledit');
-		return $page;
-	}
-	
 	function canEdit($request,$data,$attrs)
 	{
 		return false;

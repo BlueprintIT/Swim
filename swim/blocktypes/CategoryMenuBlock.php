@@ -18,7 +18,7 @@ class CategoryMenuBlock extends Block
   var $maxdepth = 2;
   var $root;
   var $orientation = 'vertical';
-  var $container;
+  var $cont;
   
   function CategoryMenuBlock($container,$id,$version)
   {
@@ -32,14 +32,14 @@ class CategoryMenuBlock extends Block
     if ($this->prefs->isPrefSet('block.orientation'))
       $this->orientation=$this->prefs->getPref('block.orientation');
     if ($this->prefs->isPrefSet('block.container'))
-      $this->container=$this->prefs->getPref('block.container');
+      $this->cont=$this->prefs->getPref('block.container');
     else
-      $this->container=$_PREFS->getPref('container.default');
+      $this->cont=$_PREFS->getPref('container.default');
   }
   
   function getModifiedDate()
   {
-    $cm = getContainer($this->container);
+    $cm = getContainer($this->cont);
     return $cm->getModifiedDate();
   }
   
@@ -173,7 +173,7 @@ class CategoryMenuBlock extends Block
         $this->displayVerticalTableItems($category,$depth,$showroot);
       }
     }
-    else if ($tag=='ul')
+    else if ($tag=='ul' || $depth>0)
     {
       $this->displayListItems($category,$depth,$showroot);
     }
@@ -214,12 +214,12 @@ class CategoryMenuBlock extends Block
   
   function displayContent($parser,$attrs,$text)
   {
-    print('<script src="/global/file/scripts/cbdom.js"/>');
-    print('<script src="/global/file/scripts/bpmm.js"/>');
+    print('<script src="/design/file/scripts/cbdom.js"/>');
+    print('<script src="/design/file/scripts/bpmm.js"/>');
     
     $this->log->debug('Displaying category menu');
     
-    $cm = getContainer($this->container);
+    $cm = getContainer($this->cont);
     
     if ((isset($this->root))&&($this->root<=0))
     {
