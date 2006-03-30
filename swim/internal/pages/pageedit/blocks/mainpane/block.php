@@ -42,26 +42,35 @@ include 'image.php';
 <table style="table-layout: fixed; border-spacing: 5px;">
 <?
 $layouts = $page->container->layouts->getPageLayouts();
-if (count($layouts)>0)
+$count = 0;
+foreach($layouts as $id => $l)
+{
+  if ($l->hidden != false)
+  	$count++;
+  if ($count==2)
+  	break;
+}
+
+if ($count>1)
 {
 ?>
 <tr>
   <td style="vertical-align: top"><label for="layout">Layout:</label></td>
   <td style="vertical-align: top"><select id="layout" onchange="this.form.submit()" name="layout">
 <?
-foreach($layouts as $id => $l)
-{
-  if ($l->hidden == false)
-  {
+	foreach($layouts as $id => $l)
+	{
+	  if ($l->hidden == false)
+	  {
 ?>    <option value="<?= $id ?>"<?
-
-  if ($layout===$l)
-    print(' selected="true"');
-  print('>'.$l->getName()) 
+	
+	  if ($layout===$l)
+	    print(' selected="true"');
+	  print('>'.$l->getName()) 
 ?></option>
 <?
-  }
-}
+	  }
+	}
 ?>
 </select></td>
   <td style="vertical-align: top">The layout determines what the page contains and how it is organised.</td>
