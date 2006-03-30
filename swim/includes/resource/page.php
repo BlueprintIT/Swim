@@ -212,7 +212,7 @@ class Page extends Resource
     {
       $version=false;
     }
-    $block=Resource::decodeResource($this->prefs->getPref($blockpref.'.resource'),$version);
+    $block=Resource::decodeResource(substr($this->prefs->getPref($blockpref.'.resource'),1),$version);
     $this->blocks[$id]=$block;
   }
   
@@ -252,7 +252,7 @@ class Page extends Resource
 	function getReferencedTemplate()
 	{
     $this->log->debug("Referenced template is ".$this->prefs->getPref('page.template'));
-		$template=Resource::decodeResource($this->prefs->getPref('page.template'));
+		$template=Resource::decodeResource(substr($this->prefs->getPref('page.template'),1));
 		return $template;
 	}
 }

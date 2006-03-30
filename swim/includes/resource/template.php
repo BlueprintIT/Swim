@@ -336,7 +336,7 @@ class Template extends Resource
 		if (isset($attrs['src']))
 		{
       $this->log->debug('Loading block '.$attrs['src']);
-			$block=Resource::decodeResource($attrs['src']);
+			$block=Resource::decodeResource(substr($attrs['src'],1));
 		}
 		else if (isset($attrs['id']))
 		{
