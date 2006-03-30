@@ -115,6 +115,12 @@ class Template extends Resource
 			$request->method=$method;
 			$request->resource=substr($url,1);
 		}
+		else if ($url=='page')
+		{
+			$request = new Request();
+			$request->method=$method;
+			$request->resource=$data['page']->getPath();
+		}
 		else
 		{
 		  $request=$this->generateRelativeURL($data,$url,$method);
