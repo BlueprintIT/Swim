@@ -21,7 +21,6 @@ $content=$page->getReferencedBlock('content');
 if ($content->prefs->isPrefSet('block.stylesheets'))
 {
     $styles=explode(',',$content->prefs->getPref('block.stylesheets'));
-    $styles[]='global/file/styles/global.css';
     $styles[]='internal/file/styles/editor.css';
     $list = '';
     foreach ($styles as $s)
@@ -29,6 +28,7 @@ if ($content->prefs->isPrefSet('block.stylesheets'))
         $style = new Request();
         $style->method='view';
         $style->resource=$s;
+        $style->query['CONTEXT']='body';
         $list.='"'.$style->encode().'",';
     }
     $list=substr($list,0,-1);

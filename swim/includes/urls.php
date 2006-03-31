@@ -319,7 +319,10 @@ class Request
 	  	$url=$url.$this->method;
 	  	if (isset($this->resource))
 	  	{
-	  		$url.='/'.$this->resource;
+	  		if (substr($this->resource,0,1)!='/')
+		  		$url.='/'.$this->resource;
+		  	else
+		  		$url.=$this->resource;
 	  	}
 	    return $host.$url;
 	  }

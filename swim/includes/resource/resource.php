@@ -682,4 +682,11 @@ function getAllResources($type)
   return $resources;
 }
 
+require $_PREFS->getPref('storage.includes').'/resource/working.php';
+require $_PREFS->getPref('storage.includes').'/resource/file.php';
+require $_PREFS->getPref('storage.includes').'/resource/container.php';
+require $_PREFS->getPref('storage.includes').'/resource/page.php';
+require $_PREFS->getPref('storage.includes').'/resource/template.php';
+require $_PREFS->getPref('storage.includes').'/resource/block.php';
+
 ?>

@@ -61,16 +61,11 @@ class Block extends Resource
 	
 	function displayIntro($attrs)
 	{
-		if ($this->prefs->isPrefSet('block.stylesheets'))
-		{
-			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
-			foreach ($styles as $style)
-			{
-				print('<stylesheet src="'.$style.'"/>');
-			}
-		}
+		$attrlist = '';
+		$stylecontext = '';
     if (!isset($attrs['notag']))
     {
+  		$stylecontext = '?CONTEXT='.urlencode($this->getType().'#'.$attrs['id']);
   		$class='block';
   		if (isset($attrs['class']))
   		{
@@ -83,6 +78,19 @@ class Block extends Resource
       {
         $attrlist.=' '.$attr.'="'.$value.'"';
       }
+    }
+
+		if ($this->prefs->isPrefSet('block.stylesheets'))
+		{
+			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
+			foreach ($styles as $style)
+			{
+				print('<stylesheet src="'.$style.$stylecontext.'"/>');
+			}
+		}
+
+    if (!isset($attrs['notag']))
+    {
   		print('<'.$this->getType().' '.$attrlist.'>');
     }
 	}
