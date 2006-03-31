@@ -127,11 +127,26 @@ if ($page->isCurrentVersion())
 ?>
 </td>
 </tr>
+<?
+$layouts = $page->container->layouts->getPageLayouts();
+$count = 0;
+foreach($layouts as $id => $l)
+{
+  if ($l->hidden != false)
+  	$count++;
+  if ($count==2)
+  	break;
+}
+
+if ($count>1)
+{
+?>
 <tr>
   <td style="vertical-align: top">Layout:</td>
   <td style="vertical-align: top"><?= $layout->getName() ?></td>
 </tr>
 <?
+}
 foreach ($layout->variables as $pref => $variable)
 {
 ?>
