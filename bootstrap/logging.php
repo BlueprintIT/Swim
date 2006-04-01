@@ -492,12 +492,6 @@ class LoggerManager
     array_pop(self::$uids);
   }
 	
-	static function loadPreferences()
-	{
-		global $_PREFS;
-		self::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
-	}
-	
 	static function getOutputter()
 	{
 		return self::$output;
