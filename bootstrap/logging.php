@@ -13,20 +13,21 @@
  * $Revision$
  */
 
-define('SWIM_LOG_NONE',0);
-define('SWIM_LOG_FATAL',1);
-define('SWIM_LOG_ERROR',2);
-define('SWIM_LOG_WARN',3);
-define('SWIM_LOG_INFO',4);
-define('SWIM_LOG_DEBUG',5);
-define('SWIM_LOG_TRACE',5);
-define('SWIM_LOG_ALL',2000);
+define('LOG_LEVEL_FATAL', 1);
+define('LOG_LEVEL_ERROR', LOG_LEVEL_FATAL+1);
+define('LOG_LEVEL_WARN', LOG_LEVEL_ERROR+1);
+define('LOG_LEVEL_INFO', LOG_LEVEL_WARN+1);
+define('LOG_LEVEL_DEBUG', LOG_LEVEL_INFO+1);
+define('LOG_LEVEL_TRACE', LOG_LEVEL_DEBUG+1);
+
+define('LOG_LEVEL_NONE', LOG_LEVEL_FATAL-1);
+define('LOG_LEVEL_ALL', LOG_LEVEL_TRACE);
 
 class LogOutput
 {
 	protected $pattern;
 	protected $tracePattern;
-	private $level = SWIM_LOG_ALL;
+	private $level = LOG_LEVEL_ALL;
 	
 	function LogOutput()
 	{
@@ -46,11 +47,16 @@ class LogOutput
 	function convertPattern($text,$vars)
 	{
 		$matches=array();
-		$count=preg_match_all('/\$\[([^=#$[\]]+?)\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
+		$count=preg_match_all('/\$\[([^=#$[\]]+?)([+-]\d+)?\]/',$text,$matches,PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER);
 		for($p=$count-1; $p>=0; $p--)
 		{
 			$pref=$matches[1][$p][0];
 			$offset=$matches[0][$p][1];
+			if (isset($matches[2][$p][0]))
+			{
+				$type = substr($matches[2][$p][0],0,1);
+				$padsize = substr($matches[2][$p][0],1);
+			}
 			$length=strlen($matches[0][$p][0]);
 			if (isset($vars[$pref]))
 			{
@@ -59,6 +65,20 @@ class LogOutput
 			else
 			{
 				$replacement='';
+			}
+			if (isset($type))
+			{
+				while (strlen($replacement)<$padsize)
+				{
+					if ($type=='-')
+					{
+						$replacement=' '.$replacement;
+					}
+					else
+					{
+						$replacement.=' ';
+					}
+				}
 			}
 			$text=substr_replace($text,$replacement,$offset,$length);
 		}
@@ -70,20 +90,23 @@ class LogOutput
 		$detail['txtlevel']='UNKNOWN';
 		switch($detail['level'])
 		{
-			case SWIM_LOG_FATAL:
+			case LOG_LEVEL_FATAL:
 				$detail['txtlevel']='FATAL';
 				break;
-			case SWIM_LOG_ERROR:
+			case LOG_LEVEL_ERROR:
 				$detail['txtlevel']='ERROR';
 				break;
-			case SWIM_LOG_WARN:
+			case LOG_LEVEL_WARN:
 				$detail['txtlevel']='WARN';
 				break;
-			case SWIM_LOG_INFO:
+			case LOG_LEVEL_INFO:
 				$detail['txtlevel']='INFO';
 				break;
-			case SWIM_LOG_DEBUG:
+			case LOG_LEVEL_DEBUG:
 				$detail['txtlevel']='DEBUG';
+				break;
+			case LOG_LEVEL_TRACE:
+				$detail['txtlevel']='TRACE';
 				break;
 		}
 		if ((isset($detail['args']))&&(count($detail['args'])>0))
@@ -113,6 +136,7 @@ class LogOutput
 		}
 		$detail['logger']=$logger->getName();
     $detail['uid']=LoggerManager::getUID();
+    $detail['time']=round((microtime(true)*1000)-LoggerManager::getBaseTime());
 		return $detail;
 	}
 	
@@ -143,8 +167,8 @@ class FileLogOutput extends LogOutput
 	{
 		$this->LogOutput();
 		$this->filename=$filename;
-		$this->pattern="[$[txtlevel] $[uid]] $[logger]: $[text] ($[file]:$[line])\n";
-		$this->tracePattern="$[logger]: $[function]$[arglist] ($[file]:$[line])\n";
+		$this->pattern="[$[time+5] $[txtlevel+5] $[uid-4]] $[logger+30]: $[text] ($[file]:$[line])\n";
+		$this->tracePattern="                   $[logger+30]: $[function]$[arglist] ($[file]:$[line])\n";
 	}
 	
 	function internalOutput($text)
@@ -342,92 +366,92 @@ class Logger
 	
 	function fatal($text)
 	{
-		$this->log(SWIM_LOG_FATAL,$text);
+		$this->log(LOG_LEVEL_FATAL,$text);
 	}
 	
 	function fataltrace($text)
 	{
-		$this->logtrace(SWIM_LOG_FATAL,$text);
+		$this->logtrace(LOG_LEVEL_FATAL,$text);
 	}
 	
 	function error($text)
 	{
-		$this->log(SWIM_LOG_ERROR,$text);
+		$this->log(LOG_LEVEL_ERROR,$text);
 	}
 	
 	function errortrace($text)
 	{
-		$this->logtrace(SWIM_LOG_ERROR,$text);
+		$this->logtrace(LOG_LEVEL_ERROR,$text);
 	}
 	
 	function warn($text)
 	{
-		$this->log(SWIM_LOG_WARN,$text);
+		$this->log(LOG_LEVEL_WARN,$text);
 	}
 	
 	function warntrace($text)
 	{
-		$this->logtrace(SWIM_LOG_WARN,$text);
+		$this->logtrace(LOG_LEVEL_WARN,$text);
 	}
 	
 	function info($text)
 	{
-		$this->log(SWIM_LOG_INFO,$text);
+		$this->log(LOG_LEVEL_INFO,$text);
 	}
 	
 	function infotrace($text)
 	{
-		$this->logtrace(SWIM_LOG_INFO,$text);
+		$this->logtrace(LOG_LEVEL_INFO,$text);
 	}
 	
   function debug($text)
   {
-    $this->log(SWIM_LOG_DEBUG,$text);
+    $this->log(LOG_LEVEL_DEBUG,$text);
   }
   
   function debugtrace($text)
   {
-    $this->logtrace(SWIM_LOG_DEBUG,$text);
+    $this->logtrace(LOG_LEVEL_DEBUG,$text);
   }
   
   function trace($text)
   {
-    $this->log(SWIM_LOG_TRACE,$text);
+    $this->log(LOG_LEVEL_TRACE,$text);
   }
   
   function tracetrace($text)
   {
-    $this->logtrace(SWIM_LOG_TRACE,$text);
+    $this->logtrace(LOG_LEVEL_TRACE,$text);
   }
   
 	function isFatalEnabled()
 	{
-		return $this->getLevel()>=SWIM_LOG_FATAL;
+		return $this->getLevel()>=LOG_LEVEL_FATAL;
 	}
 	
 	function isErrorEnabled()
 	{
-		return $this->getLevel()>=SWIM_LOG_ERROR;
+		return $this->getLevel()>=LOG_LEVEL_ERROR;
 	}
 	
 	function isWarnEnabled()
 	{
-		return $this->getLevel()>=SWIM_LOG_WARN;
+		return $this->getLevel()>=LOG_LEVEL_WARN;
 	}
 	
 	function isInfoEnabled()
 	{
-		return $this->getLevel()>=SWIM_LOG_INFO;
+		return $this->getLevel()>=LOG_LEVEL_INFO;
 	}
   
   function isDebugEnabled()
   {
-    return $this->getLevel()>=SWIM_LOG_DEBUG;
+    return $this->getLevel()>=LOG_LEVEL_DEBUG;
   }
   
   function isTraceEnabled()
   {
-    return $this->getLevel()>=SWIM_LOG_TRACE;
+    return $this->getLevel()>=LOG_LEVEL_TRACE;
   }
 }
 
@@ -436,14 +460,21 @@ class LoggerManager
 	private static $loggers = array();
   private static $root;
   private static $uids = array();
+  private static $basetime;
 	
 	static function init()
 	{
+		self::$basetime = microtime(true)*1000;
     self::$root = new Logger(null,'');
-    self::$root->setLevel(SWIM_LOG_WARN);
+    self::$root->setLevel(LOG_LEVEL_WARN);
 		self::$root->setLogOutput(new PageLogOutput());
     self::pushState();
 	}
+  
+  static function getBaseTime()
+  {
+  	return self::$basetime;
+  }
   
   static function getUID()
   {
@@ -577,23 +608,23 @@ function caught_error($type,$text,$file,$line)
 	
 	if (($type==E_ERROR)||($type==E_PARSE)||($type==E_CORE_ERROR)||($type==E_COMPILE_ERROR))
 	{
-		$log->log(SWIM_LOG_FATAL,$text,$trace);
+		$log->log(LOG_LEVEL_FATAL,$text,$trace);
 	}
 	else if (($type==E_WARNING)||($type==E_CORE_WARNING)||($type==E_COMPILE_WARNING)||($type==E_USER_ERROR))
 	{
-		$log->log(SWIM_LOG_ERROR,$text,$trace);
+		$log->log(LOG_LEVEL_ERROR,$text,$trace);
 	}
 	else if (($type==E_NOTICE)||($type==E_USER_WARNING))
 	{
-		$log->log(SWIM_LOG_WARN,$text,$trace);
+		$log->log(LOG_LEVEL_WARN,$text,$trace);
 	}
 	else if ($type==E_USER_NOTICE)
 	{
-		$log->log(SWIM_LOG_INFO,$text,$trace);
+		$log->log(LOG_LEVEL_INFO,$text,$trace);
 	}
 	else if ($type==2048)
 	{
-		$log->log(SWIM_LOG_DEBUG,$text,$trace);
+		$log->log(LOG_LEVEL_DEBUG,$text,$trace);
 	}
 }
 

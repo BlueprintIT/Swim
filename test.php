@@ -65,21 +65,21 @@ AddonManager::disable();
 SwimEngine::ensureStarted();
 
 LoggerManager::setLogOutput("",new PageLogOutput());
-LoggerManager::setLogLevel('test',SWIM_LOG_INFO);
+LoggerManager::setLogLevel('test',LOG_LEVEL_INFO);
 
 if (isset($_GET['level']))
 {
   $lev = strtolower($_GET['level']);
   if ($lev=='debug')
-    LoggerManager::setLogLevel('test',SWIM_LOG_DEBUG);
+    LoggerManager::setLogLevel('test',LOG_LEVEL_DEBUG);
   else if ($lev=='info')
-    LoggerManager::setLogLevel('test',SWIM_LOG_INFO);
+    LoggerManager::setLogLevel('test',LOG_LEVEL_INFO);
   else if ($lev=='warn')
-    LoggerManager::setLogLevel('test',SWIM_LOG_WARN);
+    LoggerManager::setLogLevel('test',LOG_LEVEL_WARN);
   else if ($lev=='error')
-    LoggerManager::setLogLevel('test',SWIM_LOG_ERROR);
+    LoggerManager::setLogLevel('test',LOG_LEVEL_ERROR);
   else if ($lev=='fatal')
-    LoggerManager::setLogLevel('test',SWIM_LOG_FATAL);
+    LoggerManager::setLogLevel('test',LOG_LEVEL_FATAL);
 }
 
 $log=LoggerManager::getLogger('test');

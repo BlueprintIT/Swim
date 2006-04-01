@@ -270,9 +270,9 @@ class MenuBlock extends Block
 
 		$file=$this->prefs->getPref('block.menublock.filename','block.xml');
 		$parser = new MenuParser();
-		//LoggerManager::setLogLevel('',SWIM_LOG_ALL);
+		//LoggerManager::setLogLevel('',LOG_LEVEL_ALL);
 		$parser->parseFile($this->getDir().'/'.$file);
-		//LoggerManager::setLogLevel('',SWIM_LOG_WARN);
+		//LoggerManager::setLogLevel('',LOG_LEVEL_WARN);
 		$this->rootmenu=$parser->menu;
 	}
 	
