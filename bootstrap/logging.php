@@ -136,7 +136,7 @@ class LogOutput
 		}
 		$detail['logger']=$logger->getName();
     $detail['uid']=LoggerManager::getUID();
-    $detail['time']=round((microtime(true)*1000)-LoggerManager::getBaseTime());
+    $detail['time']=round((microtime(true)-LoggerManager::getBaseTime())*1000);
 		return $detail;
 	}
 	
@@ -464,7 +464,7 @@ class LoggerManager
 	
 	static function init()
 	{
-		self::$basetime = microtime(true)*1000;
+		self::$basetime = microtime(true);
     self::$root = new Logger(null,'');
     self::$root->setLevel(LOG_LEVEL_WARN);
 		self::$root->setLogOutput(new PageLogOutput());

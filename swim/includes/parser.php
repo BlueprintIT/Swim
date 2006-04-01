@@ -32,7 +32,7 @@ class Parser
     $this->_attrvalue='';
     $this->_quote='';
     $this->_log=LoggerManager::getLogger('swim.parser.'.get_class($this));
-    $this->_log->debug('In state 0');
+    $this->_log->trace('In state 0');
   }
   
   // Called when a new start tag is found
@@ -64,7 +64,7 @@ class Parser
   // Parses a whole file in one call
   function parseFile($filename)
   {
-    $this->_log->debug('Parsing file '.$filename);
+    $this->_log->trace('Parsing file '.$filename);
     if (($source=fopen($filename,'r'))!==false)
     {
 	    while (!feof($source))
@@ -129,22 +129,22 @@ class Parser
           if (isset($matches[3][0]))
           {
             $tagname=$matches[3][0];
-            $this->_log->debug('Start tag for '.$tagname);
+            $this->_log->trace('Start tag for '.$tagname);
             if ($this->onStartTag($tagname))
             {
-            	$this->_log->debug('Capturing tag '.$tagname);
+            	$this->_log->trace('Capturing tag '.$tagname);
               $this->_tagname=$tagname;
               $this->_state=1;
             }
             else
             {
-            	$this->_log->debug('Ignoring tag '.$tagname);
+            	$this->_log->trace('Ignoring tag '.$tagname);
               $this->onText('<'.$matches[1][0]);
             }
           }
           else
           {
-            $this->_log->debug('End tag for '.$matches[2][0]);
+            $this->_log->trace('End tag for '.$matches[2][0]);
             if (!$this->onEndTag($matches[2][0]))
             {
               $this->onText('<'.$matches[1][0]);
@@ -164,21 +164,21 @@ class Parser
         {
           if ($text[0]=='>')
           {
-            $this->_log->debug('Found end of start tag, moving to state 0');
+            $this->_log->trace('Found end of start tag, moving to state 0');
             $this->_state=0;
             $this->onStartTagComplete($this->_tagname);
             $this->parseText(substr($text,1));
           }
           else if (substr($text,0,2)=='/>')
           {
-            $this->_log->debug('Found end of simple tag, moving to state 0');
+            $this->_log->trace('Found end of simple tag, moving to state 0');
             $this->_state=0;
             $this->onEndTag($this->_tagname);
             $this->parseText(substr($text,2));
           }
           else if (preg_match('/^('.$validregex.')=(\'|")/',$text,$matches))
           {
-            $this->_log->debug('Found attribute '.$matches[1].' moving to state 2');
+            $this->_log->trace('Found attribute '.$matches[1].' moving to state 2');
             $this->_attrname=$matches[1];
             $this->_attrvalue='';
             $this->_quote=$matches[2];
@@ -195,7 +195,7 @@ class Parser
       case 2:
         if (preg_match('/^(.*?)'.$this->_quote.'/',$text,$matches))
         {
-          $this->_log->debug('Found end of attribute. Back to state 1.');
+          $this->_log->trace('Found end of attribute. Back to state 1.');
           $this->_attrvalue.=$matches[1];
           $this->_state=1;
           $this->onAttribute($this->_attrname,$this->_attrvalue);
@@ -266,7 +266,7 @@ class StackedParser extends Parser
   // Pushes a new tag onto the stack
   function pushStack($tagname)
   {
-    $this->_log->debug('Pushing '.$tagname. ' onto the stack');
+    $this->_log->trace('Pushing '.$tagname. ' onto the stack');
     $this->_tagstack[]=array('tag' => $tagname, 'attrs' => array(), 'text' => '');
     $this->_current=&$this->_tagstack[count($this->_tagstack)-1];
   }
@@ -275,7 +275,7 @@ class StackedParser extends Parser
   function popStack()
   {
     $result=array_pop($this->_tagstack);
-    $this->_log->debug('Popped '.$result['tag'].' off the stack');
+    $this->_log->trace('Popped '.$result['tag'].' off the stack');
     if (count($this->_tagstack)>0)
     {
       $this->_current=&$this->_tagstack[count($this->_tagstack)-1];
@@ -318,7 +318,7 @@ class TemplateParser extends StackedParser
 	// Adds an object observer to the parser
 	function addObserver($tagname,$observer)
 	{
-    $this->_log->debug('Observer added for '.$tagname);
+    $this->_log->trace('Observer added for '.$tagname);
     if (!isset($this->observers[$tagname]))
     {
     	$this->observers[$tagname]=array();
@@ -353,7 +353,7 @@ class TemplateParser extends StackedParser
   // Adds a callback to the parser. Tags with this name will be extracted.
   function addCallback($tagname,$function)
   {
-    $this->_log->debug('Callback added for '.$tagname);
+    $this->_log->trace('Callback added for '.$tagname);
   	$this->addObserver($tagname,new TagObserver($function));
   }
   
@@ -367,7 +367,7 @@ class TemplateParser extends StackedParser
   function callObserver($observer,$tagname,$attrs,$content)
   {
     ob_start();
-    $this->_log->debug('Calling observer for '.$tagname);
+    $this->_log->trace('Calling observer for '.$tagname);
     $done=$observer->observeTag($this,$tagname,$attrs,$content);
     $text=ob_get_contents();
     ob_end_clean();
@@ -407,7 +407,7 @@ class TemplateParser extends StackedParser
       }
       if (isset($this->observers[$tag]))
       {
-		    $this->_log->debug('Buffering callbacks');
+		    $this->_log->trace('Buffering callbacks');
 		    foreach ($this->observers[$tag] as $observer)
 		    {
 		    	if ($this->callObserver($observer,$tag,$result['attrs'],$result['text']))
