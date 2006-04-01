@@ -243,16 +243,4 @@ class Preferences
   }
 }
 
-function saveSitePreferences()
-{
-	global $_PREFS;
-	
-	$confdir=$host->getPref('storage.config');
-	LockManager::lockResourceWrite($confdir);
-	$file=fopen($_PREFS->getPref('storage.config').'/site.conf','w');
-	$_PREFS->savePreferences($file);
-	fclose($file);
-	LockManager::unlockResource($confdir);
-}
-
 ?>
