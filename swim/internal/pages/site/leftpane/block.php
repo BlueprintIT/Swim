@@ -32,19 +32,10 @@ class LinkedCategoryTree extends YahooPageTree
   }
 }
 
-$cont = getContainer($_PREFS->getPref('container.default'));
-$resource = Resource::decodeResource($request);
-if ($resource!==null)
-{
-  if ($resource->isContainer())
-  {
-    $cont = $resource;
-  }
-  else
-  {
-    $cont = $resource->container;
-  }
-}
+if (isset($request->query['container']))
+	$cont = getContainer($query->query['container']);
+else
+	$cont = getContainer($_PREFS->getPref('container.default'));
 
 $edit = new Request();
 $edit->method='view';
