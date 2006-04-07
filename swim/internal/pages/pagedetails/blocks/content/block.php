@@ -1,18 +1,7 @@
 <?
 
-$cont = getContainer($_PREFS->getPref('container.default'));
-$page = Resource::decodeResource($request);
-if ($page!==null)
-{
-  if ($page->isContainer())
-  {
-    $cont = $page;
-  }
-  else
-  {
-    $cont = $page->container;
-  }
-}
+$page = Resource::decodeResource($request->query['page']);
+$cont = $page->container;
 
 $pageprefs = $page->prefs;
 $layout=$page->getLayout();
