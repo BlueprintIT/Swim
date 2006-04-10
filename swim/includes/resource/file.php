@@ -96,6 +96,11 @@ class File extends Resource
     return determineContentType($this->getDir().'/'.$this->id);
   }
   
+  function getFileName()
+  {
+  	return $this->getDir().'/'.$this->id;
+  }
+  
   function outputFile()
   {
     if (isset($this->parent))

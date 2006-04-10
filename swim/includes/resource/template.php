@@ -128,13 +128,23 @@ class Template extends Resource
 		return $request;
 	}
 	
-	function generateURL($data,$url,$method='view')
+	function generateURL($data,$url,$method='view',$params=array())
 	{
 		if (strpos($url,"://")>0)
 		{
+			if (count($params)>0)
+			{
+				if (strpos($url,"?")===false)
+					$url=$url.'?';
+				foreach($params as $key => $value)
+					$url=$url.$key.'='.htmlentities($value).'&';
+				$url=substr($url,0,-1);
+			}
 			return $url;
 		}
 	  $request=$this->generateRequest($data,$url,$method);
+	  foreach ($params as $key => $value)
+	  	$request->query[$key]=$value;
 	  return $request->encode();
 	}
 	
@@ -333,7 +343,26 @@ class Template extends Resource
 	function displayImage($parser,$tag,$attrs,$text)
 	{
     $this->log->debug('Adding image '.$attrs['src']);
-		$attrs['src']=$this->generateURL($parser->data,$attrs['src']);
+    $method = 'view';
+    $params = array();
+    if (isset($attrs['maxheight']))
+    {
+    	$params['maxheight']=$attrs['maxheight'];
+    	unset($attrs['maxheight']);
+    }
+    if (isset($attrs['maxwidth']))
+    {
+    	$params['maxwidth']=$attrs['maxwidth'];
+    	unset($attrs['maxheight']);
+    }
+    if (count($params)>0)
+    	$method='resize';
+    if (isset($attrs['padding']))
+    {
+    	$params['padding']=$attrs['padding'];
+    	unset($attrs['padding']);
+    }
+		$attrs['src']=$this->generateURL($parser->data,$attrs['src'],$method,$params);
 		$this->displayElement($parser,'img',$attrs,$text,false);
 		return true;
 	}
