@@ -113,7 +113,7 @@ class Resource
 	function loadBlock($id,$version = false)
 	{
 		$block = loadBlock($this->getDir().'/blocks/'.$id,$this,$id,$version);
-		if (($block!==false)&&($block->exists()))
+		if (($block!==null)&&($block->exists()))
 		{
 			return $block;
 		}

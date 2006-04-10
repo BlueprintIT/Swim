@@ -23,17 +23,23 @@ class LinkedCategoryTree extends YahooPageTree
       if ($request->resource!=$page->getPath())
       {
         $link = new Request();
-        $link->resource = $page->getPath();
-        $link->method='admin';
+        $link->resource='internal/page/pagedetails';
+        $link->query['page'] = $page->getPath();
+        $link->method='view';
         return $link->encode();
       }
     }
     return parent::getItemLink($page);
   }
+  
+  function getItemTarget($item)
+  {
+  	return 'main';
+  }
 }
 
 if (isset($request->query['container']))
-	$cont = getContainer($query->query['container']);
+	$cont = getContainer($request->query['container']);
 else
 	$cont = getContainer($_PREFS->getPref('container.default'));
 

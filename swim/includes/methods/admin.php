@@ -24,24 +24,16 @@ function method_admin($request)
   if ($request->resource!='')
   	$resource=Resource::decodeResource($request);
 
-	if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_READ)))
+	if ($_USER->isLoggedIn())
   {
-    if (($request->resource=='')||($resource!==null))
-    {
-      if (($resource===null)||($resource->isPage())||($resource->isContainer()))
-      {
-        $page = Resource::decodeResource('internal/page/pagedetails');
-        $page->display($request);
-    	}
-    	else
-    	{
-        displayGeneralError($request,'You can only administrate pages.');
-    	}
-    }
-    else
-    {
-    	displayNotFound($request);
-    }
+		foreach (AdminManager::$sections as $section)
+		{
+		  if ($section->isAvailable())
+		  {
+		  	redirect($section->getURL());
+		  	return;
+		  }
+		}
   }
   else
   {

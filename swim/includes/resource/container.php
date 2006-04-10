@@ -572,8 +572,9 @@ class ContainerAdminSection
   public function getURL()
   {
     $request = new Request();
-    $request->method='admin';
-    $request->resource=$this->container->id;
+    $request->method='view';
+    $request->resource='internal/page/site';
+    $request->query['container']=$this->container->id;
     return $request->encode();
   }
   
@@ -590,17 +591,16 @@ class ContainerAdminSection
   {
     global $_PREFS;
     
-    if (($request->method!='admin')&&($request->method!='edit'))
+    if ($request->method!='view')
       return false;
-    
-    $resource = Resource::decodeResource($request);
-    if ($resource===null)
-      return $this->container->id == $_PREFS->getPref('container.default');
-    
-    if (($resource===$this->container)||($resource->container===$this->container))
-      return true;
-    
-    return false;
+   	
+   	if ($request->resource != 'internal/page/site')
+   		return false;
+   		
+   	if (!isset($request->query['container']))
+   		return $this->container->id == $_PREFS->getPref('container.default');
+
+		return $this->container->id == $request->query['container'];   	
   }
 }
 

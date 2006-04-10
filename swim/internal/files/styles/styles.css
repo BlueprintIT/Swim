@@ -41,29 +41,29 @@ table {
   margin-right: 10px;
 }
 
-.pane .header {
+.header {
   border-bottom: 1px solid ThreeDShadow;
   background-color: ThreeDFace;
   text-align: right;
 }
 
-.pane .header form {
+.header form {
   margin: 0;
   padding: 0;
 }
 
-.pane .header input, .pane .header button {
+.header input, .header button {
   float: left;
   margin: 10px;
 }
 
-.pane .header h2 {
+.header h2 {
   margin: 0;
   padding: 10px;
   color: blue;
 }
 
-.pane .body {
+.body {
   padding: 10px;
   margin-left: auto;
   margin-right: auto;
@@ -71,7 +71,7 @@ table {
   font-size: 0.8em;
 }
 
-.pane iframe.body {
+iframe.body {
   padding: 0;
   width: 100%;
   height: 90%;

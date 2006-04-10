@@ -32,11 +32,13 @@ function method_create($request)
         $new=$container->getPage($id);
         $new->savePreferences();
         $source = new Request();
-        $source->method='admin';
-        $source->resource=$new->getPath();
+        $source->method='view';
+        $source->resource='internal/page/pagedetails';
+        $source->query['page']=$new->getPath();
         $chained = new Request();
-        $chained->method='edit';
-        $chained->resource=$new->getPath();
+        $chained->method='view';
+        $chained->resource='internal/page/pageedit';
+        $chained->query['page']=$new->getPath();
         $chained->nested=$source;
         redirect($chained);
 			}

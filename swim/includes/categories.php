@@ -361,6 +361,11 @@ class YahooPageTree extends CategoryTree
     return "";
   }
   
+  function getItemTarget($item)
+  {
+  	return false;
+  }
+  
   function getItemLink($item)
   {
     return false;
@@ -385,11 +390,14 @@ class YahooPageTree extends CategoryTree
     $icon = $this->getItemIconClass($item);
     $style = $this->getItemLabelClass($item);
     $link = $this->getItemLink($item);
+    $target = $this->getItemTarget($item);
     $data = "{ label: '".$label."'";
     if ($link !== false)
       $data.=", href: '".$link."'";
     if ($icon != false)
       $data.=", iconClass: '".$icon."'";
+    if ($target != false)
+      $data.=", target: '".$target."'";
     if ($style != false)
       $data.=", labelClass: '".$style."'";
     $data.=" }";

@@ -1,6 +1,13 @@
 <?
 
-$page = Resource::decodeResource($request);
+if (isset($request->query['version']))
+{
+	$page = Resource::decodeResource($request->query['page'], $request->query['version']);
+}
+else
+{
+	$page = Resource::decodeResource($request->query['page']);
+}
 $version=$page->version;
 $page = $page->makeWorkingVersion();
 $pageprefs = $page->prefs;
@@ -8,19 +15,17 @@ $layout=$page->getLayout();
 
 $upload = new Request();
 $upload->method = 'save';
-$upload->resource = $request->resource;
+$upload->resource = $page->getPath();
 
 $commit = new Request();
 $commit->method='commit';
-$commit->resource=$request->resource;
+$commit->resource=$page->getPath();
 $commit->query['version']=$version;
-$commit->nested = new Request();
-$commit->nested->method = $request->nested->method;
-$commit->nested->resource = $request->nested->resource;
+$commit->nested = $request->nested;
 
 $cancel = new Request();
 $cancel->method='cancel';
-$cancel->resource=$request->resource;
+$cancel->resource=$page->getPath();
 $cancel->nested=$request->nested;
 
 include 'html.php';

@@ -1,6 +1,10 @@
 <?
 
-$page = Resource::decodeResource($request->query['page']);
+if (isset($request->query['version']))
+	$page = Resource::decodeResource($request->query['page'], $request->query['version']);
+else
+	$page = Resource::decodeResource($request->query['page']);
+
 $cont = $page->container;
 
 $pageprefs = $page->prefs;
@@ -8,10 +12,10 @@ $layout=$page->getLayout();
 
 $edit = new Request();
 $edit->query['version']=$page->version;
-$edit->method='edit';
+$edit->query['page']=$page->getPath();
+$edit->method='view';
+$edit->resource='internal/page/pageedit';
 $edit->nested=$request;
-
-$edit->resource=$request->resource;
 
 $create = new Request();
 $create->method='create';
@@ -21,7 +25,8 @@ $delete = new Request();
 $delete->resource=$page->getPath();
 $delete->method='delete';
 $delete->nested = new Request();
-$delete->nested->resource='admin';
+$delete->nested->method='view';
+$delete->nested->resource='internal/page/site/block/mainpane/file/index.html';
 
 ?>
 <div class="header">
@@ -65,6 +70,7 @@ rsort($verlist);
 $select = new Request();
 $select->method=$request->method;
 $select->resource=$request->resource;
+$select->query['page']=$request->query['page'];
 
 ?>
 <form style="display: inline" action="<?= $select->encodePath() ?>" method="GET">
@@ -99,7 +105,7 @@ if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
   $revert = new Request();
   $revert->query['version']=$page->version;
   $revert->method='revert';
-  $revert->resource=$request->resource;
+  $revert->resource=$page->getPath();
   $revert->nested=$request;
 ?>
 <form style="display: inline" method="POST" action="<?= $revert->encodePath() ?>">
