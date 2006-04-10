@@ -12,9 +12,10 @@ function textContent(element)
 	return content;
 }
 
-BlueprintIT.widget.SiteTree = function(url, div) {
+BlueprintIT.widget.SiteTree = function(siteadmin, url, div) {
 	this.location=url;
 	this.element=div;
+	this.baselocation=siteadmin;
 	
 	YAHOO.util.Event.addListener(window, "load", this.init, this, true);
 }
@@ -22,6 +23,7 @@ BlueprintIT.widget.SiteTree = function(url, div) {
 BlueprintIT.widget.SiteTree.prototype = {
 	element: null,
 	location: null,
+	baselocation: null,
 	pages: null,
 	
 	init: function(event, obj) {
@@ -51,28 +53,28 @@ BlueprintIT.widget.SiteTree.prototype = {
 		}
 	},
 	
-	loadCategory: function(element, parentnode) {
+	loadCategory: function(element, treenode) {
 		var node = element.firstChild;
 		while (node) {
 			if (node.nodeType == 1) {
-				parentnode.expanded=true;
-				this.loadItem(node, parentnode);
+				treenode.expanded=true;
+				this.loadItem(node, treenode);
 			}
 			node = node.nextSibling;
 		}
 	},
 
 	loadFromDocument: function(doc) {
-		var nodes = doc.getElementsByTagName("tree");
-		if (nodes.length < 1)
+		var node = doc.getElementsByTagName("tree");
+		
+		if (!node || node.length==0)
 			return;
 			
 		this.pages = [];
 		var tree = new YAHOO.widget.TreeView(this.element);
-		var web = new YAHOO.widget.TextNode("Website", tree.getRoot(), true);
-		this.loadCategory(nodes[0], web);
+		this.loadCategory(node[0], tree.getRoot());
 		var unused = new YAHOO.widget.TextNode("Unused Pages", tree.getRoot(), true);
-		nodes = doc.getElementsByTagName("pages");
+		var nodes = doc.getElementsByTagName("pages");
 		if (nodes.length > 0) {
 			var node = nodes[0].firstChild;
 			while (node) {

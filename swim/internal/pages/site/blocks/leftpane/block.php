@@ -15,11 +15,16 @@ if (isset($request->query['container']))
 else
 	$cont = getContainer($_PREFS->getPref('container.default'));
 
+$index = new Request();
+$index->method='view';
+$index->resource='internal/page/sitedetails';
+$index->query['container']=$cont->id;
+
 $containers = new Request();
 $containers->method='view';
 $containers->resource=$cont->id.'/categories';
 ?>
-var SiteTree = new BlueprintIT.widget.SiteTree('<?= $containers->encode() ?>', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('<?= $index->encode() ?>', '<?= $containers->encode() ?>', 'categorytree');
 </script>
 <?
 $edit = new Request();
