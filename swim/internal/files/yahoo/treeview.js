@@ -1147,7 +1147,7 @@ YAHOO.widget.TextNode.prototype.getNodeHtml = function() {
 	sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';
 	sb[sb.length] = '<tr>';
 
-	for (i=0;i<this.depth;++i) {
+	for (var i=0;i<this.depth;++i) {
 		// sb[sb.length] = '<td class="ygtvdepthcell">&nbsp;</td>';
 		sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '">&nbsp;</td>';
 	}

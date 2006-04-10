@@ -202,8 +202,8 @@ YAHOO.util.Connect =
 		var poll = window.setInterval(
 			function(){
 				if(o.conn.readyState==4){
-					oConn.handleTransactionResponse(o, callback);
 					window.clearInterval(poll);
+					oConn.handleTransactionResponse(o, callback);
 				}
 			}
 		,this._polling_interval);
@@ -447,6 +447,7 @@ YAHOO.util.Connect =
 		if(o){
 			return o.conn.readyState != 4 && o.conn.readyState != 0;
 		}
+		return null;
 	},
 
   /**

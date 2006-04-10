@@ -17,13 +17,19 @@ class XMLTree extends CategoryTree
   
   function displayItemStartTag($item,$indent)
   {
+  	$info = new Request();
+  	$info->method='view';
     if ($item instanceof Category)
     {
-      print($indent.'<category id="'.$item->id.'">');
+    	$info->resource='internal/page/containerdetails';
+    	$info->query['container']=$item->id;
+      print($indent.'<category infolink="'.$info->encode().'" id="'.$item->id.'">');
     }
     else if ($item instanceof Page)
     {
-      print($indent.'<page path="'.$item->getPath().'">');
+    	$info->resource='internal/page/pagedetails';
+    	$info->query['page']=$item->getPath();
+      print($indent.'<page infolink="'.$info->encode().'" path="'.$item->getPath().'">');
     }
     else if ($item instanceof Link)
     {
@@ -66,8 +72,7 @@ $tree->display('  ');
 $pages = $container->getResources('page');
 foreach ($pages as $page)
 {
-?>    <page path="<?= $page->getPath() ?>"><?= htmlspecialchars($page->prefs->getPref('page.variables.title')) ?></page>
-<?
+	$tree->displayItem($page, '    ');
 }
 ?>
   </pages>

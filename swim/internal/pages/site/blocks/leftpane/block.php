@@ -3,46 +3,25 @@
 <script src="/internal/file/yahoo/event.js"/>
 <script src="/internal/file/yahoo/dom.js"/>
 <script src="/internal/file/yahoo/dragdrop.js"/>
+<script src="/internal/file/yahoo/connection.js"/>
 <script src="/internal/file/yahoo/treeview.js"/>
 <script src="/internal/file/scripts/treeview.js"/>
+<script src="/internal/page/site/block/leftpane/file/sitetree.js"/>
+<script>
 <?
-
-class LinkedCategoryTree extends YahooPageTree
-{
-  function LinkedCategoryTree($id, $root)
-  {
-    $this->YahooPageTree($id, $root);
-  }
-  
-  function getItemLink($page)
-  {
-    if ($page instanceof Page)
-    {
-      $request = SwimEngine::getCurrentRequest();
-      
-      if ($request->resource!=$page->getPath())
-      {
-        $link = new Request();
-        $link->resource='internal/page/pagedetails';
-        $link->query['page'] = $page->getPath();
-        $link->method='view';
-        return $link->encode();
-      }
-    }
-    return parent::getItemLink($page);
-  }
-  
-  function getItemTarget($item)
-  {
-  	return 'main';
-  }
-}
 
 if (isset($request->query['container']))
 	$cont = getContainer($request->query['container']);
 else
 	$cont = getContainer($_PREFS->getPref('container.default'));
 
+$containers = new Request();
+$containers->method='view';
+$containers->resource=$cont->id.'/categories';
+?>
+var SiteTree = new BlueprintIT.widget.SiteTree('<?= $containers->encode() ?>', 'categorytree');
+</script>
+<?
 $edit = new Request();
 $edit->method='view';
 $edit->resource='internal/page/siteedit';
@@ -65,9 +44,5 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 </div>
 <div class="body">
 <div id="categorytree">
-<?
-$tree = new LinkedCategoryTree("categorytree", $cont->getRootCategory());
-$tree->display();
-?>
 </div>
 </div>
