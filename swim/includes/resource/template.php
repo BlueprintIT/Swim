@@ -332,6 +332,7 @@ class Template extends Resource
 	
 	function displayImage($parser,$tag,$attrs,$text)
 	{
+    $this->log->debug('Adding image '.$attrs['src']);
 		$attrs['src']=$this->generateURL($parser->data,$attrs['src']);
 		$this->displayElement($parser,'img',$attrs,$text,false);
 		return true;
@@ -346,14 +347,14 @@ class Template extends Resource
 		}
 		else if (isset($attrs['id']))
 		{
-      $this->log->debug('Loading page block '.$attrs['id']);
 			$page=$parser->data['page'];
+      $this->log->debug('Loading page block '.$attrs['id'].' for page '.$page->getPath());
 			$block=$page->getReferencedBlock($attrs['id']);
 		}
 		if ($block!==null)
 		{
 			if (isset($parser->data['block']))
-				array_push($parser->data['stack'], array('id' => $parser->data['blockid'], 'block', $parser->data['block']));
+				array_push($parser->data['stack'], array('id' => $parser->data['blockid'], 'block'=> $parser->data['block']));
 			
 			$parser->data['blockid']=$attrs['id'];
 			$parser->data['block']=$block;

@@ -231,7 +231,7 @@ class Resource
 	
 	function getResource($type,$id,$version = false)
 	{
-		$path=$type.'/'.$id.':'.$version;
+		$path=$this->getPath().'/'.$type.'/'.$id.':'.$version;
     $resource = ObjectCache::getItem('resource', $path);
 		if ($resource===null)
 		{

@@ -15,11 +15,15 @@
 
 class Link
 {
+	var $parent;
+	var $key;
   var $name;
   var $address;
   
-  function Link($name,$address)
+  function Link($category,$key,$name,$address)
   {
+  	$this->parent=$category;
+  	$this->key=$key;
     $this->name=$name;
     $this->address=$address;
   }
@@ -58,11 +62,29 @@ class Category
 
   	if ($item instanceof Category)
   	{
-  		//TODO Errrm...
+  		$item->parent=$this;
+  		$item->container=$this->container;
+  		if (isset($item->id))
+  		{
+  			$_STORAGE->queryExec('UPDATE Category SET parent='.$this->id.', sortkey='.$pos.' WHERE id='.$item->id.';');
+  		}
+  		else
+  		{
+        $_STORAGE->queryExec('INSERT INTO Category (name,parent,sortkey) VALUES ("'.$_STORAGE->escape($item->name).'",'.$this->id.','.$pos.');');
+  		}
   	}
   	else if ($item instanceof Link)
   	{
-  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$pos.');');
+  		if (isset($item->parent))
+  		{
+	  		$_STORAGE->queryExec('UPDATE LinkCategory SET category='.$this->id.', sortkey='.$pos.' WHERE category='.$item->category->id.' AND sortkey='.$item->pos.';');
+  		}
+  		else
+  		{
+	  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$pos.');');
+  		}
+  		$item->parent=$this;
+  		$item->key=$pos;
   	}
   	else if ($item instanceof Page)
   	{
@@ -85,10 +107,41 @@ class Category
       $cat=$this->container->getCategory($id);
       $cat->clean();
       $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
-      $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey-1 WHERE parent='.$this->id.' AND sortkey>'.$pos.';');
     }
+    $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey-1 WHERE parent='.$this->id.' AND sortkey>'.$pos.';');
     if (isset($this->list))
       unset($this->list);
+  }
+  
+  function indexOf($item)
+  {
+  	global $_STORAGE;
+
+  	if (($item instanceof Category)||($item instanceof Link))
+  	{
+  		if ($item->parent!==$this)
+  			return false;
+  	}
+  	
+  	if ($item instanceof Category)
+  	{
+  		$pos = $_STORAGE->singleQuery('SELECT sortkey from Category WHERE id='.$item->id.';');
+  		if ($pos===null)
+  			return false;
+  		return $pos;
+  	}
+  	else if ($item instanceof Link)
+  	{
+  		return $item->key;
+  	}
+  	else if ($item instanceof Page)
+  	{
+  		$pos = $_STORAGE->singleQuery('SELECT sortkey from PageCategory WHERE page="'.$item->getPath().'" AND category='.$this->id.';');
+  		if ($pos===null)
+  			return false;
+  		return $pos;
+  	}
+  	return false;
   }
   
   function clean()
@@ -161,7 +214,7 @@ class Category
     while ($set->valid())
     {
       $details = $set->fetch();
-      $list[$details['sortkey']] = new Link($details['name'],$details['link']);
+      $list[$details['sortkey']] = new Link($this, $details['sortkey'], $details['name'],$details['link']);
     }
     ksort($list);
     return $list;

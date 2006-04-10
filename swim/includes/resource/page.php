@@ -25,6 +25,24 @@ class Page extends Resource
     $this->applyLayout();
   }
   
+  function delete()
+  {
+  	$cats=$this->container->getPageCategories($parser->data['page']);
+  	foreach ($cats as $category)
+  	{
+  		$pos = $category->indexOf($this);
+  		if ($pos===false)
+  		{
+  			$this->log->error('Page appears to be in category '.$category->id.' but indexOf returned false.');
+  		}
+  		else
+  		{
+	  		$category->remove($category->indexOf($this));
+	  	}
+  	}
+  	base::delete();
+  }
+  
   function applyLayout()
   {
     $layout = $this->getLayout();
@@ -218,6 +236,7 @@ class Page extends Resource
     }
     $block=Resource::decodeResource(substr($this->prefs->getPref($blockpref.'.resource'),1),$version);
     $this->blocks[$id]=$block;
+    return $block;
   }
   
 	function getReferencedBlock($id)
@@ -227,7 +246,7 @@ class Page extends Resource
 			$blockpref='page.blocks.'.$id;
 			if (($this->prefs->isPrefSet($blockpref.'.resource'))&&(!$this->prefs->isPrefInherited($blockpref.'.resource')))
 			{
-        $this->getReferencedBlockFromPref($id,$blockpref);
+        return $this->getReferencedBlockFromPref($id,$blockpref);
 			}
 			else if ($this->hasResource('block',$id))
 			{
@@ -235,19 +254,22 @@ class Page extends Resource
 				if ($block!==null)
 				{
 					$this->blocks[$id]=$block;
+					return $block;
 				}
 				else
 				{
 					$this->blocks[$id]=null;
+					return null;
 				}
 			}
       else if ($this->prefs->isPrefSet($blockpref.'.resource'))
       {
-        $this->getReferencedBlockFromPref($id,$blockpref);
+        return $this->getReferencedBlockFromPref($id,$blockpref);
       }
 			else
 			{
 				$this->blocks[$id]=null;
+				return null;
 			}
 		}
 		return $this->blocks[$id];

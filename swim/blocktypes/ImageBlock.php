@@ -24,7 +24,18 @@ class ImageBlock extends Block
   {
     if ($this->prefs->isPrefSet('block.image.src'))
     {
-      print('<image src="'.$this->prefs->getPref('block.image.src').'"/>');
+      print('<image src="'.$this->prefs->getPref('block.image.src').'"');
+      foreach ($attrs as $key => $value)
+      {
+      	if ($key == 'notag')
+      		continue;
+      		
+      	if ($key == 'id')
+      		continue;
+      		
+	      print($key.'="'.htmlentities($value).'"');
+      }
+      print('/>');
     }
     return true;
   }

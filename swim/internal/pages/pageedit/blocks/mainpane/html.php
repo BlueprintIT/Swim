@@ -50,9 +50,12 @@ tinyMCE.init({
     mode : "exact",
     elements : "editor",
     theme : "advanced",
-    plugins : "swim,table",
-    content_css : new Array(<?= $list ?>),
-    remove_linebreaks : false,
+    plugins : "swim,table",<?
+if (isset($list))
+{
+?>    content_css : new Array(<?= $list ?>),<?
+}
+?>    remove_linebreaks : false,
     apply_source_formatting : true,
     relative_urls : true,
     document_host : "<?= $_SERVER['HTTP_HOST'] ?>",

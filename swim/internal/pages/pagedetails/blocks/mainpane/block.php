@@ -143,6 +143,33 @@ if ($page->isCurrentVersion())
 ?>
 </td>
 </tr>
+<tr>
+	<td>Link to another category:</td>
+	<td>
+		<form>
+			<select id="">
+<?
+function showCategoryOption($page,$category,$indent)
+{
+	print('        <option value="'.$category->id.'"');
+	if ($category->indexOf($page)!==false)
+		print(' disabled="disabled"');
+	print('>'.$indent.' '.$category->name.'</option>'."\n");
+	$items = $category->items();
+	foreach ($items as $item)
+	{
+		if ($item instanceof Category)
+			showCategoryOption($page,$item, '--'.$indent);
+	}
+}
+
+showCategoryOption($page,$cont->getRootCategory(),'');
+?>
+			</select>
+			<button>Add...</button>
+		</form>
+	</td>
+</tr>
 <?
 $layouts = $page->container->layouts->getPageLayouts();
 $count = 0;

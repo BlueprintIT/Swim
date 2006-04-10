@@ -35,7 +35,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 			label: textContent(node),
 			iconClass: node.tagName
 		};
-		if (node.hasAttribute("infolink")) {
+		if (node.getAttribute("infolink")) {
 			details.href = node.getAttribute("infolink");
 			details.target = "main";
 		}
@@ -73,14 +73,17 @@ BlueprintIT.widget.SiteTree.prototype = {
 		this.pages = [];
 		var tree = new YAHOO.widget.TreeView(this.element);
 		this.loadCategory(node[0], tree.getRoot());
-		var unused = new YAHOO.widget.TextNode("Unused Pages", tree.getRoot(), true);
+		var unused = null;
 		var nodes = doc.getElementsByTagName("pages");
 		if (nodes.length > 0) {
 			var node = nodes[0].firstChild;
 			while (node) {
 				if ((node.nodeType == 1) && (node.tagName == "page")) {
-					if (!this.pages[node.getAttribute("path")])
+					if (!this.pages[node.getAttribute("path")]) {
+						if (!unused)
+							unused = new YAHOO.widget.TextNode("Ungategorised Pages", tree.getRoot(), true);
 						this.loadItem(node, unused);
+					}
 				}
 				node = node.nextSibling;
 			}
