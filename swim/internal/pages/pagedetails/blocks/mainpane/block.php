@@ -36,7 +36,9 @@ $delete->method='delete';
 $delete->nested = new Request();
 $delete->nested->method='view';
 $delete->nested->query['reloadtree']=true;
-$delete->nested->resource='internal/page/sitedetails';
+$delete->nested->resource='internal/page/categorydetails';
+$root = $cont->getRootCategory();
+$delete->nested->query['category']=$root->id;
 $delete->nested->query['container']=$cont->id;
 
 ?>

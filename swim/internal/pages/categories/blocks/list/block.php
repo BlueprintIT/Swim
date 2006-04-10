@@ -1,10 +1,13 @@
 <?
 class XMLTree extends CategoryTree
 {
-  function XMLTree($root)
+	var $container;
+	
+  function XMLTree($container)
   {
-    $this->CategoryTree($root);
+    $this->CategoryTree($container->getRootCategory());
     $this->padding=' ';
+    $this->container=$container;
   }
   
   function displayCategoryContentStartTag($category,$indent)
@@ -21,19 +24,20 @@ class XMLTree extends CategoryTree
   	$info->method='view';
     if ($item instanceof Category)
     {
-    	$info->resource='internal/page/containerdetails';
-    	$info->query['container']=$item->id;
-      print($indent.'<category infolink="'.$info->encode().'" id="'.$item->id.'">');
+    	$info->resource='internal/page/categorydetails';
+    	$info->query['category']=$item->id;
+    	$info->query['container']=$this->container->id;
+      print($indent.'<category infolink="'.htmlentities($info->encode()).'" id="'.$item->id.'">');
     }
     else if ($item instanceof Page)
     {
     	$info->resource='internal/page/pagedetails';
     	$info->query['page']=$item->getPath();
-      print($indent.'<page infolink="'.$info->encode().'" path="'.$item->getPath().'">');
+      print($indent.'<page infolink="'.htmlentities($info->encode()).'" path="'.htmlentities($item->getPath()).'">');
     }
     else if ($item instanceof Link)
     {
-      print($indent.'<link path="'.$item->address.'">');
+      print($indent.'<link path="'.htmlentities($item->address).'">');
     }
   }
   
@@ -62,7 +66,7 @@ if (($container === null) || (!$container->isContainer()))
 ?>
 	<tree>
 <?
-$tree = new XMLTree($container->getRootCategory());
+$tree = new XMLTree($container);
 $tree->showRoot=true;
 $tree->display('  ');
 ?>
