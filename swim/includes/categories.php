@@ -37,6 +37,8 @@ class Category
   var $container;
   var $log;
   var $list;
+  var $icon;
+  var $hovericon;
   
   function Category($container,$parent,$id,$name)
   {
@@ -198,7 +200,7 @@ class Category
         $this->remove($details['sortkey']);
       }
     }
-    $set=$_STORAGE->query('SELECT id,name,sortkey FROM Category WHERE parent='.$this->id.';');
+    $set=$_STORAGE->query('SELECT id,name,sortkey,icon,hovericon FROM Category WHERE parent='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->fetch();
@@ -206,6 +208,15 @@ class Category
       if ($cat===null)
       {
         $cat = new Category($this->container,$this,$details['id'],$details['name']);
+        $cat->icon = $details['icon'];
+        if ($details['hovericon']===null)
+        {
+	        $cat->hovericon = $details['icon'];
+        }
+        else
+        {
+	        $cat->hovericon = $details['hovericon'];
+        }
         ObjectCache::setItem('category', $details['id'], $cat);
       }
       $list[$details['sortkey']]=$cat;

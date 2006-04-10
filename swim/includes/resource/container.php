@@ -75,12 +75,17 @@ class Container extends Resource
     return $this->rootcategory;
   }
   
-  function getReadyCategory($id,$parent,$name)
+  function getReadyCategory($id,$parent,$name,$icon,$hovericon)
   {
     $category = ObjectCache::getItem('category', $id);
     if ($category === null)
     {
       $category = new Category($this,$this->getCategory($parent),$id,$name);
+      $category->icon = $icon;
+      if ($hovericon===null)
+      	$category->hovericon=$icon;
+      else
+      	$category->hovericon=$hovericon;
       ObjectCache::setItem('category', $id, $category);
     }
     return $category;
@@ -93,11 +98,20 @@ class Container extends Resource
     $category = ObjectCache::getItem('category', $id);
     if ($category === null)
     {
-      $set=$_STORAGE->query('SELECT id,parent,name FROM Category WHERE id='.$id.';');
+      $set=$_STORAGE->query('SELECT id,parent,name,icon,hovericon FROM Category WHERE id='.$id.';');
       if ($set->valid())
       {
         $details = $set->fetch();
         $category = new Category($this,$this->getCategory($details['parent']),$details['id'],$details['name']);
+        $category->icon = $details['icon'];
+        if ($details['hovericon']===null)
+        {
+	        $category->hovericon = $details['icon'];
+        }
+        else
+        {
+	        $category->hovericon = $details['hovericon'];
+        }
         ObjectCache::setItem('category', $id, $category);
       }
     }
@@ -109,12 +123,12 @@ class Container extends Resource
     global $_STORAGE;
 
     $path="'".$_STORAGE->escape($page->getPath())."'";
-    $set=$_STORAGE->query('SELECT id,parent,name FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE PageCategory.page='.$path.';');
+    $set=$_STORAGE->query('SELECT id,parent,name,icon,hovericon FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE PageCategory.page='.$path.';');
     $results = array();
     while ($set->valid())
     {
       $details=$set->fetch();
-      $results[]=$this->getReadyCategory($details['id'],$details['parent'],$details['name']);
+      $results[]=$this->getReadyCategory($details['id'],$details['parent'],$details['name'],$details['icon'],$details['hovericon']);
       $this->log->debug('Found page '.$page->getPath().' in category '.$details['id']);
     }
     return $results;

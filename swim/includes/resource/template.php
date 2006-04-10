@@ -90,7 +90,8 @@ class Template extends Resource
 		else if (isset($data['block']))
 		{
 			$url=$data['block']->getPath().'/file/'.$url;
-			$request->query['version']=$data['block']->version;
+			if (isset($data['block']->version))
+				$request->query['version']=$data['block']->version;
 		}
 		else
 		{
@@ -311,7 +312,9 @@ class Template extends Resource
 	
 	function displayStylesheet($parser,$tag,$attrs,$text)
 	{
-		$src=$this->generateURL($parser->data,$attrs['src']);
+		$src = $attrs['src'];
+		unset($attrs['src']);
+		$src=$this->generateURL($parser->data,$src,'view',$attrs);
 		if (!isset($parser->data['styles'][$src]))
 		{
 			$link=$this->buildElement($parser,'link',array('type'=>'text/css','rel'=>'stylesheet','href'=>$src),'',false);

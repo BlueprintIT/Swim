@@ -198,7 +198,7 @@ class Parser
           $this->_log->trace('Found end of attribute. Back to state 1.');
           $this->_attrvalue.=$matches[1];
           $this->_state=1;
-          $this->onAttribute($this->_attrname,$this->_attrvalue);
+          $this->onAttribute($this->_attrname,urldecode($this->_attrvalue));
           $this->parseText(substr($text,strlen($matches[0])));
         }
         else

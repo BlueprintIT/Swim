@@ -188,11 +188,21 @@ class CategoryMenuBlock extends Block
       {
         if ($page instanceof Page)
         {
-          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'"><span>'.$item->name.'</span></anchor>');
+          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'">');
         }
         else if ($page instanceof Link)
         {
-          print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'"><span>'.$item->name.'</span></a>');
+          print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'">');
+        }
+        if ($item->icon!==null)
+	        print('<image class="icon" src="/'.$item->container->id.'/file/'.$item->icon.'"/>');
+        if ($page instanceof Page)
+        {
+          print('<span>'.$item->name.'</span></anchor>');
+        }
+        else if ($page instanceof Link)
+        {
+          print('<span>'.$item->name.'</span></a>');
         }
       }
       else

@@ -65,7 +65,7 @@ class Block extends Resource
 		$stylecontext = '';
     if (!isset($attrs['notag']))
     {
-  		$stylecontext = '?CONTEXT='.urlencode($this->getType().'#'.$attrs['id']);
+  		$stylecontext = ' CONTEXT="'.urlencode($this->getType().'#'.$attrs['id']).'"';
   		$class='block';
   		if (isset($attrs['class']))
   		{
@@ -85,7 +85,7 @@ class Block extends Resource
 			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
 			foreach ($styles as $style)
 			{
-				print('<stylesheet src="'.$style.$stylecontext.'"/>');
+				print('<stylesheet src="'.$style.'"'.$stylecontext.'/>');
 			}
 		}
 
