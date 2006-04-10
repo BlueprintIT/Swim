@@ -2,6 +2,7 @@
 class XMLTree extends CategoryTree
 {
 	var $container;
+	var $category = null;
 	
   function XMLTree($container)
   {
@@ -16,6 +17,20 @@ class XMLTree extends CategoryTree
   
   function displayCategoryContentEndTag($category,$indent)
   {
+  }
+  
+  function displayItem($item,$indent)
+  {
+  	if ($item instanceof Category)
+  	{
+  		$previous = $this->category;
+  		$this->category = $item;
+  	}
+  	parent::displayItem($item,$indent);
+  	if ($item instanceof Category)
+  	{
+  		$this->category=$previous;
+  	}
   }
   
   function displayItemStartTag($item,$indent)
@@ -33,6 +48,8 @@ class XMLTree extends CategoryTree
     {
     	$info->resource='internal/page/pagedetails';
     	$info->query['page']=$item->getPath();
+    	if (isset($this->category))
+	    	$info->query['category']=$this->category->id;
       print($indent.'<page infolink="'.htmlentities($info->encode()).'" path="'.htmlentities($item->getPath()).'">');
     }
     else if ($item instanceof Link)

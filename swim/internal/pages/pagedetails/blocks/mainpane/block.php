@@ -16,6 +16,12 @@ else
 
 $cont = $page->container;
 
+if (isset($request->query['category']))
+	$category = $cont->getCategory($request->query['category']);
+else
+	$category = $cont->getRootCategory();
+
+
 $pageprefs = $page->prefs;
 $layout=$page->getLayout();
 
@@ -28,6 +34,7 @@ $edit->nested=$request;
 
 $create = new Request();
 $create->method='create';
+$create->query['category']=$category->id;
 $create->resource=$cont->id.'/page';
 
 $delete = new Request();

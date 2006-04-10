@@ -14,7 +14,8 @@ $category = $container->getCategory($request->query['category']);
 
 $create = new Request();
 $create->method='create';
-$create->resource=$cont->id.'/page';
+$create->query['category']=$category->id;
+$create->resource=$container->id.'/page';
 
 ?>
 <div class="header">

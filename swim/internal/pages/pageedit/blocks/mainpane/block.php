@@ -27,7 +27,18 @@ $commit->nested->query['reloadtree']=true;
 $cancel = new Request();
 $cancel->method='cancel';
 $cancel->resource=$page->getPath();
-$cancel->nested=$request->nested;
+if (count(array_keys($page->getVersions()))>1)
+{
+	$cancel->nested=$request->nested;
+}
+else
+{
+	$cancel->nested = new Request();
+	$cancel->method='view';
+	$cancel->resource='internal/page/categorydetails';
+	$cancel->query['container']=$page->container->id;
+	$cancel->query['category']=$request->nested->query['category'];
+}
 
 include 'html.php';
 include 'image.php';

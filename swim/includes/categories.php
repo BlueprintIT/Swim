@@ -43,6 +43,35 @@ class Category
     $this->log=$container->log;
   }
   
+  function add($item)
+  {
+  	$this->insert($item, $this->count());
+  }
+  
+  function insert($item, $pos)
+  {
+    global $_STORAGE;
+
+    $_STORAGE->queryExec('UPDATE LinkCategory SET sortkey=sortkey+1 WHERE category='.$this->id.' AND sortkey>='.$pos.';');
+    $_STORAGE->queryExec('UPDATE PageCategory SET sortkey=sortkey+1 WHERE category='.$this->id.' AND sortkey>='.$pos.';');
+    $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey+1 WHERE parent='.$this->id.' AND sortkey>='.$pos.';');
+
+  	if ($item instanceof Category)
+  	{
+  		//TODO Errrm...
+  	}
+  	else if ($item instanceof Link)
+  	{
+  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$pos.');');
+  	}
+  	else if ($item instanceof Page)
+  	{
+  		$_STORAGE->queryExec('INSERT INTO PageCategory (page,category,sortkey) VALUES (\''.$_STORAGE->escape($item->getPath()).'\','.$this->id.','.$pos.');');
+  	}
+    if (isset($this->list))
+      unset($this->list);
+  }
+  
   function remove($pos)
   {
     global $_STORAGE;
