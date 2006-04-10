@@ -1,5 +1,14 @@
 <?
 
+if (isset($request->query['reloadtree']))
+{
+?>
+<script>
+	window.top.SiteTree.loadTree();
+</script>
+<?
+}
+
 if (isset($request->query['version']))
 	$page = Resource::decodeResource($request->query['page'], $request->query['version']);
 else
@@ -26,7 +35,9 @@ $delete->resource=$page->getPath();
 $delete->method='delete';
 $delete->nested = new Request();
 $delete->nested->method='view';
-$delete->nested->resource='internal/page/site/block/mainpane/file/index.html';
+$delete->nested->query['reloadtree']=true;
+$delete->nested->resource='internal/page/sitedetails';
+$delete->nested->query['container']=$cont->id;
 
 ?>
 <div class="header">
@@ -106,7 +117,8 @@ if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
   $revert->query['version']=$page->version;
   $revert->method='revert';
   $revert->resource=$page->getPath();
-  $revert->nested=$request;
+  $revert->nested= new Request($request);
+  $revert->nested->query['reloadtree']=true;
 ?>
 <form style="display: inline" method="POST" action="<?= $revert->encodePath() ?>">
 <?= $revert->getFormVars() ?>

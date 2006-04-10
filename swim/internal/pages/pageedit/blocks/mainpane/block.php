@@ -21,7 +21,8 @@ $commit = new Request();
 $commit->method='commit';
 $commit->resource=$page->getPath();
 $commit->query['version']=$version;
-$commit->nested = $request->nested;
+$commit->nested = new Request($request->nested);
+$commit->nested->query['reloadtree']=true;
 
 $cancel = new Request();
 $cancel->method='cancel';
