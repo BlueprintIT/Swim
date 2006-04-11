@@ -38,10 +38,10 @@ $edit->nested=$request;
 if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 {
 ?>
-<form method="GET" action="<?= $edit->encodePath() ?>">
+<!--<form method="GET" action="<?= $edit->encodePath() ?>">
 <?= $edit->getFormVars(); ?>
 <input type="submit" value="Edit">
-</form>
+</form>-->
 <?
 }
 ?>

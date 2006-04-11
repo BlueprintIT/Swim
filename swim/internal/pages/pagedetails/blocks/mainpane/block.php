@@ -1,13 +1,8 @@
-<?
-
-if (isset($request->query['reloadtree']))
-{
-?>
+<script src="/internal/file/yahoo/YAHOO.js"/>
+<script src="/internal/file/yahoo/event.js"/>
+<script src="/internal/file/yahoo/connection.js"/>
 <script>
-	window.top.SiteTree.loadTree();
-</script>
 <?
-}
 
 if (isset($request->query['version']))
 	$page = Resource::decodeResource($request->query['page'], $request->query['version']);
@@ -48,7 +43,90 @@ $root = $cont->getRootCategory();
 $delete->nested->query['category']=$root->id;
 $delete->nested->query['container']=$cont->id;
 
+$mutate = new Request();
+$mutate->method='mutate';
+$mutate->resource=$cont->id.'/categories';
+$mutate->query['page']=$page->getPath();
+
+if (isset($request->query['reloadtree']))
+{
 ?>
+	window.top.SiteTree.loadTree();
+<?
+}
+
+?>
+
+function removeCompleted(req) {
+	var row = req.argument.button.parentNode.parentNode.parentNode;
+	row.parentNode.removeChild(row);
+	window.top.SiteTree.loadTree();
+	var option = document.getElementById("linktocat"+req.argument.category);
+	option.disabled=false;
+}
+
+function removeFromCategory(button) {
+	var category = button.form.elements.namedItem("category").value;
+	if (category) {
+		var callback = {
+			success: removeCompleted,
+			failure: function(obj) {
+				alert("There was an error performing this action.");
+			},
+			argument: {
+				button: button,
+				category: category
+			}
+		};
+		var target = "<?= $mutate->encode() ?>";
+		target=target+"&action=remove&category="+category;
+		YAHOO.util.Connect.asyncRequest("GET", target, callback, null);
+	}
+}
+
+function addCompleted(req) {
+	window.top.SiteTree.loadTree();
+	var option = document.getElementById("linktocat"+req.argument.category);
+	option.disabled=true;
+	//window.location.reload();
+}
+
+function addToCategory(button) {
+	var category = button.form.elements.namedItem("category").value;
+	if (category) {
+		var callback = {
+			success: addCompleted,
+			failure: function(obj) {
+				alert("There was an error performing this action.");
+			},
+			argument: {
+				button: button,
+				category: category
+			}
+		};
+		var target = "<?= $mutate->encode() ?>";
+		target=target+"&action=add&category="+category;
+		YAHOO.util.Connect.asyncRequest("GET", target, callback, null);
+	}
+}
+
+function buttonClicked(event) {
+	if (this.className=="remove")
+		removeFromCategory(this);
+	else if (this.className=="add")
+		addToCategory(this);
+}
+
+function findButtons() {
+	var buttons = document.getElementsByTagName("button");
+	for (var i=0; i<buttons.length; i++) {
+		YAHOO.util.Event.addListener(buttons[i], "click", buttonClicked);
+	}
+}
+
+YAHOO.util.Event.addListener(window, "load", findButtons);
+
+</script>
 <div class="header">
 <?
 if ($_USER->hasPermission('documents',PERMISSION_WRITE))
@@ -144,14 +222,43 @@ if ($page->isCurrentVersion())
 </td>
 </tr>
 <tr>
+	<td>Currently listed in:</td>
+	<td>
+		<table>
+<?
+$categories = $page->container->getPageCategories($page);
+foreach ($categories as $cat)
+{
+	$catid = $cat->id;
+	$text = $cat->name;
+	$cat = $cat->parent;
+	while ($cat !== null)
+	{
+		$text=$cat->name.' > '.$text;
+		$cat = $cat->parent;
+	}
+?>
+			<tr>
+				<form>
+					<input type="hidden" name="category" value="<?= $catid ?>">
+					<td><?= $text ?></td>
+					<td><button class="remove" type="button">Remove...</button></td>
+				</form>
+			</tr>
+<?
+}
+?>		</table>
+	</td>
+</tr>
+<tr>
 	<td>Link to another category:</td>
 	<td>
 		<form>
-			<select id="">
+			<select id="linkcategory" name="category">
 <?
 function showCategoryOption($page,$category,$indent)
 {
-	print('        <option value="'.$category->id.'"');
+	print('        <option id="linktocat'.$category->id.'" value="'.$category->id.'"');
 	if ($category->indexOf($page)!==false)
 		print(' disabled="disabled"');
 	print('>'.$indent.' '.$category->name.'</option>'."\n");
@@ -166,7 +273,7 @@ function showCategoryOption($page,$category,$indent)
 showCategoryOption($page,$cont->getRootCategory(),'');
 ?>
 			</select>
-			<button>Add...</button>
+			<button class="add" type="button">Add...</button>
 		</form>
 	</td>
 </tr>
