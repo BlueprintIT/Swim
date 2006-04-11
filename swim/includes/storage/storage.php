@@ -120,10 +120,44 @@ class StorageConnection
 {
   protected $log;
   protected $new = false;
+  protected $transaction = 0;
 
 	function StorageConnection()
 	{
     $this->log = LoggerManager::getLogger('swim.storage.connection');
+	}
+	
+	function beginTransaction()
+	{
+		if ($this->transaction==0)
+			$this->queryExec('BEGIN;');
+		$this->transaction++;
+	}
+	
+	function commitTransaction()
+	{
+		$this->transaction--;
+		if ($this->transaction<=0)
+			$this->queryExec('COMMIT;');
+		if ($this->transaction<0)
+		{
+			$this->log->warntrace('Ending one transaction too many.');
+			$this->transaction=0;
+		}
+	}
+	
+	function rollbackTransaction()
+	{
+		$this->transaction--;
+		if ($this->transaction<=0)
+			$this->queryExec('ROLLBACK;');
+		else
+			$this->log->errortrace('Could not rollback nested transaction.');
+		if ($this->transaction<0)
+		{
+			$this->log->warntrace('Ending one transaction too many.');
+			$this->transaction=0;
+		}
 	}
 	
   public function escape($text)

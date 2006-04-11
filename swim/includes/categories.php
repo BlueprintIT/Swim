@@ -54,44 +54,122 @@ class Category
   	$this->insert($item, $this->count());
   }
   
-  function insert($item, $pos)
+  function shiftItems($cutoff, $amount)
+  {
+  	global $_STORAGE;
+  	
+  	$_STORAGE->beginTransaction();
+  	
+  	if ($amount>0)  // Shift up
+  	{
+	  	$order = 'DESC';
+  		$chg = '+'.$amount;
+  	}
+  	else            // Shift down
+  	{
+	  	$order = 'ASC';
+	  	$chg = $amount;
+  	}
+  		
+  	$rows = $_STORAGE->arrayQuery('SELECT * FROM LinkCategory WHERE category='.$this->id.' AND sortkey>='.$cutoff.' ORDER BY sortkey '.$order.';');
+  	foreach ($rows as $row)
+  	{
+  		$_STORAGE->queryExec('UPDATE LinkCategory SET sortkey=sortkey'.$chg.' WHERE sortkey='.$row['sortkey'].' AND category='.$this->id.';');
+  	}
+
+  	$rows = $_STORAGE->arrayQuery('SELECT * FROM PageCategory WHERE category='.$this->id.' AND sortkey>='.$cutoff.' ORDER BY sortkey '.$order.';');
+  	foreach ($rows as $row)
+  	{
+	    $_STORAGE->queryExec('UPDATE PageCategory SET sortkey=sortkey'.$chg.' WHERE sortkey='.$row['sortkey'].' AND category='.$this->id.';');
+		}
+		
+  	$rows = $_STORAGE->arrayQuery('SELECT * FROM Category WHERE parent='.$this->id.' AND sortkey>='.$cutoff.' ORDER BY sortkey '.$order.';');
+  	foreach ($rows as $row)
+  	{
+	    $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey'.$chg.' WHERE sortkey='.$row['sortkey'].' AND parent='.$this->id.';');
+	  }
+	  
+	  $_STORAGE->commitTransaction();
+  }
+  
+  function insert($item, $npos)
   {
     global $_STORAGE;
 
-    $_STORAGE->queryExec('UPDATE LinkCategory SET sortkey=sortkey+1 WHERE category='.$this->id.' AND sortkey>='.$pos.';');
-    $_STORAGE->queryExec('UPDATE PageCategory SET sortkey=sortkey+1 WHERE category='.$this->id.' AND sortkey>='.$pos.';');
-    $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey+1 WHERE parent='.$this->id.' AND sortkey>='.$pos.';');
+		$_STORAGE->beginTransaction();
 
-  	if ($item instanceof Category)
+  	if (($item instanceof Category) || ($item instanceof Link))
   	{
-  		$item->parent=$this;
-  		$item->container=$this->container;
-  		if (isset($item->id))
+  		if ($item->parent !==null)
   		{
-  			$_STORAGE->queryExec('UPDATE Category SET parent='.$this->id.', sortkey='.$pos.' WHERE id='.$item->id.';');
-  		}
-  		else
-  		{
-        $_STORAGE->queryExec('INSERT INTO Category (name,parent,sortkey) VALUES ("'.$_STORAGE->escape($item->name).'",'.$this->id.','.$pos.');');
-  		}
-  	}
-  	else if ($item instanceof Link)
-  	{
-  		if (isset($item->parent))
-  		{
-	  		$_STORAGE->queryExec('UPDATE LinkCategory SET category='.$this->id.', sortkey='.$pos.' WHERE category='.$item->category->id.' AND sortkey='.$item->pos.';');
-  		}
-  		else
-  		{
-	  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$pos.');');
-	  		$item->id = $_STORAGE->lastInsertRowid();
-  		}
-  		$item->parent=$this;
+	  		if ($item instanceof Category)
+		  		$pos = $_STORAGE->singleQuery('SELECT sortkey FROM Category WHERE id='.$item->id.';');
+		  	
+		  	if ($item instanceof Link)
+		  		$pos = $_STORAGE->singleQuery('SELECT sortkey FROM LinkCategory WHERE id='.$item->id.';');
+	
+	  		if ($item->parent !== $this)
+	  		{
+	  			$this->shiftItems($npos, 1);
+	
+		  		if ($item instanceof Category)
+		  		{
+			  		$_STORAGE->queryExec('UPDATE Category SET sortkey='.$npos.', parent='.$this->id.' WHERE id='.$item->id.';');
+			  		$item->container=$this->container;
+			  	}
+			  	
+			  	if ($item instanceof Link)
+			  		$_STORAGE->queryExec('Update LinkCategory SET sortkey='.$npos.', category='.$this->id.' WHERE id='.$item->id.';');
+			  		
+			  	$item->parent->shiftItems($pos, -1);
+			  	$item->parent=$this;
+	  		}
+	  		else
+	  		{
+  				$this->shiftItems($npos, 1);
+  				
+		  		if ($item instanceof Category)
+			  		$_STORAGE->queryExec('UPDATE Category SET sortkey='.$npos.' WHERE id='.$item->id.';');
+			  	
+			  	if ($item instanceof Link)
+			  		$_STORAGE->queryExec('Update LinkCategory SET sortkey='.$npos.' WHERE id='.$item->id.';');
+
+  				$this->shiftItems($pos, -1);
+	  		}
+	  	}
+	  	else
+	  	{
+	  		$this->shiftItems($npos, 1);
+		  	if ($item instanceof Category)
+		  	{
+		  		$item->parent=$this;
+		  		$item->container=$this->container;
+	        $_STORAGE->queryExec('INSERT INTO Category (name,parent,sortkey) VALUES ("'.$_STORAGE->escape($item->name).'",'.$this->id.','.$npos.');');
+		  		$item->id = $_STORAGE->lastInsertRowid();
+		  	}
+		  	else if ($item instanceof Link)
+		  	{
+		  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$npos.');');
+		  		$item->id = $_STORAGE->lastInsertRowid();
+		  	}
+	  	}
   	}
   	else if ($item instanceof Page)
   	{
-  		$_STORAGE->queryExec('INSERT INTO PageCategory (page,category,sortkey) VALUES (\''.$_STORAGE->escape($item->getPath()).'\','.$this->id.','.$pos.');');
+  		$positions = $_STORAGE->arrayQuery('SELECT sortkey FROM PageCategory WHERE page=\''.$_STORAGE->escape($item->getPath()).'\' AND category='.$this->id.' ORDER BY sortkey DESC;');
+  		foreach ($positions as $row)
+  		{
+		    $_STORAGE->queryExec('DELETE FROM PageCategory WHERE category='.$this->id.' AND sortkey='.$row['sortkey'].';');
+		    $this->shiftItems($row['sortkey'], -1);
+		    //if ($row['sortkey']<$npos)
+		    //	$npos--;
+  		}
+  		$this->shiftItems($npos, 1);
+  		$_STORAGE->queryExec('INSERT INTO PageCategory (page,category,sortkey) VALUES (\''.$_STORAGE->escape($item->getPath()).'\','.$this->id.','.$npos.');');
   	}
+  	
+  	$_STORAGE->commitTransaction();
+  	
     if (isset($this->list))
       unset($this->list);
   }
@@ -99,10 +177,11 @@ class Category
   function remove($pos)
   {
     global $_STORAGE;
+    
+    $_STORAGE->beginTransaction();
+    
     $_STORAGE->queryExec('DELETE FROM LinkCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
-    $_STORAGE->queryExec('UPDATE LinkCategory SET sortkey=sortkey-1 WHERE category='.$this->id.' AND sortkey>'.$pos.';');
     $_STORAGE->queryExec('DELETE FROM PageCategory WHERE category='.$this->id.' AND sortkey='.$pos.';');
-    $_STORAGE->queryExec('UPDATE PageCategory SET sortkey=sortkey-1 WHERE category='.$this->id.' AND sortkey>'.$pos.';');
     $id = $_STORAGE->singleQuery('SELECT id FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
     if ($id!=false)
     {
@@ -110,7 +189,10 @@ class Category
       $cat->clean();
       $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
     }
-    $_STORAGE->queryExec('UPDATE Category SET sortkey=sortkey-1 WHERE parent='.$this->id.' AND sortkey>'.$pos.';');
+    $this->shiftItems($pos,-1);
+
+    $_STORAGE->commitTransaction();
+    
     if (isset($this->list))
       unset($this->list);
   }
@@ -169,16 +251,16 @@ class Category
   {
     if (!isset($this->list))
     {
-      $this->list=$this->items();
+      $this->items();
     }
     return count($this->list);
   }
   
   function item($pos)
   {
-    if (isset($this->list))
+    if (!isset($this->list))
     {
-      $this->list=$this->items();
+      $this->items();
     }
     return $this->list[$pos];
   }
@@ -231,6 +313,7 @@ class Category
       $list[$details['sortkey']] = new Link($this, $details['id'], $details['name'],$details['link']);
     }
     ksort($list);
+    $this->list=$list;
     return $list;
   }
   

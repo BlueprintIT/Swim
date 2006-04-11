@@ -67,6 +67,38 @@ function method_mutate($request)
 		  		return;
 		  	}
 		  }
+		  else if (isset($request->query['item']))
+		  {
+		  	$pos = $request->query['item'];
+		  	$item = $category->item($pos);
+		  	if ($item === null)
+		  	{
+		  		$log->error('Invalid item - '.$pos.' of '.count($items));
+		  		foreach ($items as $k => $i)
+		  		{
+		  			$log->error($k." => ".get_class($i));
+		  		}
+		  		displayGeneralError("Invalid item specified.");
+		  		return;
+		  	}
+		  	
+		  	if ($request->query['action']=='moveup')
+		  	{
+		  		$log->debug('Move item '.get_class($item).' to '.($pos-1));
+		  		$category->insert($item, $pos-1);
+		  	}
+		  	else if ($request->query['action']=='movedown')
+		  	{
+		  		$log->debug('Move item '.get_class($item).' to '.($pos+1));
+		  		$category->insert($item, $pos+1);
+		  	}
+		  	else
+		  	{
+		  		$log->error('Invalid action');
+		  		displayGeneralError("Invalid action specified.");
+		  		return;
+		  	}
+		  }
 		}
 		else
 		{

@@ -14,7 +14,7 @@ Save Account=0
 Create Tagfile=0
 CTags Legacy Support=0
 Project Directory=C:\UserData\Dave\UEStudio\Swim
-Working Time=57440
+Working Time=59895
 [uemakeXp]
 ReleaseMode=0
 [Files]
@@ -35,7 +35,6 @@ C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 56647 - 1 - blocks 
 C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 37443 - 2 - attachments=1
 C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 37443 - 2 - blocks=1
 C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 37443 - 2 - blocks - image=1
-C:\UserData\Dave\UEStudio\Swim\ - swim=1
 C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 24974=1
 C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 24974 - 1=1
 C:\UserData\Dave\UEStudio\Swim\ - site - catalogue - pages - 24974 - 1 - blocks=1
@@ -54,24 +53,18 @@ C:\UserData\Dave\UEStudio\Swim\ - site - design - pages=1
 C:\UserData\Dave\UEStudio\Swim\ - site - design - pages - properties=1
 C:\UserData\Dave\UEStudio\Swim\ - site - design - pages - properties - blocks=1
 C:\UserData\Dave\UEStudio\Swim\ - site - design - files - scripts=1
-C:\UserData\Dave\UEStudio\Swim\ - swim - internal=1
-C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages=1
 C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - pagedetails=1
 C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site=1
 C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site - blocks=1
 C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site - blocks - leftpane=1
-C:\UserData\Dave\UEStudio\Swim\ - swim - includes=1
-C:\UserData\Dave\UEStudio\Swim\ - swim - includes - methods=1
-C:\UserData\Dave\UEStudio\Swim\ - site=1
-C:\UserData\Dave\UEStudio\Swim\ - site - config=1
 [Open Files]
-Open File0=C:\UserData\Dave\UEStudio\Swim\swim\internal\pages\pagedetails\blocks\mainpane\block.php
+Open File0=
 Open File Pos0=2520
 Open File Line0=1554
 Active File Index=0
 Open File Window Pos0=2,3,-1,-1,-4,-25,22,24,682,653
 Open File1=C:\UserData\Dave\UEStudio\Swim\swim\internal\pages\site\blocks\leftpane\block.php
-Active File Display Mode=3
+Active File Display Mode=-1
 Open File Pos1=1430
 Open File Line1=0
 Open File Window Pos1=0,1,-1,-1,-4,-25,44,48,708,663

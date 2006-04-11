@@ -132,10 +132,10 @@ YAHOO.util.Event.addListener(window, "load", findButtons);
 if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 {
 ?>
-<form method="GET" action="<?= $create->encodePath() ?>">
+<!--<form method="GET" action="<?= $create->encodePath() ?>">
 <?= $create->getFormVars() ?>
 <input type="submit" value="Create new Page">
-</form>
+</form>-->
 <?
 }
 ?>
