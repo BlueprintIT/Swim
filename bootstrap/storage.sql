@@ -20,6 +20,7 @@ CREATE TABLE PageCategory (
 );
 
 CREATE TABLE LinkCategory (
+	id INTEGER PRIMARY KEY,
 	link TEXT,
 	name TEXT,
 	category INTEGER,

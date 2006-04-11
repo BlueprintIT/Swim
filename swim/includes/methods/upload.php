@@ -99,51 +99,9 @@ function method_upload($request)
 	}
   else
   {
-    $parts=split('/',$request->resource,2);
-    if ((count($parts)==2)&&($parts[1]=='categories'))
-    {
-      $log->debug('Uploading category database');
-      if ($_USER->hasPermission('documents',PERMISSION_WRITE))
-      {
-        $cm = getContainer($parts[0]);
-        if ($_SERVER['REQUEST_METHOD']=='PUT')
-        {
-          $doc = new DOMDocument();
-          if ($doc->load('php://input'))
-          {
-            $log->debug('XML successfully loaded');
-            $log->debug($doc->saveXML());
-            $cm->loadCategories($doc);
-            header($_SERVER["SERVER_PROTOCOL"]." 202 Accepted");
-            print("Resource accepted");
-            return;
-          }
-          else
-          {
-            $log->error('Error loading XML');
-            displayServerError($request);
-          }
-        }
-        else
-        {
-          $log->error('Invalid HTTP method - '.$_SERVER['REQUEST_METHOD']);
-          displayServerError($request);
-        }
-      }
-      else
-      {
-        $log->debug('No write permission');
-        header($_SERVER["SERVER_PROTOCOL"]." 401 Not Authorized");
-        print("You don't have permission to edit categories.");
-        return;
-      }
-    }
-    else
-    {
-    	$log->warn('Unknown upload to '.$request->resource);
-      displayNotFound($request);
-      return;
-    }
+  	$log->warn('Unknown upload to '.$request->resource);
+    displayNotFound($request);
+    return;
   }
 }
 

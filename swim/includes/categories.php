@@ -16,11 +16,11 @@
 class Link
 {
 	var $parent;
-	var $key;
+	var $id;
   var $name;
   var $address;
   
-  function Link($category,$key,$name,$address)
+  function Link($category,$id,$name,$address)
   {
   	$this->parent=$category;
   	$this->key=$key;
@@ -84,9 +84,9 @@ class Category
   		else
   		{
 	  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$pos.');');
+	  		$item->id = $_STORAGE->lastInsertRowid();
   		}
   		$item->parent=$this;
-  		$item->key=$pos;
   	}
   	else if ($item instanceof Page)
   	{
@@ -134,7 +134,10 @@ class Category
   	}
   	else if ($item instanceof Link)
   	{
-  		return $item->key;
+  		$pos = $_STORAGE->singleQuery('SELECT sortkey from LinkCategory WHERE id='.$item->id.';');
+  		if ($pos===null)
+  			return false;
+  		return $pos;
   	}
   	else if ($item instanceof Page)
   	{
@@ -221,11 +224,11 @@ class Category
       }
       $list[$details['sortkey']]=$cat;
     }
-    $set=$_STORAGE->query('SELECT name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
+    $set=$_STORAGE->query('SELECT id,name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->fetch();
-      $list[$details['sortkey']] = new Link($this, $details['sortkey'], $details['name'],$details['link']);
+      $list[$details['sortkey']] = new Link($this, $details['id'], $details['name'],$details['link']);
     }
     ksort($list);
     return $list;
