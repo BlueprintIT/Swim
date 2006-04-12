@@ -172,11 +172,16 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <?= $createc->getFormVars() ?>
 <input type="submit" value="Add a new Category">
 </form>
+<?
+if ($category !== $container->getRootCategory())
+{
+?>
 <form action="<?= $edit->encodePath() ?>" method="GET">
 <?= $edit->getFormVars() ?>
 <input type="submit" value="Edit Category">
 </form>
 <?
+}
 }
 ?>
 <h2>Category Details</h2>

@@ -58,15 +58,15 @@ if (isset($request->query['reloadtree']))
 ?>
 
 function removeCompleted(req) {
-	var row = req.argument.button.parentNode.parentNode.parentNode;
-	row.parentNode.removeChild(row);
+	var row = document.getElementById("catrow-"+req.argument.category);
+	row.style.display="none";
 	window.top.SiteTree.loadTree();
-	var option = document.getElementById("linktocat"+req.argument.category);
+	var option = document.getElementById("linktocat-"+req.argument.category);
 	option.disabled=false;
 }
 
 function removeFromCategory(button) {
-	var category = button.form.elements.namedItem("category").value;
+	var category = button.id.substring(10);
 	if (category) {
 		var callback = {
 			success: removeCompleted,
@@ -74,7 +74,6 @@ function removeFromCategory(button) {
 				alert("There was an error performing this action.");
 			},
 			argument: {
-				button: button,
 				category: category
 			}
 		};
@@ -86,13 +85,15 @@ function removeFromCategory(button) {
 
 function addCompleted(req) {
 	window.top.SiteTree.loadTree();
-	var option = document.getElementById("linktocat"+req.argument.category);
+	var option = document.getElementById("linktocat-"+req.argument.category);
 	option.disabled=true;
-	//window.location.reload();
+	document.getElementById("linkcategory").selectedIndex=-1;
+	var row = document.getElementById("catrow-"+req.argument.category);
+	row.style.display=null;
 }
 
 function addToCategory(button) {
-	var category = button.form.elements.namedItem("category").value;
+	var category = document.getElementById("linkcategory").value;
 	if (category) {
 		var callback = {
 			success: addCompleted,
@@ -100,7 +101,6 @@ function addToCategory(button) {
 				alert("There was an error performing this action.");
 			},
 			argument: {
-				button: button,
 				category: category
 			}
 		};
@@ -226,27 +226,25 @@ if ($page->isCurrentVersion())
 	<td>
 		<table>
 <?
-$categories = $page->container->getPageCategories($page);
-foreach ($categories as $cat)
+function showCategoryRemove($page,$category,$indent)
 {
-	$catid = $cat->id;
-	$text = $cat->name;
-	$cat = $cat->parent;
-	while ($cat !== null)
-	{
-		$text=$cat->name.' > '.$text;
-		$cat = $cat->parent;
-	}
+	if ($category->indexOf($page)===false)
+		$style='style="display: none" ';
 ?>
-			<tr>
-				<form>
-					<input type="hidden" name="category" value="<?= $catid ?>">
-					<td><?= $text ?></td>
-					<td><button class="remove" type="button">Remove...</button></td>
-				</form>
+			<tr <?= $style?>id="catrow-<?= $category->id ?>">
+				<td><?= $indent.$category->name ?></td>
+				<td><button id="removeBtn-<?= $category->id ?>" class="remove" type="button">Remove...</button></td>
 			</tr>
 <?
+	$items = $category->items();
+	foreach ($items as $item)
+	{
+		if ($item instanceof Category)
+			showCategoryRemove($page,$item, $indent.$category->name.' &gt; ');
+	}
 }
+
+showCategoryRemove($page,$cont->getRootCategory(),'');
 ?>		</table>
 	</td>
 </tr>
@@ -258,7 +256,7 @@ foreach ($categories as $cat)
 <?
 function showCategoryOption($page,$category,$indent)
 {
-	print('        <option id="linktocat'.$category->id.'" value="'.$category->id.'"');
+	print('        <option id="linktocat-'.$category->id.'" value="'.$category->id.'"');
 	if ($category->indexOf($page)!==false)
 		print(' disabled="disabled"');
 	print('>'.$indent.' '.$category->name.'</option>'."\n");
