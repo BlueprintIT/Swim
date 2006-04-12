@@ -408,6 +408,36 @@ class Template extends Resource
 		return true;
 	}
 	
+	function displayFileBrowser($parser,$tag,$attrs,$text)
+	{
+		$src=$this->generateURL($parser->data,'/internal/file/scripts/filebrowser.js');
+		if (!isset($parser->data['scripts'][$src]))
+		{
+			$script=$this->buildElement($parser,'script',array('type'=>'text/javascript','src'=>$src));
+			$parser->data['head'].=$script."\n";
+			$parser->data['scripts'][$src]=true;
+		}
+
+		$id = $attrs['name'];
+		$browser = new Request();
+		$browser->method='fileselect';
+		if (isset($attrs['page']))
+			$browser->resource = $attrs['page'];
+		if (isset($attrs['version']))
+			$browser->query['version']=$attrs['version'];
+		$browser->query['action']='fileBrowserCallback(\''.$id.'\', selected)';
+		echo '<input id="'.$id.'" name="'.$attrs['name'].'" type="hidden" value="'.$attrs['value'].'">';
+		if ((isset($attrs['value'])) && (strlen($attrs['value'])>0))
+		{
+			$rlvalue = $attrs['value'];
+			$rlvalue = substr(strrchr($rlvalue,'/'),1);
+		}
+		else
+			$rlvalue = '[No file selected]';
+		echo '<input id="fbfake-'.$id.'" disabled="true" type="text" value="'.$rlvalue.'">';
+		echo '<button type="button" onclick="showFileBrowser(\''.$browser->encode().'\',\''.$id.'\')">Select...</button>';
+	}
+	
 	function displayFile($parser,$tag,$attrs,$text)
 	{
 		$request=$this->generateRequest($parser->data,$attrs['src'],"view");
@@ -584,6 +614,10 @@ class Template extends Resource
 		{
 			return $this->displayFile($parser,$tag,$attrs,$text);
 		}
+		else if ($tag=='filebrowser')
+		{
+			return $this->displayFileBrowser($parser,$tag,$attrs,$text);
+		}
 		else if ($tag=='if')
 		{
 			return $this->displayIf($parser,$tag,$attrs,$text);
@@ -657,6 +691,7 @@ class Template extends Resource
 		$parser->addObserver('date',$this);
 		$parser->addObserver('time',$this);
 		$parser->addObserver('file',$this);
+		$parser->addObserver('filebrowser',$this);
 		
 		$this->lockRead();
 		ob_start();

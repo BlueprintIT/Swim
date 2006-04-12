@@ -49,5 +49,6 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 </div>
 <div class="body">
 <div id="categorytree">
+	<p>Loading Site...</p>
 </div>
 </div>

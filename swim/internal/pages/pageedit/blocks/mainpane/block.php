@@ -130,7 +130,7 @@ foreach ($layout->blocks as $id => $blk)
 <?
       if ($blk->getType()=='image')
       {
-        block_image($id,$block,$blk);
+        block_image($id,$page,$block,$blk);
       }
 ?>
 </tr>
