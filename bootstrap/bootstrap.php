@@ -80,7 +80,6 @@ require_once $bootstrap.'/logging.php';
 error_reporting(E_ALL);
 
 LoggerManager::setLogLevel('',LOG_LEVEL_INFO);
-LoggerManager::setLogLevel('swim.storage',LOG_LEVEL_INFO);
 LoggerManager::setLogLevel('php',LOG_LEVEL_INFO);
 LoggerManager::setLogLevel('swim.utils.shutdown',LOG_LEVEL_WARN);
 

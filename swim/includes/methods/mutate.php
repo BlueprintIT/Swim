@@ -33,41 +33,7 @@ function method_mutate($request)
 		  	displayGeneralError("Invalid category specified.");
 		  	return;
 		  }
-		  if (isset($request->query['page']))
-		  {
-		  	$page = Resource::decodeResource($request->query['page']);
-		  	if ($page===null)
-		  	{
-		  		$log->error('Page was null');
-				  displayGeneralError("Invalid page specified.");
-				  return;
-		  	}
-		  	if ($request->query['action']=='add')
-		  	{
-		  		$category->add($page);
-          header($_SERVER["SERVER_PROTOCOL"]." 200 OK");
-          header("Content-Type: text/plain");
-          print("Resource accepted");
-          return;
-		  	}
-		  	else if ($request->query['action']=='remove')
-		  	{
-		  		$pos = $category->indexOf($page);
-		  		if ($pos!==false)
-		  			$category->remove($pos);
-          header($_SERVER["SERVER_PROTOCOL"]." 200 OK");
-          header("Content-Type: text/plain");
-          print("Resource accepted");
-          return;
-		  	}
-		  	else
-		  	{
-		  		$log->error('Invalid action');
-		  		displayGeneralError("Invalid action specified.");
-		  		return;
-		  	}
-		  }
-		  else if (isset($request->query['item']))
+		  if (isset($request->query['item']))
 		  {
 		  	$pos = $request->query['item'];
 		  	$item = $category->item($pos);
@@ -92,6 +58,11 @@ function method_mutate($request)
 		  		$log->debug('Move item '.get_class($item).' to '.($pos+1));
 		  		$category->insert($item, $pos+1);
 		  	}
+		  	else if ($request->query['action']=='remove')
+		  	{
+		  		if ($pos!==false)
+		  			$category->remove($pos);
+		  	}
 		  	else
 		  	{
 		  		$log->error('Invalid action');
@@ -99,6 +70,70 @@ function method_mutate($request)
 		  		return;
 		  	}
 		  }
+		  else if (isset($request->query['page']))
+		  {
+		  	$page = Resource::decodeResource($request->query['page']);
+		  	if ($page===null)
+		  	{
+		  		$log->error('Page was null');
+				  displayGeneralError("Invalid page specified.");
+				  return;
+		  	}
+		  	if ($request->query['action']=='add')
+		  	{
+		  		$log->debug('Adding page');
+		  		$category->add($page);
+		  	}
+		  	else if ($request->query['action']=='remove')
+		  	{
+		  		$pos = $category->indexOf($page);
+		  		if ($pos!==false)
+		  		{
+			  		$log->debug('Adding page');
+		  			$category->remove($pos);
+		  		}
+		  		else
+		  		{
+			  		$log->error('Page does not exist in category');
+		  		}
+		  	}
+		  	else
+		  	{
+		  		$log->error('Invalid action');
+		  		displayGeneralError("Invalid action specified.");
+		  		return;
+		  	}
+		  }
+		  else if (isset($request->query['subcategory']))
+		  {
+		  	$subcat = $cm->getCategory($request->query['subcategory']);
+		  	if ($subcat!==null)
+		  	{
+		  		$parent = $category;
+		  		while ($parent!==null)
+		  		{
+		  			if ($parent===$subcat)
+		  			{
+				  		$log->error('Invalid move specified');
+				  		displayGeneralError("Invalid move specified.");
+				  		return;
+		  			}
+		  			$parent = $parent->parent;
+		  		}
+		  		$log->debug('Moving category');
+		  		$category->add($subcat);
+		  	}
+		  	else
+		  	{
+		  		$log->error('Invalid sub category');
+		  		displayGeneralError("Invalid category specified.");
+		  		return;
+		  	}
+		  }
+      header($_SERVER["SERVER_PROTOCOL"]." 200 OK");
+      header("Content-Type: text/plain");
+      print("Resource accepted");
+      return;
 		}
 		else
 		{

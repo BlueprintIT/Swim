@@ -39,7 +39,34 @@ $mutate->method='mutate';
 $mutate->resource=$container->id.'/categories';
 $mutate->query['category']=$category->id;
 
+$move = new Request();
+$move->method='mutate';
+$move->resource=$container->id.'/categories';
+$move->query['subcategory']=$category->id;
+
 ?>
+function moveCompleted(req) {
+	window.top.SiteTree.loadTree();
+}
+
+function moveToCategory() {
+	var category = document.getElementById("targetlist").value;
+	if (category) {
+		var callback = {
+			success: moveCompleted,
+			failure: function(obj) {
+				alert("There was an error performing this action.");
+			},
+			argument: {
+				category: category
+			}
+		};
+		var target = "<?= $move->encode() ?>";
+		target=target+"&action=add&category="+category;
+		YAHOO.util.Connect.asyncRequest("GET", target, callback, null);
+	}
+}
+
 function moveUpComplete(req) {
 	var list = document.getElementById("contentList");
 	var top = list.options[req.argument.index-1];
@@ -111,6 +138,8 @@ function init(event) {
 	YAHOO.util.Event.addListener(button, "click", moveUp);
 	button = document.getElementById("moveDownBtn");
 	YAHOO.util.Event.addListener(button, "click", moveDown);
+	button = document.getElementById("moveBtn");
+	YAHOO.util.Event.addListener(button, "click", moveToCategory);
 	var list = document.getElementById("contentList");
 	YAHOO.util.Event.addListener(list, "change", updateButtons);
 	updateButtons();
@@ -150,6 +179,33 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <tr>
   <td style="vertical-align: top">Name:</td>
   <td style="vertical-align: top"><?= $category->name ?></td>
+</tr>
+<tr>
+	<td>Move to another category:</td>
+	<td>
+		<form>
+			<select id="targetlist" name="category">
+<?
+function showCategoryOption($current,$category,$indent)
+{
+	if ($category===$current)
+		return;
+	
+	print('        <option value="'.$category->id.'">'.$indent.' '.$category->name.'</option>'."\n");
+	$items = $category->items();
+	foreach ($items as $item)
+	{
+		if ($item instanceof Category)
+			showCategoryOption($current,$item, '--'.$indent);
+	}
+}
+
+showCategoryOption($category,$container->getRootCategory(),'');
+?>
+			</select>
+			<button id="moveBtn" type="button">Move...</button>
+		</form>
+	</td>
 </tr>
 <tr>
   <td style="vertical-align: top">Contents:</td>

@@ -14,7 +14,7 @@ Save Account=0
 Create Tagfile=0
 CTags Legacy Support=0
 Project Directory=C:\UserData\Dave\UEStudio\Swim
-Working Time=59895
+Working Time=75936
 [uemakeXp]
 ReleaseMode=0
 [Files]
@@ -53,10 +53,22 @@ C:\UserData\Dave\UEStudio\Swim\ - site - design - pages=1
 C:\UserData\Dave\UEStudio\Swim\ - site - design - pages - properties=1
 C:\UserData\Dave\UEStudio\Swim\ - site - design - pages - properties - blocks=1
 C:\UserData\Dave\UEStudio\Swim\ - site - design - files - scripts=1
-C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - pagedetails=1
-C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site=1
 C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site - blocks=1
 C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site - blocks - leftpane=1
+C:\UserData\Dave\UEStudio\Swim\ - swim=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - categorydetails=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - categorydetails - blocks=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - categorydetails - blocks - mainpane=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - pagedetails=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - internal - pages - site=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - includes=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - includes - methods=1
+C:\UserData\Dave\UEStudio\Swim\ - site=1
+C:\UserData\Dave\UEStudio\Swim\ - site - config=1
+C:\UserData\Dave\UEStudio\Swim\ - bootstrap=1
+C:\UserData\Dave\UEStudio\Swim\ - swim - includes - storage=1
 [Open Files]
 Open File0=
 Open File Pos0=2520
