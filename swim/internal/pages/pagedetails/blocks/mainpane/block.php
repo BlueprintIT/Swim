@@ -228,6 +228,7 @@ if ($page->isCurrentVersion())
 <?
 function showCategoryRemove($page,$category,$indent)
 {
+	$style='';
 	if ($category->indexOf($page)===false)
 		$style='style="display: none" ';
 ?>

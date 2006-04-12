@@ -35,17 +35,18 @@ class PageListBlock extends Block
       $this->cont=$_PREFS->getPref('container.default');
   }
   
-  function findPages($category, &$pages)
+  function findPages($category, &$pages, &$seen)
   {
     $this->log->debug('Listing category '.$category->id);
   	$items = $category->items();
   	foreach ($items as $id => $item)
   	{
   		if (($item instanceof Category) && ($this->recursive))
-  			$this->findPages($item, $pages);
+  			$this->findPages($item, $pages, $seen);
   			
-  		if ($item instanceof Page)
+  		if (($item instanceof Page) && (!in_array($item,$seen)))
   		{
+  			array_push($seen,$item);
   			if (isset($this->sort))
   			{
   				$value = $item->getPref($this->sort);
@@ -60,7 +61,7 @@ class PageListBlock extends Block
   			}
   			else
   			{
-		  		array_push($pages,array($item));
+ 		  		array_push($pages,array($item));
 		  	}
 	  	}
   	}
@@ -82,7 +83,8 @@ class PageListBlock extends Block
 	    $realpage = $parser->data['page'];
 	    
 	    $pages = array();
-	    $this->findPages($category, $pages);
+	    $seen = array();
+	    $this->findPages($category, $pages, $seen);
 	    
 	    foreach ($pages as $pagearray)
 	    {

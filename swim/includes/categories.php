@@ -142,6 +142,9 @@ class Category
 	  		}
 	  		else
 	  		{
+	  			if ($pos<$npos)
+	  				$npos++;
+	  				
   				$this->shiftItems($npos, 1);
   				
 		  		if ($item instanceof Category)
@@ -150,7 +153,7 @@ class Category
 			  	if ($item instanceof Link)
 			  		$_STORAGE->queryExec('Update LinkCategory SET sortkey='.$npos.' WHERE id='.$item->id.';');
 
-  				$this->shiftItems($pos, -1);
+  				$this->shiftItems($pos+1, -1);
 	  		}
 	  	}
 	  	else
