@@ -38,6 +38,14 @@ class ObjectCache
     }
     self::$cache[$type][$key]=$object;
   }
+  
+  public static function removeItem($type, $key)
+  {
+    if (!isset(self::$log))
+      self::$log = LoggerManager::getLogger('swim.cache');
+    
+    unset(self::$cache[$type][$key]);
+  }
 }
 
 ?>

@@ -143,6 +143,12 @@ function method_save($request)
   			$category=null;
   			if (count($parts)==3)
 	  			$category = $container->getCategory($parts[2]);
+	  		else
+	  		{
+					$parent = $container->getCategory($request->query['parent']);
+	  			$category = new Category($container, null, null, "");
+	  			$parent->add($category);
+	  		}
   			if ($category !== null)
   			{
           foreach ($request->query as $name => $value)
@@ -174,6 +180,8 @@ function method_save($request)
           		$category->hovericon = $request->query['hovericon'];
           	}
           	$category->save();
+          	// TODO remove this crappy code
+          	$redirect.='&category='.$category->id;
           }
           redirect($redirect);
   			}

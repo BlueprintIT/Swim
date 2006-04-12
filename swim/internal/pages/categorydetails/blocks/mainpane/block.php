@@ -25,17 +25,31 @@ $createl->query['category']=$category->id;
 $createl->resource=$container->id.'/link';
 
 $createc = new Request();
-$createc->method='create';
-$createc->query['category']=$category->id;
-$createc->resource=$container->id.'/category';
+$createc->method='view';
+$createc->query['parent']=$category->id;
+$createc->query['container']=$container->id;
+$createc->resource='internal/page/categoryedit';
+$createc->nested=$request;
+
+if ($category->parent!==null)
+{
+	$delete = new Request();
+	$delete->method='delete';
+	$delete->resource=$container->id.'/categories/'.$category->id;
+	$delete->nested = new Request();
+	$delete->nested->method='view';
+	$delete->nested->resource = 'internal/page/categorydetails';
+	$delete->nested->query['container'] = $container->id;
+	$delete->nested->query['category'] = $category->parent->id;
+	$delete->nested->query['reloadtree'] = true;
+}
 
 $edit = new Request();
 $edit->method='view';
 $edit->query['container']=$container->id;
 $edit->query['category']=$category->id;
 $edit->resource='internal/page/categoryedit';
-$edit->nested=new Request($request);
-$edit->nested->query['reloadtree']=true;
+$edit->nested=$request;
 
 $mutate = new Request();
 $mutate->method='mutate';
@@ -164,10 +178,10 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <?= $createp->getFormVars() ?>
 <input type="submit" value="Add a new Page">
 </form>
-<form method="GET" action="<?= $createl->encodePath() ?>">
+<!-- <form method="GET" action="<?= $createl->encodePath() ?>">
 <?= $createl->getFormVars() ?>
 <input type="submit" value="Add a new Link">
-</form>
+</form> -->
 <form method="GET" action="<?= $createc->encodePath() ?>">
 <?= $createc->getFormVars() ?>
 <input type="submit" value="Add a new Category">
@@ -179,6 +193,10 @@ if ($category !== $container->getRootCategory())
 <form action="<?= $edit->encodePath() ?>" method="GET">
 <?= $edit->getFormVars() ?>
 <input type="submit" value="Edit Category">
+</form>
+<form onsubmit="return confirm('This will delete this category, continue?');" action="<?= $delete->encodePath() ?>" method="GET">
+<?= $delete->getFormVars() ?>
+<input type="submit" value="Delete this Category">
 </form>
 <?
 }

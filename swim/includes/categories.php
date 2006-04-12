@@ -193,6 +193,14 @@ class Category
       unset($this->list);
   }
   
+  function delete()
+  {
+  	global $_STORAGE;
+    $this->clean();
+    $_STORAGE->queryExec('DELETE FROM Category WHERE id='.$this->id.';');
+    // TODO clear from cache?
+  }
+  
   function remove($pos)
   {
     global $_STORAGE;
@@ -205,8 +213,7 @@ class Category
     if ($id!=false)
     {
       $cat=$this->container->getCategory($id);
-      $cat->clean();
-      $_STORAGE->queryExec('DELETE FROM Category WHERE parent='.$this->id.' AND sortkey='.$pos.';');
+      $cat->delete();
     }
     $this->shiftItems($pos,-1);
 

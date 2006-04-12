@@ -35,7 +35,32 @@ function method_delete($request)
   }
   else
   {
-    displayNotFound($request);
+  	$parts = explode('/',$request->resource);
+  	if ((count($parts)==3)&&($parts[1]=='categories'))
+  	{
+  		$container = getContainer($parts[0]);
+  		if ($container !== null)
+  		{
+  			$category = $container->getCategory($parts[2]);
+  			if ($category !== null)
+  			{
+  				$category->delete();
+  				redirect($request->nested);
+  			}
+  			else
+  			{
+			    displayNotFound($request);
+  			}
+  		}
+  		else
+  		{
+		    displayNotFound($request);
+  		}
+  	}
+  	else
+  	{
+	    displayNotFound($request);
+	  }
   }
 }
 
