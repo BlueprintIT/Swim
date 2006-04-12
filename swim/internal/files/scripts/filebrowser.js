@@ -13,3 +13,11 @@ function fileBrowserCallback(id, selected) {
 	var fake = document.getElementById("fbfake-"+id);
 	fake.value = selected;
 }
+
+function clearFileBrowser(id) {
+	var field = document.getElementById(id);
+	field.value = "";
+	
+	var fake = document.getElementById("fbfake-"+id);
+	fake.value = "[No file selected]";
+}

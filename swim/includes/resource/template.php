@@ -423,6 +423,8 @@ class Template extends Resource
 		$browser->method='fileselect';
 		if (isset($attrs['page']))
 			$browser->resource = $attrs['page'];
+		else if (isset($attrs['container']))
+			$browser->resource = $attrs['container'];
 		if (isset($attrs['version']))
 			$browser->query['version']=$attrs['version'];
 		$browser->query['action']='fileBrowserCallback(\''.$id.'\', selected)';
@@ -430,12 +432,15 @@ class Template extends Resource
 		if ((isset($attrs['value'])) && (strlen($attrs['value'])>0))
 		{
 			$rlvalue = $attrs['value'];
-			$rlvalue = substr(strrchr($rlvalue,'/'),1);
+			$pos = strrpos($rlvalue, '/');
+			if ($pos!==false)
+				$rlvalue = substr($rlvalue, $pos+1);
 		}
 		else
 			$rlvalue = '[No file selected]';
 		echo '<input id="fbfake-'.$id.'" disabled="true" type="text" value="'.$rlvalue.'">';
 		echo '<button type="button" onclick="showFileBrowser(\''.$browser->encode().'\',\''.$id.'\')">Select...</button>';
+		echo '<button type="button" onclick="clearFileBrowser(\''.$id.'\')">Clear</button>';
 	}
 	
 	function displayFile($parser,$tag,$attrs,$text)

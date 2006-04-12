@@ -195,7 +195,7 @@ class CategoryMenuBlock extends Block
           print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'">');
         }
         if ($item->icon!==null)
-	        print('<image class="icon" src="/'.$item->container->id.'/file/'.$item->icon.'"/>');
+	        print('<image class="icon" src="'.$item->icon.'"/>');
         if ($page instanceof Page)
         {
           print('<span>'.$item->name.'</span></anchor>');

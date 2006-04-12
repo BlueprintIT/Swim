@@ -46,6 +46,14 @@ if (!isset($request->query['category']))
   <td style="vertical-align: top">Name:</td>
   <td style="vertical-align: top"><input type="text" name="name" value="<?= $category->name ?>"></td>
 </tr>
+<tr>
+  <td style="vertical-align: top">Icon:</td>
+  <td style="vertical-align: top"><filebrowser name="icon" container="<?= $container->id ?>" value="<?= $category->icon ?>"/></td>
+</tr>
+<tr>
+  <td style="vertical-align: top">Hover Icon:</td>
+  <td style="vertical-align: top"><filebrowser name="hovericon" container="<?= $container->id ?>" value="<?= $category->hovericon ?>"/></td>
+</tr>
 </table>
 </div>
 </form>
