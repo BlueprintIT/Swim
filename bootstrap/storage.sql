@@ -23,6 +23,7 @@ CREATE TABLE LinkCategory (
 	id INTEGER PRIMARY KEY,
 	link TEXT,
 	name TEXT,
+	newwindow BOOLEAN,
 	category INTEGER,
 	sortkey INTEGER,
 	UNIQUE(category,sortkey)

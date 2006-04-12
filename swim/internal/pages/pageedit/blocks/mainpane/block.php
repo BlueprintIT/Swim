@@ -8,6 +8,25 @@ else
 {
 	$page = Resource::decodeResource($request->query['page']);
 }
+$details = $page->getWorkingDetails();
+
+if ((!$details->isMine())&&(isset($request->query['forcelock'])))
+{
+	if ($request->query['forcelock']=='continue')
+	{
+		$details->takeOver();
+	}
+	else if ($request->query['forcelock']=='discard')
+	{
+		$details->takeOverClean();
+	}
+}
+
+if (!$details->isMine())
+{
+	displayLocked($request,$details,$resource);
+}
+
 $version=$page->version;
 $page = $page->makeWorkingVersion();
 $pageprefs = $page->prefs;

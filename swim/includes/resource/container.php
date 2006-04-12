@@ -75,6 +75,25 @@ class Container extends Resource
     return $this->rootcategory;
   }
   
+  function getLink($id)
+  {
+    global $_STORAGE;
+    
+    $link = ObjectCache::getItem('link', $id);
+    if ($link === null)
+    {
+      $set=$_STORAGE->query('SELECT * FROM Link WHERE id='.$id.';');
+      if ($set->valid())
+      {
+        $details = $set->fetch();
+        $link = new Link($this->getCategory($details['category']),$details['id'],$details['name'],$details['link']);
+        $link->newwindow = $details['newwindow'];
+        ObjectCache::setItem('link', $id, $link);
+      }
+    }
+    return $link;
+  }
+  
   function getReadyCategory($id,$parent,$name,$icon,$hovericon)
   {
     $category = ObjectCache::getItem('category', $id);

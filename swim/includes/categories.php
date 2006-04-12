@@ -19,6 +19,7 @@ class Link
 	var $id;
   var $name;
   var $address;
+  var $newwindow = true;
   
   function Link($category,$id,$name,$address)
   {
@@ -26,6 +27,13 @@ class Link
   	$this->key=$key;
     $this->name=$name;
     $this->address=$address;
+  }
+  
+  function save()
+  {
+  	global $_STORAGE;
+  	
+  	$_STORAGE->queryExec('UPDATE LinkCategory SET name=\''.$_STORAGE->escape($this->name).'\', link=\''.$_STORAGE->escape($this->address).'\', newwindow=\''.$this->newwindow.'\' WHERE id='.$this->id.';');
   }
 }
 
@@ -168,7 +176,7 @@ class Category
 		  	}
 		  	else if ($item instanceof Link)
 		  	{
-		  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$npos.');');
+		  		$_STORAGE->queryExec('INSERT INTO LinkCategory (link,name,category,newwindow,sortkey) VALUES (\''.$_STORAGE->escape($item->address).'\',\''.$_STORAGE->escape($item->name).'\','.$this->id.','.$item->newwindow.','.$npos.');');
 		  		$item->id = $_STORAGE->lastInsertRowid();
 		  	}
 	  	}
@@ -332,11 +340,21 @@ class Category
       }
       $list[$details['sortkey']]=$cat;
     }
-    $set=$_STORAGE->query('SELECT id,name,link,sortkey FROM LinkCategory WHERE category='.$this->id.';');
+    $set=$_STORAGE->query('SELECT id,name,link,newwindow,sortkey FROM LinkCategory WHERE category='.$this->id.';');
     while ($set->valid())
     {
       $details = $set->fetch();
-      $list[$details['sortkey']] = new Link($this, $details['id'], $details['name'],$details['link']);
+      $link = ObjectCache::getItem('link', $details['id']);
+      if ($line === null)
+      {
+	      $list[$details['sortkey']] = new Link($this, $details['id'], $details['name'],$details['link']);
+	      $list[$details['sortkey']]->newwindow = $details['newwindow'];
+	      ObjectCache::setItem('link', $list[$details['sortkey']]);
+	    }
+	    else
+	    {
+	    	$list[$details['sortkey']] = $link;
+	    }
     }
     ksort($list);
     $this->list=$list;
