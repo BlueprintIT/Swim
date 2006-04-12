@@ -31,8 +31,11 @@ $createc->resource=$container->id.'/category';
 
 $edit = new Request();
 $edit->method='view';
+$edit->query['container']=$container->id;
 $edit->query['category']=$category->id;
 $edit->resource='internal/page/categoryedit';
+$edit->nested=new Request($request);
+$edit->nested->query['reloadtree']=true;
 
 $mutate = new Request();
 $mutate->method='mutate';
@@ -125,23 +128,27 @@ function moveDown() {
 
 function updateButtons() {
 	var list = document.getElementById("contentList");
-
-	var button = document.getElementById("moveUpBtn");
-	button.disabled=(list.selectedIndex<=0);
+	if (list) {
+		var button = document.getElementById("moveUpBtn");
+		button.disabled=(list.selectedIndex<=0);
 	
-	button = document.getElementById("moveDownBtn");
-	button.disabled=((list.selectedIndex<0)||(list.selectedIndex==(list.length-1)));
+		button = document.getElementById("moveDownBtn");
+		button.disabled=((list.selectedIndex<0)||(list.selectedIndex==(list.length-1)));
+	}
 }
 
 function init(event) {
 	var button = document.getElementById("moveUpBtn");
-	YAHOO.util.Event.addListener(button, "click", moveUp);
+	if (button)
+		YAHOO.util.Event.addListener(button, "click", moveUp);
 	button = document.getElementById("moveDownBtn");
-	YAHOO.util.Event.addListener(button, "click", moveDown);
+	if (button)
+		YAHOO.util.Event.addListener(button, "click", moveDown);
 	button = document.getElementById("moveBtn");
 	YAHOO.util.Event.addListener(button, "click", moveToCategory);
 	var list = document.getElementById("contentList");
-	YAHOO.util.Event.addListener(list, "change", updateButtons);
+	if (list)
+		YAHOO.util.Event.addListener(list, "change", updateButtons);
 	updateButtons();
 }
 
@@ -180,6 +187,10 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
   <td style="vertical-align: top">Name:</td>
   <td style="vertical-align: top"><?= $category->name ?></td>
 </tr>
+<?
+if ($category!==$container->getRootCategory())
+{
+?>
 <tr>
 	<td>Move to another category:</td>
 	<td>
@@ -207,6 +218,12 @@ showCategoryOption($category,$container->getRootCategory(),'');
 		</form>
 	</td>
 </tr>
+<?
+}
+$items= $category->items();
+if (count($items)>1)
+{
+?>
 <tr>
   <td style="vertical-align: top">Contents:</td>
   <td style="vertical-align: top">
@@ -215,7 +232,6 @@ showCategoryOption($category,$container->getRootCategory(),'');
   			<td rowspan="2">
   				<select id="contentList" size="7">
 <?
-$items= $category->items();
 $pos=0;
 foreach ($items as $item)
 {
@@ -247,5 +263,8 @@ foreach ($items as $item)
   	</table>
   </td>
 </tr>
+<?
+}
+?>
 </table>
 </div>

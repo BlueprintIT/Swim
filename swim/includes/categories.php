@@ -49,6 +49,22 @@ class Category
     $this->log=$container->log;
   }
   
+  function save()
+  {
+  	global $_STORAGE;
+  	
+  	if ($this->id !==null)
+  	{
+  		$_STORAGE->queryExec('UPDATE Category SET name=\''.$_STORAGE->escape($this->name).'\', parent='.$this->parent->id.', icon=\''.$_STORAGE->escape($this->icon).'\', hovericon=\''.$_STORAGE->escape($this->hovericon).'\' WHERE id='.$this->id.';');
+  	}
+  	else
+  	{
+  		$_STORAGE->queryExec('INSERT INTO Category (name, parent, icon, hovericon) VALUES (\''.$_STORAGE->escape($this->name).'\','.$this->parent->id.',\''.$_STORAGE->escape($this->icon).'\',\''.$_STORAGE->escape($this->hovericon).'\');');
+  		$this->id = $_STORAGE->lastInsertRowid();
+  		ObjectCache::setItem('category', $this->id, $cat);
+  	}
+  }
+  
   function add($item)
   {
   	$this->insert($item, $this->count());

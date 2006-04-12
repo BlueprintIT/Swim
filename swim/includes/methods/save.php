@@ -134,7 +134,61 @@ function method_save($request)
   }
   else
   {
-    displayNotFound($request);
+  	$parts = explode('/',$request->resource);
+  	if (($parts[1]=='categories')&&((count($parts)==2)||(count($parts)==3)))
+  	{
+  		$container = getContainer($parts[0]);
+  		if ($container !== null)
+  		{
+  			$category=null;
+  			if (count($parts)==3)
+	  			$category = $container->getCategory($parts[2]);
+  			if ($category !== null)
+  			{
+          foreach ($request->query as $name => $value)
+          {
+            if (substr($name,0,7)=='action:')
+            {
+              if (strlen($value)>0)
+              {
+                $type=substr($name,7);
+                if (isset($request->query[$type]))
+                {
+                  $redirect='http://'.$_SERVER['HTTP_HOST'].$request->query[$type];
+                }
+              }
+            }
+          }
+          if ($type != 'cancel')
+          {
+          	if (isset($request->query['name']))
+          	{
+          		$category->name = $request->query['name'];
+          	}
+          	if (isset($request->query['icon']))
+          	{
+          		$category->icon = $request->query['icon'];
+          	}
+          	if (isset($request->query['hovericon']))
+          	{
+          		$category->hovericon = $request->query['hovericon'];
+          	}
+          	$category->save();
+          }
+          redirect($redirect);
+  			}
+  		}
+	    else
+	    {
+	    	$log->warn('Invalid container');
+	      displayNotFound($request);
+	    }
+  	}
+    else
+    {
+	    $log->warn('Invalid path');
+      displayNotFound($request);
+    }
   }
 }
 
