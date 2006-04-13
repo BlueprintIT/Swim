@@ -82,7 +82,7 @@ class Container extends Resource
     $link = ObjectCache::getItem('link', $id);
     if ($link === null)
     {
-      $set=$_STORAGE->query('SELECT * FROM Link WHERE id='.$id.';');
+      $set=$_STORAGE->query('SELECT * FROM LinkCategory WHERE id='.$id.';');
       if ($set->valid())
       {
         $details = $set->fetch();

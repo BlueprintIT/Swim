@@ -96,13 +96,18 @@ class SqliteStorage extends StorageConnection
     $result = $this->db->query($query);
     if ($result && $result !== TRUE)
 	    return new SqliteStorageResult($result);
+    if ($result===false)
+    	$this->log->errorTrace('Query error '.$this->lastErrorText().' for "'.$query.'"');
 	  return $result;
   }
   
   public function queryExec($query)
   {
     $this->log->debug('queryExec: '.$query);
-    return $this->db->queryExec($query);
+    $result = @$this->db->queryExec($query);
+    if ($result===false)
+    	$this->log->errorTrace('Query error '.$this->lastErrorText().' for "'.$query.'"');
+    return $result;
   }
 
   public function lastInsertRowid()
@@ -118,6 +123,11 @@ class SqliteStorage extends StorageConnection
   public function lastError()
   {
     return $this->db->lastError();
+  }
+
+  public function lastErrorText()
+  {
+    return sqlite_error_string($this->db->lastError());
   }
 }
 

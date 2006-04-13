@@ -54,7 +54,10 @@ class XMLTree extends CategoryTree
     }
     else if ($item instanceof Link)
     {
-      print($indent.'<link path="'.htmlentities($item->address).'">');
+    	$info->resource='internal/page/linkdetails';
+    	$info->query['link']=$item->id;
+    	$info->query['container']=$this->container->id;
+      print($indent.'<link infolink="'.htmlentities($info->encode()).'" path="'.htmlentities($item->address).'">');
     }
   }
   

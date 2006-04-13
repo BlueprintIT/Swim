@@ -57,6 +57,27 @@ function method_delete($request)
 		    displayNotFound($request);
   		}
   	}
+  	elseif ((count($parts)==3)&&($parts[1]=='links'))
+  	{
+  		$container = getContainer($parts[0]);
+  		if ($container !== null)
+  		{
+  			$link = $container->getLink($parts[2]);
+  			if ($link !== null)
+  			{
+  				$link->delete();
+  				redirect($request->nested);
+  			}
+  			else
+  			{
+			    displayNotFound($request);
+  			}
+  		}
+  		else
+  		{
+		    displayNotFound($request);
+  		}
+  	}
   	else
   	{
 	    displayNotFound($request);

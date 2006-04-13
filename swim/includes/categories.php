@@ -24,9 +24,16 @@ class Link
   function Link($category,$id,$name,$address)
   {
   	$this->parent=$category;
-  	$this->key=$key;
+  	$this->id=$id;
     $this->name=$name;
     $this->address=$address;
+  }
+  
+  function delete()
+  {
+  	$pos = $this->parent->indexOf($this);
+  	$this->parent->remove($pos);
+  	//ObjectCache::removeItem('link', $this->id);
   }
   
   function save()
@@ -124,7 +131,7 @@ class Category
 
   	if (($item instanceof Category) || ($item instanceof Link))
   	{
-  		if ($item->parent !==null)
+  		if ($item->parent !== null)
   		{
 	  		if ($item instanceof Category)
 		  		$pos = $_STORAGE->singleQuery('SELECT sortkey FROM Category WHERE id='.$item->id.';');
@@ -345,11 +352,11 @@ class Category
     {
       $details = $set->fetch();
       $link = ObjectCache::getItem('link', $details['id']);
-      if ($line === null)
+      if ($link === null)
       {
 	      $list[$details['sortkey']] = new Link($this, $details['id'], $details['name'],$details['link']);
 	      $list[$details['sortkey']]->newwindow = $details['newwindow'];
-	      ObjectCache::setItem('link', $list[$details['sortkey']]);
+	      ObjectCache::setItem('link', $details['id'], $list[$details['sortkey']]);
 	    }
 	    else
 	    {

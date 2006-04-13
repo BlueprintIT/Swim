@@ -191,6 +191,11 @@ class StorageConnection
     $this->log->error('Unimplemented storage method');
   }
   
+  public function lastErrorText()
+  {
+    $this->log->error('Unimplemented storage method');
+  }
+  
   public function arrayQuery($query)
   {
     $this->log->debug('arrayQuery: '.$query);

@@ -20,9 +20,11 @@ $createp->query['category']=$category->id;
 $createp->resource=$container->id.'/page';
 
 $createl = new Request();
-$createl->method='create';
-$createl->query['category']=$category->id;
-$createl->resource=$container->id.'/link';
+$createl->method='view';
+$createl->query['parent']=$category->id;
+$createl->query['container']=$container->id;
+$createl->resource='internal/page/linkedit';
+$createl->nested=$request;
 
 $createc = new Request();
 $createc->method='view';
@@ -178,10 +180,10 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 <?= $createp->getFormVars() ?>
 <input type="submit" value="Add a new Page">
 </form>
-<!-- <form method="GET" action="<?= $createl->encodePath() ?>">
+<form method="GET" action="<?= $createl->encodePath() ?>">
 <?= $createl->getFormVars() ?>
 <input type="submit" value="Add a new Link">
-</form> -->
+</form>
 <form method="GET" action="<?= $createc->encodePath() ?>">
 <?= $createc->getFormVars() ?>
 <input type="submit" value="Add a new Category">

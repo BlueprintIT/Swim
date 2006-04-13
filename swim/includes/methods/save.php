@@ -147,7 +147,6 @@ function method_save($request)
 	  		{
 					$parent = $container->getCategory($request->query['parent']);
 	  			$category = new Category($container, null, null, "");
-	  			$parent->add($category);
 	  		}
   			if ($category !== null)
   			{
@@ -179,9 +178,65 @@ function method_save($request)
           	{
           		$category->hovericon = $request->query['hovericon'];
           	}
+          	if ($category->id===null)
+			  			$parent->add($category);
           	$category->save();
           	// TODO remove this crappy code
           	$redirect.='&category='.$category->id;
+          }
+          redirect($redirect);
+  			}
+  		}
+	    else
+	    {
+	    	$log->warn('Invalid container');
+	      displayNotFound($request);
+	    }
+  	}
+  	else if (($parts[1]=='links')&&((count($parts)==2)||(count($parts)==3)))
+  	{
+  		$container = getContainer($parts[0]);
+  		if ($container !== null)
+  		{
+  			$link=null;
+  			if (count($parts)==3)
+	  			$link = $container->getLink($parts[2]);
+	  		else
+	  		{
+					$parent = $container->getCategory($request->query['parent']);
+	  			$link = new Link(null, null, "", "");
+	  		}
+  			if ($link !== null)
+  			{
+          foreach ($request->query as $name => $value)
+          {
+            if (substr($name,0,7)=='action:')
+            {
+              if (strlen($value)>0)
+              {
+                $type=substr($name,7);
+                if (isset($request->query[$type]))
+                {
+                  $redirect='http://'.$_SERVER['HTTP_HOST'].$request->query[$type];
+                }
+              }
+            }
+          }
+          if ($type != 'cancel')
+          {
+          	if (isset($request->query['name']))
+          	{
+          		$link->name = $request->query['name'];
+          	}
+          	if (isset($request->query['address']))
+          	{
+          		$link->address = $request->query['address'];
+          	}
+          	if ($link->id===null)
+			  			$parent->add($link);
+          	$link->save();
+          	// TODO remove this crappy code
+          	$redirect.='&link='.$link->id;
           }
           redirect($redirect);
   			}

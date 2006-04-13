@@ -130,6 +130,27 @@ function method_mutate($request)
 		  		return;
 		  	}
 		  }
+		  else if (isset($request->query['link']))
+		  {
+		  	$link = $cm->getLink($request->query['link']);
+		  	if ($link!==null)
+		  	{
+		  		$log->debug('Moving link');
+		  		$category->add($link);
+		  	}
+		  	else
+		  	{
+		  		$log->error('Invalid link');
+		  		displayGeneralError("Invalid link specified.");
+		  		return;
+		  	}
+		  }
+		  else
+		  {
+	  		$log->error('Invalid mutation');
+	  		displayGeneralError("No valid mutate was specified.");
+	  		return;
+		  }
       header($_SERVER["SERVER_PROTOCOL"]." 200 OK");
       header("Content-Type: text/plain");
       print("Resource accepted");
