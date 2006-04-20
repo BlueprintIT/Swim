@@ -169,9 +169,22 @@ function method_view($request)
 				displayLogin($request,'You must log in to view this resource.');
 			}
 		}
+		else if ($resource->isBlock())
+		{
+			if ($_USER->canRead($resource))
+			{
+				setDefaultCache();
+			  $preview = Resource::decodeResource($_PREFS->getPref('method.preview.page'));
+			  $preview->display($request);
+			}
+			else
+			{
+				displayLogin($request,'You must log in to view this resource.');
+			}
+		}
 		else
 		{
-			displayGeneralError($request,'You can only view pages or files.');
+			displayGeneralError($request,'You can only view pages, blocks or files.');
 		}
 	}
   else if (substr($request->resource,-11)=='/categories')

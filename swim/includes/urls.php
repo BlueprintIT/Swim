@@ -13,6 +13,17 @@
  * $Revision$
  */
 
+//[$-_.+!*'(),;:@&=]
+function urlPathEncode($path)
+{
+  return preg_replace("/[^a-zA-Z0-9\\/\\$-_.+!*'(),;:@&=]/e", "'%'.dechex(ord('\\0'))", $path);
+}
+
+function urlPathDecode($path)
+{
+  return rawurldecode($path);
+}
+
 function encodeQuery($query)
 {
   if (count($query)==0)
@@ -320,9 +331,9 @@ class Request
 	  	if (isset($this->resource))
 	  	{
 	  		if (substr($this->resource,0,1)!='/')
-		  		$url.='/'.$this->resource;
+		  		$url.='/'.urlPathEncode($this->resource);
 		  	else
-		  		$url.=$this->resource;
+		  		$url.=urlPathEncode($this->resource);
 	  	}
 	    return $host.$url;
 	  }
@@ -441,6 +452,8 @@ class Request
 	  {
 	  	// Site is setup to use path info to choose page
 
+      $path = urlPathDecode($path);
+      
 	    if ((isset($path))&&(strlen($path)>0))
 	    {
 	    	while ((strlen($path)>0)&&($path[0]=='/'))

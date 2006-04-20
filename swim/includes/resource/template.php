@@ -356,7 +356,7 @@ class Template extends Resource
     if (isset($attrs['maxwidth']))
     {
     	$params['maxwidth']=$attrs['maxwidth'];
-    	unset($attrs['maxheight']);
+    	unset($attrs['maxwidth']);
     }
     if (count($params)>0)
     	$method='resize';
@@ -376,6 +376,7 @@ class Template extends Resource
 		{
       $this->log->debug('Loading block '.$attrs['src']);
 			$block=Resource::decodeResource(substr($attrs['src'],1));
+      unset($attrs['src']);
 		}
 		else if (isset($attrs['id']))
 		{

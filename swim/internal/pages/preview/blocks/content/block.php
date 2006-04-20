@@ -13,7 +13,7 @@ if ($resource->isBlock())
 		$id=$resource->prefs->getPref('block.format');
 	}
 ?>
-<block id="<?= $id ?>" src="<?= $resource->getPath() ?>"/>
+<block id="<?= $id ?>" src="/<?= $resource->getPath() ?>"/>
 <?
 }
 
