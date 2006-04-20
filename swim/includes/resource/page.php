@@ -27,7 +27,7 @@ class Page extends Resource
   
   function delete()
   {
-  	$cats=$this->container->getPageCategories($parser->data['page']);
+  	$cats=$this->container->getPageCategories($this);
   	foreach ($cats as $category)
   	{
   		$pos = $category->indexOf($this);
@@ -40,7 +40,7 @@ class Page extends Resource
 	  		$category->remove($category->indexOf($this));
 	  	}
   	}
-  	base::delete();
+  	parent::delete();
   }
   
   function applyLayout()
