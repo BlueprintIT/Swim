@@ -102,7 +102,7 @@ BlueprintIT.widget.StyledTextNode = function(oData, oParent, expanded) {
 
 BlueprintIT.widget.StyledTextNode.prototype = new YAHOO.widget.TextNode();
 
-BlueprintIT.widget.StyledTextNode.prototype.iconClass = "";
+BlueprintIT.widget.StyledTextNode.prototype.iconClass = null;
 BlueprintIT.widget.StyledTextNode.prototype.labelClass = "";
 
 BlueprintIT.widget.StyledTextNode.prototype.setUpStyles = function(oData) {
@@ -111,18 +111,20 @@ BlueprintIT.widget.StyledTextNode.prototype.setUpStyles = function(oData) {
 	}
 
 	if (oData.iconClass) {
-		this.iconClass = ' ' + oData.iconClass;
-	}
-
-	if (oData.fullClass) {
-		this.labelStyle = ' ' + oData.fullClass;
-		this.iconClass += ' ' + oData.fullClass;
+		this.iconClass = oData.iconClass;
 	}
 }
 
 BlueprintIT.widget.StyledTextNode.prototype.getStyle = function() {
 	var style = YAHOO.widget.TextNode.prototype.getStyle.call(this);
-	style += this.iconClass;
+	if (this.iconClass) {
+    var loc = (this.nextSibling) ? "t" : "l";
+    var type = "n";
+    if (this.hasChildren(true) || this.isDynamic()) {
+      type = (this.expanded) ? "m" : "p";
+    }
+    style += ' ' + this.iconClass + ' ' + this.iconClass + loc + type;
+  }
 	return style;
 }
 

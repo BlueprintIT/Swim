@@ -9,10 +9,11 @@ body {
 	margin: 0;
 	overflow: hidden;
 	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
 }
 
 p, div, td, li {
-  font-size: small;
+	font-size: 10pt;
 }
 
 table {
@@ -80,12 +81,14 @@ iframe.body {
 }
 
 /* first or middle sibling, no children */
-.ygtvtn.page { background-image: -swim-url(../images/pagetn.gif) !important; width:34px !important; }
-.ygtvtn.link { background-image: -swim-url(../images/linktn.gif) !important; width:34px !important; }
+.pagetn { background-image: -swim-url(../images/pagetn.gif) !important; width:34px !important; }
+.linktn { background-image: -swim-url(../images/linktn.gif) !important; width:34px !important; }
+.usertn { background-image: -swim-url(../images/usertn.gif) !important; width:34px !important; }
 
 /* last sibling, no children */
-.ygtvln.page { background-image: -swim-url(../images/pageln.gif) !important; width:34px !important; }
-.ygtvln.link { background-image: -swim-url(../images/linkln.gif) !important; width:34px !important; }
+.pageln { background-image: -swim-url(../images/pageln.gif) !important; width:34px !important; }
+.linkln { background-image: -swim-url(../images/linkln.gif) !important; width:34px !important; }
+.userln { background-image: -swim-url(../images/userln.gif) !important; width:34px !important; }
 
 #categorytree .selected {
   background-color: Highlight;
