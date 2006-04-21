@@ -21,9 +21,6 @@ function method_admin($request)
   checkSecurity($request, true, true);
   $resource=null;
   
-  if ($request->resource!='')
-  	$resource=Resource::decodeResource($request);
-
 	if ($_USER->isLoggedIn())
   {
 		foreach (AdminManager::$sections as $section)

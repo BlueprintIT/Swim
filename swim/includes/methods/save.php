@@ -58,7 +58,7 @@ function method_save($request)
   
   checkSecurity($request, true, true);
   
-  $resource=Resource::decodeResource($request);
+  $resource=$request->resource;
   $log=LoggerManager::getLogger("swim.method.save");
 
   if ($resource!==null)
@@ -134,7 +134,7 @@ function method_save($request)
   }
   else
   {
-  	$parts = explode('/',$request->resource);
+  	$parts = explode('/',$request->resourcePath);
   	if (($parts[1]=='categories')&&((count($parts)==2)||(count($parts)==3)))
   	{
   		$container = getContainer($parts[0]);

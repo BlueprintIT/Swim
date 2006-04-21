@@ -20,7 +20,7 @@ function method_mutate($request)
 	
   $log=LoggerManager::getLogger("swim.method.mutate");
 
-  $parts=split('/',$request->resource,2);
+  $parts=split('/',$request->resourcePath,2);
   if ((count($parts)==2)&&($parts[1]=='categories'))
   {
 		if ($_USER->hasPermission('documents',PERMISSION_WRITE))
@@ -39,11 +39,7 @@ function method_mutate($request)
 		  	$item = $category->item($pos);
 		  	if ($item === null)
 		  	{
-		  		$log->error('Invalid item - '.$pos.' of '.count($items));
-		  		foreach ($items as $k => $i)
-		  		{
-		  			$log->error($k." => ".get_class($i));
-		  		}
+		  		$log->error('Invalid item - '.$pos.' of '.$category->id);
 		  		displayGeneralError("Invalid item specified.");
 		  		return;
 		  	}
@@ -166,7 +162,7 @@ function method_mutate($request)
 	}
 	else
 	{
-  	$log->warn('Unknown mutate to '.$request->resource);
+  	$log->warn('Unknown mutate to '.$request->resourcePath);
     displayNotFound($request);
 	}
 }

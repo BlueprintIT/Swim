@@ -76,7 +76,7 @@ class AddonAdminSection extends AdminSection
   {
     if ($request->method!='view')
       return false;
-    if ($request->resource!='internal/page/external')
+    if ($request->resourcePath!='internal/page/external')
       return false;
     if ($request->query['url']!=$this->url)
       return false;

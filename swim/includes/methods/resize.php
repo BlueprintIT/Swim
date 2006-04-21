@@ -23,7 +23,7 @@ function method_resize($request)
 {
 	global $_USER,$_PREFS;
 	
-	$resource=Resource::decodeResource($request);
+	$resource=$request->resource;
 	$log=LoggerManager::getLogger("swim.method.view");
   
 	if ($resource!==null)

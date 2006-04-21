@@ -23,7 +23,7 @@ foreach ($users as $username => $user)
     $name = $username;
   $edit = new Request();
   $edit->method='users';
-  $edit->resource='view/'.$username;
+  $edit->resourcePath='view/'.$username;
 ?>
   details = {
     label: "<?= $name ?>",

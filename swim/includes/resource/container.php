@@ -552,7 +552,7 @@ class ContainerAdminSection
     if ($request->method!='view')
       return false;
    	
-   	if ($request->resource != 'internal/page/site')
+   	if ($request->resourcePath != 'internal/page/site')
    		return false;
    		
    	if (!isset($request->query['container']))

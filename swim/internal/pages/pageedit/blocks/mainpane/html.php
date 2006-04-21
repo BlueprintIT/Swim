@@ -14,7 +14,7 @@ $expurl->resource=$page->getPath().'/file/';
 
 $browser = new Request();
 $browser->method='fileselect';
-$browser->resource = $page->getPath();
+$browser->resource = $page;
 $browser->query['version']=$page->version;
 
 $content=$page->getReferencedBlock('content');

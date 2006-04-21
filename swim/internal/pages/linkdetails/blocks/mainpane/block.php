@@ -33,7 +33,7 @@ $edit->nested=$request;
 
 $move = new Request();
 $move->method='mutate';
-$move->resource=$container->id.'/categories';
+$move->resourcePath=$container->id.'/categories';
 $move->query['link']=$link->id;
 
 ?>

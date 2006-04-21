@@ -170,10 +170,7 @@ class CSSHandler
 	
 	function output($request)
 	{
-	  if ($request->resource instanceof Resource)
-  		$this->path = dirname($request->resource->getPath());
-  	else
-  	  $this->path = dirname($request->resource);
+  	$this->path = dirname($request->resourcePath);
 		foreach ($request->query as $name => $value)
 		{
 			$this->defines[$name] = $value;

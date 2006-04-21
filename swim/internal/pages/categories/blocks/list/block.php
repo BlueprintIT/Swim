@@ -77,7 +77,7 @@ class XMLTree extends CategoryTree
     }
   }
 }
-$container = Resource::decodeResource(substr($request->resource,0,-11));
+$container = Resource::decodeResource(substr($request->resourcePath,0,-11));
 if (($container === null) || (!$container->isContainer()))
 {
   $container = getContainer($_PREFS->getPref('container.default'));

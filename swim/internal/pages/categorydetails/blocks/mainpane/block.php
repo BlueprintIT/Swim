@@ -17,7 +17,7 @@ $category = $container->getCategory($request->query['category']);
 $createp = new Request();
 $createp->method='create';
 $createp->query['category']=$category->id;
-$createp->resource=$container->id.'/page';
+$createp->resourcePath=$container->id.'/page';
 
 $createl = new Request();
 $createl->method='view';
@@ -37,7 +37,7 @@ if ($category->parent!==null)
 {
 	$delete = new Request();
 	$delete->method='delete';
-	$delete->resource=$container->id.'/categories/'.$category->id;
+	$delete->resourcePath=$container->id.'/categories/'.$category->id;
 	$delete->nested = new Request();
 	$delete->nested->method='view';
 	$delete->nested->resource = 'internal/page/categorydetails';
@@ -55,12 +55,12 @@ $edit->nested=$request;
 
 $mutate = new Request();
 $mutate->method='mutate';
-$mutate->resource=$container->id.'/categories';
+$mutate->resourcePath=$container->id.'/categories';
 $mutate->query['category']=$category->id;
 
 $move = new Request();
 $move->method='mutate';
-$move->resource=$container->id.'/categories';
+$move->resourcePath=$container->id.'/categories';
 $move->query['subcategory']=$category->id;
 
 ?>

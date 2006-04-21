@@ -460,20 +460,42 @@ class User
 	
 	function canRead($resource)
 	{
-		//return true;
+    global $_USER;
+    
+    if ($this === $_USER)
+    {
+      $perm = ObjectCache::getItem('canRead',$resource->getPath());
+      if ($perm !== null)
+        return $perm;
+    }
 		$this->log->debug('Checking canRead');
-  	return $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
+  	$perm = $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
+
+    if ($this === $_USER)
+      ObjectCache::setItem('canRead', $resource->getPath(), $perm);
+
+    return $perm;
 	}
 	
 	function canWrite($resource)
 	{
-		//return true;
-		$this->log->debug('Checking canWrite');
-    if (($resource->isWritable())&&($this->hasPermission('documents',PERMISSION_WRITE)))
+    global $_USER;
+    
+    if ($this === $_USER)
     {
-  		return $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
+      $perm = ObjectCache::getItem('canWrite',$resource->getPath());
+      if ($perm !== null)
+        return $perm;
     }
-    return false;
+		$this->log->debug('Checking canWrite');
+    $perm = false;
+    if (($resource->isWritable())&&($this->hasPermission('documents',PERMISSION_WRITE)))
+  		$perm = $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
+
+    if ($this === $_USER)
+      ObjectCache::setItem('canWrite', $resource->getPath(), $perm);
+
+    return $perm;
 	}
 }
 

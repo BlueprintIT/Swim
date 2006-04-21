@@ -1,7 +1,7 @@
 <?
 $create = new Request();
 $create->method='users';
-$create->resource='create';
+$create->resourcePath='create';
 $create->nested=$request;
 ?>
 <div class="header">

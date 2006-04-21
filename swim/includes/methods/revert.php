@@ -19,7 +19,7 @@ function method_revert($request)
 	
   checkSecurity($request, true, true);
   
-	$resource = Resource::decodeResource($request);
+	$resource = $request->resource;
 
 	if ($resource!==null)
 	{

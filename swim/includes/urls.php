@@ -245,7 +245,8 @@ function checkSecurity($request, $required, $allowed)
 
 class Request
 {
-	var $resource;
+  var $resPath = '';
+  var $resObject;
   var $protocol;
 	var $method;
 	var $query = array();
@@ -262,7 +263,8 @@ class Request
     if ($clone!==null)
     {
       $this->protocol=$clone->protocol;
-      $this->resource=$clone->resource;
+      $this->resPath=$clone->resPath;
+      $this->resObject=$clone->resObject;
       $this->method=$clone->method;
       $this->query=$clone->query;
       $this->nested=$clone->nested;
@@ -275,6 +277,59 @@ class Request
     }
   }
 	
+  public function __get($name)
+  {
+    if ($name == 'resource')
+    {
+      if (isset($this->resObject))
+        return $this->resObject;
+      return null;
+    }
+    else if ($name == 'resourcePath')
+    {
+      return $this->resPath;
+    }
+    else
+    {
+      $this->log->warn('Attempt to get unknown property - '.$name);
+    }
+  }
+  
+  public function __set($name, $value)
+  {
+    if ($name == 'resource')
+    {
+      if ($value instanceof Resource)
+      {
+        $this->resObject = $value;
+        $this->resPath = $value->getPath();
+      }
+      else if ($value === null)
+      {
+        $this->resObject = null;
+        $this->resPath = '';
+      }
+      else
+      {
+        unset($this->resObject);
+        $this->resPath = $value;
+        Resource::decodeResource($this);
+      }
+    }
+    else if ($name == 'resourcePath')
+    {
+      $this->resPath = $value;
+      if ($value == '')
+        $this->resObject = null;
+      else
+        unset($this->resObject);
+    }
+    else
+    {
+      $this->log->warn('Attempt to set unknown property - '.$name);
+    }
+  }
+  
   function isXHTML()
   {
     if ((isset($_SERVER['HTTP_ACCEPT']))&&(strpos($_SERVER['HTTP_ACCEPT'],'application/xhtml+xml')!==false))
@@ -301,13 +356,9 @@ class Request
 	{
 		global $_PREFS;
 		
-    if (!$this->resource instanceof Resource)
-    {
-      $resource = Resource::decodeResource($this);
-      if ($resource !== null)
-        $this->resource = $resource;
-    }
-    
+    if (!isset($this->resObject))
+      Resource::decodeResource($this);
+      
     $host='';
     $thisprotocol=$this->protocol;
     if (!$_PREFS->getPref('security.sslenabled'))
@@ -317,7 +368,7 @@ class Request
     if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
       $protocol='https';
 
-    if ($this->resource instanceof Resource)
+    if ($this->resource !== null)
     {
       if (!$this->resource->prefs->getPref('security.sslallowed'))
         $thisprotocol = 'http';
@@ -333,19 +384,16 @@ class Request
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
       $url=null;
-      if (($this->method=='view') && ($this->resource instanceof Resource))
+      if (($this->method=='view') && ($this->resource !== null))
       {
-        $url = $this->resource->getViewPath();
+        $url = $this->resource->getViewPath($this);
       }
       if ($url === null)
       {
   	  	$url='/'.$this->method;
-  	  	if (isset($this->resource))
+        $res = $this->resourcePath;
+        if (strlen($res)>0)
   	  	{
-  	  	  if ($this->resource instanceof Resource)
-  	  	    $res = $this->resource->getPath();
-  	  	  else
-  	  	    $res = $this->resource;
   	  	    
   	  		if (substr($res,0,1)!='/')
   		  		$url.='/'.$res;
@@ -367,10 +415,7 @@ class Request
 		
 		$newquery=$this->query;
 		$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
-		if ($this->resource instanceof Resource)
-  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource->getPath();
-		else
-  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
+ 		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resourcePath;
 		if (isset($this->nested))
 		{
 			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->makeAllVars());
@@ -390,10 +435,7 @@ class Request
 	  if ($_PREFS->getPref('url.encoding')!='path')
 	  {
 			$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
-  		if ($this->resource instanceof Resource)
-    		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource->getPath();
-  		else
-    		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
+  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resourcePath;
 	  }
 	  return $newquery;
 	}
@@ -497,7 +539,7 @@ class Request
 		    		$request->method=substr($path,0,$pos);
 		    		if (strlen($path)>$pos+1)
 		    		{
-			    		$request->resource=substr($path,$pos+1);
+			    		$request->resourcePath=substr($path,$pos+1);
 			    	}
 		    	}
 		    }
@@ -512,7 +554,7 @@ class Request
     
     if (isset($query[$_PREFS->getPref('url.resourcevar')]))
     {
-      $request->resource=$query[$_PREFS->getPref('url.resourcevar')];
+      $request->resourcePath=$query[$_PREFS->getPref('url.resourcevar')];
       unset($query[$_PREFS->getPref('url.resourcevar')]);
     }
     
@@ -529,14 +571,14 @@ class Request
     	$request->method=$_PREFS->getPref('method.default');
     }
     
-    if ((!isset($request->resource))&&($_PREFS->isPrefSet('method.'.$request->method.'.defaultresource')))
+    if ((strlen($request->resourcePath)==0)&&($_PREFS->isPrefSet('method.'.$request->method.'.defaultresource')))
     {
     	$request->resource=$_PREFS->getPref('method.'.$request->method.'.defaultresource');
     }
-    
-    $res = Resource::decodeResource($request);
-    if ($res !== null)
-      $request->resource = $res;
+    else
+    {
+      Resource::decodeResource($request);
+    }
 
 	  return $request;
 	}

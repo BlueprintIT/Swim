@@ -120,7 +120,7 @@ class Template extends Resource
 		{
 			$request = new Request();
 			$request->method=$method;
-			$request->resource=$data['page']->getPath();
+			$request->resource=$data['page'];
 		}
 		else
 		{
@@ -291,7 +291,7 @@ class Template extends Resource
 			{
 				return true;
 			}
-			$request->resource=$block->getPath();
+			$request->resource=$block;
 			unset($attrs['block']);
 			$request->query['version']=$block->version;
 			if (isset($attrs['file']))
@@ -302,7 +302,7 @@ class Template extends Resource
 		else
 		{
 			$page=$parser->data['page'];
-			$request->resource=$page->getPath();
+			$request->resource=$page;
 			$request->query['version']=$page->version;
 		}
 		$attrs['href']=$request->encode();
@@ -447,7 +447,7 @@ class Template extends Resource
 	function displayFile($parser,$tag,$attrs,$text)
 	{
 		$request=$this->generateRequest($parser->data,$attrs['src'],"view");
-		$resource=Resource::decodeResource($request);
+		$resource=$request->resource;
 		if ($resource->isFile())
 		{
 			ob_start();

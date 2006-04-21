@@ -11,10 +11,10 @@ else
 	
 $upload = new Request();
 $upload->method = 'save';
-$upload->resource = $container->id.'/links';
+$upload->resourcePath = $container->id.'/links';
 
 if (isset($request->query['link']))
-	$upload->resource.='/'.$link->id;
+	$upload->resourcePath.='/'.$link->id;
 
 $commit = new Request();
 $commit->method = 'view';

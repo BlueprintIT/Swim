@@ -1,6 +1,6 @@
 <?
 
-$block = Resource::decodeResource($request);
+$block = $request->resource;
 
 $commit = $request->nested;
 

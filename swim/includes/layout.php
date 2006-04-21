@@ -300,7 +300,7 @@ class LayoutCollection
     }
     else
     {
-      $this->log->debug('Layout template does not exist');
+      $this->log->debug('Layout template does not exist in '.$dir);
     }
   }
   

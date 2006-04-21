@@ -19,7 +19,7 @@ function method_delete($request)
   
   checkSecurity($request, true, true);
   
-  $resource = Resource::decodeResource($request);
+  $resource = $request->resource;
 
   if ($resource!==null)
   {
@@ -35,7 +35,7 @@ function method_delete($request)
   }
   else
   {
-  	$parts = explode('/',$request->resource);
+  	$parts = explode('/',$request->requestPath);
   	if ((count($parts)==3)&&($parts[1]=='categories'))
   	{
   		$container = getContainer($parts[0]);

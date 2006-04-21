@@ -76,7 +76,7 @@ class Category
   	{
   		$_STORAGE->queryExec('INSERT INTO Category (name, parent, icon, hovericon) VALUES (\''.$_STORAGE->escape($this->name).'\','.$this->parent->id.',\''.$_STORAGE->escape($this->icon).'\',\''.$_STORAGE->escape($this->hovericon).'\');');
   		$this->id = $_STORAGE->lastInsertRowid();
-  		ObjectCache::setItem('category', $this->id, $cat);
+  		ObjectCache::setItem('category', $this->id, $this);
   	}
   }
   

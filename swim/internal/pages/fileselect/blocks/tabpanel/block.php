@@ -3,7 +3,7 @@ $page = new Request($request);
 $page->query['type']='page';
 $global = new Request($request);
 $global->query['type']='global';
-$resource = Resource::decodeResource($request);
+$resource = $request->resource;
 ?>
 <tr>
 <?

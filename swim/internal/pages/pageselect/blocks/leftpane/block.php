@@ -20,7 +20,7 @@ class LinkedCategoryTree extends YahooPageTree
     {
       $request = SwimEngine::getCurrentRequest();
       
-      if ($request->resource!=$page->getPath())
+      if ($request->resource !== $page)
       {
         $link = new Request();
         $link->resource = $request->resource;

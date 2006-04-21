@@ -34,18 +34,18 @@ $layout=$page->getLayout();
 
 $upload = new Request();
 $upload->method = 'save';
-$upload->resource = $page->getPath();
+$upload->resource = $page;
 
 $commit = new Request();
 $commit->method='commit';
-$commit->resource=$page->getPath();
+$commit->resource=$page;
 $commit->query['version']=$version;
 $commit->nested = new Request($request->nested);
 $commit->nested->query['reloadtree']=true;
 
 $cancel = new Request();
 $cancel->method='cancel';
-$cancel->resource=$page->getPath();
+$cancel->resource=$page;
 $versions = array_keys($page->getVersions());
 if ((count($versions)==1) && ($versions[0]=='base'))
 {

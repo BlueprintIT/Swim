@@ -19,7 +19,7 @@ function method_commit($request)
 	
   checkSecurity($request, true, true);
   
-	$resource = Resource::decodeResource($request);
+	$resource = $request->resource;
 
 	if ($resource!==null)
 	{
@@ -56,7 +56,7 @@ function method_commit($request)
 					}
 					else
 					{
-						$nresource=Resource::decodeResource($request->nested);
+						$nresource=$request->nested->resource;
 						if ($nresource->isPage())
 						{
 							$page=$nresource;

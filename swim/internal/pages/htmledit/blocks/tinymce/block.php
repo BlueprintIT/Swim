@@ -1,6 +1,6 @@
 <?
 
-$resource = Resource::decodeResource($request);
+$resource = $request->resource;
 if ($resource->prefs->isPrefSet('block.stylesheets'))
 {
 	$styles=explode(',',$resource->prefs->getPref('block.stylesheets'));

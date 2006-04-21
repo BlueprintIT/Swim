@@ -19,7 +19,7 @@ function method_cancel($request)
 	
   checkSecurity($request, true, true);
   
-	$resource = Resource::decodeResource($request);
+	$resource = $request->resource;
 
 	if ($resource!==null)
 	{
@@ -35,9 +35,9 @@ function method_cancel($request)
         $vers = array_keys($resource->getVersions());
         if ((count($vers==1))&&($vers[0]=='base'))
         {
-          if ($request->nested->resource==$resource->getPath())
+          if ($request->nested->resource===$resource)
           {
-            $request->nested->resource='';
+            $request->nested->resource=null;
           }
           $resource->delete();
         }

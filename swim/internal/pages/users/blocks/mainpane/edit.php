@@ -1,6 +1,6 @@
 <?
 
-$user = new User(substr($request->resource,5));
+$user = new User(substr($request->resourcePath,5));
 
 $save = new Request();
 $save->method='saveuser';

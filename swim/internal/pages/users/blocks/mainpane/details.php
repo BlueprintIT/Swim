@@ -2,19 +2,19 @@
 
 $create = new Request();
 $create->method='users';
-$create->resource='create';
+$create->resourcePath='create';
 $create->nested=$request;
 
-$user = new User(substr($request->resource,5));
+$user = new User(substr($request->resourcePath,5));
 
 $edit = new Request();
 $edit->method='users';
-$edit->resource='edit/'.$user->getUsername();
+$edit->resourcePath='edit/'.$user->getUsername();
 $edit->nested=$request;
 
 $delete = new Request();
 $delete->method='deleteuser';
-$delete->resource=$user->getUsername();
+$delete->resourcePath=$user->getUsername();
 $delete->nested=$request;
 
 ?>

@@ -25,12 +25,12 @@ class Page extends Resource
     $this->applyLayout();
   }
   
-	function getViewPath()
+	function getViewPath($request)
 	{
-	  if (!isset($this->parent))
-  	  return '/site/'.$this->container->id.'/0/'.$this->id.'/'.$this->prefs->getPref('page.variables.title');
+	  if ((!isset($this->parent)) && ($this->prefs->getPref('url.humanreadable') === true))
+  	  return '/site/'.$this->container->id.'/-/'.$this->id.'/'.$this->prefs->getPref('page.variables.title');
   	else
-  	  return parent::getViewPath();
+  	  return parent::getViewPath($request);
 	}
 	
   function delete()
@@ -116,7 +116,7 @@ class Page extends Resource
 	{
 		$template=$this->getReferencedTemplate();
 		if ($template===null)
-			$this->log->errorTrace("Null template for ".$request->resource);
+			$this->log->errorTrace("Null template for ".$request->resourcePath);
 		$template->display($request,$this);
 	}
 	

@@ -17,7 +17,7 @@ function method_view($request)
 {
 	global $_USER,$_PREFS;
 	
-	$resource=Resource::decodeResource($request);
+	$resource=$request->resource;
 	$log=LoggerManager::getLogger("swim.method.view");
   
 	if ($resource!==null)
@@ -177,9 +177,9 @@ function method_view($request)
 			displayGeneralError($request,'You can only view pages, blocks or files.');
 		}
 	}
-  else if (substr($request->resource,-11)=='/categories')
+  else if (substr($request->resourcePath,-11)=='/categories')
   {
-    $resource = Resource::decodeResource(substr($request->resource,0,-11));
+    $resource = Resource::decodeResource(substr($request->resourcePath,0,-11));
     if (($resource!==null) && ($resource->isContainer()))
     {
       $page = Resource::decodeResource('internal/page/categories');
@@ -192,6 +192,7 @@ function method_view($request)
   }
 	else
 	{
+    $log->debug('Resource not found - '.$request->resourcePath);
 		displayNotFound($request);
 	}
 }

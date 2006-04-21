@@ -22,7 +22,7 @@ $index->query['container']=$cont->id;
 
 $containers = new Request();
 $containers->method='view';
-$containers->resource=$cont->id.'/categories';
+$containers->resourcePath=$cont->id.'/categories';
 ?>
 var SiteTree = new BlueprintIT.widget.SiteTree('<?= $index->encode() ?>', '<?= $containers->encode() ?>', 'categorytree');
 </script>

@@ -22,7 +22,7 @@ function method_deleteuser($request)
   
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_DELETE)))
   {
-    $user = new User($request->resource);
+    $user = new User($request->requestPath);
     if (!UserManager::deleteUser($user))
     {
       redirect($request->nested);

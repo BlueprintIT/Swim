@@ -20,7 +20,7 @@ function method_upload($request)
 	
   $log=LoggerManager::getLogger("swim.method.upload");
 
-	$resource=Resource::decodeResource($request);
+	$resource=$request->resource;
   
   $log->debug('upload');
   
@@ -87,7 +87,7 @@ function method_upload($request)
 			}
 			else
 			{
-				$log->debug('Inaccessible file '.$request->resource);
+				$log->debug('Inaccessible file '.$request->resourcePath);
 				displayLogin($request,'You must log in to write to this resource.');
 			}
 		}
@@ -99,7 +99,7 @@ function method_upload($request)
 	}
   else
   {
-  	$log->warn('Unknown upload to '.$request->resource);
+  	$log->warn('Unknown upload to '.$request->resourcePath);
     displayNotFound($request);
     return;
   }

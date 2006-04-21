@@ -1,6 +1,6 @@
 <?
 
-$resource=Resource::decodeResource($request);
+$resource=$request->resource;
 if ($resource->isPage())
 {
 	$resource=$resource->getReferencedBlock('content');

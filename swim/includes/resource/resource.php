@@ -82,9 +82,9 @@ class Resource
 	  return substr($this->getDir(),strlen($this->container->getDir()));
 	}
 	
-	function getViewPath()
+	function getViewPath($request)
 	{
-	  return '/view/'.$this->getPath();
+	  return '/'.$request->method.'/'.$this->getPath();
 	}
 	
   function isVersioned()
@@ -633,16 +633,14 @@ class Resource
 	
 	static function decodeResource($request,$version=false)
 	{
-		global $_PREFS;
-		
 		$log=LoggerManager::getLogger('swim.resource');
 		
 		if ($request instanceof Request)
 		{
-		  if ($request->resource instanceof Resource)
+		  if (isset($request->resource))
 		    return $request->resource;
 		    
-			$resource=$request->resource;
+			$resource=$request->resourcePath;
 			
 			if (($version===false)&&(isset($request->query['version'])))
 			{
@@ -676,20 +674,26 @@ class Resource
 		
 		$container=getContainer($parts[0]);
     if ($container!==null)
-    {
-  		return $container->decodeRelativeResource(array_slice($parts,1),$version);
-    }
+  		$result = $container->decodeRelativeResource(array_slice($parts,1),$version);
     else
+      $result = null;
+      
+    if ($result === null)
+      $log->debug('Unknown resource - '.$resource);
+    
+    if ($request instanceof Request)
     {
-      return null;
+      $request->resource = $result;
+      if ($result === null)
+        $request->resPath = $resource;
     }
+    
+    return $result;
 	}
 }
 
 function getAllResources($type)
 {
-  global $_PREFS;
-  
   $resources=array();
   $containers=getAllContainers();
   foreach($containers as $container)

@@ -109,7 +109,7 @@ class File extends Resource
   	return $this->getDir().'/'.$this->id;
   }
   
-	function getViewPath()
+	function getViewPath($request)
 	{
 	  if ((!$this->isDynamic())
 	   && ($this->prefs->getPref('url.allowdirect'))
@@ -120,7 +120,7 @@ class File extends Resource
 	    return $path;
 	  }
 	  else
-  	  return parent::getViewPath();
+  	  return parent::getViewPath($request);
 	}
 	
   function isDynamic()

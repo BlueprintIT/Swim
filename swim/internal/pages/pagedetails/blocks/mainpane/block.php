@@ -30,10 +30,10 @@ $edit->nested=$request;
 $create = new Request();
 $create->method='create';
 $create->query['category']=$category->id;
-$create->resource=$cont->id.'/page';
+$create->resourcePath=$cont->id.'/page';
 
 $delete = new Request();
-$delete->resource=$page->getPath();
+$delete->resource=$page;
 $delete->method='delete';
 $delete->nested = new Request();
 $delete->nested->method='view';
@@ -45,7 +45,7 @@ $delete->nested->query['container']=$cont->id;
 
 $mutate = new Request();
 $mutate->method='mutate';
-$mutate->resource=$cont->id.'/categories';
+$mutate->resourcePath=$cont->id.'/categories';
 $mutate->query['page']=$page->getPath();
 
 if (isset($request->query['reloadtree']))
@@ -203,7 +203,7 @@ if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
   $revert = new Request();
   $revert->query['version']=$page->version;
   $revert->method='revert';
-  $revert->resource=$page->getPath();
+  $revert->resource=$page;
   $revert->nested= new Request($request);
   $revert->nested->query['reloadtree']=true;
 ?>

@@ -8,7 +8,7 @@
 		$setblock->query['version']=$request->nested->query['version'];
 	}
 	$setblock->nested=$request->nested;
-	$page=Resource::decodeResource($request->nested);
+	$page=$request->nested->resource;
 	if (isset($request->query['format']))
 	{
 		$format=$request->query['format'];
@@ -34,7 +34,7 @@ var blockurl=[];
 		$block=$blocks[$title];
 		$req = new Request();
 		$req->method='preview';
-		$req->resource=$block->getPath();
+		$req->resource=$block;
 		print('blockurl['.$pos.']="'.$req->encode().'";'."\n");
 		$pos++;
 	}
@@ -105,7 +105,7 @@ if (isset($format))
 {
 	$create = new Request();
 	$create->method='docreate';
-	$create->resource='global/block';
+	$create->resourcePath='global/block';
 	$create->nested=$request;
 
 ?>
