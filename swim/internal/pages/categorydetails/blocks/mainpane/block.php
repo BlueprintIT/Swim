@@ -269,7 +269,7 @@ foreach ($items as $item)
 	{
 		$name = $item->name;
 	}
-?>						<option value="<?= $pos ?>"><?= $name ?> (<?= $type ?>)</option>
+?>						<option value="<?= $pos ?>"><image src="/internal/file/images/<?= strtolower($type) ?>.gif"/> <?= $name ?> (<?= $type ?>)</option>
 <?
 	$pos++;
 }

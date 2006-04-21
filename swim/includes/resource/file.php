@@ -19,6 +19,14 @@ class File extends Resource
     }
   }
   
+  function isVersioned()
+  {
+    if (isset($this->parent))
+      return $this->parent->isVersioned();
+    else
+      return false;
+  }
+  
   function getSubfile($name)
   {
     if (isset($this->parent))
@@ -101,7 +109,28 @@ class File extends Resource
   	return $this->getDir().'/'.$this->id;
   }
   
-  function outputFile()
+	function getViewPath()
+	{
+	  if ((!$this->isDynamic())
+	   && ($this->prefs->getPref('url.allowdirect'))
+	   && ($this->prefs->isPrefSet('container.'.$this->container->id.'.directpath')))
+	  {
+	    $path = $this->prefs->getPref('container.'.$this->container->id.'.directpath');
+	    $path .= $this->getContainerPath().'/'.$this->id;
+	    return $path;
+	  }
+	  else
+  	  return parent::getViewPath();
+	}
+	
+  function isDynamic()
+  {
+    if (is_file($this->getDir().'/'.$this->id.'.php'))
+      return true;
+    return FileHandlers::canHandle($this->getContentType());
+  }
+  
+  function outputRealFile()
   {
     if (isset($this->parent))
     {
@@ -111,14 +140,12 @@ class File extends Resource
     {
       $this->container->lockRead();
     }
-    if (is_file($this->getDir().'/'.$this->id))
-    {
-      readfile($this->getDir().'/'.$this->id);
-    }
-    if (is_file($this->getDir().'/'.$this->id.'.php'))
-    {
+    
+  	if (is_file($this->getDir().'/'.$this->id.'.php'))
       include($this->getDir().'/'.$this->id.'.php');
-    }
+    else if (is_file($this->getDir().'/'.$this->id))
+      readfile($this->getDir().'/'.$this->id);
+    
     if (isset($this->parent))
     {
       $this->parent->unlock();
@@ -127,6 +154,18 @@ class File extends Resource
     {
       $this->container->unlock();
     }
+  }
+  
+  function outputFile($request = null)
+  {
+    if ($request === null)
+      $this->log->warntrace("Unset request to outputfile");
+      
+    $type = $this->getContentType();
+    if (FileHandlers::canHandle($type))
+  		FileHandlers::output($type, $request, $this);
+  	else
+  	  $this->outputRealFile();
   }
   
   function openFileRead($name = null)

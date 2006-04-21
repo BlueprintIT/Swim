@@ -1,0 +1,31 @@
+#banner h1 {
+  margin: 10px;
+  border: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  text-align: center;
+  font-weight: normal;
+  font-size: 32pt;
+  height: 80px;
+  color: #2d4492;
+}
+
+#banner img {
+  vertical-align: middle;
+}
+
+#banner #compliance {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+}
+
+#banner #compliance img {
+  float: left;
+}
+
+#admin {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+}
+

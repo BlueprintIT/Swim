@@ -13,7 +13,6 @@
  * $Revision$
  */
 
-
 function method_view($request)
 {
 	global $_USER,$_PREFS;
@@ -44,16 +43,7 @@ function method_view($request)
 						setCacheInfo($resource->getModifiedDate(),$resource->getETag());
 						$type=$resource->getContentType();
 						setContentType($type);
-						if ($type=='text/css')
-						{
-							include $_PREFS->getPref('storage.handlers').'/csshandler.php';
-							$handlerf = new CSSHandlerFactory();
-							$handlerf->output($request, $resource);
-						}
-						else
-						{
-							$resource->outputFile();
-						}
+						$resource->outputFile($request);
 					}
 					else
 					{

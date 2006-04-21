@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Page viewing method
+ * CSS parsing
  *
  * Copyright Blueprint IT Ltd. 2006
  *
@@ -158,7 +158,7 @@ class CSSHandler
 	function parse($resource)
 	{
 		ob_start();
-		$resource->outputFile();
+		$resource->outputRealFile();
 		$css=ob_get_contents();
 		ob_end_clean();
 		$lines=explode("\n",$css);
@@ -170,7 +170,10 @@ class CSSHandler
 	
 	function output($request)
 	{
-		$this->path = dirname($request->resource);
+	  if ($request->resource instanceof Resource)
+  		$this->path = dirname($request->resource->getPath());
+  	else
+  	  $this->path = dirname($request->resource);
 		foreach ($request->query as $name => $value)
 		{
 			$this->defines[$name] = $value;
@@ -185,6 +188,11 @@ class CSSHandlerFactory
 	{
 	}
 	
+	function getMimeTypes()
+	{
+	  return array('text/css');
+	}
+	
 	function getHandler($resource)
 	{
 		return new CSSHandler($resource);
@@ -196,5 +204,7 @@ class CSSHandlerFactory
 		$handler->output($request);
 	}
 }
+
+FileHandlers::addHandler(new CSSHandlerFactory());
 
 ?>

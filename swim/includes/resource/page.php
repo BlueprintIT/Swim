@@ -25,6 +25,14 @@ class Page extends Resource
     $this->applyLayout();
   }
   
+	function getViewPath()
+	{
+	  if (!isset($this->parent))
+  	  return '/site/'.$this->container->id.'/0/'.$this->id.'/'.$this->prefs->getPref('page.variables.title');
+  	else
+  	  return parent::getViewPath();
+	}
+	
   function delete()
   {
   	$cats=$this->container->getPageCategories($this);

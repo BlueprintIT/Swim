@@ -13,7 +13,6 @@
  * $Revision$
  */
 
-//[$-_.+!*'(),;:@&=]
 function urlPathEncode($path)
 {
   return preg_replace("/[^a-zA-Z0-9\\/\\$-_.+!*'(),;:@&=]/e", "'%'.dechex(ord('\\0'))", $path);
@@ -302,6 +301,13 @@ class Request
 	{
 		global $_PREFS;
 		
+    if (!$this->resource instanceof Resource)
+    {
+      $resource = Resource::decodeResource($this);
+      if ($resource !== null)
+        $this->resource = $resource;
+    }
+    
     $host='';
     $thisprotocol=$this->protocol;
     if (!$_PREFS->getPref('security.sslenabled'))
@@ -311,6 +317,14 @@ class Request
     if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
       $protocol='https';
 
+    if ($this->resource instanceof Resource)
+    {
+      if (!$this->resource->prefs->getPref('security.sslallowed'))
+        $thisprotocol = 'http';
+      else if ($this->resource->prefs->getPref('security.sslrequired'))
+        $thisprotocol = 'https';
+    }
+    
     if ($thisprotocol!=$protocol)
     {
       $host=$thisprotocol.'://'.$_SERVER['HTTP_HOST'];
@@ -318,24 +332,28 @@ class Request
     
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
-      $url=$_PREFS->getPref('url.pagegen').'/';
-      if ($this->method=='view')
+      $url=null;
+      if (($this->method=='view') && ($this->resource instanceof Resource))
       {
-        $resource = Resource::decodeResource($this);
-        if (($resource!==null)&&($resource->isPage())&&($resource->container->id=='global'))
-        {
-          // TODO Make a search engine optimised url here
-        }
+        $url = $this->resource->getViewPath();
       }
-	  	$url=$url.$this->method;
-	  	if (isset($this->resource))
-	  	{
-	  		if (substr($this->resource,0,1)!='/')
-		  		$url.='/'.urlPathEncode($this->resource);
-		  	else
-		  		$url.=urlPathEncode($this->resource);
-	  	}
-	    return $host.$url;
+      if ($url === null)
+      {
+  	  	$url='/'.$this->method;
+  	  	if (isset($this->resource))
+  	  	{
+  	  	  if ($this->resource instanceof Resource)
+  	  	    $res = $this->resource->getPath();
+  	  	  else
+  	  	    $res = $this->resource;
+  	  	    
+  	  		if (substr($res,0,1)!='/')
+  		  		$url.='/'.$res;
+  		  	else
+  		  		$url.=$res;
+  	  	}
+  	  }
+	    return $host.$_PREFS->getPref('url.pagegen').urlPathEncode($url);
 	  }
 	  else
 	  {
@@ -349,7 +367,10 @@ class Request
 		
 		$newquery=$this->query;
 		$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
-		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
+		if ($this->resource instanceof Resource)
+  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource->getPath();
+		else
+  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
 		if (isset($this->nested))
 		{
 			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->makeAllVars());
@@ -369,7 +390,10 @@ class Request
 	  if ($_PREFS->getPref('url.encoding')!='path')
 	  {
 			$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
-			$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
+  		if ($this->resource instanceof Resource)
+    		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource->getPath();
+  		else
+    		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resource;
 	  }
 	  return $newquery;
 	}
@@ -509,6 +533,10 @@ class Request
     {
     	$request->resource=$_PREFS->getPref('method.'.$request->method.'.defaultresource');
     }
+    
+    $res = Resource::decodeResource($request);
+    if ($res !== null)
+      $request->resource = $res;
 
 	  return $request;
 	}

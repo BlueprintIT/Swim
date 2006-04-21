@@ -77,6 +77,21 @@ class Resource
     $this->writable=$this->prefs->getPref('resource.writable',true);
 	}
 	
+	function getContainerPath()
+	{
+	  return substr($this->getDir(),strlen($this->container->getDir()));
+	}
+	
+	function getViewPath()
+	{
+	  return '/view/'.$this->getPath();
+	}
+	
+  function isVersioned()
+  {
+    return $this->container->isVersioned();
+  }
+  
   function isWritable()
   {
     return $this->writable;
@@ -169,7 +184,7 @@ class Resource
 	{
     if (!is_dir($this->getDir()))
     {
-      $this->log->errortrace("Resource dir does not exist - ".$this->getPath());
+      $this->log->errortrace("Resource dir (".$this->getDir().") does not exist - ".$this->getPath());
     }
 		$this->lockWrite();
     if (!is_dir($this->getDir().'/'.$type.'s'))
@@ -622,8 +637,11 @@ class Resource
 		
 		$log=LoggerManager::getLogger('swim.resource');
 		
-		if (is_object($request))
+		if ($request instanceof Request)
 		{
+		  if ($request->resource instanceof Resource)
+		    return $request->resource;
+		    
 			$resource=$request->resource;
 			
 			if (($version===false)&&(isset($request->query['version'])))

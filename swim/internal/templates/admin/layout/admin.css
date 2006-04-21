@@ -1,5 +1,5 @@
 body {
-	padding-top: 130px;
+	padding-top: 140px;
 	padding-bottom: 10px;
 	padding-left: 0px;
 	padding-right: 0px;
@@ -10,40 +10,11 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-}
-
-#banner h1 {
-  margin: 10px;
-  border: 1px solid ThreeDShadow;
-  background-color: ThreeDFace;
-  text-align: center;
-  font-size: 25pt;
-  font-weight: normal;
-  height: 70px;
-}
-
-#banner img {
-  vertical-align: -18px;
-}
-
-#banner #compliance {
-  position: absolute;
-  bottom: 15px;
-  left: 15px;
-}
-
-#banner #compliance img {
-  float: left;
-}
-
-#admin {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
+  height: 100px;
 }
 
 #tabpanel {
   position: absolute;
-  top: 90px;
+  top: 100px;
   left: 0;
 }
