@@ -75,7 +75,8 @@ class Template extends Resource
 		else if (substr($url,0,6)=='block/')
 		{
 			$url=$data['block']->getPath().substr($url,5);
-			$request->query['version']=$data['block']->version;
+      if ($this->isVersioned())
+  			$request->query['version']=$data['block']->version;
 		}
 		else if (substr($url,0,5)=='page/')
 		{
@@ -85,18 +86,20 @@ class Template extends Resource
 		else if (substr($url,0,9)=='template/')
 		{
 			$url=$this->getPath().substr($url,8);
-			$request->query['version']=$this->version;
+      if ($this->isVersioned())
+  			$request->query['version']=$this->version;
 		}
 		else if (isset($data['block']))
 		{
 			$url=$data['block']->getPath().'/file/'.$url;
-			if (isset($data['block']->version))
+      if ($this->isVersioned())
 				$request->query['version']=$data['block']->version;
 		}
 		else
 		{
 			$url=$this->getPath().'/file/'.$url;
-			$request->query['version']=$this->version;
+      if ($this->isVersioned())
+  	 		$request->query['version']=$this->version;
 		}
 		$request->resource=$url;
 		return $request;
