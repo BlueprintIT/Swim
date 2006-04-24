@@ -78,17 +78,17 @@ class CategoryMenuBlock extends Block
     Block::displayIntro($attrs);
   }
   
-  function displayTableItem($item,$depth)
+  function displayTableItem($item,$parent,$depth)
   {
     print('<td class="menuitem level'.($depth+1).'"><span>'."\n");
-    $this->displayItem($item,$depth);
+    $this->displayItem($item,$parent,$depth);
     print('</span></td>'."\n");
   }
   
-  function displayVerticalTableItem($item,$depth)
+  function displayVerticalTableItem($item,$parent,$depth)
   {
     print('<tr>'."\n");
-    $this->displayTableItem($item,$depth);
+    $this->displayTableItem($item,$parent,$depth);
     print('</tr>'."\n");
   }
   
@@ -101,16 +101,16 @@ class CategoryMenuBlock extends Block
     
     foreach ($category->items() as $item)
     {
-      $this->displayVerticalTableItem($item,$depth);
+      $this->displayVerticalTableItem($item,$category,$depth);
     }
     
     if ($showroot)
       print('</table>');
   }
   
-  function displayHorizontalTableItem($item,$depth)
+  function displayHorizontalTableItem($item,$parent,$depth)
   {
-    $this->displayTableItem($item,$depth);
+    $this->displayTableItem($item,$parent,$depth);
   }
   
   function displayHorizontalTableItems($category,$depth,$showroot=true)
@@ -123,7 +123,7 @@ class CategoryMenuBlock extends Block
     print('<tr>'."\n");
     foreach ($category->items() as $item)
     {
-      $this->displayHorizontalTableItem($item,$depth);
+      $this->displayHorizontalTableItem($item,$category,$depth);
     }
     print('</tr>'."\n");
     
@@ -131,10 +131,10 @@ class CategoryMenuBlock extends Block
       print('</table>');
   }
   
-  function displayListItem($item,$depth)
+  function displayListItem($item,$parent,$depth)
   {
     print('<li class="menuitem level'.($depth+1).'">'."\n");
-    $this->displayItem($item,$depth);
+    $this->displayItem($item,$parent,$depth);
     print('</li>'."\n");
   }
   
@@ -151,7 +151,7 @@ class CategoryMenuBlock extends Block
       
       foreach ($items as $item)
       {
-        $this->displayListItem($item,$depth);
+        $this->displayListItem($item,$category,$depth);
       }
       
       if ($showroot)
@@ -179,7 +179,7 @@ class CategoryMenuBlock extends Block
     }
   }
   
-  function displayItem($item,$depth)
+  function displayItem($item,$parent,$depth)
   {
     if ($item instanceof Category)
     {
@@ -198,7 +198,9 @@ class CategoryMenuBlock extends Block
           print('href="'.$page->address.'">');
         }
         if ($item->icon!==null)
-	        print('<image class="icon" src="'.$item->icon.'"/>');
+          print('<image class="icon" src="'.$item->icon.'"/>');
+        if ($item->hoverIcon!==null)
+          print('<image class="hoverIcon" src="'.$item->hoverIcon.'"/>');
         if ($page instanceof Page)
         {
           print('<span>'.$item->name.'</span></anchor>');
@@ -217,7 +219,11 @@ class CategoryMenuBlock extends Block
     }
     else if ($item instanceof Page)
     {
-      print('<anchor class="page level'.($depth+1).'" href="/'.$item->getPath().'"><span>'.$item->prefs->getPref('page.variables.title').'</span></anchor>');
+      $request = new Request();
+      $request->method = 'view';
+      $request->resource = $item;
+      $request->data['category'] = $parent;
+      print('<a class="page level'.($depth+1).'" href="'.$request->encode().'"><span>'.$item->prefs->getPref('page.variables.title').'</span></a>');
     }
     else if ($item instanceof Link)
     {

@@ -487,6 +487,10 @@ class Template extends Resource
 			$request->query['template']=$attrs['template'];
 			unset($attrs['template']);
 		}
+    if (isset($parser->data['request']->data['category']))
+    {
+      $request->data['category'] = $parser->data['request']->data['category'];
+    }
 		foreach ($attrs as $id => $value)
 		{
 			if (substr($id,0,6)=='query:')

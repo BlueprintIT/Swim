@@ -36,6 +36,13 @@ function method_site($request)
     return;
   }
   
+  if ($parts[1] != '-')
+  {
+    $category = $container->getCategory($parts[1]);
+    if ($category !== null)
+      $request->data['category'] = $category;
+  }
+  
   if ($parts[2] != '-')
   {
     $page = $container->getPage($parts[2]);

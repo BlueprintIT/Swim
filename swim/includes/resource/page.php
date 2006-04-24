@@ -25,10 +25,87 @@ class Page extends Resource
     $this->applyLayout();
   }
   
+  function findBestCategory($category)
+  {
+    if (($category !== null) && ($category->indexOf($this) !== false))
+      return $category;
+    
+    $cats = $this->container->getPageCategories($this);
+    if (count($cats)==0)
+      return null;
+    
+    if ((count($cats[0])==1) || ($category === null))
+      return $cats[0];
+      
+    $bestcat = null;
+    $bestpos = 0;
+    foreach ($cats as $cat)
+    {
+      $pos = 0;
+      $test = $cat;
+      while (($test !== null) && ($test !== $category))
+      {
+        $pos++;
+        $test = $test->parent;
+      }
+      if (($test !== null) && (($bestcat === null) || ($pos<abs($bestpos))))
+      {
+        $bestcat = $cat;
+        $bestpos = $pos;
+      }
+
+      $pos = 0;
+      $test = $category;
+      while (($test !== null) && ($test !== $cat))
+      {
+        $pos--;
+        $test = $test->parent;
+      }
+      if (($test !== null) && (($bestcat === null) || (-$pos<abs($bestpos))))
+      {
+        $bestcat = $cat;
+        $bestpos = $pos;
+      }
+    }
+    
+    if ($bestcat !== null)
+      return $bestcat;
+      
+    return $cats[0];
+  }
+  
 	function getViewPath($request)
 	{
 	  if ((!isset($this->parent)) && ($this->prefs->getPref('url.humanreadable') === true))
-  	  return '/site/'.$this->container->id.'/-/'.$this->id.'/'.$this->prefs->getPref('page.variables.title');
+    {
+      $path = '/site/'.$this->container->id.'/';
+      $cat = null;
+      if (isset($request->data['category']))
+      {
+        $cat = $this->findBestCategory($request->data['category']);
+      }
+      else
+      {
+        $cat = $this->findBestCategory(null);
+      }
+      
+      if ($cat !== null)
+      {
+        $path.=$cat->id.'/'.$this->id.'/';
+        $catpath = '';
+        while ($cat !== null)
+        {
+          $catpath = $cat->name.'/'.$catpath;
+          $cat = $cat->parent;
+        }
+        $path.=$catpath.$this->prefs->getPref('page.variables.title');
+      }
+      else
+      {
+        $path.='-/'.$this->id.'/'.$this->prefs->getPref('page.variables.title');
+      }
+      return $path;
+    }
   	else
   	  return parent::getViewPath($request);
 	}

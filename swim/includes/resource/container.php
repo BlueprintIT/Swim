@@ -141,6 +141,7 @@ class Container extends Resource
   {
     global $_STORAGE;
 
+    $this->log->debug('Searching for page '.$page->getPath().' in categories.');
     $path="'".$_STORAGE->escape($page->getPath())."'";
     $set=$_STORAGE->query('SELECT id,parent,name,icon,hovericon FROM Category JOIN PageCategory ON Category.id=PageCategory.category WHERE PageCategory.page='.$path.';');
     $results = array();
