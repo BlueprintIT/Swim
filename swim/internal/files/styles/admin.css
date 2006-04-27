@@ -1,11 +1,11 @@
 #include styles.css
 
 a, a:visited {
-	color: blue;
+	color: BLUE;
 }
 
 a:hover, a:visited:hover {
-	color: purple;
+	color: PURPLE;
 }
 
 #tabpanel {

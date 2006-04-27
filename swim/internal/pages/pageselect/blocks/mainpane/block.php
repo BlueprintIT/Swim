@@ -20,4 +20,4 @@ function submit()
 <button onclick="window.close()">Cancel</button>
 <h2>Preview</h2>
 </div>
-<block id="" class="body" src="<?= $page ?>/block/content"/>
+<block id="" class="body" src="/<?= $page ?>/block/content"/>

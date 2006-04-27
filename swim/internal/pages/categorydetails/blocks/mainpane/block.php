@@ -64,6 +64,8 @@ $move->resourcePath=$container->id.'/categories';
 $move->query['subcategory']=$category->id;
 
 ?>
+  window.top.SiteTree.selectCategory("<?= $category->id; ?>");
+  
 function moveCompleted(req) {
 	window.top.SiteTree.loadTree();
 }

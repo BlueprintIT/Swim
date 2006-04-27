@@ -56,6 +56,7 @@ if (isset($request->query['reloadtree']))
 }
 
 ?>
+  window.top.SiteTree.selectPage("<?= $page->getPath(); ?>");
 
 function removeCompleted(req) {
 	var row = document.getElementById("catrow-"+req.argument.category);

@@ -1,5 +1,12 @@
+#banner {
+  padding-top: 10px;
+}
+
 #banner h1 {
-  margin: 10px;
+  margin-top: 0;
+  margin-bottom: 0px;
+  margin-left: 10px;
+  margin-right: 10px;
   border: 1px solid ThreeDShadow;
   background-color: ThreeDFace;
   text-align: center;
@@ -15,7 +22,7 @@
 
 #banner #compliance {
   position: absolute;
-  bottom: 15px;
+  bottom: 25px;
   left: 15px;
 }
 
@@ -25,7 +32,7 @@
 
 #admin {
   position: absolute;
-  bottom: 15px;
+  bottom: 25px;
   right: 15px;
 }
 

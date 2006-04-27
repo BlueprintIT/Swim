@@ -1,3 +1,6 @@
+#define BLUE #2d4492
+#define PURPLE #cb007e
+
 html {
 	height: 100%;
 	width: 100%;
@@ -61,7 +64,7 @@ table {
 .header h2 {
   margin: 0;
   padding: 10px;
-  color: blue;
+  color: BLUE;
 }
 
 .body {
@@ -81,11 +84,13 @@ iframe.body {
 }
 
 /* first or middle sibling, no children */
+.categorytn { background-image: -swim-url(../yahoo/img/folders/tm.gif) !important; width:34px !important; }
 .pagetn { background-image: -swim-url(../images/pagetn.gif) !important; width:34px !important; }
 .linktn { background-image: -swim-url(../images/linktn.gif) !important; width:34px !important; }
 .usertn { background-image: -swim-url(../images/usertn.gif) !important; width:34px !important; }
 
 /* last sibling, no children */
+.categoryln { background-image: -swim-url(../yahoo/img/folders/lm.gif) !important; width:34px !important; }
 .pageln { background-image: -swim-url(../images/pageln.gif) !important; width:34px !important; }
 .linkln { background-image: -swim-url(../images/linkln.gif) !important; width:34px !important; }
 .userln { background-image: -swim-url(../images/userln.gif) !important; width:34px !important; }
@@ -95,18 +100,12 @@ iframe.body {
   color: HighlightText;
 }
 
-#categorytree a, .categorytree a:visited {
+#categorytree a,
+#categorytree a:active,
+#categorytree a:hover,
+.categorytree a:visited {
   color: WindowText;
   text-decoration: none;
-}
-
-#categorytree a:hover, .categorytree a:visited:hover {
-  color: Highlight;
-  text-decoration: none;
-}
-
-#categorytree .selected a, .categorytree .selected a:hover, .categorytree .selected a:visited {
-  color: HighlightText;
 }
 
 .filetable {
