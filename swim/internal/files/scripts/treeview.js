@@ -88,10 +88,6 @@ YAHOO.widget.Node.prototype.removeChild = function(node) {
 	return node;
 }
 
-var BlueprintIT = {
-	widget: {}
-}
-
 BlueprintIT.widget.StyledTextNode = function(oData, oParent, expanded) {
 	if (oParent) {
 		this.init(oData, oParent, expanded);

@@ -1,0 +1,4 @@
+var BlueprintIT = {
+	menus: {},
+	widget: {}
+}

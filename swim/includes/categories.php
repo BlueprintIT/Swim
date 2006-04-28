@@ -334,15 +334,17 @@ class Category
       if ($cat===null)
       {
         $cat = new Category($this->container,$this,$details['id'],$details['name']);
-        $cat->icon = $details['icon'];
-        if ($details['hovericon']===null)
-        {
-	        $cat->hovericon = $details['icon'];
-        }
+        
+        if ($details['icon']!=false)
+          $cat->icon = $details['icon'];
         else
-        {
+          $cat->icon = null;
+          
+        if ($details['hovericon']!=false)
 	        $cat->hovericon = $details['hovericon'];
-        }
+        else
+	        $cat->hovericon = $cat->icon;
+
         ObjectCache::setItem('category', $details['id'], $cat);
       }
       $list[$details['sortkey']]=$cat;

@@ -1,37 +1,3 @@
-YAHOO.util.Dom.textContent = function(el) {
-	el = this.get(el);
-	var content = "";
-	var node = el.firstChild;
-	while (node) {
-		if (node.nodeType == 3)
-			content+=node.nodeValue;
-		
-		node = node.nextSibling;
-	}
-	return content;
-}
-
-YAHOO.util.Dom.addClass = function(el, name) {
-	el = this.get(el);
-	if (el)
-		el.className+=" "+name;
-}
-
-YAHOO.util.Dom.removeClass = function(el, name) {
-	el = this.get(el);
-	if (el) {
-		var classes = el.className.split(' ');
-		if (classes.length>0) {
-			var newclass = '';
-			for (var k in classes) {
-				if (classes[k]!=name)
-					newclass+=' '+classes[k];
-			}
-			el.className=newclass.substring(1,newclass.length);
-		}
-	}
-}
-
 BlueprintIT.widget.SiteTree = function(siteadmin, url, div) {
 	this.location=url;
 	this.element=div;

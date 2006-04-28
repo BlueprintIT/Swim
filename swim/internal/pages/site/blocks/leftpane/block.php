@@ -1,11 +1,13 @@
 <stylesheet src="/internal/file/yahoo/css/folders/tree.css"/>
 <script src="/internal/file/yahoo/YAHOO.js"/>
+<script src="/internal/file/scripts/BlueprintIT.js"/>
 <script src="/internal/file/yahoo/event.js"/>
 <script src="/internal/file/yahoo/dom.js"/>
 <script src="/internal/file/yahoo/dragdrop.js"/>
 <script src="/internal/file/yahoo/connection.js"/>
 <script src="/internal/file/yahoo/treeview.js"/>
 <script src="/internal/file/scripts/treeview.js"/>
+<script src="/internal/file/scripts/dom.js"/>
 <script src="/internal/page/site/block/leftpane/file/sitetree.js"/>
 <script>
 <?

@@ -198,9 +198,9 @@ class CategoryMenuBlock extends Block
           print('href="'.$page->address.'">');
         }
         if ($item->icon!==null)
-          print('<image class="icon" src="'.$item->icon.'"/>');
-        if ($item->hoverIcon!==null)
-          print('<image class="hoverIcon" src="'.$item->hoverIcon.'"/>');
+          print('<image class="icon" src="'.$item->hovericon.'"/>');
+        if ($item->hovericon!==null)
+          print('<image class="hoverIcon" src="'.$item->hovericon.'"/>');
         if ($page instanceof Page)
         {
           print('<span>'.$item->name.'</span></anchor>');
@@ -233,8 +233,12 @@ class CategoryMenuBlock extends Block
   
   function displayContent($parser,$attrs,$text)
   {
-    print('<script src="/design/file/scripts/cbdom.js"/>');
-    print('<script src="/design/file/scripts/bpmm.js"/>');
+    print('<script src="/internal/file/yahoo/YAHOO.js"/>');
+    print('<script src="/internal/file/scripts/BlueprintIT.js"/>');
+    print('<script src="/internal/file/yahoo/event.js"/>');
+    print('<script src="/internal/file/yahoo/dom.js"/>');
+    print('<script src="/internal/file/scripts/dom.js"/>');
+    print('<script src="/internal/file/scripts/bpmm.js"/>');
     
     $this->log->debug('Displaying category menu');
     
