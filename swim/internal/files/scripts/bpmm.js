@@ -31,14 +31,12 @@ BlueprintIT.menus.InstantAnimator.prototype = {
 	}
 }
 
-BlueprintIT.menus.SlideAnimator = function(manager)
+BlueprintIT.menus.SlideAnimator = function()
 {
-	this.manager = manager;
 }
 
 BlueprintIT.menus.SlideAnimator.prototype = {
-	manager: null,
-	step: 5,
+	step: 3,
 	delay: 10,
 
 	startAnimateIn: function(item)
@@ -47,7 +45,7 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
 		item.setVisible(true);
 		item.state=2;
-		item.timer=this.manager.startTimer(item,this.delay);
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
 	},
 	
 	animateIn: function(item)
@@ -55,7 +53,7 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 		item.clippos+=this.step;
 
 		var region = YAHOO.util.Dom.getRegion(item.element);
-		var height = region.top-region.bottom;
+		var height = region.bottom-region.top;
 		if (item.clippos>=height)
 		{
 			item.clippos=height;
@@ -65,17 +63,17 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 		else
 		{
 			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
-			this.manager.startTimer(item,this.delay);
+			BlueprintIT.timing.startTimer(item,this.delay);
 		}	
 	},
 	
 	startAnimateOut: function(item)
 	{
 		var region = YAHOO.util.Dom.getRegion(item.element);
-		item.clippos=region.top-region.bottom;
+		item.clippos=region.bottom-region.top;
 		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, auto, auto)');
 		item.state=5;
-		item.timer=this.manager.startTimer(item,this.delay);
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
 	},
 	
 	animateOut: function(item)
@@ -92,18 +90,16 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 		else
 		{
 			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
-			this.manager.startTimer(item,this.delay);
+			BlueprintIT.timing.startTimer(item,this.delay);
 		}	
 	}		
 }
 
-BlueprintIT.menus.FadeAnimator = function(manager)
+BlueprintIT.menus.FadeAnimator = function()
 {
-	this.manager = manager;
 }
 
 BlueprintIT.menus.FadeAnimator.prototype = {
-	manager: null,
 	step: 0.05,
 	delay: 10,
 
@@ -113,7 +109,7 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 		item.setVisible(true);
 		item.state=2;
 		item.opacpos = 0;
-		item.timer=this.manager.startTimer(item,this.delay);
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
 	},
 	
 	animateIn: function(item)
@@ -132,7 +128,7 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 		{
 			YAHOO.util.Dom.setStyle(item.element, 'opacity', next);
 			item.opacpos = next;
-			this.manager.startTimer(item,this.delay);
+			BlueprintIT.timing.startTimer(item,this.delay);
 		}
 	},
 	
@@ -141,7 +137,7 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 		YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
 		item.state=5;
 		item.opacpos = 1;
-		item.timer=this.manager.startTimer(item,this.delay);
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
 	},
 	
 	animateOut: function(item)
@@ -161,7 +157,7 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 		{
 			YAHOO.util.Dom.setStyle(item.element, 'opacity', next);
 			item.opacpos = next;
-			this.manager.startTimer(item,this.delay);
+			BlueprintIT.timing.startTimer(item,this.delay);
 		}
 	}		
 }
@@ -171,10 +167,11 @@ BlueprintIT.menus.VERTICAL = 1;
 
 BlueprintIT.menus.MenuManager = function()
 {
-	this.menuitems = [];
-
-	this.textarea=document.getElementById('log');
-	this.animator = new BlueprintIT.menus.InstantAnimator(this);
+	this.instantAnimator = new BlueprintIT.menus.InstantAnimator();
+	this.slideAnimator = new BlueprintIT.menus.SlideAnimator();
+	this.fadeAnimator = new BlueprintIT.menus.FadeAnimator();
+	this.animator = this.instantAnimator;
+	
 	YAHOO.util.Event.addListener(document,'focus',this.focusEvent,this,true);
 	YAHOO.util.Event.addListener(document,'keypress',this.keyPressEvent,this,true);
 }
@@ -183,33 +180,23 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	popupDelay: 200,
 	hideDelay: 200,
+	
 	animator: null,
+	slideAnimator: null,
+	fadeAnimator: null,
+	instantAnimator: null,
 	
 	textarea: null,
-	
-	itemcount: 0,
-	
-	menuitems: null,
 	
 	selected: null,
 	
 	log: function(text)
 	{
+		return;
+		if (!this.textarea)
+			this.textarea=document.getElementById('log');
 		if (this.textarea)
 			this.textarea.value+=text+"\n";
-	},
-	
-	startTimer: function(item,timeout)
-	{
-		function timerCallback() {
-			item.onTimer();
-		}
-		return window.setTimeout(timerCallback, timeout);
-	},
-	
-	cancelTimer: function(id)
-	{
-		window.clearTimeout(id);
 	},
 	
 	findMenuItem: function(element)
@@ -219,8 +206,8 @@ BlueprintIT.menus.MenuManager.prototype = {
 		
 		try
 		{
-			if (element.id && this.menuitems[element.id])
-				return this.menuitems[element.id];
+			if (element.menuitem)
+				return element.menuitem;
 			
 			if (element.parentNode)
 				return this.findMenuItem(element.parentNode);
@@ -234,17 +221,13 @@ BlueprintIT.menus.MenuManager.prototype = {
 	{
 		items.reverse();
 		for (var k in items)
-		{
 			items[k].mouseOut();
-		}
 	},
 	
 	mouseOver: function(items)
 	{
 		for (var k in items)
-		{
 			items[k].mouseOver();
-		}
 	},
 	
 	makeItemList: function(bottom)
@@ -268,9 +251,8 @@ BlueprintIT.menus.MenuManager.prototype = {
 	{
 		var line = '';
 		for (var k in chain)
-		{
 			line+=chain[k].element.id+' ';
-		}
+
 		this.log(line);
 	},
 	
@@ -291,14 +273,10 @@ BlueprintIT.menus.MenuManager.prototype = {
 			this.mouseOver(dests);
 			
 			if (this.selected)
-			{
-				this.selected.unfocusCurrent();
-			}
+				this.selected.unfocus();
 			this.selected=newitem;
 			if (this.selected)
-			{
-				this.selected.focusCurrent();
-			}
+				this.selected.focus();
 		}
 	},
 	
@@ -306,15 +284,11 @@ BlueprintIT.menus.MenuManager.prototype = {
 	{
 		if (ev.type=='keypress')
 		{
-			if (this.selected)
+			this.log("keyPressEvent");
+			if ((this.selected) && (ev.keyCode>=37) && (ev.keyCode<=40))
 			{
-				if ((ev.keyCode>=37)&&(ev.keyCode<=40))
-				{
-					if (this.selected.keyPress(ev.keyCode))
-					{
-						ev.preventDefault();
-					}
-				}
+				if (this.selected.keyPress(ev.keyCode))
+					ev.preventDefault();
 			}
 		}
 	},
@@ -323,6 +297,7 @@ BlueprintIT.menus.MenuManager.prototype = {
 	{
 		if (ev.type=='focus')
 		{
+			this.log("focusEvent");
 			this.changeSelection(this.findMenuItem(ev.target));
 		}
 	},
@@ -342,35 +317,48 @@ BlueprintIT.menus.MenuManager.prototype = {
 		}
 	},
 	
-	loadFrom: function(orientation,element,parentitem,parentmenu)
+	loadFrom: function(element,animator,orientation,depth,parentitem,parentmenu)
 	{
+		if (!depth)
+			depth = 0;
+		if (!animator)
+			animator = this.animator;
+		
 		if (YAHOO.util.Dom.hasClass(element,'horizmenu'))
-		{
 			orientation=BlueprintIT.menus.HORIZONTAL;
-		}
 		else if (YAHOO.util.Dom.hasClass(element,'vertmenu'))
-		{
 			orientation=BlueprintIT.menus.VERTICAL;
-		}
+		
+		if (YAHOO.util.Dom.hasClass(element,'fadein'))
+			animator = this.fadeAnimator;
+		else if (YAHOO.util.Dom.hasClass(element,'slidein'))
+			animator = this.slideAnimator;
+		else if (YAHOO.util.Dom.hasClass(element,'appearin'))
+			animator = this.instantAnimator;
+		
 		if (YAHOO.util.Dom.hasClass(element,'menuitem'))
 		{
+			YAHOO.util.Dom.addClass(element,'level'+depth);
 			parentitem = new MenuItem(this,parentmenu,element);
 			parentmenu=null;
 		}
 		else if (YAHOO.util.Dom.hasClass(element,'menupopup')||YAHOO.util.Dom.hasClass(element,'menu'))
 		{
-			parentmenu = new Menu(this,parentitem,orientation,element);
+			depth++;
+			YAHOO.util.Dom.addClass(element,'level'+depth);
+			parentmenu = new Menu(this,parentitem,orientation,element,animator);
 			parentitem=null;
 		}
 		else if ((element.tagName=='A')&&(parentitem))
 		{
+			YAHOO.util.Dom.addClass(element,'level'+depth);
 			parentitem.setFocusElement(element);
 		}
 		var child = element.firstChild;
 		while (child)
 		{
 			if (child.nodeType==1)
-				this.loadFrom(orientation,child,parentitem,parentmenu);
+				this.loadFrom(child,animator,orientation,depth,parentitem,parentmenu);
 			child=child.nextSibling;
 		}
 	},
@@ -378,24 +366,20 @@ BlueprintIT.menus.MenuManager.prototype = {
 	loadMenus: function()
 	{
 		this.log("Loading");
-		this.loadFrom(BlueprintIT.menus.HORIZONTAL,document.documentElement);
+		this.loadFrom(document.documentElement,this.animator);
 	}
 }
 
-function Menu(manager,item,orientation,element)
+function Menu(manager,item,orientation,element,animator)
 {
 	this.manager = manager;
 	this.manager.log('Created menu from '+element.tagName);
+	this.animator = animator;
 
 	this.menuItems=[];
-	if (!element.id)
-	{
-		element.id='bpmm_'+this.manager.itemcount;
-	}
 	if (item)
 	{
-		this.manager.menuitems[element.id]=item;
-		this.manager.itemcount++;
+		element.menuitem = item;
 	
 		this.parentItem=item;
 		this.parentItem.submenu=this;
@@ -409,6 +393,25 @@ function Menu(manager,item,orientation,element)
 	this.orientation=orientation;
 	this.element=element;
 }
+
+/*
+   State 0 - normal
+             can move to state 1 on mouse over
+   State 1 - waiting to appear
+             can move to state 0 on mouse out
+             can move to state 2/3 on timer complete
+   State 2 - animating in
+             can move to state 5 on mouse out
+             can move to state 3 on animation complete
+   State 3 - visible
+             can move to state 4 on mouse out
+   State 4 - waiting to disappear
+             can move to state 3 on mouse over
+             can move to state 5/0 on timer complete
+   State 5 - animating out
+             can move to state 2 on mouse over
+             can move to state 0 on animation complete
+*/
 
 Menu.prototype = {
 	
@@ -465,12 +468,10 @@ Menu.prototype = {
 		{
 			case 0:
 			case 1:
-				//this.parentItem.setMenuPosition();
-				this.animator=this.manager.animator;
 				this.animator.startAnimateIn(this);
 				break;
 			case 4:
-				this.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=3;
 				break;
 			case 5:
@@ -484,7 +485,7 @@ Menu.prototype = {
 		switch (this.state)
 		{
 			case 1:
-				this.manager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=0;
 				break;
 			case 2:
@@ -492,7 +493,6 @@ Menu.prototype = {
 				break;
 			case 3:
 			case 4:
-				this.animator=this.manager.animator;
 				this.animator.startAnimateOut(this);
 				break;
 		}
@@ -505,10 +505,10 @@ Menu.prototype = {
 		{
 			case 0:
 				this.state=1;
-				this.timer=this.manager.startTimer(this,this.manager.popupDelay);
+				this.timer=BlueprintIT.timing.startTimer(this,this.manager.popupDelay);
 				break;
 			case 4:
-				this.manager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=3;
 				break;
 			case 5:
@@ -523,7 +523,7 @@ Menu.prototype = {
 		switch (this.state)
 		{
 			case 1:
-				this.manager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=0;
 				break;
 			case 2:
@@ -531,7 +531,7 @@ Menu.prototype = {
 				break;
 			case 3:
 				this.state=4;
-				this.timer=this.manager.startTimer(this,this.manager.hideDelay);
+				this.timer=BlueprintIT.timing.startTimer(this,this.manager.hideDelay);
 				break;
 		}
 	}
@@ -542,12 +542,7 @@ function MenuItem(manager,parent,element)
 	this.manager = manager;
 	this.manager.log('Created menuitem from '+element.tagName);
 
-	if (!element.id)
-	{
-		element.id='bpmm_'+this.manager.itemcount;
-	}
-	this.manager.menuitems[element.id]=this;
-	this.manager.itemcount++;
+	element.menuitem = this;
 
 	this.parentMenu=parent;
 	this.element=element;
@@ -571,30 +566,18 @@ MenuItem.prototype = {
 		this.focusElement=el;
 	},
 	
-	focusCurrent: function()
-	{
-		if (this.parentMenu.parentItem)
-			YAHOO.util.Dom.addClass(this.element, 'currentfocus');
-		if (this.focusElement)
-			YAHOO.util.Dom.addClass(this.focusElement, 'itemfocus');
-	},
-	
-	unfocusCurrent: function()
-	{
-		if (this.parentMenu.parentItem)
-			YAHOO.util.Dom.removeClass(this.element, 'currentfocus');
-		if (this.focusElement)
-			YAHOO.util.Dom.removeClass(this.focusElement, 'itemfocus');
-	},
-	
 	focus: function()
 	{
-		YAHOO.util.Dom.addClass(this.element, 'menufocus');
+		YAHOO.util.Dom.addClass(this.element, 'focused');
+		if (this.focusElement)
+			YAHOO.util.Dom.addClass(this.focusElement, 'focused');
 	},
 	
 	unfocus: function()
 	{
-		YAHOO.util.Dom.removeClass(this.element, 'menufocus');
+		YAHOO.util.Dom.removeClass(this.element, 'focused');
+		if (this.focusElement)
+			YAHOO.util.Dom.removeClass(this.focusElement, 'focused');
 	},
 	
 	keyPress: function(code)
@@ -635,7 +618,7 @@ MenuItem.prototype = {
 			{
 				if (this.pos==0)
 				{
-					if (parentOrient==BlueprintIT.menus.HORIZONTAL)
+					if (parentOrient == BlueprintIT.menus.HORIZONTAL)
 						newitem=this.parentMenu.parentItem;
 					else
 						newitem=this.parentMenu.menuItems[this.parentMenu.menuItems.length-1];
@@ -677,13 +660,9 @@ MenuItem.prototype = {
 		if (newitem)
 		{
 			if (newitem.focusElement)
-			{
 				newitem.focusElement.focus();
-			}
 			else
-			{
 				this.changeSelection(newitem);
-			}
 			return true;
 		}
 		return false;
@@ -693,22 +672,24 @@ MenuItem.prototype = {
 	{
 		this.manager.log('mouseOver '+this.element.id);
 
-		this.focus();
+		YAHOO.util.Dom.addClass(this.element, 'opened');
+		if (this.focusElement)
+			YAHOO.util.Dom.addClass(this.focusElement, 'opened');
+
 		if (this.submenu)
-		{
 			this.submenu.startShow();
-		}
 		else if (this.parentMenu.parentItem)
-		{
 			this.parentMenu.startShow();
-		}
 	},
 	
 	mouseOut: function()
 	{
 		this.manager.log('mouseOut '+this.element.id);
 		
-		this.unfocus();
+		YAHOO.util.Dom.removeClass(this.element, 'opened');
+		if (this.focusElement)
+			YAHOO.util.Dom.removeClass(this.focusElement, 'opened');
+
 		if (this.submenu)
 			this.submenu.startHide();
 	},
@@ -720,44 +701,43 @@ MenuItem.prototype = {
 			var region = YAHOO.util.Dom.getRegion(this.element);
 			var subregion = YAHOO.util.Dom.getRegion(this.submenu.element);
 
+			var width = subregion.right-subregion.left;
+			var height = subregion.bottom-subregion.top;
 		  var bwidth = YAHOO.util.Dom.getClientWidth();
 		  var bheight = YAHOO.util.Dom.getClientHeight();
+
 			if (this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 			{
 			  var left = region.left
 			  var top = region.bottom;
-			  var width = subregion.right-subregion.left;
 
-			  if ((left+width)>bwidth)
+			  if (((top+height)>bwidth) && (region.top >= height))
 			  {
-			    left -= width;
-			    if (left < 0)
-			    	left = 0;
+			  	top = region.top-height;
 			  }
 			}
 			else
 			{
 			  var left = region.right;
 			  var top = region.top;
-			  var width = subregion.right-subregion.left;
-			  
-			  if ((left+width)>bwidth)
+
+			  if (((left+width)>bwidth) && (region.left >= width))
 			  {
 			    left = region.left-width;
-			    if (left < 0)
-			    	left = 0;
 			  }
 			}
+			if ((left+width)>bwidth)
+				left = bwidth-width;
+			if (left < 0)
+				left = 0;
+			if ((top+height)>bheight)
+				top = bheight-height;
+			if (top < 0)
+				top = 0;
 			this.manager.log("setMenuPosition "+left+" "+top);
 			YAHOO.util.Dom.setXY(this.submenu.element, [left, top]);
 		}
 	}
 }
 
-function init()
-{
-	var menuManager = new BlueprintIT.menus.MenuManager();
-	menuManager.loadMenus();
-}
-
-YAHOO.util.Event.addListener(window, "load", init);
+var menuManager = new BlueprintIT.menus.MenuManager();

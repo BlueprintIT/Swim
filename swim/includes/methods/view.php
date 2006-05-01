@@ -141,7 +141,7 @@ function method_view($request)
 				$modified=$resource->getTotalModifiedDate();
 				if (isset($request->query['template']))
 				{
-					$template=Resource::decodeResource($request->query['template']);
+					$template=Resource::decodeResource(substr($request->query['template'],1));
 					if ($template!==null)
 					{
 						$modified=max($modified,$template->getModifiedDate());

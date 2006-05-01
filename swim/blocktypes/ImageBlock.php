@@ -33,7 +33,7 @@ class ImageBlock extends Block
 	      	if ($key == 'notag')
 	      		continue;
 	      		
-	      	if ($key == 'id')
+	      	if (($key == 'id') && (!isset($attrs['notag'])))
 	      		continue;
 	      		
 		      print($key.'="'.htmlentities($value).'"');

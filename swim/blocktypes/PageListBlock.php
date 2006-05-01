@@ -16,15 +16,12 @@
 class PageListBlock extends Block
 {
 	private $cont;
-	private $recursive = false;
 	private $template = 'block.html';
 	private $sort;
 	
   function PageListBlock($container,$id,$version)
   {
     $this->Block($container,$id,$version);
-    if ($this->prefs->isPrefSet('block.recursive'))
-      $this->recursive=$this->prefs->getPref('block.recursive');
     if ($this->prefs->isPrefSet('block.sort'))
       $this->sort=$this->prefs->getPref('block.sort');
     if ($this->prefs->isPrefSet('block.template'))
@@ -35,14 +32,17 @@ class PageListBlock extends Block
       $this->cont=$_PREFS->getPref('container.default');
   }
   
-  function findPages($category, &$pages, &$seen)
+  function findPages($category, $depth, &$pages, &$seen)
   {
+    if ($depth==0)
+      return;
+      
     $this->log->debug('Listing category '.$category->id);
   	$items = $category->items();
   	foreach ($items as $id => $item)
   	{
-  		if (($item instanceof Category) && ($this->recursive))
-  			$this->findPages($item, $pages, $seen);
+  		if ($item instanceof Category)
+  			$this->findPages($item, $depth-1, $pages, $seen);
   			
   		if (($item instanceof Page) && (!in_array($item,$seen)))
   		{
@@ -67,24 +67,96 @@ class PageListBlock extends Block
   	}
   }
   
+  function displayCategories($parser,$category,$depth)
+  {
+    if ($depth==0)
+      return;
+      
+    $parser->parseText('<ul>');
+    $items = $category->items();
+    
+    if (count($items)>0)
+    {
+      foreach ($items as $item)
+      {
+        if ($item instanceof Category)
+        {
+          $parser->parseText('<li>');
+          $linked = false;
+          if ($item->container->prefs->isPrefSet('categories.customlink'))
+          {
+            $request = new Request();
+            $request->method = 'view';
+            $request->resource = $item->container->prefs->getPref('categories.customlink');
+            $request->query['category'] = $item->id;
+            $parser->parseText('<a class="page" href="'.$request->encode().'">');
+            $linked = true;
+          }
+          else
+          {
+            $page = $item->getDefaultItem();
+            if ($page!==null)
+            {
+              if ($page instanceof Page)
+              {
+                $request = new Request();
+                $request->method = 'view';
+                $request->resource = $page;
+                $parser->parseText('<a class="page" href="'.$request->encode().'">');
+              }
+              else if ($page instanceof Link)
+              {
+                $parser->parseText('<a class="link" ');
+                if ($page->newwindow)
+                  $parser->parseText('target="_blank" ');
+                $parser->parseText('href="'.$page->address.'">');
+              }
+            }
+            $linked = true;
+          }
+          if ($item->icon!==null)
+            $parser->parseText('<image class="icon" src="'.$item->icon.'"/>');
+          else if ($this->prefs->isPrefSet('block.defaulticon'))
+            $parser->parseText('<image class="icon" src="'.$this->prefs->getPref('block.defaulticon').'"/>');
+          
+          if ($item->hovericon!==null)
+            $parser->parseText('<image class="hoverIcon" src="'.$item->hovericon.'"/>');
+          else if ($item->icon!==null)
+            $parser->parseText('<image class="hoverIcon" src="'.$item->icon.'"/>');
+          else if ($this->prefs->isPrefSet('block.defaulticon'))
+            $parser->parseText('<image class="hoverIcon" src="'.$this->prefs->getPref('block.defaulticon').'"/>');
+          
+          $parser->parseText('<span>'.$item->name.'</span>');
+          if ($linked)
+            $parser->parseText('</a>');
+          
+          if ($this->prefs->getPref('block.subcategories',false))
+            $this->displayCategories($parser,$item,$depth-1);
+
+          $parser->parseText('</li>');
+        }
+      }
+    }
+    $parser->parseText('</ul>');
+  }
+  
   function displayContent($parser,$attrs,$text)
   {
+    $cm = getContainer($this->cont);
+    if (isset($parser->data['request']->query['category']))
+      $category = $cm->getCategory($parser->data['request']->query['category']);
+    else
+      $category = $cm->getRootCategory();
+
+    $this->displayCategories($parser,$category,$this->prefs->getPref('block.categorydepth',0));
+    
     if ($this->fileIsReadable($this->template))
     {
-    	$cm = getContainer($this->cont);
-	    if (isset($parser->data['request']->query['category']))
-	    {
-	    	$category = $cm->getCategory($parser->data['request']->query['category']);
-	    }
-	    else
-	    {
-	    	$category = $cm->getRootCategory();
-	    }
 	    $realpage = $parser->data['page'];
 	    
 	    $pages = array();
 	    $seen = array();
-	    $this->findPages($category, $pages, $seen);
+	    $this->findPages($category, $this->prefs->getPref('block.pagedepth',-1), $pages, $seen);
 	    
 	    foreach ($pages as $pagearray)
 	    {

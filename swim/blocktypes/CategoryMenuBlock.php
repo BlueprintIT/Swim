@@ -67,22 +67,21 @@ class CategoryMenuBlock extends Block
       $attrs['class']='menu ';
       
     if ($this->orientation=='horizontal')
-    {
       $attrs['class'].='horizmenu';
-    }
     else
-    {
       $attrs['class'].='vertmenu';
-    }
 
+    if ($this->prefs->isPrefSet('block.animation'))
+      $attrs['class'].=' '.$this->prefs->getPref('block.animation');
+      
     Block::displayIntro($attrs);
   }
   
   function displayTableItem($item,$parent,$depth)
   {
-    print('<td class="menuitem level'.($depth+1).'"><span>'."\n");
+    print('<td class="menuitem">'."\n");
     $this->displayItem($item,$parent,$depth);
-    print('</span></td>'."\n");
+    print('</td>'."\n");
   }
   
   function displayVerticalTableItem($item,$parent,$depth)
@@ -133,7 +132,7 @@ class CategoryMenuBlock extends Block
   
   function displayListItem($item,$parent,$depth)
   {
-    print('<li class="menuitem level'.($depth+1).'">'."\n");
+    print('<li class="menuitem">'."\n");
     $this->displayItem($item,$parent,$depth);
     print('</li>'."\n");
   }
@@ -183,37 +182,54 @@ class CategoryMenuBlock extends Block
   {
     if ($item instanceof Category)
     {
-      $page = $item->getDefaultItem();
-      if ($page!==null)
+      $linked = false;
+      if ($item->container->prefs->isPrefSet('categories.customlink'))
       {
-        if ($page instanceof Page)
-        {
-          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'">');
-        }
-        else if ($page instanceof Link)
-        {
-          print('<a class="link level'.($depth+1).'" ');
-          if ($page->newwindow)
-	          print('target="_blank" ');
-          print('href="'.$page->address.'">');
-        }
-        if ($item->icon!==null)
-          print('<image class="icon" src="'.$item->hovericon.'"/>');
-        if ($item->hovericon!==null)
-          print('<image class="hoverIcon" src="'.$item->hovericon.'"/>');
-        if ($page instanceof Page)
-        {
-          print('<span>'.$item->name.'</span></anchor>');
-        }
-        else if ($page instanceof Link)
-        {
-          print('<span>'.$item->name.'</span></a>');
-        }
+        $request = new Request();
+        $request->method = 'view';
+        $request->resource = $item->container->prefs->getPref('categories.customlink');
+        $request->query['category'] = $item->id;
+        print('<a class="page" href="'.$request->encode().'">');
+        $linked = true;
       }
       else
       {
-        print($item->name);
+        $page = $item->getDefaultItem();
+        if ($page!==null)
+        {
+          if ($page instanceof Page)
+          {
+            $request = new Request();
+            $request->method = 'view';
+            $request->resource = $page;
+            print('<a class="page" href="'.$request->encode().'">');
+          }
+          else if ($page instanceof Link)
+          {
+            print('<a class="link" ');
+            if ($page->newwindow)
+  	          print('target="_blank" ');
+            print('href="'.$page->address.'">');
+          }
+        }
+        $linked = true;
       }
+      if ($item->icon!==null)
+        print('<image class="icon" src="'.$item->icon.'"/>');
+      else if ($this->prefs->isPrefSet('block.defaulticon'))
+        print('<image class="icon" src="'.$this->prefs->getPref('block.defaulticon').'"/>');
+      
+      if ($item->hovericon!==null)
+        print('<image class="hoverIcon" src="'.$item->hovericon.'"/>');
+      else if ($item->icon!==null)
+        print('<image class="hoverIcon" src="'.$item->icon.'"/>');
+      else if ($this->prefs->isPrefSet('block.defaulticon'))
+        print('<image class="hoverIcon" src="'.$this->prefs->getPref('block.defaulticon').'"/>');
+      
+      print('<span>'.$item->name.'</span>');
+      if ($linked)
+        print('</a>');
+
       if ($this->maxdepth>$depth)
         $this->displayListItems($item,$depth+1);
     }
@@ -223,11 +239,11 @@ class CategoryMenuBlock extends Block
       $request->method = 'view';
       $request->resource = $item;
       $request->data['category'] = $parent;
-      print('<a class="page level'.($depth+1).'" href="'.$request->encode().'"><span>'.$item->prefs->getPref('page.variables.title').'</span></a>');
+      print('<a class="page" href="'.$request->encode().'"><span>'.$item->prefs->getPref('page.variables.title').'</span></a>');
     }
     else if ($item instanceof Link)
     {
-      print('<a class="link level'.($depth+1).'" target="_blank" href="'.$item->address.'"><span>'.$item->name.'</span></a>');
+      print('<a class="link" target="_blank" href="'.$item->address.'"><span>'.$item->name.'</span></a>');
     }
   }
   
@@ -269,6 +285,8 @@ class CategoryMenuBlock extends Block
     $this->log->debug('Got root category');
     
     $this->displayItems($root,0,false);
+    
+    print('<script type="text/javascript">menuManager.loadFrom(document.getElementById("'.$attrs['id'].'"));</script>');
     
     return true;
   }
