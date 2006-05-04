@@ -185,7 +185,10 @@ class CategoryMenuBlock extends Block
         }
         else if ($page instanceof Link)
         {
-          print('<a class="link level'.($depth+1).'" target="_blank" href="'.$page->address.'">'.$item->name.'</a>');
+          print('<a class="link level'.($depth+1).'" ');
+          if ($this->prefs->getPref('block.newwindowlink', true))
+            print('target="_blank" ');
+          print('href="'.$page->address.'">'.$item->name.'</a>');
         }
       }
       else
@@ -201,7 +204,10 @@ class CategoryMenuBlock extends Block
     }
     else if ($item instanceof Link)
     {
-      print('<a class="link level'.($depth+1).'" target="_blank" href="'.$item->address.'">'.$item->name.'</a>');
+      print('<a class="link level'.($depth+1).'" ');
+      if ($this->prefs->getPref('block.newwindowlink', true))
+        print('target="_blank" ');
+      print('href="'.$item->address.'">'.$item->name.'</a>');
     }
   }
   

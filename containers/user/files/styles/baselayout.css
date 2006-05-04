@@ -37,15 +37,27 @@ body {
   height: -swim-calc(footerheight)px;
   background-image: -swim-url('global/file/images/wave.gif');
   background-position: bottom right;
-  background-repeat: no-repeat;
+  background-repeat: repeat-x;
 }
 
 #footer p {
   position: absolute;
-  bottom: 110px;
+  bottom: 25px;
   right: 40px;
   color: white;
   font-size: 1.6em;
+}
+
+#footer p a, #footer p a:visited {
+  color: white;
+}
+
+#footer p a:hover, #footer p a:active {
+  color: linkhover;
+}
+
+#footer p img {
+  border: none;
 }
 
 #footer img {

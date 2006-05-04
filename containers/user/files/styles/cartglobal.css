@@ -51,6 +51,12 @@
   background-color: rgb(219,234,229);
   padding: 10px;
   margin-bottom: 10px;
+  width: 100%;
+  -moz-box-sizing: border-box;
+}
+
+.producttable {
+  width: 100%;
 }
 
 .price {

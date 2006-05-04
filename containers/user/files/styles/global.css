@@ -10,7 +10,7 @@ body {
   margin: 0;
   color: defaultcolor;
   font-family: defaultfont;
-	font-size: 10pt;
+	font-size: 83.33%;
 	font-weight: normal;
 	text-align: justify;
 }
@@ -53,7 +53,7 @@ form {
 div.button {
   width: 150px;
   height: 29px;
-  font-size: 9pt;
+  font-size: 90%;
   font-weight: bold;
   text-align: center;
 }

@@ -58,16 +58,19 @@ body {
   background-repeat: no-repeat;
 }
 
-h1#title {
+div#title {
   position: absolute;
   top: 5px;
   left: 10px;
-  padding-left: 110px;
-  padding-top: 150px;
+  width: 350px;
   background-image: -swim-url('global/file/images/cornerdragon.gif');
   background-position: top left;
   background-repeat: no-repeat;
-  width: 250px;
+}
+
+div#title h1 {
+  padding-left: 110px;
+  padding-top: 150px;
   text-align: left;
   font-size: 2em;
   font-weight: normal;
@@ -105,7 +108,7 @@ h1#title {
   height: -swim-calc(footerheight)px;
   background-image: -swim-url('global/file/images/wave.gif');
   background-position: bottom right;
-  background-repeat: no-repeat;
+  background-repeat: repeat-x;
 }
 
 #buttons {
@@ -120,6 +123,18 @@ h1#title {
   right: 40px;
   color: white;
   font-size: 1.6em;
+}
+
+#footer p a, #footer p a:visited {
+  color: white;
+}
+
+#footer p a:hover, #footer p a:active {
+  color: linkhover;
+}
+
+#footer p img {
+  border: none;
 }
 
 #ssl {
