@@ -253,6 +253,8 @@ class Template extends Resource
   {
     $this->log->debug('Displaying flash');
     $dims="";
+    if (isset($attrs['id']))
+      $dims.=' id="'.$attrs['id'].'"';
     if (isset($attrs['width']))
       $dims.=' width="'.$attrs['width'].'"';
     if (isset($attrs['height']))

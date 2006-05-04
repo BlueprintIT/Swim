@@ -72,7 +72,7 @@ class PageListBlock extends Block
     if ($depth==0)
       return;
       
-    $parser->parseText('<ul>');
+    $parser->parseText('<ul id="subcategories" class="menu vertmenu">');
     $items = $category->items();
     
     if (count($items)>0)
@@ -81,7 +81,7 @@ class PageListBlock extends Block
       {
         if ($item instanceof Category)
         {
-          $parser->parseText('<li>');
+          $parser->parseText('<li class="menuitem">');
           $linked = false;
           if ($item->container->prefs->isPrefSet('categories.customlink'))
           {
@@ -142,6 +142,13 @@ class PageListBlock extends Block
   
   function displayContent($parser,$attrs,$text)
   {
+    $parser->parseText('<script src="/internal/file/yahoo/YAHOO.js"/>');
+    $parser->parseText('<script src="/internal/file/scripts/BlueprintIT.js"/>');
+    $parser->parseText('<script src="/internal/file/yahoo/event.js"/>');
+    $parser->parseText('<script src="/internal/file/yahoo/dom.js"/>');
+    $parser->parseText('<script src="/internal/file/scripts/dom.js"/>');
+    $parser->parseText('<script src="/internal/file/scripts/bpmm.js"/>');
+
     $cm = getContainer($this->cont);
     if (isset($parser->data['request']->query['category']))
       $category = $cm->getCategory($parser->data['request']->query['category']);
@@ -149,6 +156,8 @@ class PageListBlock extends Block
       $category = $cm->getRootCategory();
 
     $this->displayCategories($parser,$category,$this->prefs->getPref('block.categorydepth',0));
+    
+    $parser->parseText('<script type="text/javascript">menuManager.loadFrom(document.getElementById("subcategories"));</script>');
     
     if ($this->fileIsReadable($this->template))
     {

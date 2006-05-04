@@ -122,15 +122,12 @@ class Container extends Resource
       {
         $details = $set->fetch();
         $category = new Category($this,$this->getCategory($details['parent']),$details['id'],$details['name']);
-        $category->icon = $details['icon'];
-        if ($details['hovericon']===null)
-        {
-	        $category->hovericon = $details['icon'];
-        }
-        else
-        {
+        if ($details['icon']!=false)
+          $category->icon = $details['icon'];
+        if ($details['hovericon']!=false)
 	        $category->hovericon = $details['hovericon'];
-        }
+        else if ($details['icon']!=false)
+	        $category->hovericon = $details['icon'];
         ObjectCache::setItem('category', $id, $category);
       }
     }
