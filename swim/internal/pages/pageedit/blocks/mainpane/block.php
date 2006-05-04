@@ -50,11 +50,11 @@ $versions = array_keys($page->getVersions());
 if ((count($versions)==1) && ($versions[0]=='base'))
 {
 	$cancel->nested = new Request();
-	$cancel->method='view';
-	$cancel->resource='internal/page/categorydetails';
-	$cancel->query['container']=$page->container->id;
+	$cancel->nested->method='view';
+	$cancel->nested->resource='internal/page/categorydetails';
+	$cancel->nested->query['container']=$page->container->id;
 	if (isset($request->nested->query['category']))
-		$cancel->query['category']=$request->nested->query['category'];
+		$cancel->nested->query['category']=$request->nested->query['category'];
 }
 else
 {

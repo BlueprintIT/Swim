@@ -146,11 +146,11 @@ if ($_USER->canWrite($page))
 ?>
 <form action="<?= $edit->encodePath() ?>" method="GET">
 <?= $edit->getFormVars() ?>
-<input type="submit" value="Edit this Page">
+<button type="submit">Edit this Page</button>
 </form>
 <form onsubmit="return confirm('This will delete this page, continue?');" action="<?= $delete->encodePath() ?>" method="GET">
 <?= $delete->getFormVars() ?>
-<input type="submit" value="Delete this Page">
+<button type="submit">Delete this Page</button>
 </form>
 <?
 }
@@ -158,9 +158,9 @@ if ($_USER->canWrite($page))
 <h2>Page Details</h2>
 </div>
 <div class="body">
-<table>
+<table style="width: 90%">
 <tr>
-    <td style="vertical-align: top"><label for="title">Version:</label></td>
+    <td style="vertical-align: top; width: 100px"><label for="title">Version:</label></td>
     <td style="vertical-align: top"><?
 
 $versions=$page->getVersions();

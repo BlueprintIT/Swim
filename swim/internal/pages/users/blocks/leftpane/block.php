@@ -3,6 +3,7 @@
 <script type="text/javascript" src="/internal/file/yahoo/dragdrop.js"></script>
 <script type="text/javascript" src="/internal/file/yahoo/event.js"></script>
 <script type="text/javascript" src="/internal/file/yahoo/treeview.js"></script>
+<script type="text/javascript" src="/internal/file/scripts/BlueprintIT.js"></script>
 <script type="text/javascript" src="/internal/file/scripts/treeview.js"></script>
 <script type="text/javascript">
 function displayTree(event)

@@ -19,7 +19,7 @@ function method_create($request)
 	
   checkSecurity($request, true, true);
   
-	list($container,$type)=explode('/',$request->requestPath);
+	list($container,$type)=explode('/',$request->resourcePath);
 	
 	$container=getContainer($container);
 	if ($container!==null)

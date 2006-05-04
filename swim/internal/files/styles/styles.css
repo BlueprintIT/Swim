@@ -1,3 +1,4 @@
+#include /internal/file/styles/quirks.css
 #define BLUE #2d4492
 #define PURPLE #cb007e
 
@@ -12,15 +13,6 @@ body {
 	margin: 0;
 	overflow: hidden;
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 10pt;
-}
-
-p, div, td, li {
-	font-size: 10pt;
-}
-
-table {
-  font-size: inherit;
 }
 
 .pane {
@@ -72,7 +64,6 @@ table {
   margin-left: auto;
   margin-right: auto;
   text-align: justify;
-  font-size: 0.8em;
 }
 
 iframe.body {
