@@ -213,7 +213,11 @@ class CategoryMenuBlock extends Block
   
   function displayContent($parser,$attrs,$text)
   {
-    print('<script src="/global/file/scripts/cbdom.js"/>');
+    print('<script src="/global/file/yahoo/YAHOO.js"/>');
+    print('<script src="/global/file/yahoo/dom.js"/>');
+    print('<script src="/global/file/yahoo/event.js"/>');
+    print('<script src="/global/file/scripts/BlueprintIT.js"/>');
+    print('<script src="/global/file/scripts/dom.js"/>');
     print('<script src="/global/file/scripts/bpmm.js"/>');
     
     $cm = getCategoryManager('website');

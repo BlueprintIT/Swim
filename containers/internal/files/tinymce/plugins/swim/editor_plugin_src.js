@@ -34,7 +34,7 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
-	var hostpart="http://"+tinyMCE.getParam('document_host','');
+	var hostpart="://"+tinyMCE.getParam('document_host','');
 	var base=tinyMCE.getParam('document_base_url','');
 	var view=tinyMCE.getParam('swim_view','');
 	if (base.indexOf(hostpart)==0)
@@ -54,7 +54,7 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 	}
 	else if (url.indexOf(hostpart)==0)
 	{
-		url=url.substring(hostpart.length);
+		url=url.substring(url.indexOf(hostpart)+hostpart.length);
 	}
 	
 	//alert(url);
@@ -82,14 +82,14 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 	{
 		if (url.substring(0,1)=='/')
 		{
-			url=hostpart+view+url.substring(1);
+			url='http'+hostpart+view+url.substring(1);
 		}
 		else if (url.indexOf(':')>0)
 		{
 		}
 		else
 		{
-			url=hostpart+basetemp+url;
+			url='http'+hostpart+basetemp+url;
 		}
 	}
 	else

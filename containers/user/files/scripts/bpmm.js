@@ -5,72 +5,198 @@
  *
  */
 
-var menuManager = {
+BlueprintIT.menus.InstantAnimator = function()
+{
+}
+
+BlueprintIT.menus.InstantAnimator.prototype = {
+	startAnimateIn: function(item)
+	{
+		item.setVisible(true);
+		item.state=3;
+	},
+	
+	animateIn: function(item)
+	{
+	},
+	
+	startAnimateOut: function(item)
+	{
+		item.setVisible(false);
+		item.state=0;
+	},
+	
+	animateOut: function(item)
+	{
+	}
+}
+
+BlueprintIT.menus.SlideAnimator = function()
+{
+}
+
+BlueprintIT.menus.SlideAnimator.prototype = {
+	step: 3,
+	delay: 10,
+
+	startAnimateIn: function(item)
+	{
+		item.clippos=0;
+		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
+		item.setVisible(true);
+		item.state=2;
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
+	},
+	
+	animateIn: function(item)
+	{
+		item.clippos+=this.step;
+
+		var region = YAHOO.util.Dom.getRegion(item.element);
+		var height = region.bottom-region.top;
+		if (item.clippos>=height)
+		{
+			item.clippos=height;
+			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, auto, auto)');
+			item.state=3;
+		}
+		else
+		{
+			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
+			BlueprintIT.timing.startTimer(item,this.delay);
+		}	
+	},
+	
+	startAnimateOut: function(item)
+	{
+		var region = YAHOO.util.Dom.getRegion(item.element);
+		item.clippos=region.bottom-region.top;
+		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, auto, auto)');
+		item.state=5;
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
+	},
+	
+	animateOut: function(item)
+	{
+		item.clippos-=this.step;
+		
+		if (item.clippos<=0)
+		{
+			item.clippos=0;
+			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, 0px, auto)');
+			item.setVisible(false);
+			item.state=0;
+		}
+		else
+		{
+			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
+			BlueprintIT.timing.startTimer(item,this.delay);
+		}	
+	}		
+}
+
+BlueprintIT.menus.FadeAnimator = function()
+{
+}
+
+BlueprintIT.menus.FadeAnimator.prototype = {
+	step: 0.05,
+	delay: 10,
+
+	startAnimateIn: function(item)
+	{
+		YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
+		item.setVisible(true);
+		item.state=2;
+		item.opacpos = 0;
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
+	},
+	
+	animateIn: function(item)
+	{
+		var next = item.opacpos;
+						
+		next+=this.step;
+
+		if (next>=1)
+		{
+			YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
+			item.opacpos = 1;
+			item.state=3;
+		}
+		else
+		{
+			YAHOO.util.Dom.setStyle(item.element, 'opacity', next);
+			item.opacpos = next;
+			BlueprintIT.timing.startTimer(item,this.delay);
+		}
+	},
+	
+	startAnimateOut: function(item)
+	{
+		YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
+		item.state=5;
+		item.opacpos = 1;
+		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
+	},
+	
+	animateOut: function(item)
+	{
+		var next = item.opacpos;
+			
+		next-=this.step;
+
+		if (next<=0)
+		{
+			YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
+			item.opacpos = 0;
+			item.setVisible(false);
+			item.state=0;
+		}
+		else
+		{
+			YAHOO.util.Dom.setStyle(item.element, 'opacity', next);
+			item.opacpos = next;
+			BlueprintIT.timing.startTimer(item,this.delay);
+		}
+	}		
+}
+
+BlueprintIT.menus.HORIZONTAL = 0;
+BlueprintIT.menus.VERTICAL = 1;
+
+BlueprintIT.menus.MenuManager = function()
+{
+	this.instantAnimator = new BlueprintIT.menus.InstantAnimator();
+	this.slideAnimator = new BlueprintIT.menus.SlideAnimator();
+	this.fadeAnimator = new BlueprintIT.menus.FadeAnimator();
+	this.animator = this.instantAnimator;
+	
+	YAHOO.util.Event.addListener(document,'focus',this.focusEvent,this,true);
+	YAHOO.util.Event.addListener(document,'keypress',this.keyPressEvent,this,true);
+}
+
+BlueprintIT.menus.MenuManager.prototype = {
 	
 	popupDelay: 200,
 	hideDelay: 200,
+	
 	animator: null,
+	slideAnimator: null,
+	fadeAnimator: null,
+	instantAnimator: null,
 	
 	textarea: null,
-	
-	timerID: [],
-	timerTarget: [],
-	
-	itemcount: 0,
-	
-	menuitems: [],
-	
-	HORIZONTAL: 0,
-	VERTICAL: 1,
 	
 	selected: null,
 	
 	log: function(text)
 	{
-		//this.textarea.value+=text+"\n";
-	},
-	
-	init: function()
-	{
-		//this.textarea=document.getElementById('log');
-		this.animator=this.instantAnimator;
-		addEvent(document,'focus',menuManager.focusEvent,false);
-		addEvent(document,'keypress',menuManager.keyPressEvent,true);
-	},
-	
-	callTimer: function(id)
-	{
-		var target=menuManager.timerTarget[id];
-		target.onTimer()
-		menuManager.removeTimer(id);
-	},
-	
-	startTimer: function(item,timeout)
-	{
-		var id = menuManager.timerTarget.length;
-		menuManager.timerTarget[id]=item;
-		menuManager.timerID[id]=window.setTimeout('menuManager.callTimer('+id+')',timeout);
-		return id+1;
-	},
-	
-	removeTimer: function(id)
-	{
-		menuManager.timerTarget[id]=null;
-		menuManager.timerID[id]=null;
-		var pos = menuManager.timerID.length-1;
-		while ((pos>=0)&&(menuManager.timerID[pos]==null))
-		{
-			menuManager.timerTarget.pop();
-			menuManager.timerID.pop();
-			pos--;
-		}
-	},
-
-	cancelTimer: function(id)
-	{
-		id--;
-		window.clearTimeout(menuManager.timerID[id]);
-		menuManager.removeTimer(id);
+		return;
+		if (!this.textarea)
+			this.textarea=document.getElementById('log');
+		if (this.textarea)
+			this.textarea.value+=text+"\n";
 	},
 	
 	findMenuItem: function(element)
@@ -80,11 +206,11 @@ var menuManager = {
 		
 		try
 		{
-			if (element.id && menuManager.menuitems[element.id])
-				return menuManager.menuitems[element.id];
+			if (element.menuitem)
+				return element.menuitem;
 			
 			if (element.parentNode)
-				return menuManager.findMenuItem(element.parentNode);
+				return this.findMenuItem(element.parentNode);
 		}
 		catch (e) { }
 					
@@ -95,17 +221,13 @@ var menuManager = {
 	{
 		items.reverse();
 		for (var k in items)
-		{
 			items[k].mouseOut();
-		}
 	},
 	
 	mouseOver: function(items)
 	{
 		for (var k in items)
-		{
 			items[k].mouseOver();
-		}
 	},
 	
 	makeItemList: function(bottom)
@@ -129,18 +251,17 @@ var menuManager = {
 	{
 		var line = '';
 		for (var k in chain)
-		{
 			line+=chain[k].element.id+' ';
-		}
-		menuManager.log(line);
+
+		this.log(line);
 	},
 	
 	changeSelection: function(newitem)
 	{
-		if (newitem!=menuManager.selected)
+		if (newitem!=this.selected)
 		{
-			var sources = menuManager.makeItemList(menuManager.selected);
-			var dests = menuManager.makeItemList(newitem);
+			var sources = this.makeItemList(this.selected);
+			var dests = this.makeItemList(newitem);
 
 			while (((dests.length>0)&&(sources.length>0))&&(dests[0]==sources[0]))
 			{
@@ -148,290 +269,149 @@ var menuManager = {
 				sources.shift();
 			}
 
-			menuManager.mouseOut(sources);
-			menuManager.mouseOver(dests);
+			this.mouseOut(sources);
+			this.mouseOver(dests);
 			
-			if (menuManager.selected)
-			{
-				menuManager.selected.unfocusCurrent();
-			}
-			menuManager.selected=newitem;
-			if (menuManager.selected)
-			{
-				menuManager.selected.focusCurrent();
-			}
+			if (this.selected)
+				this.selected.unfocus();
+			this.selected=newitem;
+			if (this.selected)
+				this.selected.focus();
 		}
 	},
 	
-	keyPressEvent: function(event)
+	keyPressEvent: function(ev)
 	{
-		var ev = getDOMEvent(event);
 		if (ev.type=='keypress')
 		{
-			if (menuManager.selected)
+			this.log("keyPressEvent");
+			if ((this.selected) && (ev.keyCode>=37) && (ev.keyCode<=40))
 			{
-				if ((ev.keyCode>=37)&&(ev.keyCode<=40))
-				{
-					if (menuManager.selected.keyPress(ev.keyCode))
-					{
-						ev.preventDefault();
-					}
-				}
+				if (this.selected.keyPress(ev.keyCode))
+					ev.preventDefault();
 			}
 		}
 	},
 	
-	focusEvent: function(event)
+	focusEvent: function(ev)
 	{
-		var ev = getDOMEvent(event);
 		if (ev.type=='focus')
 		{
-			menuManager.changeSelection(menuManager.findMenuItem(ev.target));
+			this.log("focusEvent");
+			this.changeSelection(this.findMenuItem(ev.target));
 		}
 	},
 	
-	mouseEvent: function(event)
+	mouseEvent: function(ev)
 	{
-		var ev=getDOMEvent(event);
 		if (ev.type=='mouseover')
 		{
-			var dest = menuManager.findMenuItem(ev.target);
-			menuManager.changeSelection(dest);
+			var dest = this.findMenuItem(ev.target);
+			this.changeSelection(dest);
 		}
 		else if (ev.type=='mouseout')
 		{
-			var dest = menuManager.findMenuItem(ev.relatedTarget);
+			var dest = this.findMenuItem(ev.relatedTarget);
 			if (!dest)
-				menuManager.changeSelection(null);
+				this.changeSelection(null);
 		}
 	},
 	
-	instantAnimator: {
-
-		startAnimateIn: function(item)
-		{
-			item.setVisible(true);
-			item.state=3;
-		},
-		
-		animateIn: function(item)
-		{
-		},
-		
-		startAnimateOut: function(item)
-		{
-			item.setVisible(false);
-			item.state=0;
-		},
-		
-		animateOut: function(item)
-		{
-		}
-	},
-	
-	slideAnimator: {
-		
-		step: 5,
-		delay: 10,
-
-		startAnimateIn: function(item)
-		{
-			item.clippos=0;
-			item.posel.getAssignedStyle().clip='rect(auto, auto, '+item.clippos+'px, auto)';
-			item.setVisible(true);
-			item.state=2;
-			item.timer=menuManager.startTimer(item,this.delay);
-		},
-		
-		animateIn: function(item)
-		{
-			item.clippos+=this.step;
-			
-			if (item.clippos>=item.posel.getHeight())
-			{
-				item.clippos=item.posel.getHeight();
-				item.posel.getAssignedStyle().clip='rect(auto, auto, auto, auto)';
-				item.state=3;
-			}
-			else
-			{
-				item.posel.getAssignedStyle().clip='rect(auto, auto, '+item.clippos+'px, auto)';
-				menuManager.startTimer(item,this.delay);
-			}	
-		},
-		
-		startAnimateOut: function(item)
-		{
-			item.clippos=item.posel.getHeight();
-			item.posel.getAssignedStyle().clip='rect(auto, auto, auto, auto)';
-			item.state=5;
-			item.timer=menuManager.startTimer(item,this.delay);
-		},
-		
-		animateOut: function(item)
-		{
-			item.clippos-=this.step;
-			
-			if (item.clippos<=0)
-			{
-				item.clippos=0;
-				item.posel.getAssignedStyle().clip='rect(auto, auto, 0px, auto)';
-				item.setVisible(false);
-				item.state=0;
-			}
-			else
-			{
-				item.posel.getAssignedStyle().clip='rect(auto, auto, '+item.clippos+'px, auto)';
-				menuManager.startTimer(item,this.delay);
-			}	
-		}		
-	},
-	
-	fadeAnimator: {
-		
-		step: 0.05,
-		delay: 10,
-
-		startAnimateIn: function(item)
-		{
-			item.posel.setOpacity(0);
-			item.setVisible(true);
-			item.state=2;
-			item.timer=menuManager.startTimer(item,this.delay);
-		},
-		
-		animateIn: function(item)
-		{
-			var style = item.posel.getAssignedStyle();
-	
-			var next = item.posel.getOpacity();
-							
-			next+=this.step;
-	
-			if (next>=1)
-			{
-				item.posel.setOpacity(1);
-				item.state=3;
-			}
-			else
-			{
-				item.posel.setOpacity(next);
-				menuManager.startTimer(item,this.delay);
-			}
-		},
-		
-		startAnimateOut: function(item)
-		{
-			item.posel.setOpacity(1);
-			item.state=5;
-			item.timer=menuManager.startTimer(item,this.delay);
-		},
-		
-		animateOut: function(item)
-		{
-			var style = item.posel.getAssignedStyle();
-	
-			var next = item.posel.getOpacity();
-				
-			next-=this.step;
-	
-			if (next<=0)
-			{
-				item.posel.setOpacity(0);
-				item.setVisible(false);
-				item.state=0;
-			}
-			else
-			{
-				item.posel.setOpacity(next);
-				menuManager.startTimer(item,this.delay);
-			}
-		}		
-	},
-	
-	hasClass: function(element, cls)
+	loadFrom: function(element,animator,orientation,depth,parentitem,parentmenu)
 	{
-		if (element.className)
+		if (!depth)
+			depth = 0;
+		if (!animator)
+			animator = this.animator;
+		
+		if (YAHOO.util.Dom.hasClass(element,'horizmenu'))
+			orientation=BlueprintIT.menus.HORIZONTAL;
+		else if (YAHOO.util.Dom.hasClass(element,'vertmenu'))
+			orientation=BlueprintIT.menus.VERTICAL;
+		
+		if (YAHOO.util.Dom.hasClass(element,'fadein'))
+			animator = this.fadeAnimator;
+		else if (YAHOO.util.Dom.hasClass(element,'slidein'))
+			animator = this.slideAnimator;
+		else if (YAHOO.util.Dom.hasClass(element,'appearin'))
+			animator = this.instantAnimator;
+		
+		if (YAHOO.util.Dom.hasClass(element,'menuitem'))
 		{
-			var classes = element.className.split(' ');
-			for (var k in classes)
-			{
-				if (classes[k]==cls)
-					return true;
-			}
-			return false;
-		}
-		return false;
-	},
-	
-	loadFrom: function(orientation,element,parentitem,parentmenu)
-	{
-		if (menuManager.hasClass(element,'horizmenu'))
-		{
-			orientation=menuManager.HORIZONTAL;
-		}
-		else if (menuManager.hasClass(element,'vertmenu'))
-		{
-			orientation=menuManager.VERTICAL;
-		}
-		if (menuManager.hasClass(element,'menuitem'))
-		{
-			parentitem = new MenuItem(parentmenu,element);
+			//YAHOO.util.Dom.addClass(element,'level'+depth);
+			parentitem = new MenuItem(this,parentmenu,element);
 			parentmenu=null;
 		}
-		else if (menuManager.hasClass(element,'menupopup')||menuManager.hasClass(element,'menu'))
+		else if (YAHOO.util.Dom.hasClass(element,'menupopup')||YAHOO.util.Dom.hasClass(element,'menu'))
 		{
-			parentmenu = new Menu(parentitem,orientation,element);
+			depth++;
+			//YAHOO.util.Dom.addClass(element,'level'+depth);
+			parentmenu = new Menu(this,parentitem,orientation,element,animator);
 			parentitem=null;
 		}
 		else if ((element.tagName=='A')&&(parentitem))
 		{
+			//YAHOO.util.Dom.addClass(element,'level'+depth);
 			parentitem.setFocusElement(element);
 		}
 		var child = element.firstChild;
 		while (child)
 		{
 			if (child.nodeType==1)
-				menuManager.loadFrom(orientation,child,parentitem,parentmenu);
+				this.loadFrom(child,animator,orientation,depth,parentitem,parentmenu);
 			child=child.nextSibling;
 		}
 	},
 	
 	loadMenus: function()
 	{
-		menuManager.loadFrom(menuManager.HORIZONTAL,document.documentElement);
+		this.log("Loading");
+		this.loadFrom(document.documentElement,this.animator);
 	}
 }
 
-function Menu(item,orientation,element)
+function Menu(manager,item,orientation,element,animator)
 {
-	menuManager.log('Created menu from '+element.tagName);
+	this.manager = manager;
+	this.manager.log('Created menu from '+element.tagName);
+	this.animator = animator;
 
 	this.menuItems=[];
-	if (!element.id)
-	{
-		element.id='bpmm_'+menuManager.itemcount;
-	}
 	if (item)
 	{
-		menuManager.menuitems[element.id]=item;
-		menuManager.itemcount++;
+		element.menuitem = item;
 	
 		this.parentItem=item;
 		this.parentItem.submenu=this;
-		var pos = new ElementWrapper(element.parentNode);
-		pos.getAssignedStyle().position='relative';
 	}
 	else
 	{
-		addEvent(element,'mouseover',menuManager.mouseEvent,false);
-		addEvent(element,'mouseout',menuManager.mouseEvent,false);
+		this.manager.log("Adding listener to "+element.id);
+		YAHOO.util.Event.addListener(element,'mouseover',this.manager.mouseEvent,this.manager,true);
+		YAHOO.util.Event.addListener(element,'mouseout',this.manager.mouseEvent,this.manager,true);
 	}
 	this.orientation=orientation;
 	this.element=element;
-
-	this.posel = new ElementWrapper(this.element);
 }
+
+/*
+   State 0 - normal
+             can move to state 1 on mouse over
+   State 1 - waiting to appear
+             can move to state 0 on mouse out
+             can move to state 2/3 on timer complete
+   State 2 - animating in
+             can move to state 5 on mouse out
+             can move to state 3 on animation complete
+   State 3 - visible
+             can move to state 4 on mouse out
+   State 4 - waiting to disappear
+             can move to state 3 on mouse over
+             can move to state 5/0 on timer complete
+   State 5 - animating out
+             can move to state 2 on mouse over
+             can move to state 0 on animation complete
+*/
 
 Menu.prototype = {
 	
@@ -439,32 +419,32 @@ Menu.prototype = {
 	menuItems: null,
 	orientation: null,
 	element: null,
-	posel: null,
 	timer: null,
 	state: 0,
 	animator: null,
+	manager: null,
 		
 	setPosition: function(x,y)
 	{
-		this.posel.setLeft(x);
-		this.posel.setTop(y);
+		YAHOO.util.Dom.setXY(this.element, [x, y]);
 	},
 
 	setVisible: function(value)
 	{
 	  if (value)
 	  {
-  	  this.posel.setDisplay("block");
+	  	YAHOO.util.Dom.setStyle(this.element, "display", "block");
   	  this.parentItem.setMenuPosition();
   	}
   	else
   	{
-  	  this.posel.setDisplay("none");
+	  	YAHOO.util.Dom.setStyle(this.element, "display", "none");
   	}
 	},
 	
 	onTimer: function()
 	{
+		this.manager.log("onTimer "+this.element.id+" "+this.state);
 		switch (this.state)
 		{
 			case 1:
@@ -488,12 +468,10 @@ Menu.prototype = {
 		{
 			case 0:
 			case 1:
-				//this.parentItem.setMenuPosition();
-				this.animator=menuManager.animator;
 				this.animator.startAnimateIn(this);
 				break;
 			case 4:
-				menuManager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=3;
 				break;
 			case 5:
@@ -507,7 +485,7 @@ Menu.prototype = {
 		switch (this.state)
 		{
 			case 1:
-				menuManager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=0;
 				break;
 			case 2:
@@ -515,7 +493,6 @@ Menu.prototype = {
 				break;
 			case 3:
 			case 4:
-				this.animator=menuManager.animator;
 				this.animator.startAnimateOut(this);
 				break;
 		}
@@ -523,15 +500,15 @@ Menu.prototype = {
 	
 	startShow: function()
 	{
-		//menuManager.log('startShow '+this.element.id);
+		//this.log('startShow '+this.element.id);
 		switch (this.state)
 		{
 			case 0:
 				this.state=1;
-				this.timer=menuManager.startTimer(this,menuManager.popupDelay);
+				this.timer=BlueprintIT.timing.startTimer(this,this.manager.popupDelay);
 				break;
 			case 4:
-				menuManager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=3;
 				break;
 			case 5:
@@ -542,11 +519,11 @@ Menu.prototype = {
 	
 	startHide: function()
 	{
-		//menuManager.log('startHide '+this.element.id);
+		//this.log('startHide '+this.element.id);
 		switch (this.state)
 		{
 			case 1:
-				menuManager.cancelTimer(this.timer);
+				BlueprintIT.timing.cancelTimer(this.timer);
 				this.state=0;
 				break;
 			case 2:
@@ -554,30 +531,24 @@ Menu.prototype = {
 				break;
 			case 3:
 				this.state=4;
-				this.timer=menuManager.startTimer(this,menuManager.hideDelay);
+				this.timer=BlueprintIT.timing.startTimer(this,this.manager.hideDelay);
 				break;
 		}
 	}
 }
 
-function MenuItem(parent,element)
+function MenuItem(manager,parent,element)
 {
-	menuManager.log('Created menuitem from '+element.tagName);
+	this.manager = manager;
+	this.manager.log('Created menuitem from '+element.tagName);
 
-	if (!element.id)
-	{
-		element.id='bpmm_'+menuManager.itemcount;
-	}
-	menuManager.menuitems[element.id]=this;
-	menuManager.itemcount++;
+	element.menuitem = this;
 
 	this.parentMenu=parent;
 	this.element=element;
 
 	this.parentMenu.menuItems.push(this);
 	this.pos=this.parentMenu.menuItems.length-1;
-
-	this.posel = new ElementWrapper(element);
 }
 
 MenuItem.prototype = {
@@ -585,48 +556,44 @@ MenuItem.prototype = {
 	parentMenu: null,
 	orientation: null,
 	element: null,
-	posel: null,
 	submenu: null,
 	pos: null,
 	focusElement: null,
-	focusEl: null,
+	manager: null,
 	
 	setFocusElement: function(el)
 	{
 		this.focusElement=el;
-		this.focusEl = new ElementWrapper(el);
-	},
-	
-	focusCurrent: function()
-	{
-		if (this.parentMenu.parentItem)
-			this.posel.addClass('currentfocus');
-		if (this.focusEl)
-			this.focusEl.addClass('itemfocus');
-	},
-	
-	unfocusCurrent: function()
-	{
-		if (this.parentMenu.parentItem)
-			this.posel.removeClass('currentfocus');
-		if (this.focusEl)
-			this.focusEl.removeClass('itemfocus');
 	},
 	
 	focus: function()
 	{
-		this.posel.addClass('menufocus');
+		if (this.parentMenu.parentItem)
+			YAHOO.util.Dom.addClass(this.element, 'currentfocus');
+		if (this.focusEl)
+			YAHOO.util.Dom.addClass(this.focusElement, 'itemfocus');
+
+		/*YAHOO.util.Dom.addClass(this.element, 'focused');
+		if (this.focusElement)
+			YAHOO.util.Dom.addClass(this.focusElement, 'focused');*/
 	},
 	
 	unfocus: function()
 	{
-		this.posel.removeClass('menufocus');
+		if (this.parentMenu.parentItem)
+			YAHOO.util.Dom.removeClass(this.element, 'currentfocus');
+		if (this.focusEl)
+			YAHOO.util.Dom.removeClass(this.focusElement, 'itemfocus');
+
+		/*YAHOO.util.Dom.removeClass(this.element, 'focused');
+		if (this.focusElement)
+			YAHOO.util.Dom.removeClass(this.focusElement, 'focused');*/
 	},
 	
 	keyPress: function(code)
 	{
 		var newitem = null;
-		if (this.parentMenu.orientation==menuManager.HORIZONTAL)
+		if (this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 		{
 			if (code==39)
 			{
@@ -650,7 +617,7 @@ MenuItem.prototype = {
 				newitem=this.submenu.menuItems[0];
 			}
 		}
-		else if (this.parentMenu.orientation==menuManager.VERTICAL)
+		else if (this.parentMenu.orientation==BlueprintIT.menus.VERTICAL)
 		{
 			var parentOrient = null;
 			if (this.parentMenu.parentItem)
@@ -661,7 +628,7 @@ MenuItem.prototype = {
 			{
 				if (this.pos==0)
 				{
-					if (parentOrient==menuManager.HORIZONTAL)
+					if (parentOrient == BlueprintIT.menus.HORIZONTAL)
 						newitem=this.parentMenu.parentItem;
 					else
 						newitem=this.parentMenu.menuItems[this.parentMenu.menuItems.length-1];
@@ -678,7 +645,7 @@ MenuItem.prototype = {
 			}
 			else if (code==37)
 			{
-				if (parientOrient==menuManager.HORIZONTAL)
+				if (parientOrient==BlueprintIT.menus.HORIZONTAL)
 				{
 					var newpos=this.parentMenu.parentItem.pos-1;
 					if (newpos<0)
@@ -692,7 +659,7 @@ MenuItem.prototype = {
 			}
 			else if (code==39)
 			{
-				if (parientOrient==menuManager.HORIZONTAL)
+				if (parientOrient==BlueprintIT.menus.HORIZONTAL)
 				{
 					var newpos=this.parentMenu.parentItem.pos+1;
 					newpos=newpos%this.parentMenu.parentItem.parentMenu.menuItems.length;
@@ -703,13 +670,9 @@ MenuItem.prototype = {
 		if (newitem)
 		{
 			if (newitem.focusElement)
-			{
 				newitem.focusElement.focus();
-			}
 			else
-			{
-				menuManager.changeSelection(newitem);
-			}
+				this.changeSelection(newitem);
 			return true;
 		}
 		return false;
@@ -717,24 +680,28 @@ MenuItem.prototype = {
 	
 	mouseOver: function()
 	{
-		menuManager.log('mouseOver '+this.element.id);
+		this.manager.log('mouseOver '+this.element.id);
 
-		this.focus();
+		YAHOO.util.Dom.addClass(this.element, 'menufocus');
+		/*YAHOO.util.Dom.addClass(this.element, 'opened');
+		if (this.focusElement)
+			YAHOO.util.Dom.addClass(this.focusElement, 'opened');*/
+
 		if (this.submenu)
-		{
 			this.submenu.startShow();
-		}
 		else if (this.parentMenu.parentItem)
-		{
 			this.parentMenu.startShow();
-		}
 	},
 	
 	mouseOut: function()
 	{
-		menuManager.log('mouseOut '+this.element.id);
+		this.manager.log('mouseOut '+this.element.id);
 		
-		this.unfocus();
+		YAHOO.util.Dom.removeClass(this.element, 'menufocus');
+		/*YAHOO.util.Dom.removeClass(this.element, 'opened');
+		if (this.focusElement)
+			YAHOO.util.Dom.removeClass(this.focusElement, 'opened');*/
+
 		if (this.submenu)
 			this.submenu.startHide();
 	},
@@ -743,51 +710,48 @@ MenuItem.prototype = {
 	{
 		if (this.submenu)
 		{
-			var style = this.submenu.posel.getAssignedStyle();
+			var region = YAHOO.util.Dom.getRegion(this.element);
+			var subregion = YAHOO.util.Dom.getRegion(this.submenu.element);
 
-		  var docwrap = new ElementWrapper(document.body);
-		  var bwidth = docwrap.getWidth();
-		  var bheight = docwrap.getHeight();
-			if (this.parentMenu.orientation==menuManager.HORIZONTAL)
+			var width = subregion.right-subregion.left;
+			var height = subregion.bottom-subregion.top;
+		  var bwidth = YAHOO.util.Dom.getClientWidth();
+		  var bheight = YAHOO.util.Dom.getClientHeight();
+
+			if (this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 			{
-			  var left = this.posel.getLeft();
-			  var top = this.posel.getTop()+this.posel.getHeight();
-			  var width = this.submenu.posel.getWidth();
+			  var left = region.left
+			  var top = region.bottom;
 
-        style.top=this.posel.getHeight();
-			  if ((left+width)>bwidth)
+			  if (((top+height)>bwidth) && (region.top >= height))
 			  {
-			    style.right='0';
+			  	top = region.top-height;
 			  }
-			  else
-		    {
-		      style.left='0';
-		    }
 			}
 			else
 			{
-			  var left = this.posel.getLeft()+this.posel.getWidth();
-			  var top = this.posel.getTop();
-			  var width = this.submenu.posel.getWidth();
-			  
-			  style.top='0';
-			  if ((left+width)>bwidth)
+			  var left = region.right;
+			  var top = region.top;
+
+			  if (((left+width)>bwidth) && (region.left >= width))
 			  {
-			    style.right='100%';
-			  }
-			  else
-			  {
-			    style.left='100%';
+			    left = region.left-width;
 			  }
 			}
+			if ((left+width)>bwidth)
+				left = bwidth-width;
+			if (left < 0)
+				left = 0;
+			if ((top+height)>bheight)
+				top = bheight-height;
+			if (top < 0)
+				top = 0;
+			this.manager.log("setMenuPosition "+left+" "+top);
+			YAHOO.util.Dom.setXY(this.submenu.element, [left, top]);
 		}
 	}
 }
 
-function init(event)
-{
-	menuManager.init();
-	menuManager.loadMenus();
-}
+var menuManager = new BlueprintIT.menus.MenuManager();
 
-addEvent(window,'load',init,false);
+YAHOO.util.Event.addListener(window,'load',menuManager.loadMenus,menuManager,true);
