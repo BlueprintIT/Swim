@@ -434,7 +434,7 @@ class Template extends Resource
 		if (isset($attrs['version']))
 			$browser->query['version']=$attrs['version'];
 		$browser->query['action']='fileBrowserCallback(\''.$id.'\', selected)';
-		echo '<input id="'.$id.'" name="'.$attrs['name'].'" type="hidden" value="'.$attrs['value'].'">';
+		echo '<input id="'.$id.'" name="'.$attrs['name'].'" type="hidden" value="'.$attrs['value'].'"> ';
 		if ((isset($attrs['value'])) && (strlen($attrs['value'])>0))
 		{
 			$rlvalue = $attrs['value'];
@@ -444,9 +444,13 @@ class Template extends Resource
 		}
 		else
 			$rlvalue = '[No file selected]';
-		echo '<input id="fbfake-'.$id.'" disabled="true" type="text" value="'.$rlvalue.'">';
-		echo '<button type="button" onclick="showFileBrowser(\''.$browser->encode().'\',\''.$id.'\')">Select...</button>';
-		echo '<button type="button" onclick="clearFileBrowser(\''.$id.'\')">Clear</button>';
+		echo '<input id="fbfake-'.$id.'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    echo '<div class="toolbarbutton">';
+    echo '<a href="javascript:showFileBrowser(\''.$browser->encode().'\',\''.$id.'\')">Select...</a>';
+    echo '</div> ';
+    echo '<div class="toolbarbutton">';
+    echo '<a href="javascript:clearFileBrowser(\''.$id.'\')">Clear</a>';
+    echo '</div> ';
 	}
 	
 	function displayFile($parser,$tag,$attrs,$text)

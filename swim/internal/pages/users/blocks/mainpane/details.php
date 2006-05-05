@@ -19,41 +19,45 @@ $delete->nested=$request;
 
 ?>
 <div class="header">
-<form method="GET" action="<?= $create->encodePath() ?>">
-<?= $create->getFormVars() ?>
-<input type="submit" value="Create new User">
-</form>
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="<?= $create->encode() ?>"><image src="/internal/file/icons/add-user-blue.gif"/> Create new User</a>
+</div>
 <?
 if ($user->getUsername()!='blueprintit')
 {
 ?>
-<form method="GET" action="<?= $edit->encodePath() ?>">
-<input type="submit" value="Edit this User">
-<?= $edit->getFormVars() ?>
-</form>
+<div class="toolbarbutton">
+<a href="<?= $edit->encode() ?>"><image src="/internal/file/icons/edit-grey.gif"/> Edit this User</a>
+</div>
 <?
   if ($user->getUsername()!=$_USER->getUsername())
   {
 ?>
-<form method="GET" action="<?= $delete->encodePath() ?>">
-<?= $delete->getFormVars() ?>
-<input type="submit" value="Delete this User">
-</form>
+<div class="toolbarbutton">
+<a href="<?= $delete->encode() ?>">Delete this User</a>
+</div>
 <?
   }
 }
 ?>
+</div>
 <h2>User Details</h2>
 </div>
 <div class="body">
-<table>
+<div class="section first">
+<div class="sectionheader">
+<h3>User Details</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <tr>
-<td>Username:</td>
-<td><?= $user->getUsername() ?></td>
+<td class="label">Username:</td>
+<td class="details"><?= $user->getUsername() ?></td>
 </tr>
 <tr>
-<td>Full Name:</td>
-<td><?= $user->getName() ?></td>
+<td class="label">Full Name:</td>
+<td class="details"><?= $user->getName() ?></td>
 </tr>
 <?
 $groups = $user->getGroups();
@@ -67,13 +71,15 @@ foreach ($groups as $id)
 if ($pos==0)
 {
   $pos=1;
-?><td rowspan="<?= count($groups) ?>">Groups:</td><?
+?><td class="label" rowspan="<?= count($groups) ?>">Groups:</td><?
 }
 ?>
-<td><?= $group->getName() ?></td>
+<td class="details"><?= $group->getName() ?></td>
 </tr>
 <?
 }
 ?>
 </table>
+</div>
+</div>
 </div>

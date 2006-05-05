@@ -66,8 +66,7 @@ function removeCompleted(req) {
 	option.disabled=false;
 }
 
-function removeFromCategory(button) {
-	var category = button.id.substring(10);
+function removeFromCategory(category) {
 	if (category) {
 		var callback = {
 			success: removeCompleted,
@@ -93,7 +92,7 @@ function addCompleted(req) {
 	row.style.display=null;
 }
 
-function addToCategory(button) {
+function addToCategory() {
 	var category = document.getElementById("linkcategory").value;
 	if (category) {
 		var callback = {
@@ -110,22 +109,6 @@ function addToCategory(button) {
 		YAHOO.util.Connect.asyncRequest("GET", target, callback, null);
 	}
 }
-
-function buttonClicked(event) {
-	if (this.className=="remove")
-		removeFromCategory(this);
-	else if (this.className=="add")
-		addToCategory(this);
-}
-
-function findButtons() {
-	var buttons = document.getElementsByTagName("button");
-	for (var i=0; i<buttons.length; i++) {
-		YAHOO.util.Event.addListener(buttons[i], "click", buttonClicked);
-	}
-}
-
-YAHOO.util.Event.addListener(window, "load", findButtons);
 
 </script>
 <div class="header">
@@ -144,24 +127,29 @@ if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 if ($_USER->canWrite($page))
 {
 ?>
-<form action="<?= $edit->encodePath() ?>" method="GET">
-<?= $edit->getFormVars() ?>
-<button type="submit">Edit this Page</button>
-</form>
-<form onsubmit="return confirm('This will delete this page, continue?');" action="<?= $delete->encodePath() ?>" method="GET">
-<?= $delete->getFormVars() ?>
-<button type="submit">Delete this Page</button>
-</form>
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="<?= $edit->encode() ?>"><image src="/internal/file/icons/edit-grey.gif"/> Edit this Page</a>
+</div>
+<div class="toolbarbutton">
+<a onclick="return confirm('This will delete this page, continue?');" href="<?= $delete->encode() ?>"><image src="/internal/file/icons/delete-page-blue.gif"/> Delete this Page</a>
+</div>
+</div>
 <?
 }
 ?>
 <h2>Page Details</h2>
 </div>
 <div class="body">
-<table style="width: 90%">
+<div class="section first">
+<div class="sectionheader">
+<h3>Version Control</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <tr>
-    <td style="vertical-align: top; width: 100px"><label for="title">Version:</label></td>
-    <td style="vertical-align: top"><?
+    <td class="label"><label for="title">Version:</label></td>
+    <td class="details"><?
 
 $versions=$page->getVersions();
 $verlist = array_keys($versions);
@@ -208,51 +196,95 @@ if (($_USER->canWrite($page))&&($page->prefs->getPref("page.editable")!==false))
   $revert->nested= new Request($request);
   $revert->nested->query['reloadtree']=true;
 ?>
-<form style="display: inline" method="POST" action="<?= $revert->encodePath() ?>">
+<form name="versionform" style="display: inline" method="POST" action="<?= $revert->encodePath() ?>">
 <?= $revert->getFormVars() ?>
-<input type="submit" value="Make current version" <? 
-if ($page->isCurrentVersion())
+<?
+if (!$page->isCurrentVersion())
 {
-  print('disabled="true"');
+?>
+<div class="toolbarbutton">
+<a href="javascript:document.forms.versionform.submit();">
+<image src="/internal/file/icons/check-blue.gif"/> Make current version
+</a>
+</div>
+<?
 }
-?>>
+else
+{
+?>
+<div class="toolbarbutton disabled">
+<image src="/internal/file/icons/check-grey.gif"/> Make current version
+</div>
+<?
+}
+?>
+</div>
 </form>
 <?
 }
 ?>
 </td>
 </tr>
+</table>
+</div>
+</div>
+<div class="section">
+<div class="sectionheader">
+<h3>Category Links</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <tr>
-	<td>Currently listed in:</td>
-	<td>
+	<td class="label">Currently listed in:</td>
+	<td class="details">
 		<table>
 <?
 function showCategoryRemove($page,$category,$indent)
 {
 	$style='';
+  $listed = false;
 	if ($category->indexOf($page)===false)
 		$style='style="display: none" ';
+  else
+    $listed = true;
 ?>
 			<tr <?= $style?>id="catrow-<?= $category->id ?>">
 				<td><?= $indent.$category->name ?></td>
-				<td><button id="removeBtn-<?= $category->id ?>" class="remove" type="button">Remove...</button></td>
+				<td>
+          <div class="toolbarbutton">
+          <a href="javascript:removeFromCategory(<?= $category->id ?>)"><image src="/internal/file/icons/delete-folder-purple.gif"/> Remove</a>
+          </div>
+        </td>
 			</tr>
 <?
 	$items = $category->items();
 	foreach ($items as $item)
 	{
 		if ($item instanceof Category)
-			showCategoryRemove($page,$item, $indent.$category->name.' &gt; ');
+    {
+			if (showCategoryRemove($page,$item, $indent.$category->name.' &gt; '))
+        $listed = true;
+    }
 	}
+  return $listed;
 }
 
-showCategoryRemove($page,$cont->getRootCategory(),'');
+if (!showCategoryRemove($page,$cont->getRootCategory(),''))
+{
+?>
+        <tr>
+          <td>
+            Page is Uncategorised
+          </td>
+        </tr>
+<?
+}
 ?>		</table>
 	</td>
 </tr>
 <tr>
-	<td>Link to another category:</td>
-	<td>
+	<td class="label">Link to another category:</td>
+	<td class="details">
 		<form>
 			<select id="linkcategory" name="category">
 <?
@@ -273,10 +305,21 @@ function showCategoryOption($page,$category,$indent)
 showCategoryOption($page,$cont->getRootCategory(),'');
 ?>
 			</select>
-			<button class="add" type="button">Add...</button>
+      <div class="toolbarbutton">
+      <a href="javascript:addToCategory()"><image src="/internal/file/icons/left-purple.gif"/> Link</a>
+      </div>
 		</form>
 	</td>
 </tr>
+</table>
+</div>
+</div>
+<div class="section">
+<div class="sectionheader">
+<h3>Page Options</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <?
 $layouts = $page->container->layouts->getPageLayouts();
 $count = 0;
@@ -292,8 +335,8 @@ if ($count>1)
 {
 ?>
 <tr>
-  <td style="vertical-align: top">Layout:</td>
-  <td style="vertical-align: top"><?= $layout->getName() ?></td>
+  <td class="label">Layout:</td>
+  <td class="details"><?= $layout->getName() ?></td>
 </tr>
 <?
 }
@@ -301,19 +344,25 @@ foreach ($layout->variables as $pref => $variable)
 {
 ?>
 <tr>
-  <td style="vertical-align: top"><?= $variable->name ?>:</td>
-  <td style="vertical-align: top"><?= $pageprefs->getPref($pref) ?></td>
+  <td class="label"><?= $variable->name ?>:</td>
+  <td class="details"><?= $pageprefs->getPref($pref) ?></td>
 </tr>
 <?
 }
 ?>
-<tr>
-  <td style="vertical-align: top">Content:</td>
-  <td style="vertical-align: top">
+</table>
+</div>
+</div>
+<div class="section">
+<div class="sectionheader">
+<h3>Page Content</h3>
+</div>
+<div class="sectionbody">
+  <div id="contentblock">
 <?
 $block=$page->getReferencedBlock('content');
 ?><block id="content" src="/version/<?= $page->version ?>/<?= $block->getPath() ?>"/>
-  </td>
-</tr>
-</table>
+  </div>
+</div>
+</div>
 </div>

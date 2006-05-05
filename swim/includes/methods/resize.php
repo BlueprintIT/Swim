@@ -151,7 +151,7 @@ function method_resize($request)
 							imagefill($newimage,0,0,$backg);
 							if ($transparent=true)
 								imagecolortransparent($newimage,$backg);
-							if (false)
+							if (true)
 							{
 								imagecopyresampled($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
 							}

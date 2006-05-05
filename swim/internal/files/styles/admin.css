@@ -48,3 +48,84 @@ a:hover, a:visited:hover {
 .mceEditorArea {
   overflow: auto;
 }
+
+.section.first {
+  margin-top: 0;
+}
+
+.section {
+  margin-top: 3em;
+}
+
+.sectionheader {
+  padding-bottom: 17px;
+  background-image: -swim-url(/internal/file/images/sectionline.png);
+  background-repeat: no-repeat;
+  background-position: bottom left;
+  margin-bottom: 5px;
+}
+
+.sectionheader h3 {
+  color: BLUE;
+  margin: 0;
+}
+
+.sectionbody {
+}
+
+.sectionbody table.admin {
+  width: 100%;
+}
+
+.sectionbody td.label {
+  vertical-align: middle;
+  width: 100px;
+  color: PURPLE;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 5px;
+}
+
+.sectionbody td.details {
+  vertical-align: middle;
+  padding-right: 5px;
+}
+
+.sectionbody td.description {
+  vertical-align: middle;
+  padding-right: 5px;
+  width: 35%;
+}
+
+div#contentblock {
+  border: 1px solid BLUE;
+  padding: 5px;
+}
+
+#content {
+}
+
+div.toolbarbutton.disabled {
+  color: GrayText
+}
+
+div.toolbarbutton a,
+div.toolbarbutton a:visited,
+div.toolbarbutton a:hover,
+div.toolbarbutton a:active {
+  text-decoration: none;
+}
+
+div.toolbarbutton {
+  border: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  padding: 3px;
+  display: inline;
+  white-space: nowrap;
+}
+
+div.toolbarbutton img {
+  vertical-align: middle;
+  margin-right: 3px;
+  border: 0;
+}

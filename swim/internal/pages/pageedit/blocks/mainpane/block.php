@@ -65,19 +65,46 @@ include 'html.php';
 include 'image.php';
 
 ?>
-<form action="<?= $upload->encodePath() ?>" method="POST">
+<script>
+function submitForm(form, type)
+{
+  if (type)
+  {
+    document.forms[form].elements[type].disabled=false;
+  }
+  document.forms[form].submit();
+}
+
+</script>
+<form name="mainform" action="<?= $upload->encodePath() ?>" method="POST">
 <?= $upload->getFormVars() ?>
 <input type="hidden" name="commit" value="<?= $commit->encode(); ?>">
 <input type="hidden" name="default" value="<?= $request->encode(); ?>">
 <input type="hidden" name="cancel" value="<?= $cancel->encode(); ?>">
 <div class="header">
-<input type="submit" name="action:commit" value="Save &amp; Commit">
-<input type="submit" name="action:default" value="Save Working Version">
-<input type="submit" name="action:cancel" value="Cancel">
+<input type="hidden" disabled="true" name="action:commit" value="Save &amp; Commit">
+<input type="hidden" disabled="true" name="action:default" value="Save Working Version">
+<input type="hidden" disabled="true" name="action:cancel" value="Cancel">
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="javascript:submitForm('mainform','action:commit')">Save &amp; Commit</a>
+</div>
+<div class="toolbarbutton">
+<a href="javascript:submitForm('mainform','action:default')">Save Working Version</a>
+</div>
+<div class="toolbarbutton">
+<a href="javascript:submitForm('mainform','action:cancel')">Cancel</a>
+</div>
+</div>
 <h2>Page Editor</h2>
 </div>
 <div class="body">
-<table style="table-layout: fixed; border-spacing: 5px;">
+<div class="section first">
+<div class="sectionheader">
+<h3>Page Options</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <?
 $layouts = $page->container->layouts->getPageLayouts();
 $count = 0;
@@ -93,8 +120,8 @@ if ($count>1)
 {
 ?>
 <tr>
-  <td style="vertical-align: top"><label for="layout">Layout:</label></td>
-  <td style="vertical-align: top"><select id="layout" onchange="this.form.submit()" name="layout">
+  <td class="label"><label for="layout">Layout:</label></td>
+  <td class="details"><select id="layout" onchange="this.form.submit()" name="layout">
 <?
 	foreach($layouts as $id => $l)
 	{
@@ -111,7 +138,7 @@ if ($count>1)
 	}
 ?>
 </select></td>
-  <td style="vertical-align: top">The layout determines what the page contains and how it is organised.</td>
+  <td class="description">The layout determines what the page contains and how it is organised.</td>
 </tr>
 <?
 }
@@ -120,8 +147,8 @@ foreach ($layout->variables as $pref => $variable)
 {
 ?>
 <tr>
-	<td style="vertical-align: top"><label for="pref:<?= $pref ?>"><?= $variable->name ?>:</label></td>
-	<td style="vertical-align: top; width: 45%"><?
+	<td class="label"><label for="pref:<?= $pref ?>"><?= $variable->name ?>:</label></td>
+	<td class="details"><?
 if ($variable->type == 'text')
 {
   ?><input style="width: 100%" type="input" id="pref:<?= $pref ?>" name="pref:<?= $pref ?>" value="<?= $pageprefs->getPref($pref) ?>"><?
@@ -131,7 +158,7 @@ else if ($variable->type == 'multiline')
   ?><textarea style="width: 100%; height: 50px;" id="pref:<?= $pref ?>" name="pref:<?= $pref ?>"><?= $pageprefs->getPref($pref) ?></textarea><?
 }
 ?></td>
-	<td style="vertical-align: top; width: 45%"><?= $variable->description ?></td>
+	<td class="description"><?= $variable->description ?></td>
 </tr>
 <?
 }
@@ -145,7 +172,7 @@ foreach ($layout->blocks as $id => $blk)
     {
 ?>
 <tr>
-  <td style="vertical-align: top"><?= $blk->getName() ?>:</td>
+  <td class="label"><?= $blk->getName() ?>:</td>
 <?
       if ($blk->getType()=='image')
       {
@@ -158,19 +185,25 @@ foreach ($layout->blocks as $id => $blk)
   }
 }
 ?>
+</table>
+</div>
+</div>
+<div class="section">
+<div class="sectionheader">
+<h3>Page Content</h3>
+</div>
+<div class="sectionbody">
 <?
 if ((isset($contentfile))&&($_USER->canWrite($content)))
 {
 ?>
-<tr>
-	<td style="vertical-align: top"><label for="editor">Content:</label></td>
-  <td style="vertical-align: top" colspan="2"><textarea id="editor" name="file:<?= $contentfile ?>" style="width: 100%; height: 400px"><?
+  <textarea id="editor" name="file:<?= $contentfile ?>" style="width: 100%; height: 400px"><?
 readfile($content->getDir().'/block.html');
-?></textarea></td>
-</tr>
+?></textarea>
 <?
 }
 ?>
-</table>
+</div>
+</div>
 </div>
 </form>

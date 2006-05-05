@@ -22,30 +22,46 @@ function checkForm(form)
   return true;
 }
 
+function submitForm(form)
+{
+  document.forms[form].submit();
+}
+
 </script>
-<form onsubmit="return checkForm(this)" method="POST" action="<?= $save->encodePath() ?>">
+<form name="mainform" onsubmit="return checkForm(this)" method="POST" action="<?= $save->encodePath() ?>">
 <?= $save->getFormVars() ?>
 <div class="header">
-<input type="submit" value="Save">
-<button type="button" onclick="document.location.href='<?= $request->nested->encode() ?>'">Cancel</button>
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="javascript:submitForm('mainform')">Save</a>
+</div>
+<div class="toolbarbutton">
+<a href="<?= $request->nested->encode() ?>">Cancel</a>
+</div>
+</div>
 <h2>Create User</h2>
 </div>
 <div class="body">
-<table>
+<div class="section first">
+<div class="sectionheader">
+<h3>User Details</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <tr>
-<td><label for="username">Username:</label></td>
-<td><input type="input" name="username" id="username" value=""></td>
-<td>The username is used to log in to the administration area.</td>
+<td class="label"><label for="username">Username:</label></td>
+<td class="details"><input type="input" name="username" id="username" value=""></td>
+<td class="description">The username is used to log in to the administration area.</td>
 </tr>
 <tr>
-<td><label for="password">Password:</label></td>
-<td><input type="text" name="password" id="password" value=""></td>
-<td>Enter a password for the user.</td>
+<td class="label"><label for="password">Password:</label></td>
+<td class="details"><input type="text" name="password" id="password" value=""></td>
+<td class="description">Enter a password for the user.</td>
 </tr>
 <tr>
-<td><label for="name">Full Name:</label></td>
-<td><input type="text" name="name" id="name" value=""></td>
-<td>The full name is used to display the user's name in the administrative area.</td>
+<td class="label"><label for="name">Full Name:</label></td>
+<td class="details"><input type="text" name="name" id="name" value=""></td>
+<td class="description">The full name is used to display the user's name in the administrative area.</td>
 </tr>
 <?
 $groups = UserManager::getGroups();
@@ -58,15 +74,17 @@ foreach ($groups as $id => $group)
 if ($pos==0)
 {
   $pos=1;
-?><td rowspan="<?= count($groups) ?>">Groups:</td><?
+?><td class="label" rowspan="<?= count($groups) ?>">Groups:</td><?
 }
 ?>
-<td><input type="radio" name="group" id="group-<?= $id ?>" value="<?= $id ?>"><label for="group-<?= $id ?>"><?= $group->getName() ?></label></td>
-<td><?= $group->getDescription() ?></td>
+<td class="details"><input type="radio" name="group" id="group-<?= $id ?>" value="<?= $id ?>"><label for="group-<?= $id ?>"><?= $group->getName() ?></label></td>
+<td class="description"><?= $group->getDescription() ?></td>
 </tr>
 <?
 }
 ?>
 </table>
+</div>
+</div>
 </div>
 </form>

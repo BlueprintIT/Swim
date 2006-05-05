@@ -23,7 +23,18 @@ $commit->query['container'] = $container->id;
 $commit->query['reloadtree'] = true;
 
 ?>
-<form method="POST" action="<?= $upload->encodePath() ?>">
+<script>
+function submitForm(form, type)
+{
+  if (type)
+  {
+    document.forms[form].elements[type].disabled=false;
+  }
+  document.forms[form].submit();
+}
+
+</script>
+<form name="mainform" method="POST" action="<?= $upload->encodePath() ?>">
 <?= $upload->getFormVars() ?>
 <?
 if (!isset($request->query['category']))
@@ -36,8 +47,16 @@ if (!isset($request->query['category']))
 <input type="hidden" name="commit" value="<?= $commit->encode(); ?>">
 <input type="hidden" name="cancel" value="<?= $request->nested->encode(); ?>">
 <div class="header">
-<input type="submit" name="action:commit" value="Save &amp; Commit">
-<input type="submit" name="action:cancel" value="Cancel">
+<input type="hidden" disabled="true" name="action:commit" value="Save &amp; Commit">
+<input type="hidden" disabled="true" name="action:cancel" value="Cancel">
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="javascript:submitForm('mainform','action:commit')">Save &amp; Commit</a>
+</div>
+<div class="toolbarbutton">
+<a href="javascript:submitForm('mainform','action:cancel')">Cancel</a>
+</div>
+</div>
 <h2>Edit Category</h2>
 </div>
 <div class="body">

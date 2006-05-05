@@ -5,10 +5,11 @@ $create->resourcePath='create';
 $create->nested=$request;
 ?>
 <div class="header">
-<form method="GET" action="<?= $create->encodePath() ?>">
-<?= $create->getFormVars() ?>
-<input type="submit" value="Create new User">
-</form>
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="<?= $create->encode() ?>"><image src="/internal/file/icons/add-user-blue.gif"/> Create new User</a>
+</div>
+</div>
 <h2>User Administration</h2>
 </div>
 <div class="body">

@@ -34,16 +34,16 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
-	var hostpart="http://"+tinyMCE.getParam('document_host','');
+	var hostpart="://"+tinyMCE.getParam('document_host','');
 	var base=tinyMCE.getParam('document_base_url','');
 	var view=tinyMCE.getParam('swim_view','');
-	if (base.indexOf(hostpart)==0)
+	if (base.indexOf(hostpart)>=0)
 	{
-		base=base.substring(hostpart.length);
+		base=base.substring(base.indexOf(hostpart)+hostpart.length);
 	}
 
-	//alert(base);
-	//alert(view);
+	//alert("initial: "+url);
+	//alert("hostpart: "+hostpart);
 	
 	var page='/'+base.substring(view.length);	
 	var basetemp = view+'version/temp'+page;
@@ -52,12 +52,16 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 	{
 		url=url.substring(url.indexOf('tinymce')+8);
 	}
-	else if (url.indexOf(hostpart)==0)
+	else if (url.indexOf(hostpart)>=0)
 	{
-		url=url.substring(hostpart.length);
+		url=url.substring(url.indexOf(hostpart)+hostpart.length);
 	}
 	
-	//alert(url);
+	//alert("1st: "+url);
+	//alert("base: "+base);
+	//alert("view: "+view);
+	//alert("page: "+page);
+	//alert("basetemp: "+basetemp);
 	
 	if (url.indexOf(base)==0)
 	{
@@ -76,20 +80,20 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 		url=url.substring(view.length-1);
 	}
 	
-	//alert(url);
+	//alert("2nd: "+url);
 	
 	if (!on_save)
 	{
 		if (url.substring(0,1)=='/')
 		{
-			url=hostpart+view+url.substring(1);
+			url='http'+hostpart+view+url.substring(1);
 		}
 		else if (url.indexOf(':')>0)
 		{
 		}
 		else
 		{
-			url=hostpart+basetemp+url;
+			url='http'+hostpart+basetemp+url;
 		}
 	}
 	else
@@ -109,7 +113,7 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 			url=page+url;
 		}
 	}
-	//alert(url);
+	//alert("final: "+url);
 	return url;
 }
 

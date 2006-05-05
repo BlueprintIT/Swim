@@ -11,4 +11,4 @@ $root = $cont->getRootCategory();
 $index->query['category']=$root->id;
 $index->query['container']=$cont->id;
 ?>
-<iframe name="main" style="height: 100%; width: 100%" frameborder="0" src="<?= $index->encode() ?>"></iframe>
+<iframe name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="<?= $index->encode() ?>"></iframe>

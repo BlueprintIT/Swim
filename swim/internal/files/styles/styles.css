@@ -53,6 +53,12 @@ body {
   margin: 10px;
 }
 
+.header .toolbarbutton {
+  float: left;
+  margin: 10px;
+  display: block;
+}
+
 .header h2 {
   margin: 0;
   padding: 10px;

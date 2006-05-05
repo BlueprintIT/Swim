@@ -145,29 +145,21 @@ function moveDown() {
 }
 
 function updateButtons() {
-	var list = document.getElementById("contentList");
+	/*var list = document.getElementById("contentList");
 	if (list) {
 		var button = document.getElementById("moveUpBtn");
 		button.disabled=(list.selectedIndex<=0);
 	
 		button = document.getElementById("moveDownBtn");
 		button.disabled=((list.selectedIndex<0)||(list.selectedIndex==(list.length-1)));
-	}
+	}*/
 }
 
 function init(event) {
-	var button = document.getElementById("moveUpBtn");
-	if (button)
-		YAHOO.util.Event.addListener(button, "click", moveUp);
-	button = document.getElementById("moveDownBtn");
-	if (button)
-		YAHOO.util.Event.addListener(button, "click", moveDown);
-	button = document.getElementById("moveBtn");
-	YAHOO.util.Event.addListener(button, "click", moveToCategory);
-	var list = document.getElementById("contentList");
+	/*var list = document.getElementById("contentList");
 	if (list)
 		YAHOO.util.Event.addListener(list, "change", updateButtons);
-	updateButtons();
+	updateButtons();*/
 }
 
 YAHOO.util.Event.addListener(window, "load", init);
@@ -178,30 +170,18 @@ YAHOO.util.Event.addListener(window, "load", init);
 if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 {
 ?>
-<form method="GET" action="<?= $createp->encodePath() ?>">
-<?= $createp->getFormVars() ?>
-<input type="submit" value="Add a new Page">
-</form>
-<form method="GET" action="<?= $createl->encodePath() ?>">
-<?= $createl->getFormVars() ?>
-<input type="submit" value="Add a new Link">
-</form>
-<form method="GET" action="<?= $createc->encodePath() ?>">
-<?= $createc->getFormVars() ?>
-<input type="submit" value="Add a new Category">
-</form>
 <?
 if ($category !== $container->getRootCategory())
 {
 ?>
-<form action="<?= $edit->encodePath() ?>" method="GET">
-<?= $edit->getFormVars() ?>
-<input type="submit" value="Edit Category">
-</form>
-<form onsubmit="return confirm('This will delete this category, continue?');" action="<?= $delete->encodePath() ?>" method="GET">
-<?= $delete->getFormVars() ?>
-<input type="submit" value="Delete this Category">
-</form>
+<div class="toolbar">
+<div class="toolbarbutton">
+<a href="<?= $edit->encode() ?>"><image src="/internal/file/icons/edit-grey.gif"/> Edit this Category</a>
+</div>
+<div class="toolbarbutton">
+<a onclick="return confirm('This will delete this category, continue?');" href="<?= $delete->encode() ?>"><image src="/internal/file/icons/delete-folder-blue.gif"/> Delete this Category</a>
+</div>
+</div>
 <?
 }
 }
@@ -209,18 +189,23 @@ if ($category !== $container->getRootCategory())
 <h2>Category Details</h2>
 </div>
 <div class="body">
-<table>
+<div class="section first">
+<div class="sectionheader">
+<h3>Category Details</h3>
+</div>
+<div class="sectionbody">
+<table class="admin">
 <tr>
-  <td style="vertical-align: top">Name:</td>
-  <td style="vertical-align: top"><?= $category->name ?></td>
+  <td class="label">Name:</td>
+  <td class="details"><?= $category->name ?></td>
 </tr>
 <?
 if ($category!==$container->getRootCategory())
 {
 ?>
 <tr>
-	<td>Move to another category:</td>
-	<td>
+	<td class="label">Move to another category:</td>
+	<td class="details">
 		<form>
 			<select id="targetlist" name="category">
 <?
@@ -241,23 +226,28 @@ function showCategoryOption($current,$category,$indent)
 showCategoryOption($category,$container->getRootCategory(),'');
 ?>
 			</select>
-			<button id="moveBtn" type="button">Move...</button>
+      <div class="toolbarbutton"><a href="javascript:moveToCategory()""><image src="/internal/file/icons/right-purple.gif"/> Move</a></div>
 		</form>
 	</td>
 </tr>
+</table>
+</div>
+</div>
+<div class="section">
+<div class="sectionheader">
+<h3>Category Contents</h3>
+</div>
+<div class="sectionbody">
 <?
 }
 $items= $category->items();
 if (count($items)>1)
 {
 ?>
-<tr>
-  <td style="vertical-align: top">Contents:</td>
-  <td style="vertical-align: top">
-  	<table>
-  		<tr>
-  			<td rowspan="2">
-  				<select id="contentList" size="7">
+<table>
+	<tr>
+		<td rowspan="2">
+			<select id="contentList" size="7">
 <?
 $pos=0;
 foreach ($items as $item)
@@ -276,22 +266,26 @@ foreach ($items as $item)
 	$pos++;
 }
 ?>
-  				</select>
-  			</td>
-  			<td>
-  				<button id="moveUpBtn" type="button">Move Up</button>
-  			</td>
-  		</tr>
-  		<tr>
-  			<td>
-  				<button id="moveDownBtn" type="button">Move Down</button>
-  			</td>
-  		</tr>
-  	</table>
-  </td>
-</tr>
+			</select>
+		</td>
+		<td style="text-align: center">
+      <div class="toolbarbutton"><a href="javascript:moveUp()"><image src="/internal/file/icons/up-purple.gif"/> Move Up</a></div>
+		</td>
+	</tr>
+	<tr>
+		<td style="text-align: center">
+      <div class="toolbarbutton"><a href="javascript:moveDown()""><image src="/internal/file/icons/down-purple.gif"/> Move Down</a></div>
+		</td>
+	</tr>
+</table>
+<p>
+<div class="toolbarbutton"><a href="<?= $createp->encode() ?>"><image src="/internal/file/icons/add-page-blue.gif"/> Add a new Page</a></div>
+<div class="toolbarbutton"><a href="<?= $createl->encode() ?>"><image src="/internal/file/icons/add-page-blue.gif"/> Add a new Link</a></div>
+<div class="toolbarbutton"><a href="<?= $createc->encode() ?>"><image src="/internal/file/icons/add-folder-blue.gif"/> Add a new Category</a></div>
+</p>
 <?
 }
 ?>
-</table>
+</div>
+</div>
 </div>
