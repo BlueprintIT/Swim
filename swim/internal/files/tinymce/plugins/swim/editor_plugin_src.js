@@ -45,8 +45,8 @@ function TinyMCE_swim_convertURL(url, node, on_save)
 	//alert("initial: "+url);
 	//alert("hostpart: "+hostpart);
 	
-	var page='/'+base.substring(view.length);	
-	var basetemp = view+'version/temp'+page;
+	var page=base.substring(view.length);	
+	var basetemp = view+'/version/temp'+page;
 		
 	if (url.indexOf('tinymce')>0)
 	{
