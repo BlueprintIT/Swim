@@ -49,7 +49,7 @@ a:hover, a:visited:hover {
   overflow: auto;
 }
 
-.section.first {
+div.first {
   margin-top: 0;
 }
 
@@ -106,7 +106,7 @@ div#contentblock {
 }
 
 div.toolbarbutton.disabled {
-  color: GrayText
+  color: GrayText;
 }
 
 div.toolbarbutton a,
@@ -122,10 +122,10 @@ div.toolbarbutton {
   padding: 3px;
   display: inline;
   white-space: nowrap;
+  margin-right: 3px;
 }
 
 div.toolbarbutton img {
   vertical-align: middle;
-  margin-right: 3px;
   border: 0;
 }
