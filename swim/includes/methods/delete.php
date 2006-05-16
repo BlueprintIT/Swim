@@ -35,7 +35,7 @@ function method_delete($request)
   }
   else
   {
-  	$parts = explode('/',$request->requestPath);
+  	$parts = explode('/',$request->resourcePath);
   	if ((count($parts)==3)&&($parts[1]=='categories'))
   	{
   		$container = getContainer($parts[0]);
@@ -49,11 +49,13 @@ function method_delete($request)
   			}
   			else
   			{
+          $log->info('Invalid category specified');
 			    displayNotFound($request);
   			}
   		}
   		else
   		{
+        $log->info('Invalid container specified');
 		    displayNotFound($request);
   		}
   	}

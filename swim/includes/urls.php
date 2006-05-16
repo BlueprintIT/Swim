@@ -291,7 +291,7 @@ class Request
     }
     else
     {
-      $this->log->warn('Attempt to get unknown property - '.$name);
+      $this->log->warntrace('Attempt to get unknown property - '.$name);
     }
   }
   

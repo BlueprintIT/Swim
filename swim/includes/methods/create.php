@@ -51,6 +51,7 @@ function method_create($request)
         $chained->method='view';
         $chained->resource='internal/page/pageedit';
         $chained->query['page']=$new->getPath();
+        $chained->query['reloadtree']='true';
         $chained->nested=$source;
         redirect($chained);
 			}
