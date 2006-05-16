@@ -59,7 +59,7 @@ if (isset($list))
     apply_source_formatting : true,
     relative_urls : true,
     document_host : "<?= $_SERVER['HTTP_HOST'] ?>",
-    document_base_url : "<?= $expurl->encode() ?>",
+    document_base_url : "<?= $expurl->encode(false) ?>",
     swim_view : "<?= $viewurl->encode() ?>",
     swim_pagebrowser : "<?= $pageselect->encode() ?>",
     swim_browser : "<?= $browser->encode() ?>",
