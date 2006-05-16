@@ -52,7 +52,8 @@ if ((count($versions)==1) && ($versions[0]=='base'))
 	$cancel->nested = new Request();
 	$cancel->nested->method='view';
 	$cancel->nested->resource='internal/page/categorydetails';
-	$cancel->nested->query['container']=$page->container->id;
+  $cancel->nested->query['container']=$page->container->id;
+  $cancel->nested->query['reloadtree']='true';
 	if (isset($request->nested->query['category']))
 		$cancel->nested->query['category']=$request->nested->query['category'];
 }
@@ -75,6 +76,15 @@ function submitForm(form, type)
   document.forms[form].submit();
 }
 
+<?
+if (isset($request->query['reloadtree']))
+{
+?>
+  window.top.SiteTree.loadTree();
+<?
+}
+?>
+  window.top.SiteTree.selectPage("<?= $page->getPath(); ?>");
 </script>
 <form name="mainform" action="<?= $upload->encodePath() ?>" method="POST">
 <?= $upload->getFormVars() ?>
