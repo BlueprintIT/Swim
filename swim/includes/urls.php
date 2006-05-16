@@ -352,7 +352,7 @@ class Request
 		$this->xml=$value;
 	}
 	
-	function encodePath()
+	function encodePath($humanreadable = true)
 	{
 		global $_PREFS;
 		
@@ -384,7 +384,7 @@ class Request
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
       $url=null;
-      if (($this->method=='view') && ($this->resource !== null))
+      if (($humanreadable) && ($this->method=='view') && ($this->resource !== null))
       {
         $url = $this->resource->getViewPath($this);
       }
@@ -451,9 +451,9 @@ class Request
 		return $text;
 	}
 	
-	function encode()
+	function encode($humanreadable = true)
 	{
-		$url=$this->encodePath();
+		$url=$this->encodePath($humanreadable);
 		$vars=$this->makeVars();
 		if (count($vars)>0)
 		{
