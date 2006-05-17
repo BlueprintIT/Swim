@@ -637,8 +637,8 @@ class Resource
 		
 		if ($request instanceof Request)
 		{
-		  if (isset($request->resource))
-		    return $request->resource;
+		  if (isset($request->resObject))
+		    return $request->resObject;
 		    
 			$resource=$request->resourcePath;
 			

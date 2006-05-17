@@ -177,23 +177,58 @@ function method_view($request)
 			displayGeneralError($request,'You can only view pages, blocks or files.');
 		}
 	}
-  else if (substr($request->resourcePath,-11)=='/categories')
-  {
-    $resource = Resource::decodeResource(substr($request->resourcePath,0,-11));
-    if (($resource!==null) && ($resource->isContainer()))
+	else
+	{
+    $parts = explode('/',$request->resourcePath);
+    if (($parts[1]=='categories')&&(count($parts)==2))
     {
-      $page = Resource::decodeResource('internal/page/categories');
-      $page->display($request);
+      $container = getContainer($parts[0]);
+      if ($container!==null)
+      {
+        $page = Resource::decodeResource('internal/page/categories');
+        $page->display($request);
+      }
+      else
+      {
+        displayNotFound($request);
+      }
+    }
+    else if (($parts[1]=='categories')&&(count($parts)==3))
+    {
+      $container = getContainer($parts[0]);
+      if ($container===null)
+      {
+        displayNotFound($request);
+        return;
+      }
+      if ($parts[2]=='root')
+        $category = $container->getRootCategory();
+      else
+        $category = $container->getCategory($parts[2]);
+      if ($category===null)
+      {
+        displayNotFound($request);
+        return;
+      }
+
+      if ($container->prefs->isPrefSet('categories.customlink'))
+      {
+        $req = new Request();
+        $req->method = 'view';
+        $req->resource = substr($container->prefs->getPref('categories.customlink'),1);
+        $req->data['category'] = $category;
+        SwimEngine::processRequest($req);
+      }
+      else
+      {
+        displayServerError($request);
+      }
     }
     else
     {
-      displayNotFound($request);
+      $log->debug('Resource not found - '.$request->resourcePath);
+  		displayNotFound($request);
     }
-  }
-	else
-	{
-    $log->debug('Resource not found - '.$request->resourcePath);
-		displayNotFound($request);
 	}
 }
 

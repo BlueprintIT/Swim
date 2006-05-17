@@ -87,9 +87,8 @@ class PageListBlock extends Block
           {
             $request = new Request();
             $request->method = 'view';
-            $request->resource = $item->container->prefs->getPref('categories.customlink');
-            $request->query['category'] = $item->id;
-            $parser->parseText('<a class="page" href="'.$request->encode().'">');
+            $request->resourcePath = $item->container->id.'/categories/'.$item->id;
+            $parser->parseText('<a class="category" href="'.$request->encode().'">');
             $linked = true;
           }
           else
@@ -150,8 +149,8 @@ class PageListBlock extends Block
     $parser->parseText('<script src="/internal/file/scripts/bpmm.js"/>');
 
     $cm = getContainer($this->cont);
-    if (isset($parser->data['request']->query['category']))
-      $category = $cm->getCategory($parser->data['request']->query['category']);
+    if (isset($parser->data['request']->data['category']))
+      $category = $parser->data['request']->data['category'];
     else
       $category = $cm->getRootCategory();
 

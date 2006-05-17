@@ -187,9 +187,8 @@ class CategoryMenuBlock extends Block
       {
         $request = new Request();
         $request->method = 'view';
-        $request->resource = $item->container->prefs->getPref('categories.customlink');
-        $request->query['category'] = $item->id;
-        print('<a class="page" href="'.$request->encode().'">');
+        $request->resourcePath = $item->container->id.'/categories/'.$item->id;
+        print('<a class="category" href="'.$request->encode().'">');
         $linked = true;
       }
       else

@@ -581,6 +581,9 @@ class Template extends Resource
 		}
     else if ($attrs['context'] == 'category')
     {
+      $category = $parser->data['request']->data['category'];
+      if ($name=='name')
+        print($category->name);
     }
 		return true;
 	}
