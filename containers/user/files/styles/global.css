@@ -33,6 +33,11 @@ p, ul, ol, li, td {
 	font-family: paragraphfont;
 }
 
+/* Ensure font size cascades properly in quirks mode */
+table, td {
+  font-size: 100%;
+}
+
 a {
 	color: linkcolor;
 }
