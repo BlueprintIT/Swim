@@ -553,23 +553,35 @@ class Template extends Resource
 	function displayVar($parser,$tag,$attrs,$text)
 	{
 		$name=$attrs['name'];
+    $base = '';
+    if ((!isset($attrs['context'])) || ($attrs['context'] == 'page'))
+    {
+      $base = 'page.variables.';
+    }
 		if (isset($attrs['namespace']))
 		{
 			$name=$attrs['namespace'].'.'.$name;
 		}
-		else
+    else if (strpos($name,'.')===false)
+    {
+      $name=$base.$name;
+    }
+		if ((!isset($attrs['context'])) || ($attrs['context'] == 'page'))
 		{
 			if (strpos($name,'.')===false)
 			{
 				$name='page.variables.'.$name;
 			}
+      $page=$parser->data['page'];
+      $this->log->debug('Displaying variable '.$name.' for '.$page->id);
+      if ($page->prefs->isPrefSet($name))
+      {
+        print($page->prefs->getPref($name));
+      }
 		}
-		$page=$parser->data['page'];
-		$this->log->debug('Displaying variable '.$name.' for '.$page->id);
-		if ($page->prefs->isPrefSet($name))
-		{
-			print($page->prefs->getPref($name));
-		}
+    else if ($attrs['context'] == 'category')
+    {
+    }
 		return true;
 	}
 	
