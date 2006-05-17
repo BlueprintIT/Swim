@@ -433,7 +433,7 @@ class Template extends Resource
 			$browser->resource = $attrs['container'];
 		if (isset($attrs['version']))
 			$browser->query['version']=$attrs['version'];
-		$browser->query['action']='fileBrowserCallback(\''.$id.'\', selected)';
+		$browser->query['action']='fileBrowserCallback("'.$id.'",selected)';
 		echo '<input id="'.$id.'" name="'.$attrs['name'].'" type="hidden" value="'.$attrs['value'].'"> ';
 		if ((isset($attrs['value'])) && (strlen($attrs['value'])>0))
 		{
