@@ -41,7 +41,7 @@ if (true)
 ?>
   <td class="spacer"></td>
 <?
-  display_tab($type,'cart',$prefs->getPref('url.base').'/onlinestore/admin','E-commerce');
+  display_tab($type,'cart',$prefs->getPref('url.base').'/onlinestore/admin/index.php','E-commerce');
 }
 
 if (true)
