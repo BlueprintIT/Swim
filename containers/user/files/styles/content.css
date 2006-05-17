@@ -31,3 +31,8 @@ p.tight {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+
+/* Ensure font size cascades properly in quirks mode */
+table, td {
+  font-size: 100%;
+}
