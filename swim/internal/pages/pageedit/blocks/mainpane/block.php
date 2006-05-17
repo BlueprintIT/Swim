@@ -49,6 +49,7 @@ $cancel->resource=$page;
 $versions = array_keys($page->getVersions());
 if ((count($versions)==1) && ($versions[0]=='base'))
 {
+  $deletecheck = ' onclick="return confirm(\'This page has not been saved yet so this will delete this page, continue?\');"';
 	$cancel->nested = new Request();
 	$cancel->nested->method='view';
 	$cancel->nested->resource='internal/page/categorydetails';
@@ -59,6 +60,7 @@ if ((count($versions)==1) && ($versions[0]=='base'))
 }
 else
 {
+  $deletecheck='';
 	$cancel->nested=$request->nested;
 }
 
@@ -103,7 +105,7 @@ if (isset($request->query['reloadtree']))
 <a href="javascript:submitForm('mainform','action:default')">Save Working Version</a>
 </div>
 <div class="toolbarbutton">
-<a href="javascript:submitForm('mainform','action:cancel')">Cancel</a>
+<a <?= $deletecheck ?>href="javascript:submitForm('mainform','action:cancel')">Cancel</a>
 </div>
 </div>
 <h2>Page Editor</h2>
