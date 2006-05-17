@@ -185,7 +185,7 @@ function redirect($request)
   	$url=$request->encode();
   }
   else
-  {      
+  {
     $url=$request;
   }
   if (strpos($url,'://')===false)
@@ -202,6 +202,12 @@ function checkSecurity($request, $required, $allowed)
   
   $log=LoggerManager::getLogger('swim.security');
   
+  if (!$_PREFS->getPref('security.sslenabled'))
+  {
+    $required = false;
+    $allowed = false;
+  }
+  
   if ($log->isDebugEnabled())
   {
     $text = 'Check security - allowed: ';
@@ -217,13 +223,6 @@ function checkSecurity($request, $required, $allowed)
     $log->debug($text);
   }
   
-  if (($request->protocol=='https')&&($_PREFS->getPref('security.sslenabled')==false)&&($allowed))
-  {
-    $log->warn('SSL requested but not enabled');
-    $request->protocol='http';
-    redirect($request);
-  }
-
   if (($request->protocol=='https')&&(!$allowed))
   {
     $log->debug('SSL requested but not allowed');

@@ -720,7 +720,7 @@ MenuItem.prototype = {
 
 			if (this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 			{
-			  var left = region.left
+			  var left = region.right-width;
 			  var top = region.bottom;
 
 			  if (((top+height)>bwidth) && (region.top >= height))
