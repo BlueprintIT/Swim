@@ -63,6 +63,18 @@ div.button {
   text-align: center;
 }
 
+div.shortbutton {
+  width: 75px !important;
+}
+
+div.shortbutton a, div.shortbutton a:visited {
+  background-image: -swim-url('global/file/images/shortbuttonback.gif') !important;
+}
+
+div.shortbutton a:hover, div.shortbutton a:visited:hover {
+  background-image: -swim-url('global/file/images/shortbuttonbackhover.gif') !important;
+}
+
 div.button a, div.button a:visited {
   background-image: -swim-url('global/file/images/buttonback.gif');
   background-repeat: no-repeat;
