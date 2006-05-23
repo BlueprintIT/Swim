@@ -169,6 +169,7 @@ class FileManagerBlock extends Block
 						}
 						fclose($desc);
 					}
+          unlink($dir.'/'.$file);
 ?><p class="info">File <?= $file ?> was deleted.</p><?
 				}
 			}

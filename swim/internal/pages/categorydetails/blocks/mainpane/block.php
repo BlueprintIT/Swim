@@ -170,20 +170,22 @@ YAHOO.util.Event.addListener(window, "load", init);
 if ($_USER->hasPermission('documents',PERMISSION_WRITE))
 {
 ?>
-<?
-if ($category !== $container->getRootCategory())
-{
-?>
 <div class="toolbar">
 <div class="toolbarbutton">
 <a href="<?= $edit->encode() ?>"><image src="/internal/file/icons/edit-grey.gif"/> Edit this Category</a>
 </div>
+<?
+if ($category !== $container->getRootCategory())
+{
+?>
 <div class="toolbarbutton">
 <a onclick="return confirm('This will delete this category, continue?');" href="<?= $delete->encode() ?>"><image src="/internal/file/icons/delete-folder-blue.gif"/> Delete this Category</a>
 </div>
-</div>
 <?
 }
+?>
+</div>
+<?
 }
 ?>
 <h2>Category Details</h2>
