@@ -48,7 +48,7 @@ body {
 #sidemenu {
   position: absolute;
   left: 0;
-  bottom: -swim-calc(footerheight-30)px;
+  bottom: -swim-calc(footerheight)px;
   width: 250px;
 }
 

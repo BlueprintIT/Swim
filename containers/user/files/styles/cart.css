@@ -87,7 +87,7 @@ div#title h1 {
 #sidemenu {
   position: absolute;
   left: 0;
-  bottom: -swim-calc(footerheight-20)px;
+  bottom: -swim-calc(footerheight)px;
   width: 250px;
 }
 
