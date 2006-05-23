@@ -1,51 +1,35 @@
-#include global/file/styles/styles.css
-.menupopup {
-	display: none;
-	position: absolute;
-	margin: 0;
-	padding: 0;
-	z-index: 1;
-}
-
-.level1 ul {
+CONTEXT .level1 ul {
   background-color: white;
   border-top: 1px solid bordergrey;
   border-left: 1px solid bordergrey;
   border-right: 1px solid bordergrey;
+  border-collapse: collapse;
 }
 
-.level1 li {
-  margin: 0px !important;
-  padding: 3px;
-  display: block;
-  width: 100%;
+CONTEXT .level1 li {
   color: bordergrey;
-  background-image: none !important;
   border-top: 0px none;
   border-left: 0px none;
   border-right: 0px none;
   border-bottom: 1px solid bordergrey;
+  display: table-row;
 }
 
-.level1 li.menufocus {
+CONTEXT .level1 li.opened {
   background-color: brightred;
   color: white !important;
 }
 
-.level1 li a {
-  display: block;
-  width: 100%;
-  height: 100%;
-  padding: 5px;
+CONTEXT .level1 a {
+  padding: 3px;
 }
 
-.level1 ul li a, .level1 ul li a:visited {
+CONTEXT .level1 a span {
   font-weight: normal;
   color: bordergrey;
-  text-decoration: none;
 }
 
-.level1 ul li a.itemfocus, .level1 ul li a.itemfocus:visited, .level1 ul li a.itemfocus:hover {
-  font-weight: normal !important;
-  color: white !important;
+CONTEXT .level2 a.opened span {
+  font-weight: normal;
+  color: white;
 }

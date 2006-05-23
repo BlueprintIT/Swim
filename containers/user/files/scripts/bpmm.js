@@ -338,20 +338,20 @@ BlueprintIT.menus.MenuManager.prototype = {
 		
 		if (YAHOO.util.Dom.hasClass(element,'menuitem'))
 		{
-			//YAHOO.util.Dom.addClass(element,'level'+depth);
+			YAHOO.util.Dom.addClass(element,'level'+depth);
 			parentitem = new MenuItem(this,parentmenu,element);
 			parentmenu=null;
 		}
 		else if (YAHOO.util.Dom.hasClass(element,'menupopup')||YAHOO.util.Dom.hasClass(element,'menu'))
 		{
 			depth++;
-			//YAHOO.util.Dom.addClass(element,'level'+depth);
+			YAHOO.util.Dom.addClass(element,'level'+depth);
 			parentmenu = new Menu(this,parentitem,orientation,element,animator);
 			parentitem=null;
 		}
 		else if ((element.tagName=='A')&&(parentitem))
 		{
-			//YAHOO.util.Dom.addClass(element,'level'+depth);
+			YAHOO.util.Dom.addClass(element,'level'+depth);
 			parentitem.setFocusElement(element);
 		}
 		var child = element.firstChild;
@@ -568,26 +568,16 @@ MenuItem.prototype = {
 	
 	focus: function()
 	{
-		if (this.parentMenu.parentItem)
-			YAHOO.util.Dom.addClass(this.element, 'currentfocus');
-		if (this.focusEl)
-			YAHOO.util.Dom.addClass(this.focusElement, 'itemfocus');
-
-		/*YAHOO.util.Dom.addClass(this.element, 'focused');
+		YAHOO.util.Dom.addClass(this.element, 'focused');
 		if (this.focusElement)
-			YAHOO.util.Dom.addClass(this.focusElement, 'focused');*/
+			YAHOO.util.Dom.addClass(this.focusElement, 'focused');
 	},
 	
 	unfocus: function()
 	{
-		if (this.parentMenu.parentItem)
-			YAHOO.util.Dom.removeClass(this.element, 'currentfocus');
-		if (this.focusEl)
-			YAHOO.util.Dom.removeClass(this.focusElement, 'itemfocus');
-
-		/*YAHOO.util.Dom.removeClass(this.element, 'focused');
+		YAHOO.util.Dom.removeClass(this.element, 'focused');
 		if (this.focusElement)
-			YAHOO.util.Dom.removeClass(this.focusElement, 'focused');*/
+			YAHOO.util.Dom.removeClass(this.focusElement, 'focused');
 	},
 	
 	keyPress: function(code)
@@ -682,10 +672,9 @@ MenuItem.prototype = {
 	{
 		this.manager.log('mouseOver '+this.element.id);
 
-		YAHOO.util.Dom.addClass(this.element, 'menufocus');
-		/*YAHOO.util.Dom.addClass(this.element, 'opened');
+		YAHOO.util.Dom.addClass(this.element, 'opened');
 		if (this.focusElement)
-			YAHOO.util.Dom.addClass(this.focusElement, 'opened');*/
+			YAHOO.util.Dom.addClass(this.focusElement, 'opened');
 
 		if (this.submenu)
 			this.submenu.startShow();
@@ -697,10 +686,9 @@ MenuItem.prototype = {
 	{
 		this.manager.log('mouseOut '+this.element.id);
 		
-		YAHOO.util.Dom.removeClass(this.element, 'menufocus');
-		/*YAHOO.util.Dom.removeClass(this.element, 'opened');
+		YAHOO.util.Dom.removeClass(this.element, 'opened');
 		if (this.focusElement)
-			YAHOO.util.Dom.removeClass(this.focusElement, 'opened');*/
+			YAHOO.util.Dom.removeClass(this.focusElement, 'opened');
 
 		if (this.submenu)
 			this.submenu.startHide();
@@ -720,7 +708,7 @@ MenuItem.prototype = {
 
 			if (this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 			{
-			  var left = region.right-width;
+			  var left = region.left
 			  var top = region.bottom;
 
 			  if (((top+height)>bwidth) && (region.top >= height))

@@ -60,22 +60,21 @@ class CategoryMenuBlock extends Block
       $attrs['class']='menu ';
       
     if ($this->orientation=='horizontal')
-    {
       $attrs['class'].='horizmenu';
-    }
     else
-    {
       $attrs['class'].='vertmenu';
-    }
 
+    if ($this->prefs->isPrefSet('block.animation'))
+      $attrs['class'].=' '.$this->prefs->getPref('block.animation');
+      
     Block::displayIntro($attrs);
   }
   
   function displayTableItem($item,$depth)
   {
-    print('<td class="menuitem level'.($depth+1).'"><span>'."\n");
+    print('<td class="menuitem">'."\n");
     $this->displayItem($item,$depth);
-    print('</span></td>'."\n");
+    print('</td>'."\n");
   }
   
   function displayVerticalTableItem($item,$depth)
@@ -126,7 +125,7 @@ class CategoryMenuBlock extends Block
   
   function displayListItem($item,$depth)
   {
-    print('<li class="menuitem level'.($depth+1).'">'."\n");
+    print('<li class="menuitem">'."\n");
     $this->displayItem($item,$depth);
     print('</li>'."\n");
   }
@@ -181,14 +180,18 @@ class CategoryMenuBlock extends Block
       {
         if ($page instanceof Page)
         {
-          print('<anchor class="page level'.($depth+1).'" href="/'.$page->getPath().'">'.$item->name.'</anchor>');
+          print('<anchor class="page" href="/'.$page->getPath().'">');
+          print('<span>'.$item->name.'</span>');
+          print('</anchor>');
         }
         else if ($page instanceof Link)
         {
-          print('<a class="link level'.($depth+1).'" ');
+          print('<a class="link" ');
           if ($this->prefs->getPref('block.newwindowlink', true))
             print('target="_blank" ');
-          print('href="'.$page->address.'">'.$item->name.'</a>');
+          print('href="'.$page->address.'">');
+          print('<span>'.$item->name.'</span>');
+          print('</a>');
         }
       }
       else
@@ -200,14 +203,18 @@ class CategoryMenuBlock extends Block
     }
     else if ($item instanceof Page)
     {
-      print('<anchor class="page level'.($depth+1).'" href="/'.$item->getPath().'">'.$item->prefs->getPref('page.variables.title').'</anchor>');
+      print('<anchor class="page" href="/'.$item->getPath().'">');
+      print('<span>'.$item->prefs->getPref('page.variables.title').'</span>');
+      print('</anchor>');
     }
     else if ($item instanceof Link)
     {
-      print('<a class="link level'.($depth+1).'" ');
+      print('<a class="link" ');
       if ($this->prefs->getPref('block.newwindowlink', true))
         print('target="_blank" ');
-      print('href="'.$item->address.'">'.$item->name.'</a>');
+      print('href="'.$item->address.'">');
+      print('<span>'.$item->name.'</span>');
+      print('</a>');
     }
   }
   

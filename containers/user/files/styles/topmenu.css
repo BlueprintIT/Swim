@@ -1,4 +1,8 @@
 #include global/file/styles/styles.css
+#define CONTEXT #mainmenu
+#include internal/file/styles/menus.css
+#include global/file/styles/popups.css
+
 #menubar {
   background-image: -swim-url('global/file/images/menucorner.gif');
   background-position: bottom left;
@@ -7,19 +11,19 @@
   padding-left: 37px;
 }
 
-#mainmenu {
+CONTEXT {
   height: 100%;
   border-collapse: separate !important;
   border-spacing: 0px 0px !important;
 }
 
-#mainmenu tr {
+CONTEXT tr {
   background-color: brightred;
   height: 100%;
   border: 0px none;
 }
 
-#mainmenu td {
+CONTEXT td {
   padding-left: 8px;
   padding-right: 8px;
   padding-bottom: 0px;
@@ -31,11 +35,14 @@
   color: white;
 }
 
-#mainmenu td.level1.menufocus {
+CONTEXT td.level1.opened {
   background-color: seagreen;
 }
 
-#mainmenu a.level1, #mainmenu a.level1:hover, #mainmenu a.level1:visited {
+CONTEXT a.level1 span {
   color: white;
-  text-decoration: none;
+}
+
+CONTEXT .menupopup {
+  border-collapse: separate;
 }

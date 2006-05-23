@@ -1,6 +1,13 @@
 #include global/file/styles/styles.css
+#define CONTEXT #sidemenu
+#include internal/file/styles/menus.css
+#include global/file/styles/popups.css
 
-#sidemenu li.level1 {
+CONTEXT {
+  padding-left: 40px;
+}
+
+CONTEXT li.level1 {
   list-style-type: none;
   padding-left: 0px;
   margin-top: 10px;
@@ -9,7 +16,7 @@
   text-align: left;
 }
 
-#sidemenu a.level1 {
+CONTEXT a.level1 {
   padding-left: 55px;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -19,27 +26,23 @@
   background-repeat: no-repeat;
 }
 
-#sidemenu a, #sidemenu a:visited, #sidemenu a:hover {
-  text-decoration: none;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-#sidemenu a.level1, #sidemenu a.level1:hover, #sidemenu a.level1:visited {
+CONTEXT a.level1 span {
   color: seagreen;
 }
 
-#sidemenu li.level1.menufocus a.level1 {
+CONTEXT a.opened {
   background-image: -swim-url('global/file/images/menuiconhover.gif');
+}
+
+CONTEXT .level2 a.opened {
+  background-image: none;
+}
+
+CONTEXT a.level1.opened span {
   color: deepred;
-}
-
-#sidemenu li.level1.menufocus {
-  border-bottom-color: bordergrey !important;
-}
-
-li.level1.menufocus a.level1, li.level1.menufocus a.level1:hover, li.level1.menufocus a.level1:visited {
-  color: deepred !important;
   font-weight: bold;
+}
+
+CONTEXT li.level1.opened {
+  border-bottom-color: bordergrey !important;
 }
