@@ -119,10 +119,10 @@ div#title h1 {
 
 #footer p {
   position: absolute;
-  bottom: 25px;
-  right: 40px;
+  bottom: 38px;
+  right: 20px;
   color: white;
-  font-size: 1.6em;
+  font-size: 1.4em;
 }
 
 #footer p a, #footer p a:visited {
