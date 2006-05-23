@@ -57,39 +57,32 @@ class Block extends Resource
 	
 	function displayIntro($attrs)
 	{
-    $attrlist = '';
-    $stylecontext = '';
+		if ($this->prefs->isPrefSet('block.stylesheets'))
+		{
+			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
+			foreach ($styles as $style)
+			{
+				print('<stylesheet src="/'.$style.'"/>');
+			}
+		}
     if (!isset($attrs['notag']))
     {
-      $stylecontext = ' CONTEXT="'.urlencode($this->getType().'#'.$attrs['id']).'"';
-      $class='block';
-      if (isset($attrs['class']))
-      {
-        $class.=' '.$attrs['class'];
+  		$class='block';
+  		if (isset($attrs['class']))
+  		{
+  			$class.=' '.$attrs['class'];
         unset($attrs['class']);
-      }
+  		}
       $attrlist='id="'.$attrs['id'].'" class="'.$class.'"';
       unset($attrs['id']);
       foreach ($attrs as $attr => $value)
       {
         $attrlist.=' '.$attr.'="'.$value.'"';
       }
-    }
-
-		if ($this->prefs->isPrefSet('block.stylesheets'))
-		{
-			$styles=explode(',',$this->prefs->getPref('block.stylesheets'));
-			foreach ($styles as $style)
-			{
-        print('<stylesheet src="'.$style.'"'.$stylecontext.'/>');
-			}
-		}
-
-    if (!isset($attrs['notag']))
-    {
-      print('<'.$this->getType().' '.$attrlist.'>');
+  		print('<'.$this->getType().' '.$attrlist.'>');
     }
 	}
+
 	
 	function displayOutro($attrs)
 	{

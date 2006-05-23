@@ -48,7 +48,7 @@ function method_view($request)
 						{
 							include $_PREFS->getPref('storage.handlers').'/csshandler.php';
 							$handlerf = new CSSHandlerFactory();
-							$handlerf->output($request,$resource);
+							$handlerf->output($resource);
 						}
 						else
 						{
