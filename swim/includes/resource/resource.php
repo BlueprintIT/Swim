@@ -74,6 +74,17 @@ class Resource
 			$this->log->debug('Resource configuration not found');
 		}
 
+    $this->modified = 0;
+    if ($this->prefs->isPrefSet('resource.modified'))
+    {
+      $this->modified=$this->prefs->getPref('resource.modified');
+    }
+    else if (is_readable($this->getDir().'/resource.conf'))
+    {
+      $stat=stat($this->getDir().'/resource.conf');
+      $this->modified=$stat['mtime'];
+    }
+
     $this->writable=$this->prefs->getPref('resource.writable',true);
 	}
 	
@@ -99,7 +110,8 @@ class Resource
   
 	function savePreferences()
 	{
-		$this->prefs->setPref('resource.modified',time());
+    $this->modified = time();
+		$this->prefs->setPref('resource.modified',$this->modified);
 		$file=$this->openFileWrite('resource.conf');
 		$this->prefs->savePreferences($file);
 		$this->closeFile($file);
@@ -406,23 +418,8 @@ class Resource
 	
 	function getModifiedDate()
 	{
-		if (!isset($this->modified))
-		{
-			if ($this->prefs->isPrefSet('resource.modified'))
-			{
-				$this->modified=$this->prefs->getPref('resource.modified');
-			}
-			
-			if (is_readable($this->getDir().'/resource.conf'))
-			{
-				$stat=stat($this->getDir().'/resource.conf');
-				$this->modified=$stat['mtime'];
-			}
-			else
-			{
-				$this->modified=0;
-			}
-		}
+    if ($this->modified == 0)
+      return time();
 		return $this->modified;
 	}
 	

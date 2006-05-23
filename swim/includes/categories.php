@@ -81,6 +81,7 @@ class Category
   		$this->id = $_STORAGE->lastInsertRowid();
   		ObjectCache::setItem('category', $this->id, $this);
   	}
+    $this->container->savePreferences();
   }
   
   function add($item)
@@ -124,6 +125,7 @@ class Category
 	  }
 	  
 	  $_STORAGE->commitTransaction();
+    $this->container->savePreferences();
   }
   
   function insert($item, $npos)
@@ -206,6 +208,7 @@ class Category
   	}
   	
   	$_STORAGE->commitTransaction();
+    $this->container->savePreferences();
   	
     if (isset($this->list))
       unset($this->list);
@@ -216,6 +219,7 @@ class Category
   	global $_STORAGE;
     $this->clean();
     $_STORAGE->queryExec('DELETE FROM Category WHERE id='.$this->id.';');
+    $this->container->savePreferences();
     // TODO clear from cache?
   }
   
@@ -236,6 +240,7 @@ class Category
     $this->shiftItems($pos,-1);
 
     $_STORAGE->commitTransaction();
+    $this->container->savePreferences();
     
     if (isset($this->list))
       unset($this->list);

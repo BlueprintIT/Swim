@@ -55,21 +55,15 @@ class Container extends Resource
     $this->versioned=$this->prefs->getPref('container.versioned',true);
     $this->writable=$this->prefs->getPref('resource.writable',true);
     $name = "'".$_STORAGE->escape($this->id)."'";
-    $set=$_STORAGE->query('SELECT Category.id,Category.name,date FROM Container,Category WHERE Category.id=rootcategory AND Container.id='.$name.';');
+    $set=$_STORAGE->query('SELECT Category.id,Category.name FROM Container,Category WHERE Category.id=rootcategory AND Container.id='.$name.';');
     if ($set->valid())
     {
       $details = $set->fetch();
-      $this->modified=$details['date'];
       $this->rootcategory = new Category($this,null,$details['Category.id'],$details['Category.name']);
       ObjectCache::setItem('category', $this->rootcategory->id, $this->rootcategory);
     }
  	}
 	
-  function getModifiedDate()
-  {
-    return $this->modified;
-  }
-  
   function getRootCategory()
   {
     return $this->rootcategory;

@@ -32,6 +32,12 @@ class PageListBlock extends Block
       $this->cont=$_PREFS->getPref('container.default');
   }
   
+  // TODO do something a bit cleverer here.
+  function getModifiedDate()
+  {
+    return time();
+  }
+  
   function findPages($category, $depth, &$pages, &$seen)
   {
     if ($depth==0)
