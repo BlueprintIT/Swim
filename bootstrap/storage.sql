@@ -1,6 +1,5 @@
 CREATE TABLE Container (
 	id TEXT PRIMARY KEY,
-	date INTEGER,
 	rootcategory INTEGER
 );
 

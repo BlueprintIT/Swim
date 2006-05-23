@@ -581,7 +581,7 @@ class Resource
 		}
 		else
 		{
-			//$this->log->warn('Could not open '.$filename.' for writing');
+			$this->log->warn('Could not open '.$filename.' for writing');
 		}
 		return false;
 	}

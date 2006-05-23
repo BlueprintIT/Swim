@@ -55,12 +55,11 @@ class Container extends Resource
     $this->versioned=$this->prefs->getPref('container.versioned',true);
     $this->writable=$this->prefs->getPref('resource.writable',true);
     $name = "'".$_STORAGE->escape($this->id)."'";
-    $set=$_STORAGE->query('SELECT Category.id,Category.name FROM Container,Category WHERE Category.id=rootcategory AND Container.id='.$name.';');
+    $set=$_STORAGE->query('SELECT rootcategory FROM Container WHERE id='.$name.';');
     if ($set->valid())
     {
       $details = $set->fetch();
-      $this->rootcategory = new Category($this,null,$details['Category.id'],$details['Category.name']);
-      ObjectCache::setItem('category', $this->rootcategory->id, $this->rootcategory);
+      $this->rootcategory = $this->getCategory($details['rootcategory']);
     }
  	}
 	
@@ -115,7 +114,10 @@ class Container extends Resource
       if ($set->valid())
       {
         $details = $set->fetch();
-        $category = new Category($this,$this->getCategory($details['parent']),$details['id'],$details['name']);
+        $parent = null;
+        if ($details['parent']!=false)
+          $parent = $this->getCategory($details['parent']);
+        $category = new Category($this,$parent,$details['id'],$details['name']);
         if ($details['icon']!=false)
           $category->icon = $details['icon'];
         if ($details['hovericon']!=false)
@@ -157,7 +159,9 @@ class Container extends Resource
 	
 	function fileIsWritable($filename)
 	{
-		return false;
+    if ($filename !== 'resource.conf')
+      return false;
+		return parent::fileIsWritable($filename);
 	}
 	
 	function fileIsReadable($filename)

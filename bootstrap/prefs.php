@@ -134,11 +134,11 @@ class Preferences
           $value=$matches[2];
           if ((strcasecmp($value,'true')==0)||(strcasecmp($value,'yes')==0))
           {
-            $value=true;
+            $value=TRUE;
           }
           else if ((strcasecmp($value,'false')==0)||(strcasecmp($value,'no')==0))
           {
-            $value=false;
+            $value=FALSE;
           }
           $this->preferences[$matches[1]]=$value;
         }
@@ -150,7 +150,12 @@ class Preferences
 	{
     foreach ($this->preferences as $key => $value)
     {
-    	fwrite($source,$key.'='.$value."\n");
+      $val = $value;
+      if ($value === TRUE)
+        $val = 'true';
+      else if ($value === FALSE)
+        $val = 'false';
+    	fwrite($source,$key.'='.$val."\n");
     }
 	}
 	
