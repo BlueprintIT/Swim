@@ -56,6 +56,14 @@ body {
   color: linkhover;
 }
 
+#bplink a, #bplink a:visited {
+  color: white;
+}
+
+#bplink a:hover, #bplink p a:active {
+  color: linkhover;
+}
+
 #footer p img {
   border: none;
 }

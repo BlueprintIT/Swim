@@ -35,7 +35,7 @@ CONTEXT td {
   color: white;
 }
 
-CONTEXT td.level1.opened {
+CONTEXT td.opened {
   background-color: seagreen;
 }
 
