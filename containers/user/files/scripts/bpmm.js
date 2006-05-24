@@ -198,27 +198,54 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	log: function(text)
 	{
-		return;
 		if (!this.textarea)
 			this.textarea=document.getElementById('log');
 		if (this.textarea)
-			this.textarea.value+=text+"\n";
+			this.textarea.value=text+"\n"+this.textarea.value;
 	},
 	
-	findMenuItem: function(element)
+	findMenuItemFromMenu: function(menu, event)
+	{
+		this.log('Seeking menu item for '+event.clientX+' '+event.clientY);
+		
+		var i;
+		for (i = 0; i<menu.menuItems.length; i++)
+		{
+			var region = YAHOO.util.Dom.getRegion(menu.menuItems[i].element);
+			this.log('Checking '+region.left+' '+region.right+' '+region.top+' '+region.bottom);
+			if ((event.clientX<region.left)||(event.clientX>region.right))
+				continue;
+			if ((event.clientY<region.top)||(event.clientY>region.bottom))
+				continue;
+			return menu.menuItems[i];
+		}
+		return menu.parentItem;
+	},
+	
+	findMenuItem: function(element, event)
 	{
 		if (!element)
 			return null;
 		
+		this.log('Seeking menu item for '+element.tagName+' '+element.className);
+		
 		try
 		{
-			if (element.menuitem)
-				return element.menuitem;
-			
-			if (element.parentNode)
-				return this.findMenuItem(element.parentNode);
+			while (element)
+			{
+				if (element.menuitem)
+					return element.menuitem;
+				/*else if (element.menu && event)
+					return this.findMenuItemFromMenu(element.menu, event);*/
+				else if (element.menu)
+					return element.menu.parentItem;
+				element = element.parentNode;
+			}
 		}
-		catch (e) { }
+		catch (e)
+		{
+			this.log(e);
+		}
 					
 		return null;
 	},
@@ -304,7 +331,7 @@ BlueprintIT.menus.MenuManager.prototype = {
 		if (ev.type=='focus')
 		{
 			this.log("focusEvent");
-			this.changeSelection(this.findMenuItem(ev.target));
+			this.changeSelection(this.findMenuItem(ev.target, ev));
 		}
 	},
 	
@@ -312,12 +339,12 @@ BlueprintIT.menus.MenuManager.prototype = {
 	{
 		if (ev.type=='mouseover')
 		{
-			var dest = this.findMenuItem(ev.target);
+			var dest = this.findMenuItem(ev.target, ev);
 			this.changeSelection(dest);
 		}
 		else if (ev.type=='mouseout')
 		{
-			var dest = this.findMenuItem(ev.relatedTarget);
+			var dest = this.findMenuItem(ev.relatedTarget, ev);
 			if (!dest)
 				this.changeSelection(null);
 		}
@@ -379,14 +406,14 @@ BlueprintIT.menus.MenuManager.prototype = {
 function Menu(manager,item,orientation,element,animator)
 {
 	this.manager = manager;
-	this.manager.log('Created menu from '+element.tagName);
+	//this.manager.log('Created menu from '+element.tagName);
 	this.animator = animator;
 
+	element.menu = this;
+	
 	this.menuItems=[];
 	if (item)
 	{
-		element.menuitem = item;
-	
 		this.parentItem=item;
 		this.parentItem.submenu=this;
 	}
@@ -398,6 +425,15 @@ function Menu(manager,item,orientation,element,animator)
 	}
 	this.orientation=orientation;
 	this.element=element;
+
+ 	this.iframe = document.createElement("iframe");
+ 	this.iframe.className = "menuframe";
+ 	this.iframe.frameBorder = "0";
+ 	this.iframe.src = "javascript:false;";
+ 	this.iframe.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';
+ 	YAHOO.util.Dom.setStyle(this.iframe, "position", "absolute");
+ 	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
+ 	document.body.insertBefore(this.iframe, document.body.firstChild);
 }
 
 /*
@@ -429,6 +465,7 @@ Menu.prototype = {
 	state: 0,
 	animator: null,
 	manager: null,
+	iframe: null,
 		
 	setPosition: function(x,y)
 	{
@@ -440,17 +477,23 @@ Menu.prototype = {
 	  if (value)
 	  {
 	  	YAHOO.util.Dom.setStyle(this.element, "display", "block");
+	  	YAHOO.util.Dom.setStyle(this.iframe, "display", "block");
   	  this.parentItem.setMenuPosition();
   	}
   	else
   	{
 	  	YAHOO.util.Dom.setStyle(this.element, "display", "none");
+	  	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
+
+			YAHOO.util.Dom.removeClass(this.parentItem.element, 'opened');
+			if (this.parentItem.focusElement)
+				YAHOO.util.Dom.removeClass(this.parentItem.focusElement, 'opened');
   	}
 	},
 	
 	onTimer: function()
 	{
-		this.manager.log("onTimer "+this.element.id+" "+this.state);
+		//this.manager.log("onTimer "+this.element.id+" "+this.state);
 		switch (this.state)
 		{
 			case 1:
@@ -530,6 +573,9 @@ Menu.prototype = {
 		{
 			case 1:
 				BlueprintIT.timing.cancelTimer(this.timer);
+				YAHOO.util.Dom.removeClass(this.parentItem.element, 'opened');
+				if (this.parentItem.focusElement)
+					YAHOO.util.Dom.removeClass(this.parentItem.focusElement, 'opened');
 				this.state=0;
 				break;
 			case 2:
@@ -546,7 +592,7 @@ Menu.prototype = {
 function MenuItem(manager,parent,element)
 {
 	this.manager = manager;
-	this.manager.log('Created menuitem from '+element.tagName);
+	//this.manager.log('Created menuitem from '+element.tagName);
 
 	element.menuitem = this;
 
@@ -681,7 +727,7 @@ MenuItem.prototype = {
 		YAHOO.util.Dom.addClass(this.element, 'opened');
 		if (this.focusElement)
 			YAHOO.util.Dom.addClass(this.focusElement, 'opened');
-
+		
 		if (this.submenu)
 			this.submenu.startShow();
 		else if (this.parentMenu.parentItem)
@@ -692,12 +738,14 @@ MenuItem.prototype = {
 	{
 		this.manager.log('mouseOut '+this.element.id);
 		
-		YAHOO.util.Dom.removeClass(this.element, 'opened');
-		if (this.focusElement)
-			YAHOO.util.Dom.removeClass(this.focusElement, 'opened');
-
 		if (this.submenu)
 			this.submenu.startHide();
+		else
+		{
+			YAHOO.util.Dom.removeClass(this.element, 'opened');
+			if (this.focusElement)
+				YAHOO.util.Dom.removeClass(this.focusElement, 'opened');
+		}
 	},
 	
 	setMenuPosition: function()
@@ -742,6 +790,9 @@ MenuItem.prototype = {
 				top = 0;
 			this.manager.log("setMenuPosition "+left+" "+top);
 			YAHOO.util.Dom.setXY(this.submenu.element, [left, top]);
+			this.submenu.iframe.style.width = width+"px";
+			this.submenu.iframe.style.height = height+"px";
+			YAHOO.util.Dom.setXY(this.submenu.iframe, [left, top]);
 		}
 	}
 }
