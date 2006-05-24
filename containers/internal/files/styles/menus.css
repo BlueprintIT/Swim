@@ -20,10 +20,6 @@ CONTEXT .menupopup {
   position: absolute;
 }
 
-CONTEXT .menuitem {
-  cursor: pointer;
-}
-
 CONTEXT,
 CONTEXT ul,
 CONTEXT ol,

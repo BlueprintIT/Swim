@@ -57,6 +57,10 @@ body {
   color: linkhover;
 }
 
+#bplink {
+  color: white;
+}
+
 #bplink a, #bplink a:visited {
   color: white;
 }
