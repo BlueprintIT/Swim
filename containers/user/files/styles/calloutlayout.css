@@ -41,6 +41,7 @@ body {
   right: 0;
   top: -swim-calc(bannerheight+bannermenugap);
   height: -swim-calc(menuheight)px;
+  font-size: 120%;
 }
   
 #sidemenu {
