@@ -36,7 +36,7 @@ BlueprintIT.menus.SlideAnimator = function()
 }
 
 BlueprintIT.menus.SlideAnimator.prototype = {
-	step: 3,
+	steps: 15,
 	delay: 10,
 
 	startAnimateIn: function(item)
@@ -50,10 +50,12 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 	
 	animateIn: function(item)
 	{
-		item.clippos+=this.step;
-
 		var region = YAHOO.util.Dom.getRegion(item.element);
 		var height = region.bottom-region.top;
+		var step = height/this.steps;
+		
+		item.clippos+=step;
+
 		if (item.clippos>=height)
 		{
 			item.clippos=height;
@@ -78,7 +80,11 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 	
 	animateOut: function(item)
 	{
-		item.clippos-=this.step;
+		var region = YAHOO.util.Dom.getRegion(item.element);
+		var height = region.bottom-region.top;
+		var step = height/this.steps;
+
+		item.clippos-=step;
 		
 		if (item.clippos<=0)
 		{
