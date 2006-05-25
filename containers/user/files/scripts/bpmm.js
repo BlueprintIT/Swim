@@ -198,6 +198,7 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	log: function(text)
 	{
+		return;
 		if (!this.textarea)
 			this.textarea=document.getElementById('log');
 		if (this.textarea)
