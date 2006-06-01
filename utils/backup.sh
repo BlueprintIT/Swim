@@ -6,7 +6,7 @@ cd $DIR/..
 if [ "$1" ]; then
 	BASE=$1
 else
-	BASE=`date +backups/backup-%Y%m%d-%H%M`
+	BASE=`date +../backups/backup-%Y%m%d-%H%M`
 fi
 
 TEMP_FILE=$BASE.tar

@@ -600,12 +600,10 @@ class Resource
     }
 		else if (count($parts)>=2)
 		{
-      $log=LoggerManager::getLogger('swim.resource');
-      
 			$type=$parts[0];
 			$id=$parts[1];
 
-      $log->debug("Decoding ".$type." resource ".$id." version ".$version);
+      $this->log->debug("Decoding ".$type." resource ".$id." version ".$version);
 
 			if ($type=='file')
 			{
@@ -621,7 +619,7 @@ class Resource
 				}
         else
         {
-          $log->debug("Request for ".$type." ".$id." version ".$version." failed.");
+          $this->log->debug("Request for ".$type." ".$id." version ".$version." failed.");
         }                
 			}
 		}
@@ -634,7 +632,7 @@ class Resource
 		
 		if ($request instanceof Request)
 		{
-		  if (isset($request->resObject))
+		  if ($request->resObject !== FALSE)
 		    return $request->resObject;
 		    
 			$resource=$request->resourcePath;

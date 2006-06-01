@@ -246,7 +246,7 @@ function checkSecurity($request, $required, $allowed)
 class Request
 {
   var $resPath = '';
-  var $resObject;
+  var $resObject = null;
   var $protocol;
 	var $method;
 	var $query = array();
@@ -281,7 +281,7 @@ class Request
   {
     if ($name == 'resource')
     {
-      if (isset($this->resObject))
+      if ($this->resObject !== FALSE)
         return $this->resObject;
       return null;
     }
@@ -311,7 +311,7 @@ class Request
       }
       else
       {
-        unset($this->resObject);
+        $this->resObject = FALSE;
         $this->resPath = $value;
         Resource::decodeResource($this);
       }
@@ -322,11 +322,11 @@ class Request
       if ($value == '')
         $this->resObject = null;
       else
-        unset($this->resObject);
+        $this->resObject = FALSE;
     }
     else
     {
-      $this->log->warn('Attempt to set unknown property - '.$name);
+      $this->log->warnTrace('Attempt to set unknown property - '.$name);
     }
   }
   
@@ -356,7 +356,7 @@ class Request
 	{
 		global $_PREFS;
 		
-    if (!isset($this->resObject))
+    if ($this->resObject === FALSE)
       Resource::decodeResource($this);
       
     $host='';
@@ -387,6 +387,7 @@ class Request
       if (($humanreadable) && ($this->method=='view') && ($this->resource !== null))
       {
         $url = $this->resource->getViewPath($this);
+        $this->log->warn('Path for '.$this->resource->getPath().' is '.$url);
       }
       if ($url === null)
       {

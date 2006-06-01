@@ -30,7 +30,9 @@ function determineContentType($file)
 {
 	if (function_exists('mime_content_type'))
 	{
-		return mime_content_type($file);
+    $type = mime_content_type($file);
+    if ($type != false)
+      return $type;
 	}
 	$filename=basename($file);
 	$parts=explode('.',$filename);
