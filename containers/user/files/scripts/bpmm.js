@@ -430,7 +430,6 @@ function Menu(manager,item,orientation,element,animator)
  	this.iframe = document.createElement("iframe");
  	this.iframe.className = "menuframe";
  	this.iframe.frameBorder = "0";
- 	this.iframe.src = "javascript:false;";
  	this.iframe.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';
  	YAHOO.util.Dom.setStyle(this.iframe, "position", "absolute");
  	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");

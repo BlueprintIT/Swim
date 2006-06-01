@@ -4,6 +4,7 @@ CONTEXT .level1 ul {
   border-left: 1px solid bordergrey;
   border-right: 1px solid bordergrey;
   border-collapse: collapse;
+  z-index: 1;
 }
 
 CONTEXT .level1 li {
