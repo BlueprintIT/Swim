@@ -126,16 +126,16 @@ class User
     switch ($access)
     {
       case PERMISSION_READ:
-        $type='read';
+        $type='canread';
         break;
       case PERMISSION_WRITE:
-        $type='write';
+        $type='canwrite';
         break;
       case PERMISSION_EDIT:
-        $type='edit';
+        $type='canedit';
         break;
       case PERMISSION_DELETE:
-        $type='remove';
+        $type='canremove';
         break;
       default:
         return false;
@@ -542,7 +542,7 @@ class Group
 
 class UserManager
 {
-  static function login($username,$password)
+  public static function login($username,$password)
   {
     global $_USER;
     
@@ -556,7 +556,7 @@ class UserManager
     return false;
   }
   
-  static function logout()
+  public static function logout()
   {
     global $_USER;
     
@@ -564,16 +564,37 @@ class UserManager
     unset($_SESSION['Swim.User']);
   }
   
-  static function createUser($username)
+  public static function getUser($name)
+  {
+    $user = ObjectCache::getItem('user', $name);
+    if ($user == null)
+    {
+      $user = new User($name);
+      ObjectCache::setItem('user', $name, $user);
+    }
+    return $user;
+  }
+  
+  public static function getGroup($name)
+  {
+    $group = ObjectCache::getItem('group', $name);
+    if ($group == null)
+    {
+      $group = new Group($name);
+      ObjectCache::setItem('group', $name, $group);
+    }
+    return $group;
+  }
+  
+  public static function createUser($username)
   {
     global $_STORAGE;
     
     $_STORAGE->queryExec("INSERT INTO User (id) VALUES ('".$_STORAGE->escape($username)."');");
-  	$user = new User($username);
-  	return $user;
+  	return self::getUser($username);
   }
   
-  static function deleteUser($user)
+  public static function deleteUser($user)
   {
   	global $_STORAGE;
   	
@@ -585,7 +606,7 @@ class UserManager
     return true;
   }
   
-  static function getAllUsers()
+  public static function getAllUsers()
   {
     global $_STORAGE;
     
@@ -594,13 +615,13 @@ class UserManager
     while ($result->valid())
     {
       $id = $result->fetch();
-      $user = new User($id[0]);
+      $user = self::getUser($id[0]);
       $users[$user->getUsername()]=$user;
     }
     return $users;
   }
   
-  static function getGroups()
+  public static function getAllGroups()
   {
     global $_STORAGE;
     
@@ -609,7 +630,7 @@ class UserManager
     while ($result->valid())
     {
       $id = $result->fetch();
-      $group = new Group($id[0]);
+      $group = self::getGroup($id[0]);
       $groups[$group->getID()]=$group;
     }
     return $groups;
@@ -631,7 +652,8 @@ class UserAdminSection extends AdminSection
   public function getURL()
   {
     $request = new Request();
-    $request->method='users';
+    $request->setMethod('admin');
+    $request->setPath('users/');
     return $request->encode();
   }
   
@@ -644,7 +666,7 @@ class UserAdminSection extends AdminSection
   
   public function isSelected($request)
   {
-    if ($request->method == 'users')
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,6)=='users/'))
       return true;
       
     return false;

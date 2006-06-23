@@ -84,8 +84,8 @@ class SwimEngine
     $prevstate=$_STATE;
     $_STATE=STATE_PROCESSING;
     
-    $methodfile=$request->method.".php";
-    $methodfunc='method_'.$request->method;
+    $methodfile=$request->getMethod().".php";
+    $methodfunc='method_'.$request->getMethod();
     if (is_readable($_PREFS->getPref('storage.methods').'/'.$methodfile))
     {
       require_once($_PREFS->getPref('storage.methods').'/'.$methodfile);

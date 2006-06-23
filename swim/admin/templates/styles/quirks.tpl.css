@@ -1,0 +1,9 @@
+/* Pull default to 10pt font */
+body {
+  font-size: 83.33%;
+}
+
+/* Ensure font size cascades properly in quirks mode */
+table, td {
+  font-size: 100%;
+}

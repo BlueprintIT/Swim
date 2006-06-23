@@ -18,9 +18,9 @@ class MySQLResult extends StorageResult
 	private $result;
 	private $offset = 0;
 	
-	public function StorageResult($result)
+	public function __construct($result)
 	{
-		$this->StorageResult();
+		parent::__construct();
 		$this->result = $result;
 	}
 	
@@ -69,9 +69,9 @@ class MySQLStorage extends StorageConnection
 {
   private $db;
   
-  public function MySQLStorage($host, $user, $pass, $db)
+  public function __construct($host, $user, $pass, $db)
   {
-  	$this->StorageConnection();
+  	parent::__construct();
     $this->db = new mysqli($host, $user, $pass, $db);
     $this->log->debug('Loaded '.$db.' database from '.$host);
   }
@@ -86,7 +86,7 @@ class MySQLStorage extends StorageConnection
     $this->log->debug('query: '.$query);
     $result = $this->db->query($query);
     if ($result && $result !== TRUE)
-    	return new StorageResult($result);
+    	return new MySQLResult($result);
     return $result;
   }
   

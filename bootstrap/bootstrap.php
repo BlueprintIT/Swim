@@ -89,6 +89,7 @@ require_once $bootstrap.'/prefs.php';
 loadBasePreferences();
 
 LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
+LoggerManager::setBaseDir($_PREFS->getPref('storage.basedir'));
 require_once $bootstrap.'/baseincludes.php';
 
 loadUserPreferences();

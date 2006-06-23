@@ -17,9 +17,9 @@ class SqliteStorageResult extends StorageResult
 {
 	private $result;
 	
-	function SqliteStorageResult($result)
+	function __construct($result)
 	{
-		$this->StorageResult();
+		parent::__construct();
 		$this->result = $result;
 	}
 
@@ -45,7 +45,7 @@ class SqliteStorageResult extends StorageResult
 	
 	public function current()
 	{
-		return $this->current();
+		return $this->result->current();
 	}
 	
 	public function key()
@@ -73,9 +73,9 @@ class SqliteStorage extends StorageConnection
 {
   private $db;
   
-  public function SqliteStorage($filename)
+  public function __construct($filename)
   {
-  	$this->StorageConnection();
+  	parent::__construct();
 	  if (!is_file($filename))
 	  {
 	    $this->new=true;

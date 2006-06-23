@@ -1,0 +1,266 @@
+<?
+
+/*
+ * Swim
+ *
+ * Smarty interface functions
+ *
+ * Copyright Blueprint IT Ltd. 2006
+ *
+ * $HeadURL$
+ * $LastChangedBy$
+ * $Date$
+ * $Revision$
+ */
+
+class HtmlHeader
+{
+  private $stylesheets = array();
+  private $scripts = array();
+  
+  public function addStyleSheet($path)
+  {
+    if (!isset($this->stylesheets[$path]))
+      $this->stylesheets[$path]=true;
+  }
+  
+  public function addScript($path)
+  {
+    if (!isset($this->scripts[$path]))
+      $this->scripts[$path]=true;
+  }
+  
+  public function getHtml()
+  {
+    $result = '';
+    foreach ($this->stylesheets as $path => $val)
+    {
+      $result.='<link rel="stylesheet" href="'.$path.'" type="text/css">'."\n";
+    }
+    foreach ($this->scripts as $path => $val)
+    {
+      $result.='<script src="'.$path.'" type="text/javascript"></script>'."\n";
+    }
+    return $result;
+  }
+}
+
+function brand_get_template ($tpl_name, &$tpl_source, &$smarty)
+{
+  global $_PREFS;
+  
+  $file = $_PREFS->getPref('storage.branding.templates').'/'.$tpl_name;
+  if (is_file($file))
+  {
+    $tpl_source = file_get_contents($file);
+    return true;
+  }
+  else
+    return false;
+}
+
+function brand_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty)
+{
+  global $_PREFS;
+  
+  $file = $_PREFS->getPref('storage.branding.templates').'/'.$tpl_name;
+  if (is_file($file))
+  {
+    $tpl_timestamp = filemtime($file);
+    return true;
+  }
+  else
+    return false;
+}
+
+function brand_get_secure($tpl_name, &$smarty)
+{
+  return true;
+}
+
+function brand_get_trusted($tpl_name, &$smarty)
+{
+}
+
+function get_params_request($params, $smarty)
+{
+  $request = new Request();
+  if (empty($params['method']))
+    $request->setMethod('view');
+  else
+    $request->setMethod($params['method']);
+  if (!empty($params['path']))
+    $request->setPath($params['path']);
+  if ((!empty($params['nestcurrent'])) && ($params['nestcurrent'] == "true"))
+    $request->setNested($smarty->get_template_vars('REQUEST'));
+
+  return $request;
+}
+
+function check_security($params, $content, &$smarty, &$repeat)
+{
+  global $_USER;
+  
+  $valid = false;
+  if ($_USER->isLoggedIn())
+  {
+    $valid = true;
+    foreach ($params as $section => $types)
+    {
+      $list = explode(',', $types);
+      foreach ($list as $type)
+      {
+        if (!$_USER->hasPermission($section, $type))
+          $valid=false;
+      }
+    }
+  }
+  
+  if (($valid) && (!$repeat))
+    print($content);
+  else if ((!$valid) && ($repeat))
+    displayAdminLogin($smarty->get_template_vars('REQUEST'));
+}
+
+function encode_url($params, &$smarty)
+{
+  $request = get_params_request($params, $smarty);
+  return $request->encode();
+}
+
+function encode_form($params, $content, &$smarty, &$repeat)
+{
+  if ($repeat)
+  {
+    if (empty($params['href']))
+    {
+      $request = get_params_request($params, $smarty);
+      $path = $request->encodePath();
+      $vars = $request->getFormVars();
+    }
+    else
+    {
+      $path = $params['href'];
+      $vars = '';
+    }
+    $method = "POST";
+    if (!empty($params['method']))
+      $method = $params['method'];
+    print('<form method="'.$method.'" action="'.$path.'">');
+    print($vars);
+  }
+  else
+  {
+    print($content);
+    print('</form>');
+  }
+}
+
+function encode_stylesheet($params, &$smarty)
+{
+  if (empty($params['href']))
+  {
+    $request = get_params_request($params, $smarty);
+    $path = $request->encode();
+  }
+   else
+    $path = $params['href'];
+  $head = $smarty->get_registered_object('HEAD');
+  $head->addStyleSheet($path);
+}
+
+function encode_script($params, &$smarty)
+{
+  if (empty($params['href']))
+  {
+    $request = get_params_request($params, $smarty);
+    $path = $request->encode();
+  }
+   else
+    $path = $params['href'];
+  $head = $smarty->get_registered_object('HEAD');
+  $head->addScript($path);
+}
+
+function header_outputfilter($tpl_output, &$smarty)
+{
+  $pos = strpos($tpl_output, '</head>');
+  if ($pos !== false)
+  {
+    $start = substr($tpl_output, 0, $pos);
+    $end = substr($tpl_output, $pos);
+    $head = $smarty->get_registered_object('HEAD');
+    $extra = $head->getHtml();
+    return $start.$extra.$end;
+  }
+  return $tpl_output;
+}
+
+function configureSmarty($smarty, $request)
+{
+  global $_PREFS,$_USER;
+
+  $log = LoggerManager::getLogger('page');
+  $log->debug('Creating admin smarty.');
+  
+  $smarty->assign_by_ref('USER', $_USER);
+  $smarty->assign_by_ref('REQUEST', $request);
+  $smarty->assign_by_ref('PREFS', $_PREFS);
+  $smarty->assign_by_ref('LOG', $log);
+  $smarty->register_resource('brand', array(
+                             'brand_get_template',
+                             'brand_get_timestamp',
+                             'brand_get_secure',
+                             'brand_get_trusted'));
+  $smarty->register_function('stylesheet', 'encode_stylesheet');
+  $smarty->register_function('script', 'encode_script');
+  $smarty->register_function('encode', 'encode_url');
+  $smarty->register_block('html_form', 'encode_form');
+  $smarty->register_block('secure', 'check_security');
+  $smarty->register_object('HEAD', new HtmlHeader());
+  $smarty->register_outputfilter('header_outputfilter');
+}
+
+function createAdminSmarty($request)
+{
+  global $_PREFS,$_USER;
+  
+  require_once($_PREFS->getPref('storage.smarty').'/Smarty.class.php');
+  $smarty = new Smarty();
+  $smarty->template_dir = $_PREFS->getPref('storage.admin.templates');
+  $smarty->compile_dir = $_PREFS->getPref('storage.admin.compiled');
+  $smarty->config_dir = $_PREFS->getPref('storage.admin.config');
+  $smarty->cache_dir = $_PREFS->getPref('storage.admin.cache');
+  recursiveMkDir($smarty->compile_dir);
+  recursiveMkDir($smarty->cache_dir);
+
+  configureSmarty($smarty, $request);
+  $smarty->assign('CONTENT', $_PREFS->getPref('storage.admin.static'));
+  $smarty->assign('BRAND', $_PREFS->getPref('storage.branding.static'));
+  
+  return $smarty;
+}
+
+function createSmarty($request)
+{
+  global $_PREFS,$_USER;
+  
+  $log = LoggerManager::getLogger('page');
+  $log->debug('Creating smarty.');
+  
+  require_once($_PREFS->getPref('storage.smarty').'/Smarty.class.php');
+  $smarty = new Smarty();
+  $smarty->template_dir = $_PREFS->getPref('storage.site.templates');
+  $smarty->compile_dir = $_PREFS->getPref('storage.site.compiled');
+  $smarty->config_dir = $_PREFS->getPref('storage.site.config');
+  $smarty->cache_dir = $_PREFS->getPref('storage.site.cache');
+  recursiveMkDir($smarty->compile_dir);
+  recursiveMkDir($smarty->cache_dir);
+
+  configureSmarty($smarty, $request);
+  $smarty->assign('CONTENT', $_PREFS->getPref('storage.site.static'));
+
+  return $smarty;
+}
+
+?>

@@ -17,44 +17,44 @@ class StorageResult
 {
   protected $log;
 
-	function StorageResult()
+	function __construct()
 	{
     $this->log = LoggerManager::getLogger('swim.storage.result');
 	}
 	
 	public function fetch()
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function fetchObject()
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function numFields()
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function fieldName($index)
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function key()
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function numRows()
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function seek($pos)
 	{
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
 	}
 	
 	public function fetchSingle()
@@ -122,7 +122,7 @@ class StorageConnection
   protected $new = false;
   protected $transaction = 0;
 
-	function StorageConnection()
+	function __construct()
 	{
     $this->log = LoggerManager::getLogger('swim.storage.connection');
 	}
@@ -162,38 +162,38 @@ class StorageConnection
 	
   public function escape($text)
   {
-    $this->log->warn('Unimplemented storage method');
+    $this->log->warntrace('Unimplemented storage method');
     return addslashes($text);
   }
   
   public function query($query)
   {
-    $this->log->error('Unimplemented storage method');
+    $this->log->errortrace('Unimplemented storage method');
   }
   
   public function queryExec($query)
   {
-    $this->log->error('Unimplemented storage method');
+    $this->log->errortrace('Unimplemented storage method');
   }
 
   public function lastInsertRowid()
   {
-    $this->log->error('Unimplemented storage method');
+    $this->log->errortrace('Unimplemented storage method');
   }
   
   public function changes()
   {
-    $this->log->error('Unimplemented storage method');
+    $this->log->errortrace('Unimplemented storage method');
   }
   
   public function lastError()
   {
-    $this->log->error('Unimplemented storage method');
+    $this->log->errortrace('Unimplemented storage method');
   }
   
   public function lastErrorText()
   {
-    $this->log->error('Unimplemented storage method');
+    $this->log->errortrace('Unimplemented storage method');
   }
   
   public function arrayQuery($query)
@@ -266,6 +266,7 @@ class StorageConnection
 	}
 }
 
+require "mysql.php";
 require "sqlite.php";
 
 function storage_init()
@@ -274,7 +275,20 @@ function storage_init()
   
   // TODO Add in some locking using a transaction and test for tables here
   $log = LoggerManager::getLogger('swim.storage');
-  $_STORAGE = new SqliteStorage($_PREFS->getPref('storage.config').'/storage.db');
+  $type = $_PREFS->getPref('storage.dbtype');
+  if ($type == 'sqlite')
+  {
+    $_STORAGE = new SqliteStorage($_PREFS->getPref('storage.config').'/storage.db');
+  }
+  else if ($type == 'mysql')
+  {
+    $host = $_PREFS->getPref('storage.mysql.host');
+    $user = $_PREFS->getPref('storage.mysql.user');
+    $pass = $_PREFS->getPref('storage.mysql.pass');
+    $database = $_PREFS->getPref('storage.mysql.database');
+    $_STORAGE = new MysqlStorage($host, $user, $pass, $database);
+  }
+    
   if ($_STORAGE->isNew())
   {
     $log->debug('Initialising database');

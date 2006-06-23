@@ -269,6 +269,7 @@ class Logger
 		$pos=0;
 		$tpos=$diff;
 		$count=count($trace)-$diff;
+    $basedir = LoggerManager::getBaseDir();
 		while ($pos<$count)
 		{
 			if (isset($trace[$tpos]['class']))
@@ -281,7 +282,15 @@ class Logger
 			}
 			$result[$pos]['args']=$trace[$tpos]['args'];
 			$result[$pos]['line']=$trace[$tpos-1]['line'];
-			$result[$pos]['file']=$trace[$tpos-1]['file'];
+      
+      if (substr($trace[$tpos-1]['file'],0,strlen($basedir))==$basedir)
+      {
+        $result[$pos]['file']=substr($trace[$tpos-1]['file'],strlen($basedir));
+        if ((substr($result[$pos]['file'],0,1)=='/') || (substr($result[$pos]['file'],0,1)=='\\'))
+          $result[$pos]['file'] = substr($result[$pos]['file'],1);
+      }
+      else
+  			$result[$pos]['file']=$trace[$tpos-1]['file'];
 			$pos++;
 			$tpos++;
 		}
@@ -295,7 +304,14 @@ class Logger
 		}
 		if (isset($trace[$tpos-1]['file']))
 		{
-			$result[$pos]['file']=$trace[$tpos-1]['file'];
+      if (substr($trace[$tpos-1]['file'],0,strlen($basedir))==$basedir)
+      {
+        $result[$pos]['file']=substr($trace[$tpos-1]['file'],strlen($basedir));
+        if ((substr($result[$pos]['file'],0,1)=='/') || (substr($result[$pos]['file'],0,1)=='\\'))
+          $result[$pos]['file'] = substr($result[$pos]['file'],1);
+      }
+      else
+        $result[$pos]['file']=$trace[$tpos-1]['file'];
 		}
 		else
 		{
@@ -461,6 +477,7 @@ class LoggerManager
   private static $root;
   private static $uids = array();
   private static $basetime;
+  private static $basedir;
 	
 	static function init()
 	{
@@ -535,6 +552,16 @@ class LoggerManager
 		}
 	}
 	
+  static function getBaseDir()
+  {
+    return self::$basedir;
+  }
+  
+  static function setBaseDir($value)
+  {
+    self::$basedir = $value;
+  }
+  
 	static function setLogLevel($prefix,$level)
 	{
 		if (strlen($prefix)>0)

@@ -146,57 +146,52 @@ function displayAdminLogin($request)
 
 function displayLogin($request,$message)
 {
-	$newrequest = new Request();
-	$newrequest->method='displayLogin';
-	$newrequest->nested=$request;
-	$newrequest->query['message']=$message;
-	SwimEngine::processRequest($newrequest);
+  global $_PREFS;
+  displayAdminFile($request, $_PREFS->getPref('storage.admin.templates').'/login', array('message' => $message));
+}
+
+function displayAdminFile($request, $path, $vars)
+{
+  if (is_file($path.'.tpl'))
+  {
+    $smarty = createAdminSmarty($request);
+    $smarty->assign($vars);
+    $smarty->display($path.'.tpl');
+  }
+  else if (is_file($path.'.php'))
+    include($path.'.php');
+  else if (is_file($path.'.html'))
+    include($path.'.html');
+  else
+    displayNotFound($request);
 }
 
 function displayGeneralError($request,$message)
 {
 	global $_PREFS;
+  
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-	$page = Resource::decodeResource($_PREFS->getPref('errors.general.page'));
-	$request->query['message']=$message;
-	if ($page!==null)
-	{
-		$page->display($request);
-	}
-	else
-	{
-		// TODO What to do here?
-	}
+  $smarty = createSmarty($request);
+  $smarty->assign('message', $message);
+  $smarty->display($_PREFS->getPref('errors.general.template'));
 }
 
 function displayNotFound($request)
 {
 	global $_PREFS;
+
  	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
-	$page = Resource::decodeResource($_PREFS->getPref('errors.notfound.page'));
-	if ($page!==null)
-	{
-		$page->display($request);
-	}
-	else
-	{
-		// TODO What to do here?
-	}
+  $smarty = createSmarty($request);
+  $smarty->display($_PREFS->getPref('errors.notfound.template'));
 }
 
 function displayServerError($request)
 {
 	global $_PREFS;
+
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
-	$page = Resource::decodeResource($_PREFS->getPref('errors.server.page'));
-	if ($page!==null)
-	{
-		$page->display($request);
-	}
-	else
-	{
-		// TODO What to do here?
-	}
+  $smarty = createSmarty($request);
+  $smarty->display($_PREFS->getPref('errors.server.template'));
 }
 
 function setDefaultCache()
@@ -265,6 +260,52 @@ function saveSitePreferences()
 	$_PREFS->savePreferences($file);
 	fclose($file);
 	LockManager::unlockResource($confdir);
+}
+
+function findDisplayableFile($path)
+{
+  if (is_file($path))
+    return $path;
+    
+  if (is_dir($path))
+  {
+    $found = findDisplayableFile($path.'/index.php');
+    if ($found != null)
+      return $found;
+
+    $found = findDisplayableFile($path.'/index.html');
+    if ($found != null)
+      return $found;
+
+    if (is_file($path.'/index.tpl'))
+      return $path.'/index.tpl';
+    
+    return null;
+  }
+  
+  if (is_file($path.'.tpl'))
+    return $path.'.tpl';
+    
+  $pos = strrpos($path,'.');
+  if ($pos !== false)
+  {
+    $path = substr($path, 0 ,$pos).'.tpl'.substr($path, $pos);
+    if (is_file($path))
+      return $path;
+  }
+  
+  return null;
+}
+
+function isTemplateFile($path)
+{
+  if (substr($path,-4)=='.tpl')
+    return true;
+    
+  if (strpos($path, '.tpl.')!==false)
+    return true;
+
+  return false;
 }
 
 ?>
