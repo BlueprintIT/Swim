@@ -1,7 +1,6 @@
-BlueprintIT.widget.SiteTree = function(siteadmin, url, div) {
+BlueprintIT.widget.SiteTree = function(url, div) {
 	this.location=url;
 	this.element=div;
-	this.baselocation=siteadmin;
 	this.loading=true;
 	
 	YAHOO.util.Event.addListener(window, "load", this.init, this, true);
@@ -10,7 +9,6 @@ BlueprintIT.widget.SiteTree = function(siteadmin, url, div) {
 BlueprintIT.widget.SiteTree.prototype = {
 	element: null,
 	location: null,
-	baselocation: null,
 	items: null,
 	selected: null,
 	loading: null,
@@ -51,23 +49,14 @@ BlueprintIT.widget.SiteTree.prototype = {
 	
 	loadItem: function(node, parentnode) {
 		var details = {
-			label: YAHOO.util.Dom.textContent(node),
-			iconClass: node.tagName
+			label: node.getAttribute("name"),
+			iconClass: node.getAttribute("class")
 		};
 		if (node.getAttribute("infolink")) {
 			details.href = node.getAttribute("infolink");
 			details.target = "main";
 		}
-		var id = node.tagName+"/";
-		if (node.tagName == "category") {
-			id+=node.getAttribute("id");
-		}
-		else if (node.tagName == "page") {
-			id+=node.getAttribute("path");
-		}
-		else if (node.tagName == "link") {
-			id+=node.getAttribute("id");
-		}
+		var id = node.getAttribute("id");
 		if (!this.items[id]) {
 			this.items[id] = [];
 		}
@@ -75,9 +64,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);
 		this.items[id].push(treenode);
 		
-		if (node.tagName == "category") {
-			this.loadCategory(node, treenode);
-		}
+		this.loadCategory(node, treenode);
 	},
 	
 	loadCategory: function(element, treenode) {
@@ -92,15 +79,15 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 
 	loadFromDocument: function(doc) {
-		var node = doc.getElementsByTagName("tree");
+/*		var node = doc.getElementsByTagName("tree");
 		
 		if (!node || node.length==0)
-			return;
+			return;*/
 		
 		this.items = [];
 		var tree = new YAHOO.widget.TreeView(this.element);
-		this.loadCategory(node[0], tree.getRoot());
-		var unused = null;
+		this.loadItem(doc.documentElement, tree.getRoot());
+		/*var unused = null;
 		var nodes = doc.getElementsByTagName("pages");
 		if (nodes.length > 0) {
 			var node = nodes[0].firstChild;
@@ -114,7 +101,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 				}
 				node = node.nextSibling;
 			}
-		}
+		}*/
 		tree.draw();
 		this.loading = false;
 		if (this.selected) {

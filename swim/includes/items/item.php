@@ -15,13 +15,17 @@
 
 class Item
 {
+  private $log;
   private $id;
-  private $versions = array();
-  private $current = array();
+  private $section;
+  private $variants = array();
   
-  private function __construct($id)
+  private function __construct($details)
   {
-    $this->id = $id;
+    $this->log = LoggerManager::getLogger('swim.itemversion');
+    
+    $this->id = $details['id'];
+    $this->section = $details['section'];
   }
   
   public function getId()
@@ -29,59 +33,125 @@ class Item
     return $this->id;
   }
   
-  public function getCurrentVersion($variant)
+  public function getSection()
   {
-    global $_STORAGE;
-    
-    if ($this->current != null)
-      return $this->current;
-      
-    $results = $_STORAGE->query('SELECT * FROM Item WHERE item='.$this->id.' AND variant="'.$_STORAGE->escape($variant).'" AND current=1;');
-    if ($results->valid())
-    {
-      $version = new ItemVersion($results->fetch());
-      $this->current[$variant] = $version;
-      $this->versions[$variant][$version->getVersion()] = $version;
-    }
-    return $this->current;
+    return $this->section;
   }
   
-  public function getVersion($variant, $version)
+  public function getCurrentVersion($variant)
+  {
+    $v = $this->getVariant($variant);
+    if ($v != null)
+    {
+      $r = $v->getCurrentVersion();
+      if ($r != null)
+        return $r;
+    }
+    $v = $this->getVariant('default');
+    if ($v != null)
+      return $v->getCurrentVersion();
+    return null;
+  }
+  
+  public function getVariant($variant)
   {
     global $_STORAGE;
     
-    if ($this->versions[$version] != null)
-      return $this->versions[$version];
-      
-    $results = $_STORAGE->query('SELECT * FROM Item WHERE item='.$this->id.' AND version='.$version.' AND variant="'.$_STORAGE->escape($variant).'";');
-    if ($results->valid())
-    {
-      $version = new ItemVersion($results->fetch());
-      $this->versions[$variant][$version] = $version;
-      if ($version->isCurrent())
-        $this->current[$variant] = $version;
-    }
-    return $this->versions[$version];
+    if (isset($this->variants[$variant]))
+      return $this->variants[$variant];
+    
+    $result = $_STORAGE->query('SELECT * FROM ItemVariant WHERE item='.$this->id.' AND variant="'.$_STORAGE->escape($variant).'";');
+    if ($result->valid())
+      $this->variants[$variant] = new ItemVariant($result->fetch());
+    else
+      $this->variants[$variant] = null;
+    return $this->variants[$variant];
   }
   
   public static function getItem($id)
   {
-    $result = ObjectCache::getItem('dbitem', $id);
-    if ($result != null)
+    global $_STORAGE;
+    
+    $item = ObjectCache::getItem('dbitem', $id);
+    if ($item === null)
     {
-      $result = new Item($id);
-      ObjectCache::setItem('dbitem', $id);
+      $result = $_STORAGE->query('SELECT * FROM Item WHERE id='.$id.';');
+      if ($result->valid())
+        $item = new Item($result->fetch());
+      else
+        $item = null;
+      ObjectCache::setItem('dbitem', $id, $item);
     }
-    return $result;
+    return $item;
+  }
+}
+
+class ItemVariant
+{
+  private $id;
+  private $variant;
+  private $item;
+  private $versions = array();
+  
+  public function __construct($details)
+  {
+    $this->item = $details['item'];
+    $this->variant = $details['variant'];
+    $this->id = $details['id'];
+  }
+
+  public function getItem()
+  {
+    return Item::getItem($this->item);
+  }
+  
+  public function getVariant()
+  {
+    return $this->variant;
+  }
+  
+  public function getCurrentVersion()
+  {
+    global $_STORAGE;
+    
+    if (isset($this->current))
+      return $this->current;
+      
+    $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE itemvariant='.$this->id.' AND current=1;');
+    if ($results->valid())
+    {
+      $version = new ItemVersion($results->fetch(), $this);
+      $this->current = $version;
+      $this->versions[$version->getVersion()] = $version;
+    }
+    return $this->current;
+  }
+  
+  public function getVersion($version)
+  {
+    global $_STORAGE;
+    
+    if (isset($this->versions[$version]))
+      return $this->versions[$version];
+      
+    $results = $_STORAGE->query('SELECT * FROM VersionVariant WHERE itemvariant='.$this->id.' AND version='.$version.';');
+    if ($results->valid())
+    {
+      $version = new ItemVersion($results->fetch(), $this);
+      $this->versions[$version] = $version;
+      if ($version->isCurrent())
+        $this->current = $version;
+    }
+    return $this->versions[$version];
   }
 }
 
 class ItemVersion
 {
+  private $log;
   private $id;
-  private $item;
-  private $variant;
   private $version;
+  private $variant;
   private $itemclass;
   private $owner;
   private $modified;
@@ -89,11 +159,15 @@ class ItemVersion
   private $current;
   private $fields = array();
   
-  public function __construct($details)
+  public function __construct($details, $variant = null)
   {
+    $this->log = LoggerManager::getLogger('swim.itemversion');
+    
     $this->id = $details['id'];
-    $this->item = Item::getItem($details['item']);
-    $this->variant = $details['variant'];
+    if ($variant != null)
+      $this->variant = $variant;
+    else
+      $this->variant = $details['itemvariant'];
     $this->version = $details['version'];
     $this->itemclass = ClassManager::getClass($details['class']);
     $this->modified = $details['modified'];
@@ -108,19 +182,33 @@ class ItemVersion
       $this->current = false;
   }
   
-  private function getId()
+  public function getId()
   {
     return $this->id;
   }
   
   public function getItem()
   {
-    return $this->item;
+    return $this->getVariant()->getItem();
   }
   
   public function getVariant()
   {
-    return $this->variant;
+    if ($this->variant instanceof ItemVariant)
+      return $this->variant;
+    else
+    {
+      $this->variant = null;
+      $results = $_STORAGE->query('SELECT item,variant FROM ItemVariant WHERE id='.$this->variant.';');
+      if ($results->valid())
+      {
+        $details = $result->fetch();
+        $item = Item::getItem($details['item']);
+        if ($item != null)
+          $this->variant = $item->getVariant($details['variant']);
+      }
+      return $this->variant;
+    }
   }
   
   public function getVersion()
@@ -148,7 +236,7 @@ class ItemVersion
       
     $this->owner = $value->getUsername();
     $this->modified = time();
-    $_STORAGE->queryExec('UPDATE Item SET owner="'.$_STORAGE->escape($this->owner).'", modified='.$this->modified.' WHERE id='.$this->getId().';');
+    $_STORAGE->queryExec('UPDATE VariantVersion SET owner="'.$_STORAGE->escape($this->owner).'", modified='.$this->modified.' WHERE id='.$this->getId().';');
   }
   
   public function isComplete()
@@ -168,7 +256,7 @@ class ItemVersion
       $bit = 'NULL';
 
     $this->modified = time();
-    $_STORAGE->queryExec('UPDATE Item SET complete='.$bit.', modified='.$this->modified.' WHERE id='.$this->getId().';');
+    $_STORAGE->queryExec('UPDATE VariantVersion SET complete='.$bit.', modified='.$this->modified.' WHERE id='.$this->getId().';');
   }
   
   public function isCurrent()
@@ -181,8 +269,8 @@ class ItemVersion
     if ($this->current)
       return;
       
-    $_STORAGE->queryExec('UPDATE Item SET current=NULL WHERE current=1 AND item='.$this->item->getId().' AND variant="'.$this->variant.'";');
-    $_STORAGE->queryExec('UPDATE Item SET current=1 WHERE id='.$this->getId().';');
+    $_STORAGE->queryExec('UPDATE VariantVersion SET current=0 WHERE current=1 AND itemvariant="'.$this->getVariant()->getId().'";');
+    $_STORAGE->queryExec('UPDATE VariantVersion SET current=1 WHERE id='.$this->getId().';');
   }
   
   public function getClass()
@@ -199,7 +287,15 @@ class ItemVersion
 
     $this->itemclass = $value;
     $this->modified = time();
-    $_STORAGE->queryExec('UPDATE Item SET class="'.$_STORAGE->escape($value->getId()).'", modified='.$this->modified.' WHERE id='.$this->getId().';');
+    $_STORAGE->queryExec('UPDATE VariantVersion SET class="'.$_STORAGE->escape($value->getId()).'", modified='.$this->modified.' WHERE id='.$this->getId().';');
+  }
+  
+  public function getMainSequence()
+  {
+    if ($this->itemclass == null)
+      return null;
+      
+    return $this->itemclass->getMainSequence($this);
   }
   
   public function getField($name)

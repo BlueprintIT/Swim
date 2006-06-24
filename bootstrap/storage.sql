@@ -28,24 +28,35 @@ CREATE TABLE Permission (
 
 CREATE TABLE Item (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	section VARCHAR(20)
+);
+
+CREATE TABLE ItemVariant (
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	item INTEGER,
 	variant VARCHAR(20),
+	UNIQUE (item,variant)
+);
+
+CREATE TABLE VariantVersion (
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	itemvariant INTEGER,
 	version INTEGER,
+	class VARCHAR(30),
 	modified INTEGER,
 	owner VARCHAR(20),
 	current INTEGER,
 	complete INTEGER,
-	class VARCHAR(30),
-	UNIQUE (item,variant,version)
+	UNIQUE (itemvariant,version)
 );
 
 CREATE TABLE Field (
-	item INTEGER,
+	itemversion INTEGER,
 	field VARCHAR(30),
 	intValue INTEGER,
 	textValue TEXT,
 	dateValue INTEGER,
-	UNIQUE (item,field)
+	UNIQUE (itemversion,field)
 );
 
 CREATE TABLE Sequence (

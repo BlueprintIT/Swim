@@ -273,14 +273,13 @@ class Logger
 		while ($pos<$count)
 		{
 			if (isset($trace[$tpos]['class']))
-			{
 				$result[$pos]['function']=$trace[$tpos]['class'].$trace[$tpos]['type'].$trace[$tpos]['function'];
-			}
 			else
-			{
 				$result[$pos]['function']=$trace[$tpos]['function'];
-			}
-			$result[$pos]['args']=$trace[$tpos]['args'];
+      if (isset($trace[$tpos]['args']))
+  			$result[$pos]['args']=$trace[$tpos]['args'];
+      else
+        $result[$pos]['args']=array();
 			$result[$pos]['line']=$trace[$tpos-1]['line'];
       
       if (substr($trace[$tpos-1]['file'],0,strlen($basedir))==$basedir)
@@ -295,13 +294,9 @@ class Logger
 			$tpos++;
 		}
 		if (isset($trace[$tpos-1]['line']))
-		{
 			$result[$pos]['line']=$trace[$tpos-1]['line'];
-		}
 		else
-		{
 			$result[$pos]['line']='-1';
-		}
 		if (isset($trace[$tpos-1]['file']))
 		{
       if (substr($trace[$tpos-1]['file'],0,strlen($basedir))==$basedir)
@@ -314,9 +309,7 @@ class Logger
         $result[$pos]['file']=$trace[$tpos-1]['file'];
 		}
 		else
-		{
 			$result[$pos]['file']='Unknown';
-		}
 		$result[$pos]['args']=array();
 		$result[$pos]['function']='';
 		

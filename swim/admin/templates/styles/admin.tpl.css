@@ -9,39 +9,54 @@ a:hover, a:visited:hover {
 
 #tabpanel {
   border-collapse: collapse;
+  height: 30px;
   table-layout: fixed;
   width: 100%;
 }
 
-#tabpanel td {
+@-moz-document url-prefix(http://) {
+  #tabpanel .tab {
+    -moz-appearance: tab;
+    border-top: 0px none !important;
+    border-left: 0px none !important;
+    border-right: 0px none !important;
+  }
+}
+
+#tabpanel .tab {
   padding: 5px;
-  border: 1px solid ThreeDShadow;
-  background-color: ThreeDFace;
-  width: 150px;
+  width: 130px;
   height: 30px;
   text-align: center;
+}
+
+#tabpanel .tab a {
+  display: block;
+}
+
+#tabpanel .unselected {
+  background-color: ThreeDFace;
+  border: 1px solid ThreeDShadow;
+}
+
+#tabpanel .selected {
+  background-color: transparent;
+  border-top: 1px solid ThreeDShadow;
+  border-left: 1px solid ThreeDShadow;
+  border-right: 1px solid ThreeDShadow;
 }
 
 #tabpanel .remainder {
   width: auto;
   background-color: transparent;
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  border-bottom: 1px solid ThreeDShadow;
 }
 
 #tabpanel .spacer {
   width: 10px;
   padding: 0;
   background-color: transparent;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-}
-
-#tabpanel .selected {
-  background-color: transparent;
-  border-bottom: none;
+  border-bottom: 1px solid ThreeDShadow;
 }
 
 .mceEditorArea {

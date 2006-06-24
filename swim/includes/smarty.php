@@ -153,6 +153,12 @@ function encode_url($params, &$smarty)
     return $request;
 }
 
+function dynamic_section($params, $content, &$smarty, &$repeat)
+{
+  if (!$repeat)
+    print($content);
+}
+
 function encode_form($params, $content, &$smarty, &$repeat)
 {
   if ($repeat)
@@ -232,6 +238,8 @@ function api_get($params, &$smarty)
         $result = UserManager::getUser($params['id']);
       else if ($params['type']=='group')
         $result = UserManager::getGroup($params['id']);
+      else if ($params['type']=='item')
+        $result = Item::getItem($params['id']);
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }
@@ -252,7 +260,7 @@ function api_get($params, &$smarty)
   }
 }
 
-function configureSmarty($smarty, $request)
+function configureSmarty($smarty, $request, $type)
 {
   global $_PREFS,$_USER;
 
@@ -278,13 +286,20 @@ function configureSmarty($smarty, $request)
   $smarty->register_function('script', 'encode_script');
   $smarty->register_function('encode', 'encode_url');
   $smarty->register_function('apiget', 'api_get');
+  $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_object('HEAD', new HtmlHeader());
   $smarty->register_outputfilter('header_outputfilter');
+
+  if ($type == 'text/css')
+  {
+    $smarty->left_delimiter = '[';
+    $smarty->right_delimiter = ']';
+  }
 }
 
-function createAdminSmarty($request)
+function createAdminSmarty($request, $type)
 {
   global $_PREFS,$_USER;
   
@@ -297,14 +312,17 @@ function createAdminSmarty($request)
   recursiveMkDir($smarty->compile_dir);
   recursiveMkDir($smarty->cache_dir);
 
-  configureSmarty($smarty, $request);
+  configureSmarty($smarty, $request, $type);
   $smarty->assign('CONTENT', $_PREFS->getPref('storage.admin.static'));
   $smarty->assign('BRAND', $_PREFS->getPref('storage.branding.static'));
   
+  /*if (($type == 'text/css') || ($type == 'text/javascript'))
+    $smarty->caching = true;*/
+
   return $smarty;
 }
 
-function createSmarty($request)
+function createSmarty($request, $type)
 {
   global $_PREFS,$_USER;
   
@@ -320,8 +338,10 @@ function createSmarty($request)
   recursiveMkDir($smarty->compile_dir);
   recursiveMkDir($smarty->cache_dir);
 
-  configureSmarty($smarty, $request);
+  configureSmarty($smarty, $request, $type);
   $smarty->assign('CONTENT', $_PREFS->getPref('storage.site.static'));
+  
+  //$smarty->caching = true;
 
   return $smarty;
 }

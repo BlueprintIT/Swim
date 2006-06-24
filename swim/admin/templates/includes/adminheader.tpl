@@ -1,18 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
-{php}
-function display_tab($title,$url,$selected)
-{
-  if ($selected)
-  {
-  	print('<td class="selected">'.$title.'</td>');
-  }
-  else
-  {
-  	print('<td><a href="'.$url.'">'.$title.'</a></td>');
-  }
-}
-{/php}
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -44,28 +31,29 @@ body {
 </head>
 <body>
 
-<div id="banner">
-{include file='brand:banner.tpl'}
-<div id="admin">
-	{if $USER->isLoggedIn()}
-		<p style="margin: 0">Logged in as {$USER->getName()}</p>
-		<p style="margin: 0"><a href="{encode method='admin' path='password.tpl'}">Change Password</a> <a href="{encode method='logout'}">Logout</a></p>
-	{/if}
-</div>
-</div>
+  <div id="banner">
+    {include file='brand:banner.tpl'}
+      <div id="admin">
+        {if $USER->isLoggedIn()}
+          <p style="margin: 0">Logged in as {$USER->getName()}</p>
+          <p style="margin: 0"><a href="{encode method='admin' path='password.tpl'}">Change Password</a> <a href="{encode method='logout'}">Logout</a></p>
+        {/if}
+      </div>
+  </div>
 
-<table id="tabpanel">
-<tr>
-{php}
-foreach (AdminManager::$sections as $section)
-{
-  if ($section->isAvailable())
-  {
-  	print('<td class="spacer"></td>');
-    display_tab($section->getName(), $section->getUrl(), $section->isSelected($this->get_template_vars('REQUEST')));
-  }
-}
-{/php}
-  <td class="remainder"></td>
-</tr>
-</table>
+{php}$this->assign_by_ref('sections', AdminManager::$sections);{/php}
+  <table id="tabpanel">
+    <tr>
+      {foreach from=$sections item='section'}
+        {if $section->isAvailable()}
+          <td class="spacer"></td>
+          {if $section->isSelected($REQUEST)}
+            <td class="tab selected" selected="true">{$section->getName()}</td>
+          {else}
+            <td class="tab unselected"><a href="{$section->getUrl()}">{$section->getName()}</a></td>
+          {/if}
+        {/if}
+      {/foreach}
+      <td class="remainder"></td>
+    </tr>
+  </table>

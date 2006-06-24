@@ -16,20 +16,16 @@
 class ItemClass
 {
   private $id;
+  private $parent;
   private $name = '';
   private $description = '';
-  private $collection;
   private $fields;
+  private $mainsequence = null;
   
-  public function __construct($id, $collection, $clone=null)
+  public function __construct($id, $parent = null)
   {
     $this->id = $id;
-    $this->collection = $collection;
-    if ($clone!==null)
-    {
-      $this->name = $clone->name;
-      $this->description = $clone->description;
-    }
+    $this->parent = $parent;
   }
 
   public function getId()
@@ -47,16 +43,22 @@ class ItemClass
     return $this->description;
   }
   
+  public function getMainSequence($item)
+  {
+    if ($this->mainsequence != null)
+      return $this->getField($item, $this->mainsequence);
+    if ($this->parent != null)
+      return $this->parent->getMainSequence($item);
+    return null;
+  }
+  
   public function getField($item, $name)
   {
     if (isset($this->fields[$name]))
-    {
       return Field::getField($this->fields[$name], $item, $name);
-    }
-    else
-    {
-      return Field::getField(null, $item, $name);
-    }
+    if ($this->parent != null)
+      return $this->parent->getField($item, $name);
+    return Field::getField(null, $item, $name);
   }
   
   protected function parseElement($element)
@@ -65,6 +67,8 @@ class ItemClass
   
   public function load($element)
   {
+    if ($element->hasAttribute('mainsequence'))
+      $this->mainsequence = $element->getAttribute('mainsequence');
     $el=$element->firstChild;
     while ($el!==null)
     {
@@ -124,11 +128,11 @@ class ClassManager
               self::$log->debug('Creating page layout '.$id.' That extends another.');
               $base = $this->getClass($el->getAttribute('extends'));
               self::$log->debug('Extends '.$base->getName());
-              $class = new ItemClass($id, $this, $base);
+              $class = new ItemClass($id, $base);
             }
             else
             {
-              $class = new ItemClass($id, $this);
+              $class = new ItemClass($id);
             }
             self::$classes[$id]=$class;
             $class->load($el);

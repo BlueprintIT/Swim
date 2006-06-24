@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Admin site method
+ * Site templates
  *
  * Copyright Blueprint IT Ltd. 2006
  *
@@ -13,14 +13,14 @@
  * $Revision$
  */
 
-function method_admin($request)
+function method_layout($request)
 {
   global $_USER, $_STORAGE, $_PREFS;
   
-  $log = LoggerManager::getLogger('swim.method.admin');
+  $log = LoggerManager::getLogger('swim.method.layout');
   checkSecurity($request, true, true);
   
-  $path = $_PREFS->getPref('storage.admin.templates').'/'.$request->getPath();
+  $path = $_PREFS->getPref('storage.site.templates').'/'.$request->getPath();
   $path = findDisplayableFile($path);
   if ($path != null)
   {
@@ -28,7 +28,7 @@ function method_admin($request)
     setContentType($type);
     if (isTemplateFile($path))
     {
-      $smarty = createAdminSmarty($request, $type);
+      $smarty = createSmarty($request, $type);
       $smarty->display($path);
     }
     else

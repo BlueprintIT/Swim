@@ -16,25 +16,25 @@
 class Field
 {
   protected $exists = false;
-  protected $item = null;
+  protected $itemversion = null;
   protected $name;
   protected $metadata;
   
   public function __construct($metadata, $item, $name)
   {
-    $this->item = $item;
+    $this->itemversion = $item;
     $this->name = $name;
     $this->metadata = $metadata;
   }
   
   public function getItemVersion()
   {
-    return $this->item;
+    return $this->itemversion;
   }
   
   public function isEditable()
   {
-    return !$this->item->isComplete();
+    return !$this->itemversion->isComplete();
   }
   
   public function exists()
@@ -77,7 +77,7 @@ class SimpleField extends Field
     global $_STORAGE;
     
     parent::__construct($metadata, $item, $name);
-    $results = $_STORAGE->query('SELECT '.$this->getColumn().' FROM Field WHERE item='.$this->item->getId().' AND version='.$this->item->getVersion().' AND variant="'.$this->item->getVariant().'";');
+    $results = $_STORAGE->query('SELECT '.$this->getColumn().' FROM Field WHERE itemversion='.$this->itemversion->getId().';');
     if ($results->valid())
     {
       $this->exists = true;

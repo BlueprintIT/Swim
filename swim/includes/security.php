@@ -289,11 +289,11 @@ class User
 		{
 			if ($result)
 			{
-				$this->log->debug('User is in group '.$group);
+				$this->log->debug('User is in group '.$group->getID());
 			}
 			else
 			{
-				$this->log->debug('User is not in group '.$group);
+				$this->log->debug('User is not in group '.$group->getID());
 			}
 		}
 		return $result;

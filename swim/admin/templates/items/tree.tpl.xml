@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+
+{apiget var="root" type="item" id=$request.query.root}
+{assign var="variant" value="default"}
+{include file="items/treeitem.tpl" item=$root}
