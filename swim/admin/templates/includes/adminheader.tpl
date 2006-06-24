@@ -46,6 +46,12 @@ body {
 
 <div id="banner">
 {include file='brand:banner.tpl'}
+<div id="admin">
+	{if $USER->isLoggedIn()}
+		<p style="margin: 0">Logged in as {$USER->getName()}</p>
+		<p style="margin: 0"><a href="{encode method='admin' path='password.tpl'}">Change Password</a> <a href="{encode method='logout'}">Logout</a></p>
+	{/if}
+</div>
 </div>
 
 <table id="tabpanel">

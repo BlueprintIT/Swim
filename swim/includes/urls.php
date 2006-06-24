@@ -340,6 +340,12 @@ class Request
     $this->query[$var] = $value;
   }
   
+  public function setQueryVars($values)
+  {
+    foreach ($values as $key => $value)
+      $this->query[$key]=$value;
+  }
+  
   public function getQuery()
   {
     return $this->query;

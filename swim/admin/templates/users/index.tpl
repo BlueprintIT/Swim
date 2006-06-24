@@ -3,11 +3,13 @@
 {include file='users/leftpane.tpl'}
 <div id="mainpane" class="pane">
 	<div class="header">
+		{secure users="write"}
 		<div class="toolbar">
 			<div class="toolbarbutton">
-				<a href="{encode method='admin' path='users/create.tpl' nextcurrent='true'}"><image src="{$CONTENT}/icons/add-user-blue.gif"/> Create new User</a>
+				<a href="{encode method='admin' path='users/create.tpl' nestcurrent='true'}"><image src="{$CONTENT}/icons/add-user-blue.gif"/> Create new User</a>
 			</div>
 		</div>
+		{/secure}
 		<h2>User Administration</h2>
 	</div>
 	<div class="body">

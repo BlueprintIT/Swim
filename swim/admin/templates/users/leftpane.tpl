@@ -2,7 +2,7 @@
 {script href="$CONTENT/yahoo/YAHOO.js"}
 {script href="$CONTENT/yahoo/dragdrop.js"}
 {script href="$CONTENT/yahoo/event.js"}
-{script href="$CONTENT/treeview.js"}
+{script href="$CONTENT/yahoo/treeview.js"}
 {script href="$CONTENT/scripts/BlueprintIT.js"}
 {script href="$CONTENT/scripts/treeview.js"}
 <script type="text/javascript">
@@ -24,7 +24,7 @@ foreach ($users as $username => $user)
     $name = $username;
   $edit = new Request();
   $edit->setMethod('admin');
-  $edit->setPath('users/edit.tpl');
+  $edit->setPath('users/details.tpl');
   $edit->setQueryVar('user',$username);
   print("  details = {\n");
   print("    label: \"".$name."\",\n");

@@ -82,18 +82,40 @@ function brand_get_trusted($tpl_name, &$smarty)
 {
 }
 
-function get_params_request($params, $smarty)
+function get_params_request(&$params, $smarty)
 {
-  $request = new Request();
-  if (empty($params['method']))
-    $request->setMethod('view');
+  if (!empty($params['href']))
+  {
+    $request = $params['href'];
+    unset($params['href']);
+    if (count($params)>0)
+    {
+      $query = '';
+      foreach ($params as $key => $value)
+        $query.='&'.urlencode($key).'='.urlencode($value);
+      if (strpos($request, '?')!==false)
+        $request.=$query;
+      else
+        $query.='?'.substr($query, 0);
+    }
+  }
   else
-    $request->setMethod($params['method']);
-  if (!empty($params['path']))
-    $request->setPath($params['path']);
-  if ((!empty($params['nestcurrent'])) && ($params['nestcurrent'] == "true"))
-    $request->setNested($smarty->get_template_vars('REQUEST'));
-
+  {
+    $request = new Request();
+    if (empty($params['method']))
+      $request->setMethod('view');
+    else
+      $request->setMethod($params['method']);
+    if (!empty($params['path']))
+      $request->setPath($params['path']);
+    if ((!empty($params['nestcurrent'])) && ($params['nestcurrent'] == "true"))
+      $request->setNested($smarty->get_template_vars('REQUEST'));
+    unset($params['method']);
+    unset($params['path']);
+    unset($params['nestcurrent']);
+    $request->setQueryVars($params);
+  }
+  
   return $request;
 }
 
@@ -125,28 +147,35 @@ function check_security($params, $content, &$smarty, &$repeat)
 function encode_url($params, &$smarty)
 {
   $request = get_params_request($params, $smarty);
-  return $request->encode();
+  if ($request instanceof Request)
+    return $request->encode();
+  else
+    return $request;
 }
 
 function encode_form($params, $content, &$smarty, &$repeat)
 {
   if ($repeat)
   {
-    if (empty($params['href']))
+    $method = "POST";
+    if (!empty($params['formmethod']))
+      $method = $params['formmethod'];
+    unset($params['formmethod']);
+    $request = get_params_request($params, $smarty);
+    if ($request instanceof Request)
     {
-      $request = get_params_request($params, $smarty);
       $path = $request->encodePath();
       $vars = $request->getFormVars();
     }
     else
     {
-      $path = $params['href'];
+      $path = $request;
       $vars = '';
     }
-    $method = "POST";
-    if (!empty($params['method']))
-      $method = $params['method'];
-    print('<form method="'.$method.'" action="'.$path.'">');
+    print('<form method="'.$method.'" action="'.$path.'"');
+    foreach ($params as $key => $value)
+      print(' '.$key.'="'.$value.'"');
+    print('>');
     print($vars);
   }
   else
@@ -158,26 +187,22 @@ function encode_form($params, $content, &$smarty, &$repeat)
 
 function encode_stylesheet($params, &$smarty)
 {
-  if (empty($params['href']))
-  {
-    $request = get_params_request($params, $smarty);
+  $request = get_params_request($params, $smarty);
+  if ($request instanceof Request)
     $path = $request->encode();
-  }
-   else
-    $path = $params['href'];
+  else
+    $path = $request;
   $head = $smarty->get_registered_object('HEAD');
   $head->addStyleSheet($path);
 }
 
 function encode_script($params, &$smarty)
 {
-  if (empty($params['href']))
-  {
-    $request = get_params_request($params, $smarty);
+  $request = get_params_request($params, $smarty);
+  if ($request instanceof Request)
     $path = $request->encode();
-  }
-   else
-    $path = $params['href'];
+  else
+    $path = $request;
   $head = $smarty->get_registered_object('HEAD');
   $head->addScript($path);
 }
@@ -196,6 +221,37 @@ function header_outputfilter($tpl_output, &$smarty)
   return $tpl_output;
 }
 
+function api_get($params, &$smarty)
+{
+  if ((!empty($params['var'])) && (!empty($params['type'])))
+  {
+    if (!empty($params['id']))
+    {
+      $result = null;
+      if ($params['type']=='user')
+        $result = UserManager::getUser($params['id']);
+      else if ($params['type']=='group')
+        $result = UserManager::getGroup($params['id']);
+      $smarty->assign_by_ref($params['var'], $result);
+      return "";
+    }
+    else
+    {
+      $result = null;
+      if ($params['type']=='user')
+        $result = UserManager::getAllUsers();
+      else if ($params['type']=='group')
+        $result = UserManager::getAllGroups();
+      $smarty->assign_by_ref($params['var'], $result);
+      return "";
+    }
+  }
+  else
+  {
+    return "Not enough parameters";
+  }
+}
+
 function configureSmarty($smarty, $request)
 {
   global $_PREFS,$_USER;
@@ -203,8 +259,14 @@ function configureSmarty($smarty, $request)
   $log = LoggerManager::getLogger('page');
   $log->debug('Creating admin smarty.');
   
+  $req = array();
+  $req['method'] = $request->getMethod();
+  $req['path'] = $request->getPath();
+  $req['query'] = $request->getQuery();
   $smarty->assign_by_ref('USER', $_USER);
   $smarty->assign_by_ref('REQUEST', $request);
+  $smarty->assign_by_ref('request', $req);
+  $smarty->assign_by_ref('NESTED', $request->getNested());
   $smarty->assign_by_ref('PREFS', $_PREFS);
   $smarty->assign_by_ref('LOG', $log);
   $smarty->register_resource('brand', array(
@@ -215,6 +277,7 @@ function configureSmarty($smarty, $request)
   $smarty->register_function('stylesheet', 'encode_stylesheet');
   $smarty->register_function('script', 'encode_script');
   $smarty->register_function('encode', 'encode_url');
+  $smarty->register_function('apiget', 'api_get');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_object('HEAD', new HtmlHeader());

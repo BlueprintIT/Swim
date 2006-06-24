@@ -3,8 +3,6 @@ Options +FollowSymLinks
 RewriteEngine on 
 RewriteBase /
 
-RewriteRule ^onlinestore$ redirect.php
-RewriteRule ^onlinestore/(.*) site/addons/cubecart/$1
 RewriteRule ^stats$ redirect.php
 RewriteRule ^stats/(.*) site/addons/stats$1
 

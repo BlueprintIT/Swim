@@ -58,7 +58,7 @@ div.first {
 
 .sectionheader {
   padding-bottom: 17px;
-  background-image: -swim-url(/internal/file/images/sectionline.png);
+  background-image: url([$CONTENT]/images/sectionline.png);
   background-repeat: no-repeat;
   background-position: bottom left;
   margin-bottom: 5px;

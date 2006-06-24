@@ -35,14 +35,25 @@ class User
 	
 	function User($username=false)
 	{
-    global $_STORAGE;
-    
 		$this->log = LoggerManager::getLogger('swim.user');
 		if ($username!==false)
-		{
-      $this->log->debug('Creating user '.$username);
       $this->user=$username;
-      $results = $_STORAGE->query("SELECT * FROM User WHERE id='".$_STORAGE->escape($username)."';");
+    else
+      $this->user = 'guest';
+    $this->reload();
+	}
+  
+  function reload()
+  {
+    global $_STORAGE;
+    
+    $this->exists = false;
+    $this->name = 'Guest';
+    $this->groups = array();
+    unset($this->password);
+    if ($this->user!='guest')
+    {
+      $results = $_STORAGE->query("SELECT * FROM User WHERE id='".$_STORAGE->escape($this->user)."';");
       if ($results->valid())
       {
         $this->log->debug('User is valid');
@@ -51,21 +62,16 @@ class User
         $this->name=$details['name'];
         $this->password=$details['password'];
         
-        $results = $_STORAGE->query("SELECT access FROM UserAccess WHERE user='".$_STORAGE->escape($username)."';");
+        $results = $_STORAGE->query("SELECT access FROM UserAccess WHERE user='".$_STORAGE->escape($this->user)."';");
         while ($results->valid())
         {
           $details=$results->fetch();
           $this->log->debug('Found group '.$details['access']);
-          $this->groups[]=$details['access'];
+          $this->groups[]=UserManager::getGroup($details['access']);
         }
       }
-		}
-		else
-		{
-			$this->user='guest';
-			$this->groups=array();
-		}
-	}
+    }
+  }
 	
 	function setPassword($password)
 	{
@@ -118,7 +124,7 @@ class User
   {
     global $_STORAGE;
     
-    if ($this->inGroup('root'))
+    if ($this->inGroup(UserManager::getGroup('root')))
     {
       return true;
     }
@@ -140,7 +146,7 @@ class User
       default:
         return false;
     }
-    $results = $_STORAGE->query("SELECT Permission.".$type." FROM UserAccess JOIN Permission ON UserAccess.access=Permission.access WHERE section='".$_STORAGE->escape($perm)."';");
+    $results = $_STORAGE->query("SELECT Permission.".$type." FROM UserAccess JOIN Permission ON UserAccess.access=Permission.access WHERE section='".$_STORAGE->escape($perm)."' AND user=\"".$_STORAGE->escape($this->user)."\";");
     $result = 0;
     while ($results->valid())
     {
@@ -169,7 +175,7 @@ class User
 				$value=substr($priv,$pos+1,-1);
 				if ($type=='group')
 				{
-					return $this->inGroup($value);
+					return $this->inGroup(Usermanager::getGroup($value));
 				}
 				else if ($type=='user')
 				{
@@ -229,7 +235,7 @@ class User
   		if (!in_array($group,$this->groups))
   		{
   			$this->groups[]=$group;
-        $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".$_STORAGE->escape($this->user)."','".$_STORAGE->escape($group)."');");
+        $_STORAGE->queryExec("INSERT INTO UserAccess (user,access) VALUES('".$_STORAGE->escape($this->user)."','".$_STORAGE->escape($group->getID())."');");
   		}
     }
     else
@@ -253,7 +259,7 @@ class User
   			}
   		}
   		$this->groups=$nwgroups;
-      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".$_STORAGE->escape($this->user)."' AND access='".$_STORAGE->escape($group)."';");
+      $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".$_STORAGE->escape($this->user)."' AND access='".$_STORAGE->escape($group->getID())."';");
     }
     else
     {
@@ -504,6 +510,7 @@ class Group
   var $id;
   var $name;
   var $description;
+  var $valid;
   
   function Group($id)
   {
@@ -522,6 +529,11 @@ class Group
     {
       $this->valid=false;
     }
+  }
+  
+  function groupExists()
+  {
+    return $this->valid;
   }
   
   function getID()
@@ -581,6 +593,8 @@ class UserManager
     if ($group == null)
     {
       $group = new Group($name);
+      if (!$group->groupExists())
+        $group = null;
       ObjectCache::setItem('group', $name, $group);
     }
     return $group;
@@ -590,8 +604,12 @@ class UserManager
   {
     global $_STORAGE;
     
+    
     $_STORAGE->queryExec("INSERT INTO User (id) VALUES ('".$_STORAGE->escape($username)."');");
-  	return self::getUser($username);
+  	$user = self::getUser($username);
+    if (!$user->userExists())
+      $user->reload();
+    return $user;
   }
   
   public static function deleteUser($user)
@@ -603,6 +621,7 @@ class UserManager
       $_STORAGE->queryExec("DELETE FROM User WHERE id='".$_STORAGE->escape($user->getUsername())."';");
       $_STORAGE->queryExec("DELETE FROM UserAccess WHERE user='".$_STORAGE->escape($user->getUsername())."';");
     }
+    $user->reload();
     return true;
   }
   
