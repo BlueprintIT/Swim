@@ -48,18 +48,21 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	loadItem: function(node, parentnode) {
-		var details = {
-			label: node.getAttribute("name"),
-			iconClass: node.getAttribute("class")
-		};
-		if (node.getAttribute("infolink")) {
-			details.href = node.getAttribute("infolink");
-			details.target = "main";
-		}
 		var id = node.getAttribute("id");
 		if (!this.items[id]) {
 			this.items[id] = [];
 		}
+
+		var request = new Request();
+		request.setMethod('admin');
+		request.setPath('items/details.tpl');
+		request.setQueryVar('item', id);
+		var details = {
+			label: node.getAttribute("name"),
+			iconClass: node.getAttribute("class"),
+			href: request.encode(),
+			target: 'main'
+		};
 		
 		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);
 		this.items[id].push(treenode);

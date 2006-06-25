@@ -52,13 +52,29 @@ class ItemClass
     return null;
   }
   
+  protected function addMissingFields(&$fields, $item)
+  {
+    foreach ($this->fields as $name => $el)
+      if (!isset($fields[$name]))
+        $fields[$name] = Field::getField($el, $item, $name);
+    if ($this->parent != null)
+      $this->parent->addMissingFields($fields, $item);
+  }
+  
+  public function getFields($item)
+  {
+    $fields = array();
+    $this->addMissingFields($fields, $item);
+    return $fields;
+  }
+  
   public function getField($item, $name)
   {
     if (isset($this->fields[$name]))
       return Field::getField($this->fields[$name], $item, $name);
     if ($this->parent != null)
       return $this->parent->getField($item, $name);
-    return Field::getField(null, $item, $name);
+    return null;
   }
   
   protected function parseElement($element)
@@ -84,7 +100,7 @@ class ItemClass
         }
         else if ($el->tagName=='field')
         {
-          $this->fields[$el->getAttribute('name')] = $el;
+          $this->fields[$el->getAttribute('id')] = $el;
         }
         else
         {

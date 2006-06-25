@@ -85,6 +85,8 @@ class MySQLStorage extends StorageConnection
   {
     $this->log->debug('query: '.$query);
     $result = $this->db->query($query);
+    if ($result === FALSE)
+      $this->log->errorTrace('Query error '.$this->lastErrorText().' for "'.$query.'"');
     if ($result && $result !== TRUE)
     	return new MySQLResult($result);
     return $result;
@@ -93,7 +95,10 @@ class MySQLStorage extends StorageConnection
   public function queryExec($query)
   {
     $this->log->debug('queryExec: '.$query);
-    return $this->db->query($query);
+    $result = $this->db->query($query);
+    if ($result === FALSE)
+      $this->log->errorTrace('Query error '.$this->lastErrorText().' for "'.$query.'"');
+    return $result;
   }
   
   public function lastInsertRowid()
@@ -109,6 +114,11 @@ class MySQLStorage extends StorageConnection
   public function lastError()
   {
     return $this->db->errno;
+  }
+
+  public function lastErrorText()
+  {
+    return $this->db->error;
   }
 }
 

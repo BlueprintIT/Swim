@@ -1,4 +1,4 @@
-{secure users="write"}
+{secure users="write" login="true"}
 {include file='includes/adminheader.tpl' title="User management"}
 {include file='users/leftpane.tpl'}
 <div id="mainpane" class="pane">
@@ -24,7 +24,7 @@ function submitForm(form)
     document.forms[form].submit();
 }
 {/literal}</script>
-	{html_form name="mainform" method="saveuser" nestcurrent="true"}
+	{html_form tag_name="mainform" method="saveuser" nestcurrent="true"}
 		<div class="header">
 			<div class="toolbar">
 				<div class="toolbarbutton">

@@ -140,7 +140,7 @@ function check_security($params, $content, &$smarty, &$repeat)
   
   if (($valid) && (!$repeat))
     print($content);
-  else if ((!$valid) && ($repeat))
+  else if ((!$valid) && ($repeat) && (isset($params['login'])) && ($params['login'] == 'true'))
     displayAdminLogin($smarty->get_template_vars('REQUEST'));
 }
 
@@ -164,6 +164,15 @@ function encode_form($params, $content, &$smarty, &$repeat)
   if ($repeat)
   {
     $method = "POST";
+    $attrs = '';
+    foreach(array_keys($params) as $key)
+    {
+      if (substr($key,0,4) == 'tag_')
+      {
+        $attrs.=substr($key,4).'="'.$params[$key].'" ';
+        unset($params[$key]);
+      }
+    }
     if (!empty($params['formmethod']))
       $method = $params['formmethod'];
     unset($params['formmethod']);
@@ -178,7 +187,7 @@ function encode_form($params, $content, &$smarty, &$repeat)
       $path = $request;
       $vars = '';
     }
-    print('<form method="'.$method.'" action="'.$path.'"');
+    print('<form '.$attrs.'method="'.$method.'" action="'.$path.'"');
     foreach ($params as $key => $value)
       print(' '.$key.'="'.$value.'"');
     print('>');
@@ -271,6 +280,8 @@ function configureSmarty($smarty, $request, $type)
   $req['method'] = $request->getMethod();
   $req['path'] = $request->getPath();
   $req['query'] = $request->getQuery();
+  $smarty->assign('variant', 'default');
+  $smarty->assign_by_ref('SERVER', $_SERVER);
   $smarty->assign_by_ref('USER', $_USER);
   $smarty->assign_by_ref('REQUEST', $request);
   $smarty->assign_by_ref('request', $req);
@@ -297,9 +308,14 @@ function configureSmarty($smarty, $request, $type)
     $smarty->left_delimiter = '[';
     $smarty->right_delimiter = ']';
   }
+  else if ($type == 'text/javascript')
+  {
+    $smarty->left_delimiter = '{[';
+    $smarty->right_delimiter = ']}';
+  }
 }
 
-function createAdminSmarty($request, $type)
+function createAdminSmarty($request, $type = 'text/html')
 {
   global $_PREFS,$_USER;
   
@@ -313,7 +329,7 @@ function createAdminSmarty($request, $type)
   recursiveMkDir($smarty->cache_dir);
 
   configureSmarty($smarty, $request, $type);
-  $smarty->assign('CONTENT', $_PREFS->getPref('storage.admin.static'));
+  $smarty->assign('CONTENT', $_PREFS->getPref('url.admin.static'));
   $smarty->assign('BRAND', $_PREFS->getPref('storage.branding.static'));
   
   /*if (($type == 'text/css') || ($type == 'text/javascript'))
@@ -322,7 +338,7 @@ function createAdminSmarty($request, $type)
   return $smarty;
 }
 
-function createSmarty($request, $type)
+function createSmarty($request, $type = 'text/html')
 {
   global $_PREFS,$_USER;
   
@@ -339,7 +355,7 @@ function createSmarty($request, $type)
   recursiveMkDir($smarty->cache_dir);
 
   configureSmarty($smarty, $request, $type);
-  $smarty->assign('CONTENT', $_PREFS->getPref('storage.site.static'));
+  $smarty->assign('CONTENT', $_PREFS->getPref('url.site.static'));
   
   //$smarty->caching = true;
 

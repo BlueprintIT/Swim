@@ -1,4 +1,4 @@
-{secure users="write"}
+{secure users="write" login="true"}
 {include file='includes/adminheader.tpl' title="User management"}
 {include file='users/leftpane.tpl'}
 <div id="mainpane" class="pane">
@@ -9,7 +9,7 @@ function submitForm(form)
 }
 {/literal}</script>
 	{apiget var='selected' type='user' id=$request.query.user}
-	{html_form name="mainform" method="saveuser" username=$selected->getUsername() nestcurrent="true"}
+	{html_form tag_name="mainform" method="saveuser" username=$selected->getUsername() nestcurrent="true"}
 		<div class="header">
 			<div class="toolbar">
 				<div class="toolbarbutton">

@@ -1,8 +1,9 @@
-{secure documents="read"}
-{include file='includes/adminheader.tpl' title="User management"}
+{secure documents="read" login="true"}
+{include file='includes/adminheader.tpl' title="Content management"}
 {stylesheet href="$CONTENT/yahoo/css/folders/tree.css"}
 {script href="$CONTENT/yahoo/YAHOO.js"}
 {script href="$CONTENT/scripts/BlueprintIT.js"}
+{script method="admin" path="scripts/request.js"}
 {script href="$CONTENT/yahoo/event.js"}
 {script href="$CONTENT/yahoo/dom.js"}
 {script href="$CONTENT/yahoo/dragdrop.js"}
@@ -26,7 +27,7 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
 </div>
 
 <div id="mainpane" class="pane">
-<iframe name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src=""></iframe>
+<iframe name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$request.query.root}"></iframe>
 </div>
 {include file='includes/adminfooter.tpl'}
 {/secure}

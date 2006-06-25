@@ -1,4 +1,4 @@
-{secure users="read"}
+{secure users="read" login="true"}
 {include file='includes/adminheader.tpl' title="User management"}
 {include file='users/leftpane.tpl'}
 <div id="mainpane" class="pane">

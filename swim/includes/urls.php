@@ -471,7 +471,7 @@ class Request
       if ($url === null)
       {
   	  	$url='/'.$this->method;
-        $res = $this->resourcePath;
+        $res = $this->path;
         if (strlen($res)>0)
   	  	{
   	  	    
@@ -495,7 +495,7 @@ class Request
 		
 		$newquery=$this->query;
 		$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
- 		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resourcePath;
+ 		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->path;
 		if (isset($this->nested))
 		{
 			$newquery[$_PREFS->getPref('url.nestedvar')]=encodeQuery($this->nested->makeAllVars());
@@ -515,7 +515,7 @@ class Request
 	  if ($_PREFS->getPref('url.encoding')!='path')
 	  {
 			$newquery[$_PREFS->getPref('url.methodvar')]=$this->method;
-  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->resourcePath;
+  		$newquery[$_PREFS->getPref('url.resourcevar')]=$this->path;
 	  }
 	  return $newquery;
 	}
