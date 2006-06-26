@@ -119,6 +119,35 @@ function get_params_request(&$params, $smarty)
   return $request;
 }
 
+function sort_array($params, &$smarty)
+{
+  if ((!empty($params['var'])) && (!empty($params['from'])))
+  {
+    $source = $params['from'];
+    $order = true;
+    if ((!empty($params['order'])) && ($params['order'] == 'descending'))
+      $order = false;
+      
+    $index = true;
+    if ((!empty($params['index'])) && ($params['index'] == 'key'))
+    {
+      if ($order)
+        ksort($source);
+      else
+        krsort($source);
+    }
+    else
+    {
+      if ($order)
+        asort($source);
+      else
+        arsort($source);
+    }
+  
+    $smarty->assign($params['var'], $source);
+  }
+}
+
 function check_security($params, $content, &$smarty, &$repeat)
 {
   global $_USER;
@@ -297,6 +326,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('script', 'encode_script');
   $smarty->register_function('encode', 'encode_url');
   $smarty->register_function('apiget', 'api_get');
+  $smarty->register_function('sort', 'sort_array');
   $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');

@@ -1,4 +1,4 @@
-{secure documents="read" login="true"}
+{secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="itemvariant" value=$item->getVariant($variant)}
@@ -21,10 +21,10 @@ function submitForm(form)
 		<div class="header">
 			<div class="toolbar">
 				<div class="toolbarbutton">
-					<a href="javascript:submitForm('mainform')">Save</a>
+					<a href="javascript:submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
 				</div>
 				<div class="toolbarbutton">
-					<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}">Cancel</a>
+					<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/check-grey.gif"/> Cancel</a>
 				</div>
 			</div>
 			<h2>Item Editor</h2>
@@ -48,24 +48,18 @@ function submitForm(form)
 					</table>
 				</div>
 			</div>
-			{assign var="pos" value="0"}
 			{foreach name="fieldlist" from=$class->getFields($itemversion) item="field"}
 				{if $field->getType()=='html'}
-					{if $pos==0}
-						<div class="section">
-							<div class="sectionheader">
-								<h3>Item Content</h3>
-							</div>
-							<div class="sectionbody">
-						{assign var="pos" value="1"}
-					{/if}
-					<div id="field_{$field->getId()}">{$field->getEditor()}</div>
+					<div class="section">
+						<div class="sectionheader">
+							<h3>{$field->getName()}</h3>
+						</div>
+						<div class="sectionbody">
+							<div id="field_{$field->getId()}">{$field->getEditor()}</div>
+						</div>
+					</div>
 				{/if}
 			{/foreach}
-			{if pos==1}
-					</div>
-				</div>
-			{/if}
 		</div>
 	</div>
 {/html_form}

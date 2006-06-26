@@ -84,6 +84,11 @@ class Field
     return "";
   }
   
+  public function compareTo($b)
+  {
+    return 0;
+  }
+  
   public function initialise()
   {
   }
@@ -215,6 +220,13 @@ class SimpleField extends Field
 
 class IntegerField extends SimpleField
 {
+  public function compareTo($b)
+  {
+    if ($b instanceof IntegerField)
+      return $this->toString()-$b->toString();
+    return 0;
+  }
+  
   protected function getColumn()
   {
     return "intValue";
@@ -239,6 +251,7 @@ class TextField extends SimpleField
         return '<div id="'.$this->id.'">'.$this->toString().'</div>';
       else
       {
+        recursiveMkDir($this->itemversion->getStoragePath());
         include_once($_PREFS->getPref('storage.fckeditor').'/fckeditor.php');
         $editor = new FCKeditor($this->id) ;
         $editor->BasePath = $_PREFS->getPref('url.fckeditor');
@@ -246,7 +259,10 @@ class TextField extends SimpleField
         $editor->Width  = '100%';
         $editor->Height = '400px';
         $editor->Config['SkinPath'] = $editor->BasePath.'editor/skins/office2003/';
-        $editor->Config['CustomConfigurationsPath'] = $_PREFS->getPref('url.admin.static').'/scripts/fckeditor.js' ;
+        $editor->Config['LinkBrowserURL'] = $editor->BasePath.'editor/filemanager/browser/default/browser.html?Connector=connectors/php/connector.php&ServerPath='.$this->itemversion->getStorageUrl();
+        $editor->Config['ImageBrowserURL'] = $editor->Config['LinkBrowserURL'];
+        $editor->Config['FlashBrowserURL'] = $editor->Config['LinkBrowserURL'];
+        $editor->Config['CustomConfigurationsPath'] = $_PREFS->getPref('url.admin.static').'/scripts/fckeditor.js';
         $editor->ToolbarSet = 'Swim';
         return $editor->CreateHtml();
       }
@@ -267,6 +283,13 @@ class TextField extends SimpleField
     return '"'.$_STORAGE->escape($value).'"';
   }
   
+  public function compareTo($b)
+  {
+    if ($b instanceof TextField)
+      return strcmp($this->toString(), $b->toString());
+    return 0;
+  }
+  
   protected function getColumn()
   {
     return "textValue";
@@ -275,6 +298,13 @@ class TextField extends SimpleField
 
 class DateField extends SimpleField
 {
+  public function compareTo($b)
+  {
+    if ($b instanceof DateField)
+      return $this->toString()-$b->toString();
+    return 0;
+  }
+  
   protected function getColumn()
   {
     return "dateValue";

@@ -13,12 +13,54 @@
  * $Revision$
  */
 
+class SequenceSorter
+{
+  private $field;
+  private $ascending;
+  
+  public function __construct($field, $ascending = true)
+  {
+    $this->field = $field;
+    $this->ascending = $ascending;
+  }
+  
+  public function compare($a, $b)
+  {
+    $a = $a->getCurrentVersion('default');
+    $b = $b->getCurrentVersion('default');
+    if ($a != null)
+      $a = $a->getField($this->field);
+    if ($b != null)
+      $b = $b->getField($this->field);
+    if (($b == null) && ($a == null))
+      $result = 0;
+    else if ($b==null)
+      $result = -1;
+    else if ($a = null)
+      $result = 1;
+    else
+      $result = $a->compareTo($b);
+
+    if (!$this->ascending)
+      $result = -$result;
+    return $result;
+  }
+}
+
 class Sequence extends Field
 {
   public function __construct($metadata, $item, $name)
   {
     parent::__construct($metadata, $item, $name);
     $this->exists = true;
+  }
+  
+  public function getSortedItems($field)
+  {
+    $items = $this->getItems();
+    $sorter = new SequenceSorter($field);
+    usort($items, array($sorter, 'compare'));
+    return $items;
   }
   
   public function getItems()

@@ -25,7 +25,7 @@
 					</div>
 				{else}
 					<div class="toolbarbutton">
-						<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Mark as complete</a>
+						<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}"><img src="{$CONTENT}/icons/check-grey.gif"/> Mark as complete</a>
 					</div>
 					<div class="toolbarbutton">
 						<a href="{encode method="admin" path="items/edit.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Edit</a>
@@ -47,7 +47,8 @@
 					    <td class="details">
 							{html_form tag_style="display: inline" method="admin" path="items/details.tpl" item=$item->getId() formmethod="GET"}
 								<select name="version" onchange="this.form.submit();">
-									{foreach from=$itemvariant->getVersions() item="version"}
+									{sort var="versions" order="descending" from=$itemvariant->getVersions()}
+									{foreach from=$versions item="version"}
 										{if $version == $itemversion}
 												<option value="{$version->getVersion()}" selected="true">
 										{else}
@@ -105,24 +106,19 @@
 				</table>
 			</div>
 		</div>
-		{assign var="pos" value="0"}
 		{foreach name="fieldlist" from=$class->getFields($itemversion) item="field"}
 			{if $field->getType()=='html'}
-				{if $pos==0}
-					<div class="section">
-						<div class="sectionheader">
-							<h3>Item Content</h3>
-						</div>
-						<div class="sectionbody">
-					{assign var="pos" value="1"}
-				{/if}
-				<div id="field_{$field->getId()}">{$field->toString()}</div>
+				<div class="section">
+					<div class="sectionheader">
+						<h3>{$field->getName()}</h3>
+					</div>
+					<div class="sectionbody">
+						{assign var="pos" value="1"}
+					<div id="field_{$field->getId()}">{$field->toString()}</div>
+					</div>
+				</div>
 			{/if}
 		{/foreach}
-		{if pos==1}
-				</div>
-			</div>
-		{/if}
 	</div>
 </div>
 {include file='includes/framefooter.tpl'}

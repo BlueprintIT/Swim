@@ -251,7 +251,7 @@ class ItemVariant
   
   public function createNewVersion($clone = null)
   {
-    global $_STORAGE,$_USER;
+    global $_PREFS,$_STORAGE,$_USER;
 
     $class = '';
     if ($clone != null)
@@ -270,6 +270,13 @@ class ItemVariant
       {
         $_STORAGE->queryExec('INSERT INTO Field (itemversion,field,textValue,intValue,dateValue) ' .
           'SELECT '.$id.',field,textValue,intValue,dateValue FROM Field WHERE itemversion='.$clone->getId().';');
+        $sourcefiles = $clone->getStoragePath();
+        if (is_dir($sourcefiles))
+        {
+          $targetfiles = $iv->getStoragePath();
+          recursiveMkDir($targetfiles);
+          recursiveCopy($sourcefiles, $targetfiles);
+        }
       }
       
       $fields = $iv->getFields();
@@ -324,6 +331,18 @@ class ItemVersion
       $this->current = true;
     else
       $this->current = false;
+  }
+  
+  public function getStoragePath()
+  {
+    global $_PREFS;
+    return $_PREFS->getPref('storage.site.attachments').'/'.$this->getItem()->getId().'/'.$this->getVariant()->getVariant().'/'.$this->version;
+  }
+  
+  public function getStorageUrl()
+  {
+    global $_PREFS;
+    return $_PREFS->getPref('url.site.attachments').'/'.$this->getItem()->getId().'/'.$this->getVariant()->getVariant().'/'.$this->version;
   }
   
   public function getId()
