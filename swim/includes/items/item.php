@@ -302,7 +302,7 @@ class ItemVariant
     }
     $time = time();
     $results = $_STORAGE->query('SELECT MAX(version)+1 FROM VariantVersion WHERE itemvariant='.$this->id.' GROUP BY itemvariant;');
-    if ($results->valid)
+    if ($results->valid())
       $version = $results->fetchSingle();
     else
       $version = 1;
