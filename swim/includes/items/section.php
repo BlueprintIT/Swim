@@ -19,12 +19,23 @@ class Section extends AdminSection
   private $name = '';
   private $item;
   private $variant = 'default';
+  private $classes;
+  private $log;
   
   public function __construct($id)
   {
     $this->id = $id;
+    $this->log = LoggerManager::getLogger('swim.section');
   }
 
+  public function getVisibleClasses()
+  {
+    if (isset($this->classes))
+      return $this->classes;
+    else
+      return ClassManager::getClasses();
+  }
+  
   public function getRootItem()
   {
     return Item::getItem($this->item);
@@ -57,6 +68,17 @@ class Section extends AdminSection
         if ($el->tagName=='name')
         {
           $this->name=getDOMText($el);
+        }
+        else if ($el->tagName=='classes')
+        {
+          $this->classes = array();
+          $items = explode(',', getDOMText($el));
+          foreach ($items as $name)
+          {
+            $class = ClassManager::getClass($name);
+            if ($class != null)
+              $this->classes[$name] = $class; 
+          }
         }
         else
         {

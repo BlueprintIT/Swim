@@ -17,14 +17,6 @@ BlueprintIT.widget.SiteTree.prototype = {
 		this.loadTree();
 	},
 	
-	selectCategory: function(category) {
-		this.selectItem("category/"+category);
-	},
-	
-	selectPage: function(page) {
-		this.selectItem("page/"+page);
-	},
-	
 	selectItem: function(id) {
 		if (this.loading) {
 			this.selected = id;

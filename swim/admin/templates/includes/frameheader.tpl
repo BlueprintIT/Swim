@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="Content-Script-Type" content="text/javascript">
   <title>{$title}</title>
-  {stylesheet method="admin" path="styles/admin.css"}
   {stylesheet method="admin" path="styles/frame.css"}
+  {stylesheet method="admin" path="styles/body.css"}
 </head>
 <body>

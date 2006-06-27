@@ -35,7 +35,7 @@ class Item
   
   public function getSection()
   {
-    return Section::getSection($this->section);
+    return SectionManager::getSection($this->section);
   }
   
   protected function getValidVariants($variant)
@@ -67,6 +67,14 @@ class Item
           return $r;
       }
     }
+    return null;
+  }
+  
+  public function getNewestVersion($variant)
+  {
+    $var = $this->getVariant($variant);
+    if ($var != null)
+      return $var->getNewestVersion();
     return null;
   }
   
@@ -170,6 +178,7 @@ class ItemVariant
   private $id;
   private $variant;
   private $item;
+  private $current;
   private $versions = array();
   private $complete = false;
   
@@ -210,8 +219,37 @@ class ItemVariant
           $this->current = $version;
       }
     }
+    krsort($this->versions);
     $this->complete = true;
     return $this->versions;
+  }
+  
+  public function getNewestVersion()
+  {
+    global $_STORAGE;
+    
+    if ($this->complete)
+    {
+      reset($this->versions);
+      list($key, $val) = each($this->versions);
+      return $val;
+    }
+    else
+    {
+      $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE itemvariant='.$this->id.' ORDER BY version DESC;');
+      if ($results->valid())
+      {
+        $details = $results->fetch();
+        if (isset($this->versions[$details['version']]))
+          return $this->versions[$details['version']];
+        $version = new ItemVersion($details, $this);
+        $this->versions[$details['version']] = $version;
+        if ($version->isCurrent())
+          $this->current = $version;
+        return $this->versions[$details['version']];
+      }
+      return null;
+    }
   }
   
   public function getCurrentVersion()
@@ -249,16 +287,27 @@ class ItemVariant
     return $this->versions[$version];
   }
   
-  public function createNewVersion($clone = null)
+  public function createNewVersion($class, $clone = null)
   {
     global $_PREFS,$_STORAGE,$_USER;
 
-    $class = '';
-    if ($clone != null)
+    if ($class != null)
+      $class = $class->getId();
+    else if ($clone != null)
       $class = $clone->getClass()->getId();
-    $time = time();    
+    else
+    {
+      $this->log->error('Null class and clone, cannot create an unknown item.');
+      return null;
+    }
+    $time = time();
+    $results = $_STORAGE->query('SELECT MAX(version)+1 FROM VariantVersion WHERE itemvariant='.$this->id.' GROUP BY itemvariant;');
+    if ($results->valid)
+      $version = $results->fetchSingle();
+    else
+      $version = 1;
     if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,class,modified,owner,current,complete) ' .
-      'SELECT itemvariant,MAX(version)+1,"'.$_STORAGE->escape($class).'",'.$time.',"'.$_USER->getUsername().'",0,0 FROM VariantVersion WHERE itemvariant='.$this->id.' GROUP BY itemvariant;'))
+      'VALUES ('.$this->id.','.$version.',"'.$_STORAGE->escape($class).'",'.$time.',"'.$_USER->getUsername().'",0,0);'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE id='.$id.';');

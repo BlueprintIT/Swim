@@ -24,9 +24,11 @@ class Field
   protected $name;
   protected $description;
   protected $type;
+  protected $log;
   
   public function __construct($metadata, $item, $name)
   {
+    $this->log = LoggerManager::getLogger('swim.field.'.get_class($this));
     $this->itemversion = $item;
     $this->id = $name;
     $this->metadata = $metadata;

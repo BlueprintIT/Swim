@@ -25,13 +25,13 @@ define('PERMISSION_DELETE',3);
 
 class User
 {
-	var $user;
-  var $name;
-  var $password;
-  var $exists = false;
-	var $groups = array();
-	var $log;
-	var $logged = false;
+	private $user;
+  private $name;
+  private $password;
+  private $exists = false;
+	private $groups = array();
+	private $log;
+	public $logged = false;
 	
 	function User($username=false)
 	{
@@ -699,7 +699,7 @@ session_start();
 
 if (isset($_SESSION['Swim.User']))
 {
-	$GLOBALS['_USER'] = new User($_SESSION['Swim.User']);
+	$GLOBALS['_USER'] = UserManager::getUser($_SESSION['Swim.User']);
   $GLOBALS['_USER']->logged=true;
 }
 else

@@ -4,7 +4,7 @@
 	<div class="header">
 		<h2>Please log in</h2>
 	</div>
-	<div class="body">
+	<div class="body" style="text-align: center">
 		{if $message ne ""}
 			<h3>{$message}</h3>
 		{/if}
@@ -18,7 +18,7 @@
 			{if $message ne ""}
 				<input type="hidden" name="message" value="{$message}">
 			{/if}
-			<table>
+			<table align="center">
 				<tr>
 					<td>Username:</td><td><input type='text' name='username' value=''></td>
 				</tr>
@@ -26,7 +26,7 @@
 					<td>Password:</td><td><input type='password' name='password' value=''></td>
 				</tr>
 				<tr>
-					<td colspan="2"><input type='submit' value="Login"></td>
+					<td colspan="2" style="text-align: center"><input type='submit' value="Login"></td>
 				</tr>
 			</table>
 		{/html_form}

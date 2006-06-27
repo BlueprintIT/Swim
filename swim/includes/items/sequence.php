@@ -49,10 +49,49 @@ class SequenceSorter
 
 class Sequence extends Field
 {
+  protected $classes;
+  
   public function __construct($metadata, $item, $name)
   {
     parent::__construct($metadata, $item, $name);
     $this->exists = true;
+  }
+  
+  protected function parseElement($element)
+  {
+    if ($element->tagName == 'classes')
+    {
+      $newclasses = array();
+      $items = explode(',', getDOMText($element));
+      foreach ($items as $name)
+      {
+        if (isset($this->classes[$name]))
+          $newclasses[$name] = $this->classes[$name];
+      }
+      $this->classes = $newclasses;
+    }
+    else
+      parent::parseElement($element);
+  }
+  
+  protected function parse()
+  {
+    $this->classes = $this->itemversion->getItem()->getSection()->getVisibleClasses();
+    parent::parse();
+  }
+  
+  public function getVisibleClasses()
+  {
+    if (isset($this->classes))
+      return $this->classes;
+    
+    $this->parse();
+    return $this->classes;
+  }
+  
+  public function isSorted()
+  {
+    return false;
   }
   
   public function getSortedItems($field)
@@ -75,6 +114,16 @@ class Sequence extends Field
       $items[$details['position']] = Item::getItem($details['item']);
     }
     return $items;
+  }
+  
+  public function getItem($index)
+  {
+    global $_STORAGE;
+    
+    $results = $_STORAGE->query('SELECT item FROM Sequence WHERE parent='.$this->itemversion->getItem()->getId().' AND field="'.$_STORAGE->escape($this->id).'" AND position='.$index.';');
+    if ($results->valid())
+      return Item::getItem($results->fetchSingle());
+    return null;
   }
   
   public function indexOf($item)
@@ -104,7 +153,10 @@ class Sequence extends Field
     global $_STORAGE;
     
     $results = $_STORAGE->query('SELECT MAX(position) FROM Sequence WHERE parent='.$this->itemversion->getItem()->getId().' AND field="'.$_STORAGE->escape($this->id).'";');
-    $pos = $results->fetchSingle()+1;
+    if ($results->valid())
+      $pos = $results->fetchSingle()+1;
+    else
+      $pos = 0;
     $_STORAGE->queryExec('INSERT INTO Sequence (parent,field,position,item) VALUES ('.$this->itemversion->getItem()->getId().',"'.$_STORAGE->escape($this->id).'",'.$pos.','.$item->getId().');');
     $this->items = null;
   }
@@ -113,7 +165,7 @@ class Sequence extends Field
   {
     global $_STORAGE;
     
-    if ($pos == null)
+    if ($pos === null)
       $this->appendItem($item);
     else
     {
@@ -128,7 +180,7 @@ class Sequence extends Field
     global $_STORAGE;
     
     $_STORAGE->queryExec('DELETE FROM Sequence WHERE parent='.$this->itemversion->getItem()->getId().' AND field="'.$_STORAGE->escape($this->id).'" AND position='.$pos.';');
-    $_STORAGE->queryExec('UPDATE Sequence SET position=position+1 WHERE parent='.$this->itemversion->getItem()->getId().' AND position>'.$pos.' AND field="'.$_STORAGE->escape($this->id).'";');
+    $_STORAGE->queryExec('UPDATE Sequence SET position=position-1 WHERE parent='.$this->itemversion->getItem()->getId().' AND position>'.$pos.' AND field="'.$_STORAGE->escape($this->id).'";');
     $this->items = null;
   }
 }
