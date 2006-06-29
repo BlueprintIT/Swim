@@ -6,7 +6,7 @@
 {script method="admin" path="scripts/request.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="section" value=$item->getSection()}
-{assign var="itemvariant" value=$item->getVariant($variant)}
+{assign var="itemvariant" value=$item->getVariant($session.variant)}
 {if isset($request.query.version)}
 	{assign var="itemversion" value=$itemvariant->getVersion($request.query.version)}
 {elseif $itemvariant->getCurrentVersion()}
@@ -93,7 +93,7 @@ function moveDown(item, field, link) {
 			<div class="toolbar">
 				{if $itemversion->isComplete()}
 					<div class="toolbarbutton">
-						<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Create new version for editing</a>
+						<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Create new version for editing</a>
 					</div>
 				{else}
 					<div class="toolbarbutton">
@@ -188,9 +188,9 @@ function moveDown(item, field, link) {
 						{if !$field->isSorted()}
 							<table class="sequencelist">
 								{foreach name="itemlist" from=$field->getItems() item="subitem"}
-									{assign var="rlitem" value=$subitem->getCurrentVersion($variant)}
+									{assign var="rlitem" value=$subitem->getCurrentVersion($session.variant)}
 									{if $rlitem==null}
-										{assign var="rlitem" value=$subitem->getNewestVersion($variant)}
+										{assign var="rlitem" value=$subitem->getNewestVersion($session.variant)}
 									{/if}
 									{assign var="itemclass" value=$rlitem->getClass()}
 									{assign var="itemname" value=$rlitem->getField('name')}
@@ -209,7 +209,7 @@ function moveDown(item, field, link) {
 						{secure documents="write"}
 						{assign var="choices" value=$field->getVisibleClasses()}
 						{if count($choices)>0}
-							{html_form method="createitem"  targetsection=$section->getId() targetvariant=$variant parentitem=$item->getId() parentsequence=$field->getId()}
+							{html_form method="createitem"  targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$field->getId()}
 								<p>Add a new <select name="class">
 								{foreach from=$choices item="choice"}
 									<option value="{$choice->getId()}">{$choice->getName()}</option>

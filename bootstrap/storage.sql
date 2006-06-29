@@ -67,6 +67,13 @@ CREATE TABLE Sequence (
 	UNIQUE (parent,field,position)
 );
 
+CREATE TABLE File (
+	itemversion INTEGER,
+	file VARCHAR(30),
+	description VARCHAR(50),
+	UNIQUE (itemversion,file)
+);
+
 INSERT INTO User (id,password,name) VALUES ('blueprintit','ab9debd6b50c6d5b64c64f2c93a74580','Blueprint IT');
 INSERT INTO Access (id,name,description) VALUES ('root',NULL,NULL);
 INSERT INTO Access (id,name,description) VALUES ('admin','Full Access','Provides full control over the website.');

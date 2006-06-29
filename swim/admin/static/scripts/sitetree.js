@@ -45,15 +45,11 @@ BlueprintIT.widget.SiteTree.prototype = {
 			this.items[id] = [];
 		}
 
-		var request = new Request();
-		request.setMethod('admin');
-		request.setPath('items/details.tpl');
-		request.setQueryVar('item', id);
 		var details = {
+			id: id,
 			label: node.getAttribute("name"),
 			iconClass: node.getAttribute("class"),
-			href: request.encode(),
-			target: 'main'
+			href: "javascript:onTreeItemClick('"+id+"')",
 		};
 		
 		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);

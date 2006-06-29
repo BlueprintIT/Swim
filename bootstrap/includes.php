@@ -24,6 +24,7 @@ require $_PREFS->getPref('storage.includes').'/urls.php';
 require $_PREFS->getPref('storage.includes').'/mimetypes.php';
 require $_PREFS->getPref('storage.includes').'/handlers.php';
 require $_PREFS->getPref('storage.includes').'/smarty.php';
+require $_PREFS->getPref('storage.includes').'/session.php';
 require $_PREFS->getPref('storage.includes').'/items/items.php';
 
 ?>

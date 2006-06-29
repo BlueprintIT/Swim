@@ -30,7 +30,7 @@ function method_mutatesequence($request)
       $field = null;
       $item = Item::getItem($request->getQueryVar('item'));
       if ($item != null)
-        $item = $item->getCurrentVersion('default');
+        $item = $item->getCurrentVersion(Session::getCurrentVariant());
       if ($item != null)
         $field = $item->getField($request->getQueryVar('field'));
       if ($field != null)

@@ -12,7 +12,16 @@
 {script href="$CONTENT/scripts/treeview.js"}
 {script href="$CONTENT/scripts/dom.js"}
 {script href="$CONTENT/scripts/sitetree.js"}
-<script>
+<script>{literal}
+function onTreeItemClick(id)
+{
+	var request = new Request();
+	request.setMethod('admin');
+	request.setPath('items/details.tpl');
+	request.setQueryVar('item', id);
+	document.getElementById('main').src = request.encode();
+}
+{/literal}
 var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root}', 'categorytree');
 </script>
 <div id="leftpane" class="pane">
@@ -27,7 +36,7 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
 </div>
 
 <div id="mainpane" class="pane">
-<iframe name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$request.query.root}"></iframe>
+<iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$request.query.root}"></iframe>
 </div>
 {include file='includes/adminfooter.tpl'}
 {/secure}

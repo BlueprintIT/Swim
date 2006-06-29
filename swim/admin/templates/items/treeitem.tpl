@@ -1,6 +1,6 @@
-{assign var="iv" value=$item->getCurrentVersion($variant)}
+{assign var="iv" value=$item->getCurrentVersion($session.variant)}
 {if $iv==null}
-	{assign var="iv" value=$item->getNewestVersion($variant)}
+	{assign var="iv" value=$item->getNewestVersion($session.variant)}
 {/if}
 {assign var="class" value=$iv->getClass()}
 {assign var="sequence" value=$iv->getMainSequence()}

@@ -322,6 +322,8 @@ class ItemVariant
         $sourcefiles = $clone->getStoragePath();
         if (is_dir($sourcefiles))
         {
+          $_STORAGE->queryExec('INSERT INTO File (itemversion,file,type,description) ' .
+            'SELECT '.$id.',file,type,description FROM File WHERE itemversion='.$clone->getId().';');
           $targetfiles = $iv->getStoragePath();
           recursiveMkDir($targetfiles);
           recursiveCopy($sourcefiles, $targetfiles);

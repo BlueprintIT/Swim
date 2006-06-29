@@ -26,8 +26,8 @@ class SequenceSorter
   
   public function compare($a, $b)
   {
-    $a = $a->getCurrentVersion('default');
-    $b = $b->getCurrentVersion('default');
+    $a = $a->getCurrentVersion(Session::getCurrentVariant());
+    $b = $b->getCurrentVersion(Session::getCurrentVariant());
     if ($a != null)
       $a = $a->getField($this->field);
     if ($b != null)

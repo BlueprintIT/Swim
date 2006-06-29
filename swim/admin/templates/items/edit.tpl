@@ -1,7 +1,7 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
 {apiget var="item" type="item" id=$request.query.item}
-{assign var="itemvariant" value=$item->getVariant($variant)}
+{assign var="itemvariant" value=$item->getVariant($session.variant)}
 {if isset($request.query.version)}
 	{assign var="itemversion" value=$itemvariant->getVersion($request.query.version)}
 {elseif $itemvariant->getCurrentVersion()}
