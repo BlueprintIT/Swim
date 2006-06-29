@@ -3,17 +3,18 @@
 {literal}<script>
 function selectUrl()
 {
-	var table = document.getElementById("filelist");
+	var table = document.getElementById("files");
 	var node = table.firstChild;
 	while (node)
 	{
 		if ((node.nodeType == 1) && (node.className == "selected"))
 		{
 			window.parent.opener.SetUrl(node.getAttribute("path"));
+			window.parent.close();
 			break;
 		}
+		node = node.nextSibling;
 	}
-	window.parent.close();
 }
 
 function cancel()
@@ -127,21 +128,25 @@ td.name img {
 		{/if}
 		<div style="height: 40%; overflow: auto">
 			<table id="filelist" style="width: 100%">
-				<tr id="header">
-					<td class="name">Filename</td>
-					<td class="description">Description</td>
-					<td class="type">File Type</td>
-					<td class="size">File Size</td>
-				</tr>
-				{getfiles var="files"}
-				{foreach from=$files item="file"}
-					<tr path="{$file.path}" onclick="selectRow(this)">
-						<td class="name"><img alt="" src="{$CONTENT}/icons/{$file.extension}.gif"> {$file.name}</td>
-						<td class="description">{$file.description}</td>
-						<td class="type">{$file.type}</td>
-						<td class="size">{$file.size}</td>
+				<thead>
+					<tr id="header">
+						<td class="name">Filename</td>
+						<td class="description">Description</td>
+						<td class="type">File Type</td>
+						<td class="size">File Size</td>
 					</tr>
-				{/foreach}
+				</thead>
+				<tbody id="files">
+					{getfiles var="files"}
+					{foreach from=$files item="file"}
+						<tr path="{$file.path}" onclick="selectRow(this)">
+							<td class="name"><img alt="" src="{$CONTENT}/icons/{$file.extension}.gif"> {$file.name}</td>
+							<td class="description">{$file.description}</td>
+							<td class="type">{$file.type}</td>
+							<td class="size">{$file.size}</td>
+						</tr>
+					{/foreach}
+				</tbody>
 			</table>
 		</div>
 	</div>
