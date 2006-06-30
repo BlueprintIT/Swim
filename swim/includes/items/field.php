@@ -190,6 +190,8 @@ class SimpleField extends Field
       if ($_STORAGE->query('REPLACE INTO Field (itemversion,field,'.$col.') VALUES ('.$this->itemversion->getId().',"'.$_STORAGE->escape($this->id).'",'.$this->escapeValue($value).');'))
       {
         $this->value = $value;
+        $this->exists = true;
+        $this->retrieved = true;
         $this->itemversion->updateModified();
       }
     }
@@ -280,6 +282,18 @@ class TextField extends SimpleField
     }
     else
       return parent::getEditor();
+  }
+  
+  public function copyFrom($item)
+  {
+    parent::copyFrom($item);
+    if ($this->type == 'html')
+    {
+      $this->retrieve();
+      $newvalue = str_replace($item->getStorageUrl(), $this->itemversion->getStorageUrl(), $this->value);
+      if ($newvalue != $this->value)
+        $this->setValue($newvalue);
+    }
   }
   
   protected function parseAttributes($element)
