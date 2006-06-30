@@ -22,7 +22,7 @@ function onTreeItemClick(id)
 	document.getElementById('main').src = request.encode();
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root section=$request.query.section}', 'categorytree');
 </script>
 <div id="leftpane" class="pane">
 	<div class="header">

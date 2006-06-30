@@ -40,20 +40,24 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	loadItem: function(node, parentnode) {
-		var id = node.getAttribute("id");
-		if (!this.items[id]) {
-			this.items[id] = [];
-		}
-
 		var details = {
-			id: id,
 			label: node.getAttribute("name"),
-			iconClass: node.getAttribute("class"),
-			href: "javascript:onTreeItemClick('"+id+"')",
+			iconClass: node.getAttribute("class")
 		};
 		
+		if (node.hasAttribute("id")) {
+			var id = node.getAttribute("id");
+			if (!this.items[id]) {
+				this.items[id] = [];
+			}
+			details.id = id;
+			details.href = "javascript:onTreeItemClick('"+id+"')";
+		}
+		
 		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);
-		this.items[id].push(treenode);
+		if (node.hasAttribute("id")) {
+			this.items[id].push(treenode);
+		}
 		
 		this.loadCategory(node, treenode);
 	},
@@ -70,29 +74,9 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 
 	loadFromDocument: function(doc) {
-/*		var node = doc.getElementsByTagName("tree");
-		
-		if (!node || node.length==0)
-			return;*/
-		
 		this.items = [];
 		var tree = new YAHOO.widget.TreeView(this.element);
-		this.loadItem(doc.documentElement, tree.getRoot());
-		/*var unused = null;
-		var nodes = doc.getElementsByTagName("pages");
-		if (nodes.length > 0) {
-			var node = nodes[0].firstChild;
-			while (node) {
-				if ((node.nodeType == 1) && (node.tagName == "page")) {
-					if (!this.items["page/"+node.getAttribute("path")]) {
-						if (!unused)
-							unused = new YAHOO.widget.TextNode("Uncategorised Pages", tree.getRoot(), true);
-						this.loadItem(node, unused);
-					}
-				}
-				node = node.nextSibling;
-			}
-		}*/
+		this.loadCategory(doc.documentElement, tree.getRoot());
 		tree.draw();
 		this.loading = false;
 		if (this.selected) {
