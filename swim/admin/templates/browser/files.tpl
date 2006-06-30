@@ -123,8 +123,8 @@ td.name img {
 		<h2>Global Files</h2>
 	</div>
 	<div class="body">
-		{if $request.query.message}
-			<p>$request.query.message</p>
+		{if isset($request.query.message)}
+			<p style="text-align: center">{$request.query.message}</p>
 		{/if}
 		<div style="height: 40%; overflow: auto">
 			<table id="filelist" style="width: 100%">

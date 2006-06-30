@@ -52,7 +52,7 @@ function method_upload($request)
         }
         else
         {
-          $message = 'Upload failed because a file of that name already exists.';
+          $message = 'Upload failed because a file of that name already exists - '.$path.'/'.$file['name'].'.';
         }
       }
       else

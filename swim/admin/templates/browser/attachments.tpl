@@ -118,7 +118,7 @@ td.name img {
 		<button id="okbtn" disabled="true" onclick="selectUrl()" type="button">OK</button>
 		<button onclick="cancel()" type="button">Cancel</button>
 		{secure documents="write"}
-			{html_form tag_enctype="multipart/form-data" method="upload" nestcurrent="true"}
+			{html_form tag_enctype="multipart/form-data" itemversion=$itemversion->getId() method="upload" nestcurrent="true"}
 				<input type="file" name="file">
 				<input type="submit" value="Upload">
 			{/html_form}
@@ -126,8 +126,8 @@ td.name img {
 		<h2>Global Files</h2>
 	</div>
 	<div class="body">
-		{if $request.query.message}
-			<p>$request.query.message</p>
+		{if isset($request.query.message)}
+			<p style="text-align: center">{$request.query.message}</p>
 		{/if}
 		<div style="height: 40%; overflow: auto">
 			<table id="filelist" style="width: 100%">
