@@ -317,6 +317,95 @@ function header_outputfilter($tpl_output, &$smarty)
   return $tpl_output;
 }
 
+function retrieve_rss($params, &$smarty)
+{
+  global $_PREFS;
+  
+  if ((!empty($params['items'])) && (!empty($params['src'])))
+  {
+    $source = '';
+    $filename = $_PREFS->getPref('storage.cache').'/'.urlencode($params['src']);
+    
+    $handle = @fopen($params['src'], 'r');
+    if ($handle !== FALSE)
+    {
+      $source = stream_get_contents($handle);
+      fclose($handle);
+      file_put_contents($filename, $source);
+    }
+    else if (is_readable($filename))
+      $source = file_get_contents($filename);
+    $xml = new DOMDocument('1.0', 'UTF8');
+    $xml->loadXML($source);
+    $items = array();
+    $meta = array();
+    $meta['type'] = 'unknown';
+    if ($xml->documentElement->tagName == 'rss')
+    {
+      if ($xml->documentElement->getAttribute('version') == '2.0')
+      {
+        $meta['type'] = 'rss2';
+        $channel = $xml->documentElement->firstChild;
+        while ($channel !== null)
+        {
+          if (($channel->nodeType == 1) && ($channel->tagName == 'channel'))
+          {
+            $data = $channel->firstChild;
+            while ($data !== null)
+            {
+              if ($data->nodeType == 1)
+              {
+                switch ($data->tagName)
+                {
+                  case 'item':
+                    $itemdata = array();
+                    $item = $data->firstChild;
+                    while ($item !== null)
+                    {
+                      if ($item->nodeType == 1)
+                      {
+                        switch ($item->tagName)
+                        {
+                          case 'title':
+                          case 'link':
+                          case 'description':
+                            $itemdata[$item->tagName] = getDOMText($item);
+                            break;
+                          case 'pubDate':
+                            $itemdata['date'] = getDOMText($item);
+                            break;
+                        }
+                      }
+                      $item = $item->nextSibling;
+                    }
+                    array_push($items, $itemdata);
+                    break;
+                  case 'title':
+                  case 'description':
+                  case 'copyright':
+                  case 'ttl':
+                  case 'language':
+                    $meta[$data->tagName] = getDOMText($data);
+                    break;
+                }
+              }
+              $data = $data->nextSibling;
+            }
+          }
+          $channel = $channel->nextSibling;
+        }
+      }
+    }
+    $smarty->assign_by_ref($params['items'], $items);
+    if (isset($params['metadata']))
+      $smarty->assign_by_ref($params['metadata'], $meta);
+  }
+  else
+  {
+    return "Not enough parameters";
+  }
+}
+
 function api_get($params, &$smarty)
 {
   if ((!empty($params['var'])) && (!empty($params['type'])))
@@ -430,6 +519,7 @@ function configureSmarty($smarty, $request, $type)
                              'brand_get_secure',
                              'brand_get_trusted'));
   $smarty->register_function('getfiles', 'get_files');
+  $smarty->register_function('retrieverss', 'retrieve_rss');
   $smarty->register_function('stylesheet', 'encode_stylesheet');
   $smarty->register_function('script', 'encode_script');
   $smarty->register_function('encode', 'encode_url');

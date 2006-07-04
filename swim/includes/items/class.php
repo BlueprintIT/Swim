@@ -38,6 +38,11 @@ class ItemClass
     return $this->name;
   }
   
+  public function getTemplate()
+  {
+    return 'classes/'.$this->id.'.tpl';
+  }
+  
   public function getDescription()
   {
     return $this->description;
@@ -142,7 +147,7 @@ class ClassManager
             if ($el->hasAttribute('extends'))
             {
               self::$log->debug('Creating page layout '.$id.' That extends another.');
-              $base = $this->getClass($el->getAttribute('extends'));
+              $base = self::getClass($el->getAttribute('extends'));
               self::$log->debug('Extends '.$base->getName());
               $class = new ItemClass($id, $base);
             }

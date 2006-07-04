@@ -39,9 +39,9 @@ function submitForm(form)
 						{foreach from=$class->getFields($itemversion) item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
-									<td class="label"><label for="field:{$field->getId()}">{$field->getName()}:</label></td>
+									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
 									<td class="details">{$field->getEditor()}</td>
-									<td class="description">{$field->getDescription()}</td>
+									<td class="description">{$field->getDescription()|escape}</td>
 								</tr>
 							{/if}
 						{/foreach}
@@ -52,7 +52,7 @@ function submitForm(form)
 				{if $field->getType()=='html'}
 					<div class="section">
 						<div class="sectionheader">
-							<h3>{$field->getName()}</h3>
+							<h3>{$field->getName()|escape}</h3>
 						</div>
 						<div class="sectionbody">
 							<div id="field_{$field->getId()}">{$field->getEditor()}</div>

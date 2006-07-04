@@ -248,7 +248,7 @@ class StorageConnection
 	      {
 	        if (!$this->queryExec($query))
 	        {
-	          $this->log->error('Error running query '.$query.' '.$_STORAGE->lastError());
+	          $this->log->error('Error running query '.$query.' '.$this->lastError());
 	        }
 	        $query='';
 	      }

@@ -5,7 +5,7 @@
 {assign var="class" value=$iv->getClass()}
 {assign var="sequence" value=$iv->getMainSequence()}
 {assign var="name" value=$iv->getField('name')}
-<item id="{$item->getId()}" class="{$class->getId()}" name="{$name->toString()}">
+<item id="{$item->getId()}" class="{$class->getId()}" name="{$name->toString()|escape}">
 {if $sequence}
 	{foreach from=$sequence->getItems() item="subitem"}
 		{include file="items/treeitem.tpl" item=$subitem}

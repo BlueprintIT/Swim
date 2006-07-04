@@ -170,8 +170,8 @@ function moveDown(item, field, link) {
 					{foreach from=$class->getFields($itemversion) item="field"}
 						{if $field->getType()!='html' && $field->getType()!='sequence'}
 							<tr>
-								<td class="label">{$field->getName()}:</td>
-								<td class="details">{$field->toString()}</td>
+								<td class="label">{$field->getName()|escape}:</td>
+								<td class="details">{$field->toString()|escape}</td>
 							</tr>
 						{/if}
 					{/foreach}
@@ -182,7 +182,7 @@ function moveDown(item, field, link) {
 			{if $field->getType()=='sequence'}
 				<div class="section">
 					<div class="sectionheader">
-						<h3>{$field->getName()}</h3>
+						<h3>{$field->getName()|escape}</h3>
 					</div>
 					<div class="sectionbody">
 						{if !$field->isSorted()}
@@ -226,7 +226,7 @@ function moveDown(item, field, link) {
 			{if $field->getType()=='html'}
 				<div class="section">
 					<div class="sectionheader">
-						<h3>{$field->getName()}</h3>
+						<h3>{$field->getName()|escape}</h3>
 					</div>
 					<div class="sectionbody">
 						<div id="field_{$field->getId()}" class="content">{$field->toString()}</div>

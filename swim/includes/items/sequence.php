@@ -34,9 +34,9 @@ class SequenceSorter
       $b = $b->getField($this->field);
     if (($b == null) && ($a == null))
       $result = 0;
-    else if ($b==null)
+    else if ($b == null)
       $result = -1;
-    else if ($a = null)
+    else if ($a == null)
       $result = 1;
     else
       $result = $a->compareTo($b);
@@ -61,14 +61,19 @@ class Sequence extends Field
   {
     if ($element->tagName == 'classes')
     {
-      $newclasses = array();
       $items = explode(',', getDOMText($element));
-      foreach ($items as $name)
+      if (isset($this->classes))
       {
-        if (isset($this->classes[$name]))
-          $newclasses[$name] = $this->classes[$name];
+        $newclasses = array();
+        foreach ($items as $name)
+        {
+          if (isset($this->classes[$name]))
+            $newclasses[$name] = $this->classes[$name];
+        }
+        $this->classes = $newclasses;
       }
-      $this->classes = $newclasses;
+      else
+        $this->classes = $items;
     }
     else
       parent::parseElement($element);
@@ -76,7 +81,8 @@ class Sequence extends Field
   
   protected function parse()
   {
-    $this->classes = $this->itemversion->getItem()->getSection()->getVisibleClasses();
+    if ($this->itemversion->getMainSequence() === $this)
+      $this->classes = $this->itemversion->getItem()->getSection()->getVisibleClasses();
     parent::parse();
   }
   
