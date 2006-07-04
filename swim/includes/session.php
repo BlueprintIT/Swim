@@ -20,16 +20,16 @@ class Session
     if (!isset($_SESSION['data']))
     {
       $_SESSION['data'] = array();
-      self::setDefaultVariant('default');
+      self::setCurrentVariant('default');
     }
   }
   
-  public static function getDefaultVariant($variant)
+  public static function getCurrentVariant()
   {
     return $_SESSION['data']['variant'];
   }
   
-  public static function setDefaultVariant($variant)
+  public static function setCurrentVariant($variant)
   {
     $_SESSION['data']['variant'] = $variant;
   }

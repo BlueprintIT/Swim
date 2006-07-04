@@ -73,7 +73,15 @@ class Sequence extends Field
         $this->classes = $newclasses;
       }
       else
-        $this->classes = $items;
+      {
+        $this->classes = array();
+        foreach ($items as $name)
+        {
+          $class = ClassManager::getClass($name);
+          if ($class !== null)
+            $this->classes[$name] = $class;
+        }
+      }
     }
     else
       parent::parseElement($element);
@@ -81,9 +89,12 @@ class Sequence extends Field
   
   protected function parse()
   {
-    if ($this->itemversion->getMainSequence() === $this)
+    $main = $this->itemversion->getMainSequence();
+    if (($main !== null) && ($main->getId() === $this->getId()))
       $this->classes = $this->itemversion->getItem()->getSection()->getVisibleClasses();
     parent::parse();
+    if (!isset($this->classes))
+      $this->classes = array();
   }
   
   public function getVisibleClasses()
@@ -158,9 +169,9 @@ class Sequence extends Field
   {
     global $_STORAGE;
     
-    $results = $_STORAGE->query('SELECT MAX(position) FROM Sequence WHERE parent='.$this->itemversion->getItem()->getId().' AND field="'.$_STORAGE->escape($this->id).'";');
+    $results = $_STORAGE->query('SELECT MAX(position+1) FROM Sequence WHERE parent='.$this->itemversion->getItem()->getId().' AND field="'.$_STORAGE->escape($this->id).'";');
     if ($results->valid())
-      $pos = $results->fetchSingle()+1;
+      $pos = $results->fetchSingle();
     else
       $pos = 0;
     $_STORAGE->queryExec('INSERT INTO Sequence (parent,field,position,item) VALUES ('.$this->itemversion->getItem()->getId().',"'.$_STORAGE->escape($this->id).'",'.$pos.','.$item->getId().');');

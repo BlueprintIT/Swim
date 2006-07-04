@@ -106,6 +106,7 @@ class Field
   
   protected function parseElement($element)
   {
+    $this->log->warn('Unknown element in field declaration: '.$element->tagName);
   }
   
   protected function parseAttributes($element)

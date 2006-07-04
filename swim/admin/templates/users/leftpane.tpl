@@ -1,8 +1,8 @@
 {stylesheet href="$CONTENT/yahoo/css/folders/tree.css"}
-{script href="$CONTENT/yahoo/YAHOO.js"}
-{script href="$CONTENT/yahoo/dragdrop.js"}
-{script href="$CONTENT/yahoo/event.js"}
-{script href="$CONTENT/yahoo/treeview.js"}
+{script href="$CONTENT/yui/yahoo/yahoo-min.js"}
+{script href="$CONTENT/yui/dragdrop/dragdrop-min.js"}
+{script href="$CONTENT/yui/event/event-min.js"}
+{script href="$CONTENT/yui/treeview/treeview-min.js"}
 {script href="$CONTENT/scripts/BlueprintIT.js"}
 {script href="$CONTENT/scripts/treeview.js"}
 <script type="text/javascript">

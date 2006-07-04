@@ -38,6 +38,38 @@ class Item
     return SectionManager::getSection($this->section);
   }
   
+  public function getParents()
+  {
+    global $_STORAGE;
+    
+    $parents = array();
+    $results = $_STORAGE->query('SELECT parent,field FROM Sequence WHERE item='.$this->id.';');
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      $item = Item::getItem($details['parent']);
+      array_push($parents, array('item' => $item, 'field' => $details['field']));
+    }
+    return $parents;
+  }
+  
+  public function getMainParents()
+  {
+    global $_STORAGE;
+    
+    $parents = array();
+    $results = $_STORAGE->query('SELECT parent,field FROM Sequence WHERE item='.$this->id.';');
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      $item = Item::getItem($details['parent']);
+      $item = $item->getCurrentVersion(Session::getCurrentVariant());
+      if (($item !== null) && ($item->getMainSequence()->getId() == $details['field']))
+        array_push($parents, $item);
+    }
+    return $parents;
+  }
+  
   protected function getValidVariants($variant)
   {
     $valid = array();
@@ -162,7 +194,7 @@ class Item
     if ($item === null)
     {
       $result = $_STORAGE->query('SELECT * FROM Item WHERE id='.$id.';');
-      if ($result->valid())
+      if (($result !== false) && ($result->valid()))
         $item = new Item($result->fetch());
       else
         $item = null;
@@ -527,6 +559,29 @@ class ItemVersion
       $this->itemclass = $value;
       $this->modified = $newtime;
     }
+  }
+  
+  public function getLinkTarget()
+  {
+    if ($this->itemclass === null)
+      return $this;
+    
+    if ($this->itemclass->allowsLink())
+      return $this;
+      
+    $sequence = $this->getMainSequence();
+    $items = $sequence->getItems();
+    foreach ($items as $item)
+    {
+      $iv = $item->getCurrentVersion(Session::getCurrentVariant());
+      if ($iv !== null)
+      {
+        $link = $iv->getLinkTarget();
+        if ($link !== null)
+          return $link;
+      }
+    }
+    return null;
   }
   
   public function getMainSequence()

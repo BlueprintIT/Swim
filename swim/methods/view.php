@@ -20,7 +20,7 @@ function method_view($request)
   
   $item = Item::getItem($request->getPath());
   if ($item != null)
-    $item = $item->getCurrentVersion(Session::getDefaultVariant());
+    $item = $item->getCurrentVersion(Session::getCurrentVariant());
   if ($item != null)
   {
     $smarty = createSmarty($request, 'text/html');

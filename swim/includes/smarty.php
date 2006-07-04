@@ -38,6 +38,21 @@ class ItemWrapper
       case 'version':
         return $this->itemversion->getVersion();
         break;
+      case 'parent':
+        $parents = $this->itemversion->getItem()->getMainParents();
+        if (count($parents)>0)
+          return new ItemWrapper($parents[0]);
+        return null;
+        break;
+      case 'url':
+        $target = $this->itemversion->getLinkTarget();
+        if ($target == null)
+          $target = $this->itemversion;
+        $req = new Request();
+        $req->setMethod('view');
+        $req->setPath($target->getItem()->getId());
+        return $req->encode();
+        break;
       default:
         $field = $this->itemversion->getField($name);
         if ($field != null)
@@ -93,6 +108,7 @@ class HtmlHeader
     {
       $result.='<script src="'.$path.'" type="text/javascript"></script>'."\n";
     }
+    $result.='<meta name="generator" content="SWIM 3.0">'."\n";
     return $result;
   }
 }
@@ -419,6 +435,8 @@ function api_get($params, &$smarty)
         $result = UserManager::getGroup($params['id']);
       else if ($params['type']=='item')
         $result = Item::getItem($params['id']);
+      else if ($params['type']=='section')
+        $result = SectionManager::getSection($params['id']);
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }
@@ -432,6 +450,25 @@ function api_get($params, &$smarty)
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }
+  }
+  else
+  {
+    return "Not enough parameters";
+  }
+}
+
+function item_wrap($params, &$smarty)
+{
+  if ((!empty($params['var'])) && (!empty($params['item'])))
+  {
+    $item = $params['item'];
+    if ($item instanceof Item)
+      $item = $item->getCurrentVersion(Session::getCurrentVariant());
+    else if ($item instanceof ItemVariant)
+      $item = $item->getCurrentVersion();
+    else if (!($item instanceof ItemVersion))
+      return "Invalid item specified";
+    $smarty->assign_by_ref($params['var'], new ItemWrapper($item));
   }
   else
   {
@@ -518,6 +555,7 @@ function configureSmarty($smarty, $request, $type)
                              'brand_get_timestamp',
                              'brand_get_secure',
                              'brand_get_trusted'));
+  $smarty->register_function('wrap', 'item_wrap');
   $smarty->register_function('getfiles', 'get_files');
   $smarty->register_function('retrieverss', 'retrieve_rss');
   $smarty->register_function('stylesheet', 'encode_stylesheet');

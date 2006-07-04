@@ -21,6 +21,7 @@ class ItemClass
   private $description = '';
   private $fields;
   private $mainsequence = null;
+  private $allowlink = true;
   
   public function __construct($id, $parent = null)
   {
@@ -36,6 +37,11 @@ class ItemClass
   public function getName()
   {
     return $this->name;
+  }
+  
+  public function allowsLink()
+  {
+    return $this->allowlink;
   }
   
   public function getTemplate()
@@ -90,6 +96,8 @@ class ItemClass
   {
     if ($element->hasAttribute('mainsequence'))
       $this->mainsequence = $element->getAttribute('mainsequence');
+    if (($element->hasAttribute('allowlink')) && ($element->getAttribute('allowlink') == 'false'))
+      $this->allowlink = false;
     $el=$element->firstChild;
     while ($el!==null)
     {

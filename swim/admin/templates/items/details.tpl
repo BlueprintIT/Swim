@@ -1,8 +1,8 @@
 {secure documents="read" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
-{script href="$CONTENT/yahoo/YAHOO.js"}
-{script href="$CONTENT/yahoo/event.js"}
-{script href="$CONTENT/yahoo/connection.js"}
+{script href="$CONTENT/yui/yahoo/yahoo-min.js"}
+{script href="$CONTENT/yui/event/event-min.js"}
+{script href="$CONTENT/yui/connection/connection-min.js"}
 {script method="admin" path="scripts/request.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="section" value=$item->getSection()}
@@ -39,7 +39,6 @@ function moveUp(item, field, link) {
 			success: moveUpComplete,
 			failure: function(obj) {
 				alert("There was an error performing this action.");
-				moveUpComplete(obj);
 			},
 			argument: {
 				row: row
@@ -70,7 +69,6 @@ function moveDown(item, field, link) {
 			success: moveDownComplete,
 			failure: function(obj) {
 				alert("There was an error performing this action.");
-				moveDownComplete(obj);
 			},
 			argument: {
 				row: row

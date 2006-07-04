@@ -29,16 +29,16 @@ function method_mutatesequence($request)
     {
       $field = null;
       $item = Item::getItem($request->getQueryVar('item'));
-      if ($item != null)
+      if ($item !== null)
         $item = $item->getCurrentVersion(Session::getCurrentVariant());
-      if ($item != null)
+      if ($item !== null)
         $field = $item->getField($request->getQueryVar('field'));
-      if ($field != null)
+      if ($field !== null)
       {
         if (($request->getQueryVar('action')=='moveup') && ($request->hasQueryVar('index')))
         {
           $item = $field->getItem($request->getQueryVar('index'));
-          if ($item != null)
+          if ($item !== null)
           {
             $field->removeItem($request->getQueryVar('index'));
             $field->insertItem($request->getQueryVar('index')-1, $item);
@@ -52,7 +52,7 @@ function method_mutatesequence($request)
         else if (($request->getQueryVar('action')=='movedown') && ($request->hasQueryVar('index')))
         {
           $item = $field->getItem($request->getQueryVar('index'));
-          if ($item != null)
+          if ($item !== null)
           {
             $field->removeItem($request->getQueryVar('index'));
             $field->insertItem($request->getQueryVar('index')+1, $item);

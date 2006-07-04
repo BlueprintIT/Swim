@@ -11,40 +11,6 @@ YAHOO.util.Dom.textContent = function(el) {
 	return content;
 }
 
-YAHOO.util.Dom.addClass = function(el, name) {
-	el = this.get(el);
-	if (el)
-		el.className+=" "+name;
-}
-
-YAHOO.util.Dom.removeClass = function(el, name) {
-	el = this.get(el);
-	if (el) {
-		var classes = el.className.split(' ');
-		if (classes.length>0) {
-			var newclass = '';
-			for (var k in classes) {
-				if (classes[k]!=name)
-					newclass+=' '+classes[k];
-			}
-			el.className=newclass.substring(1,newclass.length);
-		}
-	}
-}
-
-YAHOO.util.Dom.hasClass = function(el, cls) {
-	el = this.get(el);
-	if (el.className) {
-		var classes = el.className.split(' ');
-		for (var k in classes) {
-			if (classes[k]==cls)
-				return true;
-		}
-		return false;
-	}
-	return false;
-}
-
 // Gets a DOM compliant event
 YAHOO.util.Event.baseGetEvent = YAHOO.util.Event.getEvent;
 YAHOO.util.Event.getEvent = function (event) {
