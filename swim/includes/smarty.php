@@ -543,6 +543,7 @@ function configureSmarty($smarty, $request, $type)
   $req['path'] = $request->getPath();
   $req['query'] = $request->getQuery();
   $smarty->assign('session', $_SESSION['data']);
+  $smarty->assign('SHARED', $_PREFS->getPref('url.shared'));
   $smarty->assign_by_ref('SERVER', $_SERVER);
   $smarty->assign_by_ref('USER', $_USER);
   $smarty->assign_by_ref('REQUEST', $request);

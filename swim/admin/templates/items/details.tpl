@@ -1,8 +1,8 @@
 {secure documents="read" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
-{script href="$CONTENT/yui/yahoo/yahoo-min.js"}
-{script href="$CONTENT/yui/event/event-min.js"}
-{script href="$CONTENT/yui/connection/connection-min.js"}
+{script href="$SHARED/yui/yahoo/yahoo-min.js"}
+{script href="$SHARED/yui/event/event-min.js"}
+{script href="$SHARED/yui/connection/connection-min.js"}
 {script method="admin" path="scripts/request.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="section" value=$item->getSection()}

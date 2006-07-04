@@ -1,16 +1,17 @@
 {secure documents="read"}
 {include file="includes/singletabbedheader.tpl" title="Item Browser"}
-{stylesheet href="$CONTENT/yahoo/css/folders/tree.css"}
-{script href="$CONTENT/yui/yahoo/yahoo-min.js"}
-{script href="$CONTENT/scripts/BlueprintIT.js"}
+{stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
+{stylesheet href="$SHARED/treeview/treeview.css"}
+{script href="$SHARED/yui/yahoo/yahoo-min.js"}
+{script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
-{script href="$CONTENT/yui/event/event-min.js"}
-{script href="$CONTENT/yui/dom/dom-min.js"}
-{script href="$CONTENT/yui/connection/connection-min.js"}
-{script href="$CONTENT/yui/treeview/treeview-min.js"}
-{script href="$CONTENT/scripts/treeview.js"}
-{script href="$CONTENT/scripts/dom.js"}
-{script href="$CONTENT/scripts/sitetree.js"}
+{script href="$SHARED/yui/event/event-min.js"}
+{script href="$SHARED/yui/dom/dom-min.js"}
+{script href="$SHARED/yui/connection/connection-min.js"}
+{script href="$SHARED/yui/treeview/treeview-min.js"}
+{script href="$SHARED/scripts/treeview.js"}
+{script href="$SHARED/scripts/dom.js"}
+{script href="$SHARED/scripts/sitetree.js"}
 <script>{literal}
 function selectUrl(url)
 {

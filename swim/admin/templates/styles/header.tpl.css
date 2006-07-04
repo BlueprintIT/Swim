@@ -79,18 +79,6 @@ iframe.body {
   border: none 0px;
 }
 
-/* first or middle sibling, no children */
-.categorytn { background-image: url([$CONTENT]/yahoo/img/folders/tm.gif) !important; width:34px !important; }
-.pagetn { background-image: url([$CONTENT]/images/pagetn.gif) !important; width:34px !important; }
-.linktn { background-image: url([$CONTENT]/images/linktn.gif) !important; width:34px !important; }
-.usertn { background-image: url([$CONTENT]/images/usertn.gif) !important; width:34px !important; }
-
-/* last sibling, no children */
-.categoryln { background-image: url([$CONTENT]/yahoo/img/folders/lm.gif) !important; width:34px !important; }
-.pageln { background-image: url([$CONTENT]/images/pageln.gif) !important; width:34px !important; }
-.linkln { background-image: url([$CONTENT]/images/linkln.gif) !important; width:34px !important; }
-.userln { background-image: url([$CONTENT]/images/userln.gif) !important; width:34px !important; }
-
 #categorytree .selected {
   background-color: Highlight;
   color: HighlightText;
