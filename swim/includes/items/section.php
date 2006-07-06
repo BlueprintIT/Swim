@@ -33,7 +33,7 @@ class Section extends AdminSection
     if (isset($this->classes))
       return $this->classes;
     else
-      return ClassManager::getClasses();
+      return FieldSetManager::getClasses();
   }
   
   public function getRootItem()
@@ -75,7 +75,7 @@ class Section extends AdminSection
           $items = explode(',', getDOMText($el));
           foreach ($items as $name)
           {
-            $class = ClassManager::getClass($name);
+            $class = FieldSetManager::getClass($name);
             if ($class != null)
               $this->classes[$name] = $class; 
           }

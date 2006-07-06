@@ -51,9 +51,9 @@ class Sequence extends Field
 {
   protected $classes;
   
-  public function __construct($metadata, $item, $name)
+  public function __construct($metadata)
   {
-    parent::__construct($metadata, $item, $name);
+    parent::__construct($metadata);
     $this->exists = true;
   }
   
@@ -62,47 +62,30 @@ class Sequence extends Field
     if ($element->tagName == 'classes')
     {
       $items = explode(',', getDOMText($element));
-      if (isset($this->classes))
+      $this->classes = array();
+      foreach ($items as $name)
       {
-        $newclasses = array();
-        foreach ($items as $name)
-        {
-          if (isset($this->classes[$name]))
-            $newclasses[$name] = $this->classes[$name];
-        }
-        $this->classes = $newclasses;
-      }
-      else
-      {
-        $this->classes = array();
-        foreach ($items as $name)
-        {
-          $class = ClassManager::getClass($name);
-          if ($class !== null)
-            $this->classes[$name] = $class;
-        }
+        $class = FieldSetManager::getClass($name);
+        if ($class !== null)
+          $this->classes[$name] = $class;
       }
     }
     else
       parent::parseElement($element);
   }
   
-  protected function parse()
-  {
-    $main = $this->itemversion->getMainSequence();
-    if (($main !== null) && ($main->getId() === $this->getId()))
-      $this->classes = $this->itemversion->getItem()->getSection()->getVisibleClasses();
-    parent::parse();
-    if (!isset($this->classes))
-      $this->classes = array();
-  }
-  
   public function getVisibleClasses()
   {
-    if (isset($this->classes))
-      return $this->classes;
+    if (!isset($this->classes))
+      return $this->itemversion->getItem()->getSection()->getVisibleClasses();
+      
+    $main = $this->itemversion->getMainSequence();
+    if (($main !== null) && ($main->getId() === $this->getId()))
+    {
+      $sectlist = $this->itemversion->getItem()->getSection()->getVisibleClasses();
+      return array_intersect($this->classes, $sectlist);
+    }
     
-    $this->parse();
     return $this->classes;
   }
   

@@ -92,6 +92,7 @@ class SqliteStorage extends StorageConnection
   
   public function query($query)
   {
+    $this->querycount++;
     $this->log->debug('query: '.$query);
     $result = $this->db->query($query);
     if ($result && $result !== TRUE)
@@ -103,6 +104,7 @@ class SqliteStorage extends StorageConnection
   
   public function queryExec($query)
   {
+    $this->execcount++;
     $this->log->debug('queryExec: '.$query);
     $result = @$this->db->queryExec($query);
     if ($result===false)

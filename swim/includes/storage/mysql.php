@@ -86,6 +86,7 @@ class MySQLStorage extends StorageConnection
   
   public function query($query)
   {
+    $this->querycount++;
     $this->log->debug('query: '.$query);
     $result = $this->db->query($query);
     if ($result === FALSE)
@@ -97,6 +98,7 @@ class MySQLStorage extends StorageConnection
   
   public function queryExec($query)
   {
+    $this->execcount++;
     $this->log->debug('queryExec: '.$query);
     $result = $this->db->query($query);
     if ($result === FALSE)

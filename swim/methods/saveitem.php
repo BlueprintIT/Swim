@@ -48,7 +48,7 @@ function method_saveitem($request)
           }
           else if ($name == 'view')
           {
-            $view = ViewManager::getView($value);
+            $view = FieldSetManager::getView($value);
             if ($view !== null)
               $itemversion->setView($view);
           }

@@ -44,9 +44,12 @@ class FieldSet
   
   protected function addMissingFields(&$fields, $item)
   {
-    foreach ($this->fields as $name => $el)
+    foreach ($this->fields as $name => $field)
       if (!isset($fields[$name]))
-        $fields[$name] = Field::getField($el, $item, $name);
+      {
+        $fields[$name] = clone $field;
+        $fields[$name]->setItemVersion($item);
+      }
     if ($this->parent != null)
       $this->parent->addMissingFields($fields, $item);
   }
@@ -61,7 +64,11 @@ class FieldSet
   public function getField($item, $name)
   {
     if (isset($this->fields[$name]))
-      return Field::getField($this->fields[$name], $item, $name);
+    {
+      $field = clone $this->fields[$name];
+      $field->setItemVersion($item);
+      return $field;
+    }
     if ($this->parent != null)
       return $this->parent->getField($item, $name);
     return null;
@@ -88,7 +95,10 @@ class FieldSet
         else if ($el->tagName=='description')
           $this->description=getDOMText($el);
         else if ($el->tagName=='field')
-          $this->fields[$el->getAttribute('id')] = $el;
+        {
+          $field = Field::getField($el);
+          $this->fields[$field->getId()] = $field;
+        }
         else
           $this->parseElement($el);
       }
@@ -119,12 +129,9 @@ class ItemClass extends FieldSet
   
   public function getDefaultView()
   {
-    foreach ($this->views as $id)
-    {
-      $view = ViewManager::getView($id);
-      if ($view !== null)
-        return $view;
-    }
+    if ((isset($this->views)) && (count($this->views)>0))
+      return $this->views[0];
+
     if ($this->parent !== null)
       return $this->parent->getDefaultView();
       
@@ -133,22 +140,7 @@ class ItemClass extends FieldSet
   
   public function getViews()
   {
-    if (!isset($this->views))
-    {
-      if ($this->parent !== null)
-        return $this->parent->getViews();
-      else
-        return array();
-    }
-
-    $result = array();
-    foreach ($this->views as $id)
-    {
-      $view = ViewManager::getView($id);
-      if ($view !== null)
-        array_push($result, $view);
-    }
-    return $result;
+    return $this->views;
   }
   
   public function isValidView($view)
@@ -158,8 +150,10 @@ class ItemClass extends FieldSet
       
     if ($view === null)
       return ((!isset($this->views)) || (count($this->views)==0));
-      
-    return in_array($view->getId(), $this->views);
+    
+    if (isset($this->views))
+      return in_array($view, $this->views);
+    return false;
   }
   
   public function getMainSequence($item)
@@ -174,7 +168,18 @@ class ItemClass extends FieldSet
   protected function parseElement($element)
   {
     if ($element->tagName=='views')
-      $this->views = explode(",", getDOMText($element));
+    {
+      $this->views = array();
+      $views = explode(",", getDOMText($element));
+      foreach ($views as $viewid)
+      {
+        $view = FieldSetManager::getView($viewid);
+        if ($view !== null)
+          array_push($this->views, $view);
+        else
+          LoggerManager::getLogger('swim.itemclass')->warn('Invalid view '.$viewid.' specified for '.$this->getId());
+      }
+    }
   }
   
   protected function parseAttributes($element)
@@ -186,54 +191,101 @@ class ItemClass extends FieldSet
   }
 }
 
-class ClassManager
+class FieldSetManager
 {
   private static $classes = array();
+  private static $views = array();
   private static $log;
+  
+  public static function isCacheValid($cache, $files)
+  {
+    if (!is_readable($cache))
+      return false;
+      
+    foreach ($files as $file)
+    {
+      if ((file_exists($file)) && (filemtime($cache)<filemtime($file)))
+        return false;
+    }
+    return true;
+  }
   
   public static function init()
   {
     global $_PREFS;
     
     self::$log = LoggerManager::getLogger('swim.classmanager');
-    self::loadClasses($_PREFS->getPref('storage.config'));
-  }
-  
-  public static function loadClasses($dir)
-  {
-    $file = $dir.'/classes.xml';
-    $doc = new DOMDocument();
-    if ((is_readable($file))&&($doc->load($file)))
+    
+    $cache = $_PREFS->getPref('storage.cache').'/fieldsets.ser';
+    $files = array($_PREFS->getPref('storage.config').'/views.xml', $_PREFS->getPref('storage.config').'/classes.xml');
+    if (self::isCacheValid($cache, $files))
     {
-      $el=$doc->documentElement->firstChild;
-      while ($el!==null)
-      {
-        if ($el->nodeType==XML_ELEMENT_NODE)
-        {
-          if ($el->tagName=='class')
-          {
-            $id = $el->getAttribute('id');
-            if ($el->hasAttribute('extends'))
-            {
-              self::$log->debug('Creating class '.$id.' That extends another.');
-              $base = self::getClass($el->getAttribute('extends'));
-              self::$log->debug('Extends '.$base->getName());
-              $class = new ItemClass($id, $base);
-            }
-            else
-            {
-              $class = new ItemClass($id);
-            }
-            self::$classes[$id]=$class;
-            $class->load($el);
-          }
-        }
-        $el=$el->nextSibling;
-      }
+      $results = unserialize(file_get_contents($cache));
+      self::$classes = $results['classes'];
+      self::$views = $results['views'];
+      self::$log->debug('Loaded '.count(self::$views).' views and '.count(self::$classes).' classes from cache.');
     }
     else
     {
-      self::$log->debug('No classes defined at '.$dir);
+      self::loadFieldSets($files);
+      $results = array('views' => self::$views, 'classes' => self::$classes);
+      file_put_contents($cache, serialize($results));
+      self::$log->debug('Loaded '.count(self::$views).' views and '.count(self::$classes).' classes.');
+    }
+  }
+  
+  public static function loadFieldSets($files)
+  {
+    $doc = new DOMDocument();
+    foreach ($files as $file)
+    {
+      if ((is_readable($file))&&($doc->load($file)))
+      {
+        $el=$doc->documentElement->firstChild;
+        while ($el!==null)
+        {
+          if ($el->nodeType==XML_ELEMENT_NODE)
+          {
+            if ($el->tagName=='class')
+            {
+              $id = $el->getAttribute('id');
+              if ($el->hasAttribute('extends'))
+              {
+                self::$log->debug('Creating class '.$id.' That extends another.');
+                $base = self::getClass($el->getAttribute('extends'));
+                $class = new ItemClass($id, $base);
+              }
+              else
+              {
+                $class = new ItemClass($id);
+              }
+              self::$classes[$id]=$class;
+              $class->load($el);
+            }
+            else if ($el->tagName=='view')
+            {
+              $id = $el->getAttribute('id');
+              if ($el->hasAttribute('extends'))
+              {
+                self::$log->debug('Creating view '.$id.' That extends another.');
+                $base = self::getView($el->getAttribute('extends'));
+                $view = new ItemView($id, $base);
+              }
+              else
+              {
+                $view = new ItemView($id);
+              }
+              self::$views[$id]=$view;
+              $view->load($el);
+            }
+          }
+          $el=$el->nextSibling;
+        }
+      }
+      else
+      {
+        self::$log->debug('No fieldsets defined at '.$file);
+      }
     }
   }
   
@@ -253,62 +305,10 @@ class ClassManager
       return null;
     }
   }
-}
-
-class ViewManager
-{
-  private static $views = array();
-  private static $log;
-  
-  public static function init()
-  {
-    global $_PREFS;
-    
-    self::$log = LoggerManager::getLogger('swim.viewmanager');
-    self::loadViews($_PREFS->getPref('storage.config'));
-  }
-  
-  public static function loadViews($dir)
-  {
-    $file = $dir.'/views.xml';
-    $doc = new DOMDocument();
-    if ((is_readable($file))&&($doc->load($file)))
-    {
-      $el=$doc->documentElement->firstChild;
-      while ($el!==null)
-      {
-        if ($el->nodeType==XML_ELEMENT_NODE)
-        {
-          if ($el->tagName=='view')
-          {
-            $id = $el->getAttribute('id');
-            if ($el->hasAttribute('extends'))
-            {
-              self::$log->debug('Creating view '.$id.' That extends another.');
-              $base = self::getView($el->getAttribute('extends'));
-              self::$log->debug('Extends '.$base->getName());
-              $view = new ItemView($id, $base);
-            }
-            else
-            {
-              $view = new ItemView($id);
-            }
-            self::$views[$id]=$view;
-            $view->load($el);
-          }
-        }
-        $el=$el->nextSibling;
-      }
-    }
-    else
-    {
-      self::$log->debug('No views defined at '.$dir);
-    }
-  }
   
   public static function getViews()
   {
-    return self::$viewss;
+    return self::$views;
   }
   
   public static function getView($id)
@@ -324,7 +324,6 @@ class ViewManager
   }
 }
 
-ViewManager::init();
-ClassManager::init();
+FieldSetManager::init();
 
 ?>

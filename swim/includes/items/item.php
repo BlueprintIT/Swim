@@ -412,8 +412,8 @@ class ItemVersion
       $this->variant = $variant;
     $this->variantid = $details['itemvariant'];
     $this->version = $details['version'];
-    $this->itemclass = ClassManager::getClass($details['class']);
-    $this->itemview = ViewManager::getView($details['view']);
+    $this->itemclass = FieldSetManager::getClass($details['class']);
+    $this->itemview = FieldSetManager::getView($details['view']);
     if ($this->itemview === null)
       $this->itemview = $this->itemclass->getDefaultView();
     else if (!$this->itemclass->isValidView($this->itemview))

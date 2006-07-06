@@ -18,21 +18,28 @@ class Field
   protected $exists = false;
   protected $itemversion = null;
   protected $id;
-  protected $metadata;
-  protected $parsed = false;
   protected $retrieved = false;
   protected $name;
   protected $description;
   protected $type;
   protected $log;
   
-  public function __construct($metadata, $item, $name)
+  public function __construct($metadata)
   {
     $this->log = LoggerManager::getLogger('swim.field.'.get_class($this));
+    $this->parse($metadata);
+  }
+  
+  public function __clone()
+  {
+    $this->retrieved = false;
+    $this->itemversion = null;
+  }
+  
+  public function setItemVersion($item)
+  {
+    $this->retrieved = false;
     $this->itemversion = $item;
-    $this->id = $name;
-    $this->metadata = $metadata;
-    $this->type = $metadata->getAttribute('type');
   }
   
   public function getId()
@@ -42,7 +49,6 @@ class Field
   
   public function getName()
   {
-    $this->parse();
     return $this->name;
   }
   
@@ -53,7 +59,6 @@ class Field
   
   public function getDescription()
   {
-    $this->parse();
     return $this->description;
   }
   
@@ -113,13 +118,12 @@ class Field
   {
   }
   
-  protected function parse()
+  private function parse($metadata)
   {
-    if ($this->parsed)
-      return;
-      
-    $this->parseAttributes($this->metadata);
-    $el=$this->metadata->firstChild;
+    $this->id = $metadata->getAttribute('id');
+    $this->type = $metadata->getAttribute('type');
+    $this->parseAttributes($metadata);
+    $el=$metadata->firstChild;
     while ($el!==null)
     {
       if ($el->nodeType==XML_ELEMENT_NODE)
@@ -133,30 +137,29 @@ class Field
       }
       $el=$el->nextSibling;
     }
-    $this->parsed = true;
   }
   
-  public static function getField($el, $item, $name)
+  public static function getField($el)
   {
     if (($el != null) && ($el->hasAttribute('type')))
     {
       $type = $el->getAttribute('type');
       if ($type == 'text')
-        return new TextField($el, $item, $name);
+        return new TextField($el);
       if ($type == 'multiline')
-        return new TextField($el, $item, $name);
+        return new TextField($el);
       if ($type == 'html')
-        return new TextField($el, $item, $name);
+        return new TextField($el);
       if ($type == 'integer')
-        return new IntegerField($el, $item, $name);
+        return new IntegerField($el);
       if ($type == 'date')
-        return new DateField($el, $item, $name);
+        return new DateField($el);
       if ($type == 'sequence')
-        return new Sequence($el, $item, $name);
+        return new Sequence($el);
       if ($type == 'file')
-        return new FileField($el, $item, $name);
+        return new FileField($el);
     }
-    return new TextField($el, $item, $name);
+    return new TextField($el);
   }
 }
 
@@ -246,7 +249,6 @@ class TextField extends SimpleField
     $state = '';
     if (!$this->isEditable())
       $state = 'disabled="true" ';
-    $this->parse();
     if ($this->type == 'multiline')
       return '<textarea '.$state.'style="width: 100%; height: 50px;" id="field:'.$this->id.'" name="'.$this->id.'">'.htmlentities($this->toString()).'</textarea>';
     else if ($this->type == 'html')
@@ -342,7 +344,6 @@ class FileField extends TextField
   
   public function getEditor()
   {
-    $this->parse();
     $this->retrieve();
     
     $request = new Request();

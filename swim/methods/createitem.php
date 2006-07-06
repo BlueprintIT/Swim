@@ -27,7 +27,7 @@ function method_createitem($request)
     if ($request->hasQueryVar('targetvariant') && $request->hasQueryVar('targetsection')
        && $request->hasQueryVar('class'))
     {
-      $class = ClassManager::getClass($request->getQueryVar('class'));
+      $class = FieldSetManager::getClass($request->getQueryVar('class'));
       $section = SectionManager::getSection($request->getQueryVar('targetsection'));
       if (($section != null) && ($class != null))
       {

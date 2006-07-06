@@ -121,7 +121,7 @@ class SwimEngine
   
   static function shutdown()
   {
-    global $_STATE;
+    global $_STATE,$_STORAGE;
     $log=LoggerManager::getLogger('swim.engine');
     if ($_STATE<STATE_SHUTDOWN)
     {
@@ -131,6 +131,9 @@ class SwimEngine
       LockManager::shutdown();
       LoggerManager::shutdown();
       $_STATE=STATE_COMPLETE;
+
+      $log->debug($_STORAGE->getQueryCount().' db queries.');
+      $log->debug('Shutdown complete');
       exit;
     }
     else if ($_STATE==STATE_SHUTDOWN)

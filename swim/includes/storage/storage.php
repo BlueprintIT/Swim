@@ -121,12 +121,19 @@ class StorageConnection
   protected $log;
   protected $new = false;
   protected $transaction = 0;
+  protected $querycount = 0;
+  protected $execcount = 0;
 
 	function __construct()
 	{
     $this->log = LoggerManager::getLogger('swim.storage.connection');
 	}
 	
+  public function getQueryCount()
+  {
+    return $this->querycount+$this->execcount;
+  }
+  
 	function beginTransaction()
 	{
 		if ($this->transaction==0)
