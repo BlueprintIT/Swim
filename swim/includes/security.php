@@ -433,18 +433,21 @@ class User
 		
 		$resource->unlock();
 		
-		while (isset($resource->parent))
-		{
-			$resource=$resource->parent;
-			$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,$resource->isWritable());
-			if ($perm!=PERMISSION_UNKNOWN)
-				return $perm;
-		}
+    if (!($resource instanceof Container))
+    {
+  		while (isset($resource->parent))
+  		{
+  			$resource=$resource->parent;
+  			$perm=$this->checkSpecificPermission($permission,$resource->getDir(),$file,$resource->isWritable());
+  			if ($perm!=PERMISSION_UNKNOWN)
+  				return $perm;
+  		}
 		
-		$container=$resource->container;
-		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,$container->isWritable());
-		if ($perm!=PERMISSION_UNKNOWN)
-			return $perm;
+      $container=$resource->container;
+  		$perm=$this->checkSpecificPermission($permission,$container->getDir(),$file,$container->isWritable());
+  		if ($perm!=PERMISSION_UNKNOWN)
+  			return $perm;
+    }
 		
 		return $this->checkSpecificPermission($permission,$_PREFS->getPref('storage.basedir'),$file,false);
 	}
