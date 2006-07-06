@@ -32,6 +32,15 @@ class ItemWrapper
       case 'item':
         return $this->itemversion;
         break;
+      case 'section':
+        return $this->itemversion->getItem()->getSection()->getId();
+        break;
+      case 'class':
+        return $this->itemversion->getClass()->getId();
+        break;
+      case 'view':
+        return $this->itemversion->getView()->getId();
+        break;
       case 'author':
         return $this->itemversion->getOwner()->getName();
         break;

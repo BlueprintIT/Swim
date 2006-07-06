@@ -46,6 +46,12 @@ function method_saveitem($request)
             $itemversion->makeCurrent();
             $req->setQueryVar('reloadtree', 'true');
           }
+          else if ($name == 'view')
+          {
+            $view = ViewManager::getView($value);
+            if ($view !== null)
+              $itemversion->setView($view);
+          }
           else
           {
             $field = $itemversion->getField($name);

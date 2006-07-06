@@ -15,6 +15,7 @@
 	{assign var="itemversion" value=$itemvariant->getNewestVersion()}
 {/if}
 {assign var="class" value=$itemversion->getClass()}
+{assign var="view" value=$itemversion->getView()}
 <script>
 {if isset($request.query.reloadtree)}
   window.top.SiteTree.loadTree();
@@ -151,6 +152,50 @@ function moveDown(item, field, link) {
 							{/html_form}
 						</td>
 					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="section">
+			<div class="sectionheader">
+				<h3>View Options</h3>
+			</div>
+			<div class="sectionbody">
+				<table class="admin">
+					<tr>
+						<td class="label">View:</td>
+						{if $itemversion->isComplete()}
+							<td class="details">{$view->getName()}</td>
+						{else}
+							<td class="details">
+								{html_form tag_name="viewform" tag_style="display: inline" method="saveitem" itemversion=$itemversion->getId() formmethod="POST"}
+									<select name="view">
+										{foreach from=$class->getViews() item="nview"}
+											{if $nview === $itemversion->getView()}
+													<option value="{$nview->getId()}" selected="true">
+											{else}
+													<option value="{$nview->getId()}">
+											{/if}
+												{$nview->getName()}
+											</option>
+										{/foreach}
+									</select>
+									<div class="toolbarbutton">
+										<a href="javascript:document.forms.viewform.submit();">
+											<img src="{$CONTENT}/icons/check-blue.gif"> Change View
+										</a>
+									</div>
+								{/html_form}
+							</td>
+						{/if}
+					</tr>
+					{foreach from=$view->getFields($itemversion) item="field"}
+						{if $field->getType()!='html' && $field->getType()!='sequence'}
+							<tr>
+								<td class="label">{$field->getName()|escape}:</td>
+								<td class="details">{$field->toString()|escape}</td>
+							</tr>
+						{/if}
+					{/foreach}
 				</table>
 			</div>
 		</div>

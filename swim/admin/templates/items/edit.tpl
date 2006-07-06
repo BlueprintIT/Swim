@@ -1,5 +1,6 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
+{script href="$CONTENT/scripts/filebrowser.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="itemvariant" value=$item->getVariant($session.variant)}
 {if isset($request.query.version)}
@@ -10,6 +11,7 @@
 	{assign var="itemversion" value=$itemvariant->getVersions()[0]}
 {/if}
 {assign var="class" value=$itemversion->getClass()}
+{assign var="view" value=$itemversion->getView()}
 <script>{literal}
 function submitForm(form)
 {
@@ -31,6 +33,24 @@ function submitForm(form)
 		</div>
 		<div class="body">
 			<div class="section first">
+				<div class="sectionheader">
+					<h3>View Options</h3>
+				</div>
+				<div class="sectionbody">
+					<table class="admin">
+						{foreach from=$view->getFields($itemversion) item="field"}
+							{if $field->getType()!='html' && $field->getType()!='sequence'}
+								<tr>
+									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
+									<td class="details">{$field->getEditor()}</td>
+									<td class="description">{$field->getDescription()|escape}</td>
+								</tr>
+							{/if}
+						{/foreach}
+					</table>
+				</div>
+			</div>
+			<div class="section">
 				<div class="sectionheader">
 					<h3>Item Options</h3>
 				</div>

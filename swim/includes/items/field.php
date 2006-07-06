@@ -147,17 +147,16 @@ class Field
         return new TextField($el, $item, $name);
       if ($type == 'html')
         return new TextField($el, $item, $name);
-      else if ($type == 'integer')
+      if ($type == 'integer')
         return new IntegerField($el, $item, $name);
-      else if ($type == 'date')
+      if ($type == 'date')
         return new DateField($el, $item, $name);
-      else if ($type == 'sequence')
+      if ($type == 'sequence')
         return new Sequence($el, $item, $name);
+      if ($type == 'file')
+        return new FileField($el, $item, $name);
     }
-    else
-    {
-      return new TextField($el, $item, $name);
-    }
+    return new TextField($el, $item, $name);
   }
 }
 
@@ -249,7 +248,7 @@ class TextField extends SimpleField
       $state = 'disabled="true" ';
     $this->parse();
     if ($this->type == 'multiline')
-      return '<textarea '.$state.'style="width: 100%; height: 50px;" id="field:'.$this->id.'" name="'.$this->id.'">'.$this->toString().'</textarea>';
+      return '<textarea '.$state.'style="width: 100%; height: 50px;" id="field:'.$this->id.'" name="'.$this->id.'">'.htmlentities($this->toString()).'</textarea>';
     else if ($this->type == 'html')
     {
       if (!$this->isEditable())
@@ -297,12 +296,6 @@ class TextField extends SimpleField
     }
   }
   
-  protected function parseAttributes($element)
-  {
-    if ($element->hasAttribute('texttype'))
-      $this->texttype = $element->getAttribute('texttype');
-  }
-  
   protected function escapeValue($value)
   {
     global $_STORAGE;
@@ -334,6 +327,51 @@ class DateField extends SimpleField
   protected function getColumn()
   {
     return "dateValue";
+  }
+}
+
+class FileField extends TextField
+{
+  private $filetype;
+  
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute('filetype'))
+      $this->filetype = $element->getAttribute('filetype');
+  }
+  
+  public function getEditor()
+  {
+    $this->parse();
+    $this->retrieve();
+    
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('browser/filebrowser.tpl');
+    $request->setQueryVar('item', $this->itemversion->getItem()->getId());
+    $request->setQueryVar('variant', $this->itemversion->getVariant()->getVariant());
+    $request->setQueryVar('version', $this->itemversion->getVersion());
+    $request->setQueryVar('type', $this->filetype);
+
+    if (strlen($this->value)>0)
+    {
+      $rlvalue = $this->value;
+      $pos = strrpos($rlvalue, '/');
+      if ($pos!==false)
+        $rlvalue = substr($rlvalue, $pos+1);
+    }
+    else
+      $rlvalue = '[No file selected]';
+
+    echo '<input id="'.$this->id.'" name="'.$this->id.'" type="hidden" value="'.$this->value.'"> ';
+
+    echo '<input id="fbfake-'.$this->id.'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    echo '<div class="toolbarbutton">';
+    echo '<a href="javascript:showFileBrowser(\''.$this->id.'\',\''.$request->encode().'\')">Select...</a>';
+    echo '</div> ';
+    echo '<div class="toolbarbutton">';
+    echo '<a href="javascript:clearFileBrowser(\''.$this->id.'\')">Clear</a>';
+    echo '</div> ';
   }
 }
 

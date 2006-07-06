@@ -1,17 +1,18 @@
-function showFileBrowser(url) {
+function showFileBrowser(id, url) {
+	window.SetUrl = function(uri) { fileBrowserSetUrl(id, uri); };
   window.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0,width=630,height=400');
 }
 
-function fileBrowserCallback(id, selected) {
+function fileBrowserSetUrl(id, url) {
 	var field = document.getElementById(id);
-	field.value = selected;
+	field.value = url;
 	
-	var pos = selected.lastIndexOf("/");
+	var pos = url.lastIndexOf("/");
 	if (pos>=0)
-		selected = selected.substring(pos+1);
+		url = url.substring(pos+1);
 		
 	var fake = document.getElementById("fbfake-"+id);
-	fake.value = selected;
+	fake.value = url;
 }
 
 function clearFileBrowser(id) {

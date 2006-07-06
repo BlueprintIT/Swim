@@ -49,6 +49,7 @@ function encodeQuery($query)
 
 function cleanVariable($text)
 {
+  return $text;
   $text = preg_replace("/<script.*?script>/si", "", "$text");
   $text = preg_replace("/<script.*>/si", "", "$text");
   $text = preg_replace("/<\/script>/si", "", "$text");

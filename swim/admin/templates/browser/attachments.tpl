@@ -123,7 +123,7 @@ td.name img {
 				<input type="submit" value="Upload">
 			{/html_form}
 		{/secure}
-		<h2>Global Files</h2>
+		<h2>Item Attachments</h2>
 	</div>
 	<div class="body">
 		{if isset($request.query.message)}

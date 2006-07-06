@@ -324,22 +324,30 @@ class ItemVariant
     global $_PREFS,$_STORAGE,$_USER;
 
     if ($class != null)
-      $class = $class->getId();
+      $class = $class;
     else if ($clone != null)
-      $class = $clone->getClass()->getId();
+      $class = $clone->getClass();
     else
     {
       $this->log->error('Null class and clone, cannot create an unknown item.');
       return null;
     }
+    if ($clone !== null)
+    {
+      $view = $clone->getView();
+      if (!$class->isValidView($view))
+        $view = $class->getDefaultView();
+    }
+    else
+      $view = $class->getDefaultView();
     $time = time();
     $results = $_STORAGE->query('SELECT MAX(version)+1 FROM VariantVersion WHERE itemvariant='.$this->id.' GROUP BY itemvariant;');
     if ($results->valid())
       $version = $results->fetchSingle();
     else
       $version = 1;
-    if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,class,modified,owner,current,complete) ' .
-      'VALUES ('.$this->id.','.$version.',"'.$_STORAGE->escape($class).'",'.$time.',"'.$_USER->getUsername().'",0,0);'))
+    if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,class,modified,owner,current,complete) ' .
+      'VALUES ('.$this->id.','.$version.',"'.$_STORAGE->escape($view->getId()).'","'.$_STORAGE->escape($class->getId()).'",'.$time.',"'.$_USER->getUsername().'",0,0);'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE id='.$id.';');
@@ -388,6 +396,7 @@ class ItemVersion
   private $variant;
   private $variantid;
   private $itemclass;
+  private $itemview;
   private $owner;
   private $modified;
   private $complete;
@@ -404,6 +413,11 @@ class ItemVersion
     $this->variantid = $details['itemvariant'];
     $this->version = $details['version'];
     $this->itemclass = ClassManager::getClass($details['class']);
+    $this->itemview = ViewManager::getView($details['view']);
+    if ($this->itemview === null)
+      $this->itemview = $this->itemclass->getDefaultView();
+    else if (!$this->itemclass->isValidView($this->itemview))
+      $this->itemview = $this->itemclass->getDefaultView();
     $this->modified = $details['modified'];
     $this->owner = $details['owner'];
     if ($details['complete']==1)
@@ -538,6 +552,32 @@ class ItemVersion
       $this->current = true;
   }
   
+  public function getView()
+  {
+    return $this->itemview;
+  }
+  
+  public function setView($value)
+  {
+    global $_STORAGE;
+    
+    if ($this->complete)
+      return;
+      
+    if ($this->itemview->getId() == $value->getId())
+      return;
+      
+    if (!$this->itemclass->isValidView($value))
+      return;
+      
+    $newtime = time();
+    if ($_STORAGE->queryExec('UPDATE VariantVersion SET view="'.$_STORAGE->escape($value->getId()).'", modified='.$newtime.' WHERE id='.$this->getId().';'))
+    {
+      $this->itemview = $value;
+      $this->modified = $newtime;
+    }
+  }
+  
   public function getClass()
   {
     return $this->itemclass;
@@ -553,8 +593,12 @@ class ItemVersion
     if ($this->itemclass->getId() == $value->getId())
       return;
       
+    $newview = $this->itemview;
+    if (!$value->isValidView($this->itemview))
+      $newview = $value->getDefaultView();
+    
     $newtime = time();
-    if ($_STORAGE->queryExec('UPDATE VariantVersion SET class="'.$_STORAGE->escape($value->getId()).'", modified='.$newtime.' WHERE id='.$this->getId().';'))
+    if ($_STORAGE->queryExec('UPDATE VariantVersion SET view="'.$_STORAGE->escape($newview->getId()).'", class="'.$_STORAGE->escape($value->getId()).'", modified='.$newtime.' WHERE id='.$this->getId().';'))
     {
       $this->itemclass = $value;
       $this->modified = $newtime;
@@ -594,18 +638,35 @@ class ItemVersion
   
   public function getFields()
   {
+    return array_merge($this->getClassFields(), $this->getViewFields());
+  }
+  
+  public function getClassFields()
+  {
     if ($this->itemclass == null)
-      return null;
+      return array();
     
     return $this->itemclass->getFields($this);
   }
   
+  public function getViewFields()
+  {
+    if ($this->itemview == null)
+      return array();
+    
+    return $this->itemview->getFields($this);
+  }
+  
   public function getField($name)
   {
-    if ($this->itemclass == null)
-      return null;
+    $field = null;
+    if ($this->itemclass !== null)
+      $field = $this->itemclass->getField($this, $name);
       
-    return $this->itemclass->getField($this, $name);
+    if (($field === null) && ($this->itemview !== null))
+      $field = $this->itemview->getField($this, $name);
+    
+    return $field;
   }
   
   public function updateModified()

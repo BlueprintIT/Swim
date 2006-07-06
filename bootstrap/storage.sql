@@ -43,6 +43,7 @@ CREATE TABLE VariantVersion (
 	itemvariant INTEGER,
 	version INTEGER,
 	class VARCHAR(30),
+	view VARCHAR(30),
 	modified INTEGER,
 	owner VARCHAR(20),
 	current INTEGER,
