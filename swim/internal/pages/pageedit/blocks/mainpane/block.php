@@ -210,7 +210,7 @@ if ((isset($contentfile))&&($_USER->canWrite($content)))
 {
 ?>
   <textarea id="editor" name="file:<?= $contentfile ?>" style="width: 100%; height: 400px"><?
-readfile($content->getDir().'/block.html');
+@readfile($content->getDir().'/block.html');
 ?></textarea>
 <?
 }
