@@ -387,7 +387,7 @@ class Request
       if (($humanreadable) && ($this->method=='view') && ($this->resource !== null))
       {
         $url = $this->resource->getViewPath($this);
-        $this->log->warn('Path for '.$this->resource->getPath().' is '.$url);
+        $this->log->debug('Path for '.$this->resource->getPath().' is '.$url);
       }
       if ($url === null)
       {
