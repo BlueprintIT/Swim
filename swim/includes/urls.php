@@ -650,12 +650,12 @@ class Request
     
     $request->setQuery($query);
     
-    if ($request->getMethod() == '')
+    if (($request->getMethod() == '') && ($request->getPath() == '') && ($_PREFS->isPrefSet('url.defaultpath')))
+    {
     	$request->setMethod($_PREFS->getPref('url.defaultmethod'));
+      $request->setPath($_PREFS->getPref('url.defaultpath'));
+    }
     
-    if (($request->getPath() == '') && ($_PREFS->isPrefSet('url.defaultpath')))
-    	$request->setPath($_PREFS->getPref('url.defaultpath'));
-
     $log->debug('Decoded method '.$request->getMethod().' path '.$request->getPath());
     
 	  return $request;

@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-class SequenceSorter
+class ItemSorter
 {
   private $field;
   private $ascending;
@@ -44,6 +44,12 @@ class SequenceSorter
     if (!$this->ascending)
       $result = -$result;
     return $result;
+  }
+  
+  public static function sortItems($items, $field)
+  {
+    $sorter = new ItemSorter($field);
+    usort($items, array($sorter, 'compare'));
   }
 }
 
@@ -97,8 +103,7 @@ class Sequence extends Field
   public function getSortedItems($field)
   {
     $items = $this->getItems();
-    $sorter = new SequenceSorter($field);
-    usort($items, array($sorter, 'compare'));
+    ItemSorter::sortItems($items, $field);
     return $items;
   }
   

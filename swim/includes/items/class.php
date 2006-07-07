@@ -114,12 +114,18 @@ class ItemView extends FieldSet
 class ItemClass extends FieldSet
 {
   private $views;
-  private $mainsequence = null;
-  private $allowlink = true;
+  private $mainsequence;
+  private $allowlink;
   
   public function allowsLink()
   {
-    return $this->allowlink;
+    if (isset($this->allowlink))
+      return $this->allowlink;
+    
+    if ($this->parent !== null)
+      return $this->parent->allowsLink();
+    
+    return true;
   }
   
   public function getTemplate()
@@ -158,10 +164,12 @@ class ItemClass extends FieldSet
   
   public function getMainSequence($item)
   {
-    if ($this->mainsequence != null)
+    if (isset($this->mainsequence))
       return $this->getField($item, $this->mainsequence);
+    
     if ($this->parent != null)
       return $this->parent->getMainSequence($item);
+    
     return null;
   }
   
@@ -186,8 +194,9 @@ class ItemClass extends FieldSet
   {
     if ($element->hasAttribute('mainsequence'))
       $this->mainsequence = $element->getAttribute('mainsequence');
-    if (($element->hasAttribute('allowlink')) && ($element->getAttribute('allowlink') == 'false'))
-      $this->allowlink = false;
+    
+    if ($element->hasAttribute('allowlink'))
+      $this->allowlink = ($element->getAttribute('allowlink') == 'true');
   }
 }
 
