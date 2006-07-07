@@ -29,7 +29,9 @@ function method_admin($request)
     if (isTemplateFile($path))
     {
       $smarty = createAdminSmarty($request, $type);
+      $log->debug('Starting display.');
       $smarty->display($path);
+      $log->debug('Display complete.');
     }
     else
       include($path);

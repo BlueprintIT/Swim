@@ -29,7 +29,9 @@ function method_view($request)
     else
       $template = $item->getClass()->getTemplate();
     $smarty->assign_by_ref('item', new ItemWrapper($item));
+    $log->debug('Starting display.');
     $smarty->display($template, $item->getId());
+    $log->debug('Display complete.');
   }
   else
     displayNotFound($request);

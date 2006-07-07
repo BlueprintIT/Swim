@@ -29,7 +29,9 @@ function method_layout($request)
     if (isTemplateFile($path))
     {
       $smarty = createSmarty($request, $type);
+      $log->debug('Starting display.');
       $smarty->display($path);
+      $log->debug('Display complete.');
     }
     else
       include($path);
