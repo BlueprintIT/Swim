@@ -45,7 +45,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 			iconClass: node.getAttribute("class")
 		};
 		
-		if (node.hasAttribute("id")) {
+		if (node.getAttribute("id")) {
 			var id = node.getAttribute("id");
 			if (!this.items[id]) {
 				this.items[id] = [];
@@ -55,7 +55,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 		}
 		
 		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);
-		if (node.hasAttribute("id")) {
+		if (node.getAttribute("id")) {
 			this.items[id].push(treenode);
 		}
 		

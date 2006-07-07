@@ -164,7 +164,7 @@ function moveDown(item, field, link) {
 					<table class="admin">
 						<tr>
 							<td class="label">View:</td>
-							{if ($itemversion->isComplete() && $class->isValidView($view))}
+							{if ($itemversion->isComplete() || !$class->isValidView($view))}
 								<td class="details">{$view->getName()}</td>
 							{else}
 								<td class="details">

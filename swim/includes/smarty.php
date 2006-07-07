@@ -610,8 +610,8 @@ function createAdminSmarty($request, $type = 'text/html')
   $smarty->assign('CONTENT', $_PREFS->getPref('url.admin.static'));
   $smarty->assign('BRAND', $_PREFS->getPref('storage.branding.static'));
   
-  if (($type == 'text/css') || ($type == 'text/javascript'))
-    $smarty->caching = true;
+  /*if (($type == 'text/css') || ($type == 'text/javascript'))
+    $smarty->caching = true;*/
 
   return $smarty;
 }
@@ -635,7 +635,7 @@ function createSmarty($request, $type = 'text/html')
   configureSmarty($smarty, $request, $type);
   $smarty->assign('CONTENT', $_PREFS->getPref('url.site.static'));
   
-  $smarty->caching = true;
+  //$smarty->caching = true;
 
   return $smarty;
 }
