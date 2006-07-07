@@ -416,8 +416,6 @@ class ItemVersion
     $this->itemview = FieldSetManager::getView($details['view']);
     if ($this->itemview === null)
       $this->itemview = $this->itemclass->getDefaultView();
-    else if (!$this->itemclass->isValidView($this->itemview))
-      $this->itemview = $this->itemclass->getDefaultView();
     $this->modified = $details['modified'];
     $this->owner = $details['owner'];
     if ($details['complete']==1)
