@@ -545,8 +545,7 @@ function configureSmarty($smarty, $request, $type)
   global $_PREFS,$_USER;
 
   $log = LoggerManager::getLogger('page');
-  $log->debug('Creating admin smarty.');
-  
+
   $req = array();
   $req['method'] = $request->getMethod();
   $req['path'] = $request->getPath();
@@ -594,6 +593,9 @@ function configureSmarty($smarty, $request, $type)
 function createAdminSmarty($request, $type = 'text/html')
 {
   global $_PREFS,$_USER;
+  
+  $log = LoggerManager::getLogger('page');
+  $log->debug('Creating admin smarty.');
   
   require_once($_PREFS->getPref('storage.smarty').'/Smarty.class.php');
   $smarty = new Smarty();

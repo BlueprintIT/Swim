@@ -58,19 +58,21 @@ function loadUserPreferences()
 	global $bootstrap, $_PREFS, $_PREFSCOPES;
 	
 	$confdir = $_PREFSCOPES['host']->getPref('storage.config');
+
 	LockManager::lockResourceRead($confdir);
-	unset($_PREFS);
-	$_PREFS = new Preferences();
+	$_PREFSCOPES['site'] = new Preferences();
 	if (is_readable($confdir.'/site.conf'))
 	{
 		$file=fopen($confdir.'/site.conf','r');
-		$_PREFS->loadPreferences($file);
+		$_PREFSCOPES['site']->loadPreferences($file);
 		fclose($file);
 	}
-	$_PREFS->setParent($_PREFSCOPES['host']);
+	$_PREFSCOPES['site']->setParent($_PREFSCOPES['host']);
 	LockManager::unlockResource($confdir);
 	
-	$_PREFSCOPES['default']->setDelegate($_PREFS);
+	$_PREFSCOPES['default']->setDelegate($_PREFSCOPES['site']);
+  
+  $_PREFS=$_PREFSCOPES['site'];
 }
 
 $_STATE=STATE_BOOTSTRAP;
@@ -79,7 +81,7 @@ $_STATE=STATE_BOOTSTRAP;
 require_once $bootstrap.'/logging.php';
 error_reporting(E_ALL);
 
-LoggerManager::setLogLevel('',LOG_LEVEL_WARN);
+LoggerManager::setLogLevel('',LOG_LEVEL_DEBUG);
 LoggerManager::setLogLevel('php',LOG_LEVEL_INFO);
 LoggerManager::setLogLevel('swim.storage',LOG_LEVEL_WARN);
 LoggerManager::setLogLevel('swim.utils.shutdown',LOG_LEVEL_WARN);

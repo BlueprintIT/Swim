@@ -598,6 +598,8 @@ class Request
 	{
 		global $_PREFS;
 
+    $log=LoggerManager::getLogger('swim.request');
+
 		$request = new Request();
     $request->setProtocol($protocol);
 	  if ($_PREFS->getPref('url.encoding')=='path')
@@ -649,11 +651,13 @@ class Request
     $request->setQuery($query);
     
     if ($request->getMethod() == '')
-    	$request->setMethod($_PREFS->getPref('method.default'));
+    	$request->setMethod($_PREFS->getPref('url.defaultmethod'));
     
-    if ((strlen($request->getPath())==0)&&($_PREFS->isPrefSet('method.'.$request->method.'.defaultresource')))
-    	$request->setPath($_PREFS->getPref('method.'.$request->method.'.defaultresource'));
+    if (($request->getPath() == '') && ($_PREFS->isPrefSet('url.defaultpath')))
+    	$request->setPath($_PREFS->getPref('url.defaultpath'));
 
+    $log->debug('Decoded method '.$request->getMethod().' path '.$request->getPath());
+    
 	  return $request;
 	}
 }
