@@ -92,7 +92,13 @@ function moveDown(item, field, link) {
 			<div class="toolbar">
 				{if $itemversion->isComplete()}
 					<div class="toolbarbutton">
-						<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Create new version for editing</a>
+						<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/>
+						{if $class->getVersioning()=='simple'}
+							Edit
+						{else}
+							Create new version for editing
+						{/if}
+						</a>
 					</div>
 				{else}
 					<div class="toolbarbutton">

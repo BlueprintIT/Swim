@@ -18,7 +18,11 @@
 {/if}
 {assign var="class" value=$itemversion->getClass()}
 {assign var="view" value=$itemversion->getView()}
-<script>{literal}
+<script>
+{if isset($request.query.reloadtree)}
+  window.top.SiteTree.loadTree();
+{/if}
+{literal}
 function submitForm(form)
 {
   document.forms[form].submit();
@@ -26,6 +30,10 @@ function submitForm(form)
 {/literal}</script>
 <div id="mainpane">
 	{html_form tag_name="mainform" method="saveitem" itemversion=$itemversion->getId()}
+		{if $class->getVersioning()=='simple'}
+			<input type="hidden" name="complete" value="true">
+			<input type="hidden" name="current" value="true">
+		{/if}
 		<div class="header">
 			<div class="toolbar">
 				<div class="toolbarbutton">

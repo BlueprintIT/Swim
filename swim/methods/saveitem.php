@@ -33,31 +33,27 @@ function method_saveitem($request)
         $req->setPath('items/details.tpl');
         $req->setQueryVar('item', $itemversion->getItem()->getId());
         $req->setQueryVar('version', $itemversion->getVersion());
+        $req->setQueryVar('reloadtree', 'true');
         $query = $request->getQuery();
         unset($query['itemversion']);
         foreach ($query as $name => $value)
         {
-          if ($name == 'complete')
-          {
-            $itemversion->setComplete($value=='true');
-          }
-          else if ($name == 'current')
-          {
-            $itemversion->makeCurrent();
-            $req->setQueryVar('reloadtree', 'true');
-          }
-          else if ($name == 'view')
+          if ($name == 'view')
           {
             $view = FieldSetManager::getView($value);
             if ($view !== null)
               $itemversion->setView($view);
           }
-          else
+          else if (($name != 'complete') && ($name != 'current'))
           {
             $field = $itemversion->getField($name);
             $field->setValue($value);
           }
         }
+        if (isset($query['complete']))
+          $itemversion->setComplete($query['complete']=='true');
+        if (isset($query['current']))
+          $itemversion->makeCurrent();
         redirect($req);
       }
       else

@@ -116,6 +116,18 @@ class ItemClass extends FieldSet
   private $views;
   private $mainsequence;
   private $allowlink;
+  private $versioning;
+  
+  public function getVersioning()
+  {
+    if (isset($this->versioning))
+      return $this->versioning;
+      
+    if ($this->parent !== null)
+      return $this->parent->getVersioning();
+      
+    return 'full';
+  }
   
   public function allowsLink()
   {
@@ -208,6 +220,9 @@ class ItemClass extends FieldSet
     
     if ($element->hasAttribute('allowlink'))
       $this->allowlink = ($element->getAttribute('allowlink') == 'true');
+    
+    if ($element->hasAttribute('versioning'))
+      $this->versioning = $element->getAttribute('versioning');
   }
 }
 
