@@ -13,6 +13,27 @@ BlueprintIT.widget.SiteTree.prototype = {
 	selected: null,
 	loading: null,
 	
+	canHold: function(parent, child) {
+		if (parent.tree.getRoot() == parent)
+			return false;
+		
+		if (parent.data.contains && child.data.type && parent.data.contains[child.data.type])
+			return true;
+		
+		return false;
+	},
+	
+	canDrag: function(node) {
+		if (node.parent == node.tree.getRoot())
+			return false;
+			
+		return true;
+	},
+	
+	onDragDrop: function(node, point) {
+		console.log("Drop " + node.data.id + " on " + point.parent.data.id + " at " + point.position);
+	},
+	
 	init: function(event, obj) {
 		this.loadTree();
 	},
@@ -42,7 +63,9 @@ BlueprintIT.widget.SiteTree.prototype = {
 	loadItem: function(node, parentnode) {
 		var details = {
 			label: node.getAttribute("name"),
-			iconClass: node.getAttribute("class")
+			iconClass: node.getAttribute("class"),
+			type: node.getAttribute("class"),
+			contains: []
 		};
 		
 		if (node.getAttribute("id")) {
@@ -54,6 +77,12 @@ BlueprintIT.widget.SiteTree.prototype = {
 			details.href = "javascript:onTreeItemClick('"+id+"')";
 		}
 		
+		if (node.getAttribute("contains")) {
+			var content = node.getAttribute("contains").split(",");
+			for (var i = 0; i<content.length; i++)
+				details.contains[content[i]] = true;
+		}
+			
 		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);
 		if (node.getAttribute("id")) {
 			this.items[id].push(treenode);
@@ -75,7 +104,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 
 	loadFromDocument: function(doc) {
 		this.items = [];
-		var tree = new YAHOO.widget.TreeView(this.element);
+		var tree = new BlueprintIT.widget.DraggableTreeView(this.element, this);
 		this.loadCategory(doc.documentElement, tree.getRoot());
 		tree.draw();
 		this.loading = false;

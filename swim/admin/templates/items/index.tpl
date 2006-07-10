@@ -9,6 +9,7 @@
 {script href="$SHARED/yui/dom/dom-min.js"}
 {script href="$SHARED/yui/connection/connection-min.js"}
 {script href="$SHARED/yui/treeview/treeview-min.js"}
+{script href="$SHARED/yui/dragdrop/dragdrop-min.js"}
 {script href="$SHARED/scripts/treeview.js"}
 {script href="$SHARED/scripts/dom.js"}
 {script href="$SHARED/scripts/sitetree.js"}

@@ -134,6 +134,7 @@ BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 	if (node) {
 		this.node = node;
 		this.init(node.labelElId, sGroup);
+		delete this.invalidHandleTypes["A"];
 		this.initFrame();
 	}
 }
@@ -152,42 +153,50 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPosition = function
 	while (subnode) {
 		var elregion = YAHOO.util.Dom.getRegion(subnode.getEl());
 		if (ypos<elregion.top) {
-			return { parent: node, position: pos };
-		}
-		var chregion = YAHOO.util.Dom.getRegion(subnode.getChildrenEl());
-		if (ypos<chregion.top) {
-			if (ypos>((chregion.top+elregion.top)/2)) {
-				if (subnode.hasChildren()) {
-					return { parent: subnode, position: 0 };
-				}
-				else {
-					return { parent: node, position: pos+1 };
-				}
-			}
-			else {
+			if (this.node.tree.dragDropManager.canHold(node, this.node))
 				return { parent: node, position: pos };
-			}
+			else
+				return null;
 		}
-		if (ypos<chregion.bottom) {
-			return this.getInsertPosition(subnode, e);
+		if (subnode != this.node) {
+			var chregion = YAHOO.util.Dom.getRegion(subnode.getChildrenEl());
+			if (ypos<chregion.top) {
+				if (ypos>((chregion.top+elregion.top)/2)) {
+					if (this.node.tree.dragDropManager.canHold(subnode, this.node))
+						return { parent: subnode, position: 0 };
+					else
+						return { parent: node, position: pos+1 };
+				}
+				else if (this.node.tree.dragDropManager.canHold(node, this.node))
+					return { parent: node, position: pos };
+				else
+					return null;
+			}
+			if (ypos<chregion.bottom) {
+				return this.getInsertPosition(subnode, e);
+			}
 		}
 		if (ypos<elregion.bottom) {
 			if (ypos>((elregion.top+elregion.bottom)/2)) {
-				if (subnode.hasChildren()) {
+				if ((subnode != this.node) && this.node.tree.dragDropManager.canHold(subnode, this.node))
 					return { parent: subnode, position: 0 };
-				}
-				else {
+				else if (this.node.tree.dragDropManager.canHold(node, this.node))
 					return { parent: node, position: pos+1 };
-				}
+				else
+					return null;
 			}
-			else {
+			else if (this.node.tree.dragDropManager.canHold(node, this.node))
 				return { parent: node, position: pos };
-			}
+			else
+				return null;
 		}
 		pos++;
 		subnode = subnode.nextSibling;
 	}
-	return { parent: node, position: pos };
+	if (this.node.tree.dragDropManager.canHold(node, this.node))
+		return { parent: node, position: pos };
+	else
+		return null;
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragDrop = function(e, id) {
@@ -198,13 +207,8 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragDrop = function(e, id)
 
 	var point = this.getInsertPosition(this.node.tree.getRoot(), e);
 
-	var before = null;
-	if (point.position < point.parent.children.length)
-		before = point.parent.children[point.position];
-	
-	point.parent.insertBefore(this.node, before);
-	
-	this.node.tree.draw();
+	if (point)
+		this.node.tree.dragDropManager.onDragDrop(this.node, point);
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOver = function(e, id) {
@@ -212,32 +216,43 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOver = function(e, id)
 		return;
 		
 	var point = this.getInsertPosition(this.node.tree.getRoot(), e);
-
-	var x;
-	var y;
-
-	if (point.position < point.parent.children.length) {
-		var node = point.parent.children[point.position];
-		var region = YAHOO.util.Dom.getRegion(node.getEl());
-		y = region.top;
-		if (node.labelElId)
-			region = YAHOO.util.Dom.getRegion(node.labelElId);
-		x = region.left;
-	}
-	else {
-		var node = point.parent.children[point.parent.children.length-1];
-		var region = YAHOO.util.Dom.getRegion(node.getEl());
-		y = region.bottom;
-		if (node.labelElId)
-			region = YAHOO.util.Dom.getRegion(node.labelElId);
-		x = region.left;
-	}
 	
-	var el = this.getEl();
-	var s = this.node.tree.indicatorDiv.style;
-	s.width = (parseInt(el.offsetWidth) - 4) + "px";
-	s.visibility = "";
-	YAHOO.util.Dom.setXY(this.node.tree.indicatorDiv, [x, y]);
+	if (point) {
+		var x;
+		var y;
+		var width;
+	
+		var node;
+		var region;
+		
+		if (point.parent.children.length == 0) {
+			node = point.parent;
+			region = YAHOO.util.Dom.getRegion(node.getEl());
+			y = region.bottom;
+		}
+		else {
+			if (point.position < point.parent.children.length) {
+				node = point.parent.children[point.position];
+				region = YAHOO.util.Dom.getRegion(node.getEl());
+				y = region.top;
+			}
+			else if (point.parent.children.length>0) {
+				node = point.parent.children[point.parent.children.length-1];
+				region = YAHOO.util.Dom.getRegion(node.getEl());
+				y = region.bottom;
+			}
+		}
+		region = YAHOO.util.Dom.getRegion(point.parent.getLabelEl());
+		x = region.left;
+		width = region.right-region.left;
+		
+		var s = this.node.tree.indicatorDiv.style;
+		s.width = width + "px";
+		s.visibility = "";
+		YAHOO.util.Dom.setXY(this.node.tree.indicatorDiv, [x, y]);
+	}
+	else
+		this.node.tree.indicatorDiv.style.visibility = "hidden";
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOut = function(e, id) {
@@ -261,9 +276,8 @@ BlueprintIT.widget.DraggableTreeView.prototype = new YAHOO.widget.TreeView();
 BlueprintIT.widget.DraggableTreeView.prototype.dragDropManager = null;
 
 BlueprintIT.widget.DraggableTreeView.prototype.setupDD = function(node) {
-	if (this.dragDropManager.canDrag(node)) {
+	if (this.dragDropManager.canDrag(node))
 		new BlueprintIT.widget.DraggableTreeNodeProxy(node);
-	}
 	
 	var pos = 0;
 	for (pos = 0; pos<node.children.length; pos++)
@@ -276,7 +290,7 @@ BlueprintIT.widget.DraggableTreeView.prototype.createIndicator = function() {
     var s = this.indicatorDiv.style;
     s.position = "absolute";
     s.visibility = "hidden";
-    s.border = "2px solid black";
+    s.border = "1px solid black";
 		s.height = "0px";
     s.zIndex = 999;
 
