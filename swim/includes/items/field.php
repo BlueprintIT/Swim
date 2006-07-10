@@ -86,6 +86,11 @@ class Field
   {
   }
   
+  public function output(&$smarty)
+  {
+    return $this->toString();
+  }
+  
   public function toString()
   {
     return "";
@@ -350,6 +355,11 @@ class DateField extends IntegerField
     $text.='<div id="calendar_'.$this->id.'"></div>'."\n";
     $text.='<script type="text/javascript">var cal_'.$this->id.' = displayCalendar("'.$this->id.'",'.$this->toString().');</script>'."\n";
     return $text;
+  }
+  
+  public function output(&$smarty)
+  {
+    return date('d/m/Y', $this->toString());
   }
   
   protected function getDefaultValue()
