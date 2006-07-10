@@ -180,6 +180,10 @@ class SimpleField extends Field
       $this->exists = true;
       $this->value = $results->fetchSingle();
     }
+    else
+    {
+      $this->value = $this->getDefaultValue();
+    }
     $this->retrieved = true;
   }
   
@@ -208,6 +212,11 @@ class SimpleField extends Field
     return '<input '.$state.'style="width: 100%" type="input" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
   }
   
+  protected function getDefaultValue()
+  {
+    return '';
+  }
+  
   public function toString()
   {
     $this->retrieve();
@@ -232,6 +241,14 @@ class IntegerField extends SimpleField
     if ($b instanceof IntegerField)
       return $this->toString()-$b->toString();
     return 0;
+  }
+  
+  protected function escapeValue($value)
+  {
+    if (is_numeric($value))
+      return $value;
+    $this->log->warn('Invalid value to escape: '.$value);
+    return '0';
   }
   
   protected function getColumn()
@@ -317,7 +334,7 @@ class TextField extends SimpleField
   }
 }
 
-class DateField extends SimpleField
+class DateField extends IntegerField
 {
   public function compareTo($b)
   {
@@ -329,10 +346,15 @@ class DateField extends SimpleField
   public function getEditor()
   {
     $text = '';
-    $text.='<input type="hidden" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
+    $text.='<input type="text" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
     $text.='<div id="calendar_'.$this->id.'"></div>'."\n";
-    $text.='<script type="text/javascript">displayCalendar("'.$this->id.'");</script>'."\n";
+    $text.='<script type="text/javascript">var cal_'.$this->id.' = displayCalendar("'.$this->id.'",'.$this->toString().');</script>'."\n";
     return $text;
+  }
+  
+  protected function getDefaultValue()
+  {
+    return time();
   }
   
   protected function getColumn()
