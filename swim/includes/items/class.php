@@ -16,7 +16,7 @@
 class FieldSet
 {
   protected $id;
-  protected $parent;
+  protected $parent = null;
   protected $name = '';
   protected $description = '';
   protected $fields = array();
@@ -135,8 +135,13 @@ class ItemClass extends FieldSet
   
   public function getDefaultView()
   {
-    if ((isset($this->views)) && (count($this->views)>0))
-      return $this->views[0];
+    if (isset($this->views))
+    {
+      if (count($this->views)>0)
+        return $this->views[0];
+      else
+        return null;
+    }
 
     if ($this->parent !== null)
       return $this->parent->getDefaultView();
@@ -146,7 +151,13 @@ class ItemClass extends FieldSet
   
   public function getViews()
   {
-    return $this->views;
+    if (isset($this->views))
+      return $this->views;
+    
+    if ($this->parent !== null)
+      return $this->parent->getViews();
+    
+    return array();
   }
   
   public function isValidView($view)
