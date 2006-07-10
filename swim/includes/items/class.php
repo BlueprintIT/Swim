@@ -167,7 +167,7 @@ class ItemClass extends FieldSet
     if (isset($this->mainsequence))
       return $this->getField($item, $this->mainsequence);
     
-    if ($this->parent != null)
+    if ($this->parent !== null)
       return $this->parent->getMainSequence($item);
     
     return null;

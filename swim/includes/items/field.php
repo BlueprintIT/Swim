@@ -326,6 +326,15 @@ class DateField extends SimpleField
     return 0;
   }
   
+  public function getEditor()
+  {
+    $text = '';
+    $text.='<input type="hidden" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
+    $text.='<div id="calendar_'.$this->id.'"></div>'."\n";
+    $text.='<script type="text/javascript">displayCalendar("'.$this->id.'");</script>'."\n";
+    return $text;
+  }
+  
   protected function getColumn()
   {
     return "dateValue";

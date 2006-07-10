@@ -159,9 +159,13 @@ class Sequence extends Field
     
     $results = $_STORAGE->query('SELECT MAX(position+1) FROM Sequence WHERE parent='.$this->itemversion->getItem()->getId().' AND field="'.$_STORAGE->escape($this->id).'";');
     if ($results->valid())
+    {
       $pos = $results->fetchSingle();
+      if ($pos == false)
+        $pos = '0';
+    }
     else
-      $pos = 0;
+      $pos = '0';
     $_STORAGE->queryExec('INSERT INTO Sequence (parent,field,position,item) VALUES ('.$this->itemversion->getItem()->getId().',"'.$_STORAGE->escape($this->id).'",'.$pos.','.$item->getId().');');
     $this->items = null;
   }

@@ -1,6 +1,12 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
+{script href="$SHARED/yui/yahoo/yahoo-min.js"}
+{script href="$SHARED/yui/dom/dom-min.js"}
+{script href="$SHARED/yui/event/event-min.js"}
+{script href="$SHARED/yui/calendar/calendar-min.js"}
 {script href="$CONTENT/scripts/filebrowser.js"}
+{script href="$CONTENT/scripts/calendar.js"}
+{stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="itemvariant" value=$item->getVariant($session.variant)}
 {if isset($request.query.version)}

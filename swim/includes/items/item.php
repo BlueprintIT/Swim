@@ -92,10 +92,10 @@ class Item
     foreach ($valid as $var)
     {
       $v = $this->getVariant($var);
-      if ($v != null)
+      if ($v !== null)
       {
         $r = $v->getCurrentVersion();
-        if ($r != null)
+        if ($r !== null)
           return $r;
       }
     }
@@ -105,7 +105,7 @@ class Item
   public function getNewestVersion($variant)
   {
     $var = $this->getVariant($variant);
-    if ($var != null)
+    if ($var !== null)
       return $var->getNewestVersion();
     return null;
   }
