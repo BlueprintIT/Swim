@@ -1,9 +1,9 @@
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$SHARED/treeview/treeview.css"}
-{script href="$SHARED/yui/yahoo/yahoo-min.js"}
-{script href="$SHARED/yui/dragdrop/dragdrop-min.js"}
-{script href="$SHARED/yui/event/event-min.js"}
-{script href="$SHARED/yui/treeview/treeview-min.js"}
+{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script href="$SHARED/scripts/treeview.js"}
 <script type="text/javascript">

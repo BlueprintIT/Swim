@@ -1,9 +1,9 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
-{script href="$SHARED/yui/yahoo/yahoo-min.js"}
-{script href="$SHARED/yui/dom/dom-min.js"}
-{script href="$SHARED/yui/event/event-min.js"}
-{script href="$SHARED/yui/calendar/calendar-min.js"}
+{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/calendar/calendar`$smarty.config.YUI`.js"}
 {script href="$CONTENT/scripts/filebrowser.js"}
 {script href="$CONTENT/scripts/calendar.js"}
 {stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}

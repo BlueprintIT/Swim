@@ -1,8 +1,8 @@
 {secure documents="read" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
-{script href="$SHARED/yui/yahoo/yahoo-min.js"}
-{script href="$SHARED/yui/event/event-min.js"}
-{script href="$SHARED/yui/connection/connection-min.js"}
+{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="section" value=$item->getSection()}
