@@ -1,6 +1,10 @@
-/**
- * Copyright (c) 2006, Yahoo! Inc. All rights reserved.
- */
+/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.txt
+version: 0.11.0
+*/
+
 /****************************************************************************/
 /****************************************************************************/
 /****************************************************************************/
@@ -16,6 +20,7 @@
  * attributes, borders, position, fonts, etc</li>
  * </ul>
  *
+ * requires YAHOO.util.Dom Dom utility
  * requires YAHOO.util.Event Event utility
  * requires YAHOO.widget.DataSource Data source class
  * see YAHOO.util.Animation Animation utility
@@ -31,28 +36,27 @@
 YAHOO.widget.AutoComplete = function(inputEl,containerEl,oDataSource,oConfigs) {
     if(inputEl && containerEl && oDataSource) {
         // Validate data source
-        if (oDataSource.getResults) {
+        if (oDataSource && (oDataSource instanceof YAHOO.widget.DataSource)) {
             this.dataSource = oDataSource;
         }
         else {
-            //YAHOO.log("Could not instantiate AutoComplete due to an invalid DataSource", "error");
             return;
         }
+
         // Validate input element
         if(YAHOO.util.Dom.inDocument(inputEl)) {
             if(typeof inputEl == "string") {
-                    this._sName = inputEl + YAHOO.widget.AutoComplete._nIndex;
+                    this._sName = "instance" + YAHOO.widget.AutoComplete._nIndex + " " + inputEl;
                     this._oTextbox = document.getElementById(inputEl);
             }
             else {
                 this._sName = (inputEl.id) ?
-                    inputEl.id + YAHOO.widget.AutoComplete._nIndex :
-                    "yac_inputEl" + YAHOO.widget.AutoComplete._nIndex;
+                    "instance" + YAHOO.widget.AutoComplete._nIndex + " " + inputEl.id:
+                    "instance" + YAHOO.widget.AutoComplete._nIndex;
                 this._oTextbox = inputEl;
             }
         }
         else {
-            //YAHOO.log("Could not instantiate AutoComplete due to an invalid input element", "error");
             return;
         }
 
@@ -64,9 +68,10 @@ YAHOO.widget.AutoComplete = function(inputEl,containerEl,oDataSource,oConfigs) {
             else {
                 this._oContainer = containerEl;
             }
+            if(this._oContainer.style.display == "none") {
+            }
         }
         else {
-            //YAHOO.log("Could not instantiate AutoComplete due to an invalid container element", "error");
             return;
         }
 
@@ -80,22 +85,32 @@ YAHOO.widget.AutoComplete = function(inputEl,containerEl,oDataSource,oConfigs) {
         }
 
         // Initialization sequence
+        this._initContainer();
+        this._initProps();
+        this._initList();
+        this._initContainerHelpers();
+
+        // Set up events
         var oSelf = this;
         var oTextbox = this._oTextbox;
-        var oContainer = this._oContainer;
+        // Events are actually for the content module within the container
+        var oContent = this._oContainer._oContent;
 
-        YAHOO.util.Event.addListener(oTextbox,'keyup',oSelf._onTextboxKeyUp,oSelf);
-        YAHOO.util.Event.addListener(oTextbox,'keydown',oSelf._onTextboxKeyDown,oSelf);
-        YAHOO.util.Event.addListener(oTextbox,'keypress',oSelf._onTextboxKeyPress,oSelf);
-        YAHOO.util.Event.addListener(oTextbox,'focus',oSelf._onTextboxFocus,oSelf);
-        YAHOO.util.Event.addListener(oTextbox,'blur',oSelf._onTextboxBlur,oSelf);
-        YAHOO.util.Event.addListener(oContainer,'mouseover',oSelf._onContainerMouseover,oSelf);
-        YAHOO.util.Event.addListener(oContainer,'mouseout',oSelf._onContainerMouseout,oSelf);
-        YAHOO.util.Event.addListener(oContainer,'scroll',oSelf._onContainerScroll,oSelf);
-        if(oTextbox.form && this.allowBrowserAutocomplete) {
-            YAHOO.util.Event.addListener(oTextbox.form,'submit',oSelf._onFormSubmit,oSelf);
+        // Dom events
+        YAHOO.util.Event.addListener(oTextbox,"keyup",oSelf._onTextboxKeyUp,oSelf);
+        YAHOO.util.Event.addListener(oTextbox,"keydown",oSelf._onTextboxKeyDown,oSelf);
+        YAHOO.util.Event.addListener(oTextbox,"keypress",oSelf._onTextboxKeyPress,oSelf);
+        YAHOO.util.Event.addListener(oTextbox,"focus",oSelf._onTextboxFocus,oSelf);
+        YAHOO.util.Event.addListener(oTextbox,"blur",oSelf._onTextboxBlur,oSelf);
+        YAHOO.util.Event.addListener(oContent,"mouseover",oSelf._onContainerMouseover,oSelf);
+        YAHOO.util.Event.addListener(oContent,"mouseout",oSelf._onContainerMouseout,oSelf);
+        YAHOO.util.Event.addListener(oContent,"scroll",oSelf._onContainerScroll,oSelf);
+        YAHOO.util.Event.addListener(oContent,"resize",oSelf._onContainerResize,oSelf);
+        if(oTextbox.form) {
+            YAHOO.util.Event.addListener(oTextbox.form,"submit",oSelf._onFormSubmit,oSelf);
         }
 
+        // Custom events
         this.textboxFocusEvent = new YAHOO.util.CustomEvent("textboxFocus", this);
         this.textboxKeyEvent = new YAHOO.util.CustomEvent("textboxKey", this);
         this.dataRequestEvent = new YAHOO.util.CustomEvent("dataRequest", this);
@@ -108,22 +123,19 @@ YAHOO.widget.AutoComplete = function(inputEl,containerEl,oDataSource,oConfigs) {
         this.itemArrowToEvent = new YAHOO.util.CustomEvent("itemArrowTo", this);
         this.itemArrowFromEvent = new YAHOO.util.CustomEvent("itemArrowFrom", this);
         this.itemSelectEvent = new YAHOO.util.CustomEvent("itemSelect", this);
+        this.unmatchedItemSelectEvent = new YAHOO.util.CustomEvent("unmatchedItemSelect", this);
         this.selectionEnforceEvent = new YAHOO.util.CustomEvent("selectionEnforce", this);
         this.containerCollapseEvent = new YAHOO.util.CustomEvent("containerCollapse", this);
         this.textboxBlurEvent = new YAHOO.util.CustomEvent("textboxBlur", this);
-
-        // Turn off autocomplete on textbox
+        
+        // Finish up
         oTextbox.setAttribute("autocomplete","off");
-
-        // Validate and initialize public configs
-        this._initProps();
+        YAHOO.widget.AutoComplete._nIndex++;
     }
     // Required arguments were not found
     else {
-        //YAHOO.log("Could not instantiate AutoComplete due invalid arguments", "error");
     }
 };
-
 
 /***************************************************************************
  * Public member variables
@@ -163,11 +175,19 @@ YAHOO.widget.AutoComplete.prototype.queryDelay = 0.5;
 
 /**
  * Class name of a highlighted item within the auto complete container.
- * Default: "highlight".
+ * Default: "yui-ac-highlight".
  *
  * @type string
  */
-YAHOO.widget.AutoComplete.prototype.highlightClassName = "highlight";
+YAHOO.widget.AutoComplete.prototype.highlightClassName = "yui-ac-highlight";
+
+/**
+ * Class name of a pre-highlighted item within the auto complete container.
+ * Default: null.
+ *
+ * @type string
+ */
+YAHOO.widget.AutoComplete.prototype.prehighlightClassName = null;
 
 /**
  * Query delimiter. A single character separator for multiple delimited
@@ -181,6 +201,14 @@ YAHOO.widget.AutoComplete.prototype.highlightClassName = "highlight";
 YAHOO.widget.AutoComplete.prototype.delimChar = null;
 
 /**
+ * Whether or not the first item in the auto complete container should be
+ * automatically highlighted on expand. Default: true.
+ *
+ * @type boolean
+ */
+YAHOO.widget.AutoComplete.prototype.autoHighlight = true;
+
+/**
  * Whether or not the auto complete input field should be automatically updated
  * with the first query result as the user types, auto-selecting the substring
  * that the user has not typed. Default: false.
@@ -191,7 +219,7 @@ YAHOO.widget.AutoComplete.prototype.typeAhead = false;
 
 /**
  * Whether or not to animate the expansion/collapse of the auto complete
- * container in the horizontal direction.  Default: false.
+ * container in the horizontal direction. Default: false.
  *
  * @type boolean
  */
@@ -199,7 +227,7 @@ YAHOO.widget.AutoComplete.prototype.animHoriz = false;
 
 /**
  * Whether or not to animate the expansion/collapse of the auto complete
- * container in the vertical direction.  Default: true.
+ * container in the vertical direction. Default: true.
  *
  * @type boolean
  */
@@ -223,14 +251,53 @@ YAHOO.widget.AutoComplete.prototype.animSpeed = 0.3;
 YAHOO.widget.AutoComplete.prototype.forceSelection = false;
 
 /**
- * Whether or not to allow browsers to cache user typed input, which effectively
- * does not set the input attribute autocomplete="off". When users click the
- * back button after form submission, typed input can be prefilled by the
- * browser. Default: true.
+ * Whether or not to allow browsers to cache user-typed input in the input
+ * field. Disabling this feature will prevent the widget from setting the
+ * autocomplete="off" on the auto complete input field. When autocomplete="off"
+ * and users click the back button after form submission, user-typed input can
+ * be prefilled by the browser from its cache. This caching of user input may
+ * not be desired for sensitive data, such as credit card numbers, in which
+ * case, implementers should consider setting allowBrowserAutocomplete to false.
+ * Default: true.
  *
  * @type boolean
  */
 YAHOO.widget.AutoComplete.prototype.allowBrowserAutocomplete = true;
+
+/**
+ * Whether or not the auto complete container should always be displayed.
+ * Enabling this feature prevents the toggling of the container to a collapsed
+ * state. Default: false.
+ *
+ * @type boolean
+ */
+YAHOO.widget.AutoComplete.prototype.alwaysShowContainer = false;
+
+/**
+ * Whether or not to use an iFrame to layer over Windows form elements in
+ * IE. Set to true only when the auto complete container will be on top of a
+ * &lt;select&gt; field in IE and thus exposed to the IE z-index bug (i.e.,
+ * 5.5 < IE < 7). Default:false.
+ *
+ * @type boolean
+ */
+YAHOO.widget.AutoComplete.prototype.useIFrame = false;
+
+/**
+ * Configurable iFrame src used when useIFrame = true. Implementations over SSL
+ * should set this parameter to an appropriate https location in order to avoid
+ * security-related browser errors. Default:"about:blank".
+ *
+ * @type boolean
+ */
+YAHOO.widget.AutoComplete.prototype.iFrameSrc = "about:blank";
+
+/**
+ * Whether or not the auto complete container should have a shadow. Default:false.
+ *
+ * @type boolean
+ */
+YAHOO.widget.AutoComplete.prototype.useShadow = false;
 
 /***************************************************************************
  * Public methods
@@ -244,15 +311,39 @@ YAHOO.widget.AutoComplete.prototype.getName = function() {
     return this._sName;
 };
 
+ /**
+ * Public accessor to the unique name of the auto complete instance.
+ *
+ * @return {string} Unique name of the auto complete instance
+ */
+YAHOO.widget.AutoComplete.prototype.toString = function() {
+    return "AutoComplete " + this._sName;
+};
+
 /**
- * Public accessor to the internal array of DOM &lt;li&gt; element IDs that
+ * Public accessor to the internal array of DOM &lt;li&gt; elements that
  * display query results within the auto complete container.
  *
- * @return {array} Array of &lt;li&gt; element IDs within the auto complete
+ * @return {array} Array of &lt;li&gt; elements within the auto complete
  *                 container
  */
-YAHOO.widget.AutoComplete.prototype.getListIds = function() {
-    return this._aListIds;
+YAHOO.widget.AutoComplete.prototype.getListItems = function() {
+    return this._aListItems;
+};
+
+/**
+ * Public accessor to the data held in an &lt;li&gt; element of the
+ * auto complete container.
+ *
+ * @return {object or array} Object or array of result data or null
+ */
+YAHOO.widget.AutoComplete.prototype.getListItemData = function(oListItem) {
+    if(oListItem._oResultData) {
+        return oListItem._oResultData;
+    }
+    else {
+        return false;
+    }
 };
 
 /**
@@ -263,8 +354,14 @@ YAHOO.widget.AutoComplete.prototype.getListIds = function() {
  */
 YAHOO.widget.AutoComplete.prototype.setHeader = function(sHeader) {
     if(sHeader) {
-        this._oHeader.innerHTML = sHeader;
-        this._oHeader.style.display = "block";
+        if(this._oContainer._oContent._oHeader) {
+            this._oContainer._oContent._oHeader.innerHTML = sHeader;
+            this._oContainer._oContent._oHeader.style.display = "block";
+        }
+    }
+    else {
+        this._oContainer._oContent._oHeader.innerHTML = "";
+        this._oContainer._oContent._oHeader.style.display = "none";
     }
 };
 
@@ -276,20 +373,37 @@ YAHOO.widget.AutoComplete.prototype.setHeader = function(sHeader) {
  */
 YAHOO.widget.AutoComplete.prototype.setFooter = function(sFooter) {
     if(sFooter) {
-        this._oFooter.innerHTML = sFooter;
-        this._oFooter.style.display = "block";
+        if(this._oContainer._oContent._oFooter) {
+            this._oContainer._oContent._oFooter.innerHTML = sFooter;
+            this._oContainer._oContent._oFooter.style.display = "block";
+        }
+    }
+    else {
+        this._oContainer._oContent._oFooter.innerHTML = "";
+        this._oContainer._oContent._oFooter.style.display = "none";
     }
 };
 
 /**
- * Whether or not to use an iFrame to layer over Windows form elements in
- * IE. Set to true only when the auto complete container will be on top of a
- * &lt;select&gt; field in IE and thus exposed to the IE z-index bug (i.e.,
- * 5.5 < IE < 7). Default:false.
+ * Sets HTML markup for the auto complete container body. This markup will be
+ * inserted within a &lt;div&gt; tag with a class of "ac_bd".
  *
- * @type boolean
+ * @param {string} sHeader HTML markup for container body
  */
-YAHOO.widget.AutoComplete.prototype.useIFrame = false;
+YAHOO.widget.AutoComplete.prototype.setBody = function(sBody) {
+    if(sBody) {
+        if(this._oContainer._oContent._oBody) {
+            this._oContainer._oContent._oBody.innerHTML = sBody;
+            this._oContainer._oContent._oBody.style.display = "block";
+            this._oContainer._oContent.style.display = "block";
+        }
+    }
+    else {
+        this._oContainer._oContent._oBody.innerHTML = "";
+        this._oContainer._oContent.style.display = "none";
+    }
+    this._maxResultsDisplayed = 0;
+};
 
 /**
  * Overridable method that converts a result item object into HTML markup
@@ -308,6 +422,20 @@ YAHOO.widget.AutoComplete.prototype.formatResult = function(oResultItem, sQuery)
     }
     else {
         return "";
+    }
+};
+
+/**
+ * Makes query request to the data source.
+ *
+ * @param {string} sQuery Query string.
+ */
+YAHOO.widget.AutoComplete.prototype.sendQuery = function(sQuery) {
+    if(sQuery) {
+        this._sendQuery(sQuery);
+    }
+    else {
+        return;
     }
 };
 
@@ -355,8 +483,9 @@ YAHOO.widget.AutoComplete.prototype.dataReturnEvent = null;
 YAHOO.widget.AutoComplete.prototype.dataErrorEvent = null;
 
 /**
- * Fired when the auto complete container is expanded. Subscribers receive the
- * following array:<br>
+ * Fired when the auto complete container is expanded. If alwaysShowContainer is
+ * enabled, then containerExpandEvent will be fired when the container is
+ * populated with results. Subscribers receive the following array:<br>
  *     - args[0] The auto complete object instance
  */
 YAHOO.widget.AutoComplete.prototype.containerExpandEvent = null;
@@ -407,8 +536,18 @@ YAHOO.widget.AutoComplete.prototype.itemArrowFromEvent = null;
  * Subscribers receive the following array:<br>
  *     - args[0] The auto complete object instance
  *     - args[1] The selected &lt;li&gt; element item
+ *     - args[2] The data returned for the item, either as an object, or mapped from the schema into an array
  */
 YAHOO.widget.AutoComplete.prototype.itemSelectEvent = null;
+
+/**
+ * Fired when an user selection does not match any of the displayed result items.
+ * Note that this event may not behave as expected when delimiter characters
+ * have been defined. Subscribers receive the following array:<br>
+ *     - args[0] The auto complete object instance
+ *     - args[1] The user selection
+ */
+YAHOO.widget.AutoComplete.prototype.unmatchedItemSelectEvent = null;
 
 /**
  * Fired if forceSelection is enabled and the user's input has been cleared
@@ -419,8 +558,9 @@ YAHOO.widget.AutoComplete.prototype.itemSelectEvent = null;
 YAHOO.widget.AutoComplete.prototype.selectionEnforceEvent = null;
 
 /**
- * Fired when the auto complete container is collapsed. Subscribers receive the
- * following array:<br>
+ * Fired when the auto complete container is collapsed. If alwaysShowContainer is
+ * enabled, then containerCollapseEvent will be fired when the container is
+ * cleared of results. Subscribers receive the following array:<br>
  *     - args[0] The auto complete object instance
  */
 YAHOO.widget.AutoComplete.prototype.containerCollapseEvent = null;
@@ -503,45 +643,13 @@ YAHOO.widget.AutoComplete.prototype._bContainerOpen = false;
 YAHOO.widget.AutoComplete.prototype._bOverContainer = false;
 
 /**
- * iFrame DOM element. Only used in IE for iframe trick.
- *
- * @type object
- * @private
- */
-YAHOO.widget.AutoComplete.prototype._oIFrame = null;
-
-/**
- * Content DOM element. Only used in IE for iFrame trick.
- *
- * @type object
- * @private
- */
-YAHOO.widget.AutoComplete.prototype._oContent = null;
-
-/**
- * Container header DOM element.
- *
- * @type object
- * @private
- */
-YAHOO.widget.AutoComplete.prototype._oHeader = null;
-
-/**
- * Container footer DOM element.
- *
- * @type object
- * @private
- */
-YAHOO.widget.AutoComplete.prototype._oFooter = null;
-
-/**
- * Array of &lt;li&gt; elements IDs used to display query results within the
+ * Array of &lt;li&gt; elements references that contain query results within the
  * auto complete container.
  *
  * @type array
  * @private
  */
-YAHOO.widget.AutoComplete.prototype._aListIds = null;
+YAHOO.widget.AutoComplete.prototype._aListItems = null;
 
 /**
  * Number of &lt;li&gt; elements currently displayed in auto complete container.
@@ -550,6 +658,14 @@ YAHOO.widget.AutoComplete.prototype._aListIds = null;
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._nDisplayedItems = 0;
+
+/**
+ * Internal count of &lt;li&gt; elements displayed and hidden in auto complete container.
+ *
+ * @type number
+ * @private
+ */
+YAHOO.widget.AutoComplete.prototype._maxResultsDisplayed = 0;
 
 /**
  * Current query string
@@ -633,129 +749,129 @@ YAHOO.widget.AutoComplete.prototype._initProps = function() {
         }
     }
     var animSpeed = this.animSpeed;
-    if(this.animHoriz || this.animVert) {
+    if((this.animHoriz || this.animVert) && YAHOO.util.Anim) {
         if(isNaN(animSpeed) || (animSpeed < 0)) {
             animSpeed = 0.3;
         }
-
-        if(!this._oAnim && YAHOO.util.Anim) {
-            this._oAnim = new YAHOO.util.Anim(this._oContainer, {}, animSpeed);
+        if(!this._oAnim ) {
+            oAnim = new YAHOO.util.Anim(this._oContainer._oContent, {}, this.animSpeed);
+            this._oAnim = oAnim;
         }
-        else if(this._oAnim) {
+        else {
             this._oAnim.duration = animSpeed;
         }
     }
     if(this.forceSelection && this.delimChar) {
-        //YAHOO.log(oSelf.getName() + " has enabled force selection with delimiter character(s) defined.","warn");
     }
-    if (!this._aListIds) {
-        this._aListIds = [];
+    if(this.alwaysShowContainer && (this.useShadow || this.useIFrame)) {
     }
 
-    if(!this._aListIds || (this.maxResultsDisplayed != this._aListIds.length)) {
-        this._initContainer();
+    if(this.alwaysShowContainer) {
+        this._bContainerOpen = true;
     }
 };
 
 /**
- * Initializes the auto complete container
+ * Initializes the auto complete container helpers if they are enabled and do
+ * not exist
+ *
+ * @private
+ */
+YAHOO.widget.AutoComplete.prototype._initContainerHelpers = function() {
+    if(this.useShadow && !this._oContainer._oShadow) {
+        var oShadow = document.createElement("div");
+        oShadow.className = "yui-ac-shadow";
+        this._oContainer._oShadow = this._oContainer.appendChild(oShadow);
+    }
+    if(this.useIFrame && !this._oContainer._oIFrame) {
+        var oIFrame = document.createElement("iframe");
+        oIFrame.src = this.iFrameSrc;
+        oIFrame.frameBorder = 0;
+        oIFrame.scrolling = "no";
+        oIFrame.style.position = "absolute";
+        oIFrame.style.width = "100%";
+        oIFrame.style.height = "100%";
+        this._oContainer._oIFrame = this._oContainer.appendChild(oIFrame);
+    }
+};
+
+/**
+ * Initializes the auto complete container once at object creation
  *
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._initContainer = function() {
-    // Create the max number of <li> elements, but hide them all
-    this._aListIds = [];
-    var aItemsMarkup = [];
-    var sName = this._sName;
-    var sPrefix = sName + "item";
-    var sHeaderID = sName + "header";
-    var sFooterID = sName + "footer";
+    if(!this._oContainer._oContent) {
+        // The oContent div helps size the iframe and shadow properly
+        var oContent = document.createElement("div");
+        oContent.className = "yui-ac-content";
+        oContent.style.display = "none";
+        this._oContainer._oContent = this._oContainer.appendChild(oContent);
 
-    for(var i = this.maxResultsDisplayed-1; i >= 0 ; i--) {
-        var sItemID = sPrefix + i;
-        this._aListIds[i] = sItemID;
-        aItemsMarkup.unshift("<li id='" + sItemID + "'></li>\n");
+        var oHeader = document.createElement("div");
+        oHeader.className = "yui-ac-hd";
+        oHeader.style.display = "none";
+        this._oContainer._oContent._oHeader = this._oContainer._oContent.appendChild(oHeader);
+
+        var oBody = document.createElement("div");
+        oBody.className = "yui-ac-bd";
+        this._oContainer._oContent._oBody = this._oContainer._oContent.appendChild(oBody);
+
+        var oFooter = document.createElement("div");
+        oFooter.className = "yui-ac-ft";
+        oFooter.style.display = "none";
+        this._oContainer._oContent._oFooter = this._oContainer._oContent.appendChild(oFooter);
     }
-
-    var sList = "<ul id='" + sName + "list'>" +
-        aItemsMarkup.join("") + "</ul>";
-
-    // Need this iFrame trick to make sure the container appears over form
-    // elements to workaround IE z-index bug
-    var sContent = (this.useIFrame) ?
-            ["<div id='",
-            sName,
-            "content'>",
-            "<div id='",
-            sHeaderID,
-            "' class='ac_hd'></div><div class='ac_bd'>",
-            sList,
-            "</div><div id='",
-            sFooterID,
-            "' class='ac_ft'></div>",
-            "</div><iframe id='",
-            sName,
-            "iframe' src='about:blank' frameborder='0' scrolling='no'>",
-            "</iframe>"] :
-
-            ["<div id='",
-            sHeaderID,
-            "' class='ac_hd'></div><div class='ac_bd'>",
-            sList,
-            "</div><div id='",
-            sFooterID,
-            "' class='ac_ft'></div>"];
-
-    sContent = sContent.join("");
-    this._oContainer.innerHTML = sContent;
-
-    this._oHeader = document.getElementById(sHeaderID);
-    this._oFooter = document.getElementById(sFooterID);
-
-    if (this.useIFrame) {
-        this._oContent = document.getElementById(sName + "content");
-        this._oIFrame = document.getElementById(sName + "iframe");
-        this._oContent.style.position = "relative";
-        this._oIFrame.style.position = "relative";
-        this._oContent.style.zIndex = 9050;
+    else {
     }
-
-    this._oContainer.style.display = "none";
-    this._oHeader.style.display = "none";
-    this._oFooter.style.display = "none";
-
-    this._initItems();
 };
 
 /**
- * Initializes up to YAHOO.widget.AutoComplete#maxResultsDisplayed &lt;li&gt;
- * elements in the container.
+ * Clears out contents of container body and creates up to
+ * YAHOO.widget.AutoComplete#maxResultsDisplayed &lt;li&gt; elements in an
+ * &lt;ul&gt; element.
  *
  * @private
  */
-YAHOO.widget.AutoComplete.prototype._initItems = function() {
-    // set properties & events for each item now that they are in the DOM
-    for(var i = this.maxResultsDisplayed-1; i >= 0 ; i--) {
-        var oItem = document.getElementById(this._aListIds[i]);
-        this._initItem(oItem, i);
+YAHOO.widget.AutoComplete.prototype._initList = function() {
+    this._aListItems = [];
+    while(this._oContainer._oContent._oBody.hasChildNodes()) {
+        var oldListItems = this.getListItems();
+        if(oldListItems) {
+            for(var oldi = oldListItems.length-1; oldi >= 0; i--) {
+                oldListItems[oldi] = null;
+            }
+        }
+        this._oContainer._oContent._oBody.innerHTML = "";
     }
+
+    var oList = document.createElement("ul");
+    oList = this._oContainer._oContent._oBody.appendChild(oList);
+    for(var i=0; i<this.maxResultsDisplayed; i++) {
+        var oItem = document.createElement("li");
+        oItem = oList.appendChild(oItem);
+        this._aListItems[i] = oItem;
+        this._initListItem(oItem, i);
+    }
+    this._maxResultsDisplayed = this.maxResultsDisplayed;
 };
 
 /**
- * Initializes each &lt;li&gt; element in the container .
+ * Initializes each &lt;li&gt; element in the container list.
  *
  * @param {object} oItem The &lt;li&gt; DOM element
- * @param {number} onItemIndex The index of the element
+ * @param {number} nItemIndex The index of the element
  * @private
  */
-YAHOO.widget.AutoComplete.prototype._initItem = function(oItem, nItemIndex) {
+YAHOO.widget.AutoComplete.prototype._initListItem = function(oItem, nItemIndex) {
     var oSelf = this;
     oItem.style.display = "none";
     oItem._nItemIndex = nItemIndex;
+
     oItem.mouseover = oItem.mouseout = oItem.onclick = null;
-    YAHOO.util.Event.addListener(oItem,'mouseover',oSelf._onItemMouseover,oSelf);
-    YAHOO.util.Event.addListener(oItem,'mouseout',oSelf._onItemMouseout,oSelf);
-    YAHOO.util.Event.addListener(oItem,'click',oSelf._onItemMouseclick,oSelf);
+    YAHOO.util.Event.addListener(oItem,"mouseover",oSelf._onItemMouseover,oSelf);
+    YAHOO.util.Event.addListener(oItem,"mouseout",oSelf._onItemMouseout,oSelf);
+    YAHOO.util.Event.addListener(oItem,"click",oSelf._onItemMouseclick,oSelf);
 };
 
 /**
@@ -766,10 +882,14 @@ YAHOO.widget.AutoComplete.prototype._initItem = function(oItem, nItemIndex) {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._onItemMouseover = function(v,oSelf) {
-    oSelf._toggleHighlight(this,'mouseover');
-    oSelf.itemMouseOverEvent.fire(oSelf, this);
-    //YAHOO.log(oSelf.getName() + " moused over " + this.id);
+    if(oSelf.prehighlightClassName) {
+        oSelf._togglePrehighlight(this,"mouseover");
+    }
+    else {
+        oSelf._toggleHighlight(this,"to");
+    }
 
+    oSelf.itemMouseOverEvent.fire(oSelf, this);
 };
 
 /**
@@ -780,9 +900,14 @@ YAHOO.widget.AutoComplete.prototype._onItemMouseover = function(v,oSelf) {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._onItemMouseout = function(v,oSelf) {
-    oSelf._toggleHighlight(this,'mouseout');
+    if(oSelf.prehighlightClassName) {
+        oSelf._togglePrehighlight(this,"mouseout");
+    }
+    else {
+        oSelf._toggleHighlight(this,"from");
+    }
+
     oSelf.itemMouseOutEvent.fire(oSelf, this);
-    //YAHOO.log(oSelf.getName() + " moused out from " + this.id);
 };
 
 /**
@@ -794,7 +919,7 @@ YAHOO.widget.AutoComplete.prototype._onItemMouseout = function(v,oSelf) {
  */
 YAHOO.widget.AutoComplete.prototype._onItemMouseclick = function(v,oSelf) {
     // In case item has not been moused over
-    oSelf._toggleHighlight(this,'mouseover');
+    oSelf._toggleHighlight(this,"to");
     oSelf._selectItem(this);
 };
 
@@ -820,7 +945,7 @@ YAHOO.widget.AutoComplete.prototype._onContainerMouseout = function(v,oSelf) {
     oSelf._bOverContainer = false;
     // If container is still active
     if(oSelf._oCurItem) {
-        oSelf._toggleHighlight(oSelf._oCurItem,'mouseover');
+        oSelf._toggleHighlight(oSelf._oCurItem,"to");
     }
 };
 
@@ -835,6 +960,16 @@ YAHOO.widget.AutoComplete.prototype._onContainerScroll = function(v,oSelf) {
     oSelf._oTextbox.focus();
 };
 
+/**
+ * Handles container resize events.
+ *
+ * @param {event} v The resize event
+ * @param {object} oSelf The auto complete instance
+ * @private
+ */
+YAHOO.widget.AutoComplete.prototype._onContainerResize = function(v,oSelf) {
+    oSelf._toggleContainerHelpers(oSelf._bContainerOpen);
+};
 
 /**
  * Handles textbox keydown events of functional keys, mainly for UI behavior.
@@ -894,7 +1029,7 @@ YAHOO.widget.AutoComplete.prototype._onTextboxKeyDown = function(v,oSelf) {
 };
 
 /**
- * Handles textbox keypress events, mainly for FF.
+ * Handles textbox keypress events, mainly for stopEvent in Safari.
  *
  * @param {event} v The keyup event
  * @param {object} oSelf The auto complete instance
@@ -903,14 +1038,11 @@ YAHOO.widget.AutoComplete.prototype._onTextboxKeyDown = function(v,oSelf) {
 YAHOO.widget.AutoComplete.prototype._onTextboxKeyPress = function(v,oSelf) {
     var nKeyCode = v.keyCode;
 
-    // for FF < 1.0
     switch (nKeyCode) {
     case 9: // tab
     case 13: // enter
-        if(oSelf.delimChar && (oSelf._nKeyCode != nKeyCode)) {
-            if(oSelf._bContainerOpen) {
+        if((oSelf._nKeyCode != nKeyCode)) {
                 YAHOO.util.Event.stopEvent(v);
-            }
         }
         break;
     case 38: // up
@@ -939,12 +1071,11 @@ YAHOO.widget.AutoComplete.prototype._onTextboxKeyUp = function(v,oSelf) {
     var sText = this.value; //string in textbox
 
     // Filter out chars that don't trigger queries
-    if (oSelf._isIgnoreKey(nKeyCode) || (sText.toLowerCase() == this._sCurQuery)) {
+    if (oSelf._isIgnoreKey(nKeyCode) || (sText.toLowerCase() == oSelf._sCurQuery)) {
         return;
     }
     else {
         oSelf.textboxKeyEvent.fire(oSelf, nKeyCode);
-        //YAHOO.log(oSelf.getName() + " received key input " + nKeyCode);
     }
 
     // Set timeout on the request
@@ -974,13 +1105,6 @@ YAHOO.widget.AutoComplete.prototype._onTextboxKeyUp = function(v,oSelf) {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._isIgnoreKey = function(nKeyCode) {
-    if(this.typeAhead) { // fewer query triggers when type ahead is on
-        if((nKeyCode == 8) || // backspace
-        (nKeyCode == 39) || // right
-        (nKeyCode == 46)) { // delete
-            return true;
-        }
-    }
     if ((nKeyCode == 9) || (nKeyCode == 13)  || // tab, enter
             (nKeyCode == 16) || (nKeyCode == 17) || // shift, ctl
             (nKeyCode >= 18 && nKeyCode <= 20) || // alt,pause/break,caps lock
@@ -1005,7 +1129,6 @@ YAHOO.widget.AutoComplete.prototype._onTextboxFocus = function (v,oSelf) {
     oSelf._oTextbox.setAttribute("autocomplete","off");
     oSelf._bFocused = true;
     oSelf.textboxFocusEvent.fire(oSelf);
-    //YAHOO.log(oSelf.getName() + " textbox focused");
 };
 
 /**
@@ -1019,9 +1142,14 @@ YAHOO.widget.AutoComplete.prototype._onTextboxBlur = function (v,oSelf) {
     // Don't treat as a blur if it was a selection via mouse click
     if(!oSelf._bOverContainer || (oSelf._nKeyCode == 9)) {
         // Current query needs to be validated
-        if(oSelf.forceSelection && !oSelf._bItemSelected) {
+        if(!oSelf._bItemSelected) {
             if(!oSelf._bContainerOpen || (oSelf._bContainerOpen && !oSelf._textMatchesOption())) {
-                oSelf._clearSelection();
+                if(oSelf.forceSelection) {
+                    oSelf._clearSelection();
+                }
+                else {
+                    oSelf.unmatchedItemSelectEvent.fire(oSelf, oSelf._sCurQuery);
+                }
             }
         }
 
@@ -1030,7 +1158,6 @@ YAHOO.widget.AutoComplete.prototype._onTextboxBlur = function (v,oSelf) {
         }
         oSelf._bFocused = false;
         oSelf.textboxBlurEvent.fire(oSelf);
-        //YAHOO.log(oSelf.getName() + " textbox blurred");
     }
 };
 
@@ -1042,7 +1169,12 @@ YAHOO.widget.AutoComplete.prototype._onTextboxBlur = function (v,oSelf) {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._onFormSubmit = function(v,oSelf) {
-    oSelf._oTextbox.setAttribute("autocomplete","on");
+    if(oSelf.allowBrowserAutocomplete) {
+        oSelf._oTextbox.setAttribute("autocomplete","on");
+    }
+    else {
+        oSelf._oTextbox.setAttribute("autocomplete","off");
+    }
 };
 
 /**
@@ -1101,10 +1233,9 @@ YAHOO.widget.AutoComplete.prototype._sendQuery = function(sQuery) {
         return;
     }
 
-    sQuery = encodeURI(sQuery);
+    sQuery = encodeURIComponent(sQuery);
     this._nDelayID = -1;    // Reset timeout ID because request has been made
     this.dataRequestEvent.fire(this, sQuery);
-    //YAHOO.log(this.getName() + " requested data for query \"" + sQuery + "\"");
     this.dataSource.getResults(this._populateList, sQuery, this);
 };
 
@@ -1114,15 +1245,17 @@ YAHOO.widget.AutoComplete.prototype._sendQuery = function(sQuery) {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._clearList = function() {
-    this._oContainer.scrollTop = 0;
-    var aItems = this._aListIds;
+    this._oContainer._oContent.scrollTop = 0;
+    var aItems = this._aListItems;
 
-    for(var i = aItems.length-1; i >= 0 ; i--) {
-        document.getElementById(aItems[i]).style.display = "none";
+    if(aItems && (aItems.length > 0)) {
+        for(var i = aItems.length-1; i >= 0 ; i--) {
+            aItems[i].style.display = "none";
+        }
     }
 
     if (this._oCurItem) {
-        this._toggleHighlight(this._oCurItem,'mouseout');
+        this._toggleHighlight(this._oCurItem,"from");
     }
 
     this._oCurItem = null;
@@ -1145,32 +1278,33 @@ YAHOO.widget.AutoComplete.prototype._clearList = function() {
 YAHOO.widget.AutoComplete.prototype._populateList = function(sQuery, aResults, oSelf) {
     if(aResults === null) {
         oSelf.dataErrorEvent.fire(oSelf, sQuery);
-        //YAHOO.log(oSelf.getName() + " data error for query \"" + sQuery + "\"");
     }
-    else {
-        oSelf.dataReturnEvent.fire(oSelf, sQuery, aResults);
-        //YAHOO.log(oSelf.getName() + " received " + aResults.length + " results for query \"" + sQuery + "\"");
-    }
-
     if (!oSelf._bFocused || !aResults) {
         return;
     }
 
     var isOpera = (navigator.userAgent.toLowerCase().indexOf("opera") != -1);
-    oSelf._oContainer.style.width = (!isOpera) ? null : "";
-    oSelf._oContainer.style.height = (!isOpera) ? null : "";
+    var contentStyle = oSelf._oContainer._oContent.style;
+    contentStyle.width = (!isOpera) ? null : "";
+    contentStyle.height = (!isOpera) ? null : "";
 
-    var sCurQuery = decodeURI(sQuery);
+    var sCurQuery = decodeURIComponent(sQuery);
     oSelf._sCurQuery = sCurQuery;
-    var aItems = oSelf._aListIds;
     oSelf._bItemSelected = false;
+
+    if(oSelf._maxResultsDisplayed != oSelf.maxResultsDisplayed) {
+        oSelf._initList();
+    }
 
     var nItems = Math.min(aResults.length,oSelf.maxResultsDisplayed);
     oSelf._nDisplayedItems = nItems;
     if (nItems > 0) {
+        oSelf._initContainerHelpers();
+        var aItems = oSelf._aListItems;
+
         // Fill items with data
-        for(var i = nItems-1; i >= 0 ; i--) {
-            var oItemi = document.getElementById(aItems[i]);
+        for(var i = nItems-1; i >= 0; i--) {
+            var oItemi = aItems[i];
             var oResultItemi = aResults[i];
             oItemi.innerHTML = oSelf.formatResult(oResultItemi, sCurQuery);
             oItemi.style.display = "list-item";
@@ -1181,25 +1315,31 @@ YAHOO.widget.AutoComplete.prototype._populateList = function(sQuery, aResults, o
 
         // Empty out remaining items if any
         for(var j = aItems.length-1; j >= nItems ; j--) {
-            var oItemj = document.getElementById(aItems[j]);
+            var oItemj = aItems[j];
             oItemj.innerHTML = null;
             oItemj.style.display = "none";
             oItemj._sResultKey = null;
             oItemj._oResultData = null;
         }
 
-        // Select first item and show UI
-        var oFirstItem = document.getElementById(aItems[0]);
-        oSelf._toggleHighlight(oFirstItem,'mouseover');
+        if(oSelf.autoHighlight) {
+            // Go to the first item
+            var oFirstItem = aItems[0];
+            oSelf._toggleHighlight(oFirstItem,"to");
+            oSelf.itemArrowToEvent.fire(oSelf, oFirstItem);
+            oSelf._typeAhead(oFirstItem,sQuery);
+        }
+        else {
+            oSelf._oCurItem = null;
+        }
+
+        // Expand the container
         oSelf._toggleContainer(true);
-        oSelf.itemArrowToEvent.fire(oSelf, oFirstItem);
-        //YAHOO.log(oSelf.getName() + " arrowed to item " + oFirstItem.id);
-        oSelf._typeAhead(oFirstItem,sQuery);
-        oSelf._oCurItem = oFirstItem;
     }
     else {
         oSelf._clearList();
     }
+    oSelf.dataReturnEvent.fire(oSelf, sQuery, aResults);
 };
 
 /**
@@ -1223,7 +1363,6 @@ YAHOO.widget.AutoComplete.prototype._clearSelection = function() {
 
     // Fire custom event
     this.selectionEnforceEvent.fire(this);
-    //YAHOO.log(this.getName() + " cleared an invalid selection");
 };
 
 /**
@@ -1236,7 +1375,7 @@ YAHOO.widget.AutoComplete.prototype._textMatchesOption = function() {
     var foundMatch = false;
 
     for(var i = this._nDisplayedItems-1; i >= 0 ; i--) {
-        var oItem = document.getElementById(this._aListIds[i]);
+        var oItem = this._aListItems[i];
         var sMatch = oItem._sResultKey.toLowerCase();
         if (sMatch == this._sCurQuery.toLowerCase()) {
             foundMatch = true;
@@ -1255,13 +1394,13 @@ YAHOO.widget.AutoComplete.prototype._textMatchesOption = function() {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._typeAhead = function(oItem, sQuery) {
-    var oTextbox = this._oTextbox;
-    var sValue = this._oTextbox.value; // any saved queries plus what user has typed
-
-    // Don't update with type-ahead if turned off
+    // Don't update if turned off
     if (!this.typeAhead) {
         return;
     }
+
+    var oTextbox = this._oTextbox;
+    var sValue = this._oTextbox.value; // any saved queries plus what user has typed
 
     // Don't update with type-ahead if text selection is not supported
     if(!oTextbox.setSelectionRange && !oTextbox.createTextRange) {
@@ -1275,7 +1414,6 @@ YAHOO.widget.AutoComplete.prototype._typeAhead = function(oItem, sQuery) {
     this._selectText(oTextbox,nStart,nEnd);
     var sPrefill = oTextbox.value.substr(nStart,nEnd);
     this.typeAheadEvent.fire(this,sQuery,sPrefill);
-    //YAHOO.log(this.getName() + " prefilled \"" + sPrefill + "\" for query " + sQuery + "\"");
 };
 
 /**
@@ -1302,6 +1440,41 @@ YAHOO.widget.AutoComplete.prototype._selectText = function(oTextbox, nStart, nEn
 };
 
 /**
+ * Syncs auto complete container with its helpers.
+ *
+ * @param {boolean} bShow True if container is expanded, false if collapsed
+ * @private
+ */
+YAHOO.widget.AutoComplete.prototype._toggleContainerHelpers = function(bShow) {
+    var bFireEvent = false;
+    var width = this._oContainer._oContent.offsetWidth + "px";
+    var height = this._oContainer._oContent.offsetHeight + "px";
+
+    if(this.useIFrame && this._oContainer._oIFrame) {
+        bFireEvent = true;
+        if(this.alwaysShowContainer || bShow) {
+            this._oContainer._oIFrame.style.width = width;
+            this._oContainer._oIFrame.style.height = height;
+        }
+        else {
+            this._oContainer._oIFrame.style.width = 0;
+            this._oContainer._oIFrame.style.height = 0;
+        }
+    }
+    if(this.useShadow && this._oContainer._oShadow) {
+        bFireEvent = true;
+        if(this.alwaysShowContainer || bShow) {
+            this._oContainer._oShadow.style.width = width;
+            this._oContainer._oShadow.style.height = height;
+        }
+        else {
+           this._oContainer._oShadow.style.width = 0;
+            this._oContainer._oShadow.style.height = 0;
+        }
+    }
+};
+
+/**
  * Animates expansion or collapse of the container.
  *
  * @param {boolean} bShow True if container should be expanded, false if
@@ -1309,35 +1482,43 @@ YAHOO.widget.AutoComplete.prototype._selectText = function(oTextbox, nStart, nEn
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._toggleContainer = function(bShow) {
-    var oContainer = this._oContainer;
-    // Don't animate if it's already closed && !bShow
-    if (!bShow && !this._bContainerOpen) {
-        oContainer.style.display = "none";
+    // Implementer has container always open so don't mess with it
+    if(this.alwaysShowContainer) {
+        // Fire these events to give implementers a hook into the container
+        // being populated and being emptied
+        if(bShow) {
+            this.containerExpandEvent.fire(this);
+        }
+        else {
+            this.containerCollapseEvent.fire(this);
+        }
+        this._bContainerOpen = bShow;
         return;
     }
 
-    var oContent = this._oContent;
-    var oIFrame = this._oIFrame;
-    // Make the iframe used in the ie trick the same dimension as the content
-    if (bShow && oContent && oIFrame) {
-        var sDisplay = oContainer.style.display;
-        oContainer.style.display = "block";
-        oIFrame.style.width = oContent.offsetWidth+"px";
-        oIFrame.style.height = oContent.offsetHeight+"px";
-        oIFrame.style.marginTop = "-"+oContent.offsetHeight+"px";
-        oContainer.style.display = sDisplay;
+    var oContainer = this._oContainer;
+    // Container is already closed
+    if (!bShow && !this._bContainerOpen) {
+        oContainer._oContent.style.display = "none";
+        return;
     }
 
     // If animation is enabled...
     var oAnim = this._oAnim;
     if (oAnim && oAnim.getEl() && (this.animHoriz || this.animVert)) {
+        // If helpers need to be collapsed, do it right away...
+        // but if helpers need to be expanded, wait until after the container expands
+        if(!bShow) {
+            this._toggleContainerHelpers(bShow);
+        }
+
         if(oAnim.isAnimated()) {
             oAnim.stop();
         }
 
         // Clone container to grab current size offscreen
-        var oClone = oContainer.cloneNode(true);
-        oContainer.parentNode.appendChild(oClone);
+        var oClone = oContainer._oContent.cloneNode(true);
+        oContainer.appendChild(oClone);
         oClone.style.top = "-9000px";
         oClone.style.display = "block";
 
@@ -1356,58 +1537,53 @@ YAHOO.widget.AutoComplete.prototype._toggleContainer = function(bShow) {
 
         // If opening anew, set to a collapsed size...
         if(bShow && !this._bContainerOpen) {
-            oContainer.style.width = wColl+"px";
-            oContainer.style.height = hColl+"px";
+            oContainer._oContent.style.width = wColl+"px";
+            oContainer._oContent.style.height = hColl+"px";
         }
         // Else, set it to its last known size.
         else {
-            oContainer.style.width = wExp+"px";
-            oContainer.style.height = hExp+"px";
+            oContainer._oContent.style.width = wExp+"px";
+            oContainer._oContent.style.height = hExp+"px";
         }
 
-        oContainer.parentNode.removeChild(oClone);
+        oContainer.removeChild(oClone);
         oClone = null;
 
     	var oSelf = this;
     	var onAnimComplete = function() {
             // Finish the collapse
-    		if(!bShow) {
-                oContainer.style.display = "none";
-    		}
     		oAnim.onComplete.unsubscribeAll();
 
-            // Call event on expand/collapse (overridden by client)
             if(bShow) {
                 oSelf.containerExpandEvent.fire(oSelf);
-                //YAHOO.log(oSelf.getName() + " container expanded");
             }
             else {
+                oContainer._oContent.style.display = "none";
                 oSelf.containerCollapseEvent.fire(oSelf);
-                //YAHOO.log(oSelf.getName() + " container collapsed");
             }
+            oSelf._toggleContainerHelpers(bShow);
      	};
 
         // Display container and animate it
-        oContainer.style.display = "block";
+        oContainer._oContent.style.display = "block";
         oAnim.onComplete.subscribe(onAnimComplete);
         oAnim.animate();
         this._bContainerOpen = bShow;
     }
     // Else don't animate, just show or hide
     else {
-        this._bContainerOpen = bShow;
-        oContainer.style.display = (bShow) ? "block" : "none";
-
-        // Call event on expand/collapse (overriden by client)
         if(bShow) {
+            oContainer._oContent.style.display = "block";
             this.containerExpandEvent.fire(this);
-            //YAHOO.log(this.getName() + " container expanded");
         }
         else {
+            oContainer._oContent.style.display = "none";
             this.containerCollapseEvent.fire(this);
-            //YAHOO.log(this.getName() + " container collapsed");
         }
-    }
+        this._toggleContainerHelpers(bShow);
+        this._bContainerOpen = bShow;
+   }
+
 };
 
 /**
@@ -1421,16 +1597,41 @@ YAHOO.widget.AutoComplete.prototype._toggleContainer = function(bShow) {
  * @private
  */
 YAHOO.widget.AutoComplete.prototype._toggleHighlight = function(oNewItem, sType) {
-    oNewItem.className = oNewItem.className.replace(this.highlightClassName,"");
-
+    var sHighlight = this.highlightClassName;
     if(this._oCurItem) {
-        this._oCurItem.className =
-            this._oCurItem.className.replace(this.highlightClassName,"");
+        // Remove highlight from old item
+        YAHOO.util.Dom.removeClass(this._oCurItem, sHighlight);
     }
 
-    if(sType == 'mouseover') {
-        oNewItem.className += " " + this.highlightClassName;
+    if((sType == "to") && sHighlight) {
+        // Apply highlight to new item
+        YAHOO.util.Dom.addClass(oNewItem, sHighlight);
         this._oCurItem = oNewItem;
+    }
+};
+
+/**
+ * Toggles the pre-highlight on or off for an item in the container.
+ *
+ * @param {object} oNewItem New The &lt;li&gt; element item to receive highlight
+ *                              behavior
+ * @param {string} sType "mouseover" will toggle highlight on, and "mouseout"
+ *                       will toggle highlight off.
+ * @private
+ */
+YAHOO.widget.AutoComplete.prototype._togglePrehighlight = function(oNewItem, sType) {
+    if(oNewItem == this._oCurItem) {
+        return;
+    }
+
+    var sPrehighlight = this.prehighlightClassName;
+    if((sType == "mouseover") && sPrehighlight) {
+        // Apply prehighlight to new item
+        YAHOO.util.Dom.addClass(oNewItem, sPrehighlight);
+    }
+    else {
+        // Remove prehighlight from old item
+        YAHOO.util.Dom.removeClass(oNewItem, sPrehighlight);
     }
 };
 
@@ -1466,6 +1667,7 @@ YAHOO.widget.AutoComplete.prototype._updateValue = function(oItem) {
     if(oTextbox.type == "textarea") {
         oTextbox.scrollTop = oTextbox.scrollHeight;
     }
+
     // move cursor to end
     var end = oTextbox.value.length;
     this._selectText(oTextbox,end,end);
@@ -1482,8 +1684,7 @@ YAHOO.widget.AutoComplete.prototype._updateValue = function(oItem) {
 YAHOO.widget.AutoComplete.prototype._selectItem = function(oItem) {
     this._bItemSelected = true;
     this._updateValue(oItem);
-    this.itemSelectEvent.fire(this, oItem);
-    //YAHOO.log(this.getName() + " selected item " + oItem.id);
+    this.itemSelectEvent.fire(this, oItem, oItem._oResultData);
     this._clearList();
 };
 
@@ -1511,7 +1712,7 @@ YAHOO.widget.AutoComplete.prototype._jumpSelection = function() {
  */
 YAHOO.widget.AutoComplete.prototype._moveSelection = function(nKeyCode) {
     if(this._bContainerOpen) {
-        // determine current item's id number
+        // Determine current item's id number
         var oCurItem = this._oCurItem;
         var nCurItemIndex = -1;
 
@@ -1522,20 +1723,18 @@ YAHOO.widget.AutoComplete.prototype._moveSelection = function(nKeyCode) {
         var nNewItemIndex = (nKeyCode == 40) ?
                 (nCurItemIndex + 1) : (nCurItemIndex - 1);
 
-        // out of bounds
+        // Out of bounds
         if (nNewItemIndex < -2 || nNewItemIndex >= this._nDisplayedItems) {
             return;
         }
 
         if (oCurItem) {
             // Unhighlight current item
-            this._toggleHighlight(oCurItem, 'mouseout');
+            this._toggleHighlight(oCurItem, "from");
             this.itemArrowFromEvent.fire(this, oCurItem);
-            //YAHOO.log(this.getName() + " arrowed from " + oCurItem.id);
-
         }
         if (nNewItemIndex == -1) {
-           // go back to query (remove type-ahead string)
+           // Go back to query (remove type-ahead string)
             if(this.delimChar && this._sSavedQuery) {
                 if (!this._textMatchesOption()) {
                     this._oTextbox.value = this._sSavedQuery;
@@ -1551,48 +1750,47 @@ YAHOO.widget.AutoComplete.prototype._moveSelection = function(nKeyCode) {
             return;
         }
         if (nNewItemIndex == -2) {
-            // close container
+            // Close container
             this._clearList();
             return;
         }
 
-        var oNewItem = document.getElementById(this._sName + "item" + nNewItemIndex);
+        var oNewItem = this._aListItems[nNewItemIndex];
 
         // Scroll the container if necessary
-        if((YAHOO.util.Dom.getStyle(this._oContainer,"overflow") == "auto") &&
+        if((YAHOO.util.Dom.getStyle(this._oContainer._oContent,"overflow") == "auto") &&
         (nNewItemIndex > -1) && (nNewItemIndex < this._nDisplayedItems)) {
             // User is keying down
             if(nKeyCode == 40) {
                 // Bottom of selected item is below scroll area...
-                if((oNewItem.offsetTop+oNewItem.offsetHeight) > (this._oContainer.scrollTop + this._oContainer.offsetHeight)) {
+                if((oNewItem.offsetTop+oNewItem.offsetHeight) > (this._oContainer._oContent.scrollTop + this._oContainer._oContent.offsetHeight)) {
                     // Set bottom of scroll area to bottom of selected item
-                    this._oContainer.scrollTop = (oNewItem.offsetTop+oNewItem.offsetHeight) - this._oContainer.offsetHeight;
+                    this._oContainer._oContent.scrollTop = (oNewItem.offsetTop+oNewItem.offsetHeight) - this._oContainer._oContent.offsetHeight;
                 }
                 // Bottom of selected item is above scroll area...
-                else if((oNewItem.offsetTop+oNewItem.offsetHeight) < this._oContainer.scrollTop) {
+                else if((oNewItem.offsetTop+oNewItem.offsetHeight) < this._oContainer._oContent.scrollTop) {
                     // Set top of selected item to top of scroll area
-                    this._oContainer.scrollTop = oNewItem.offsetTop;
+                    this._oContainer._oContent.scrollTop = oNewItem.offsetTop;
 
                 }
             }
             // User is keying up
             else {
                 // Top of selected item is above scroll area
-                if(oNewItem.offsetTop < this._oContainer.scrollTop) {
+                if(oNewItem.offsetTop < this._oContainer._oContent.scrollTop) {
                     // Set top of scroll area to top of selected item
-                    this._oContainer.scrollTop = oNewItem.offsetTop;
+                    this._oContainer._oContent.scrollTop = oNewItem.offsetTop;
                 }
                 // Top of selected item is below scroll area
-                else if(oNewItem.offsetTop > (this._oContainer.scrollTop + this._oContainer.offsetHeight)) {
+                else if(oNewItem.offsetTop > (this._oContainer._oContent.scrollTop + this._oContainer._oContent.offsetHeight)) {
                     // Set bottom of selected item to bottom of scroll area
-                    this._oContainer.scrollTop = (oNewItem.offsetTop+oNewItem.offsetHeight) - this._oContainer.offsetHeight;
+                    this._oContainer._oContent.scrollTop = (oNewItem.offsetTop+oNewItem.offsetHeight) - this._oContainer._oContent.offsetHeight;
                 }
             }
         }
 
-        this._toggleHighlight(oNewItem, 'mouseover');
+        this._toggleHighlight(oNewItem, "to");
         this.itemArrowToEvent.fire(this, oNewItem);
-        //YAHOO.log(this.getName() + " arrowed to " + oNewItem.id);
         if(this.typeAhead) {
             this._updateValue(oNewItem);
         }
@@ -1604,12 +1802,12 @@ YAHOO.widget.AutoComplete.prototype._moveSelection = function(nKeyCode) {
 /****************************************************************************/
 
 /**
- * Class providing encapsulation of a data source.
- *
+ * Class providing encapsulation of a data source. 
+ *  
  * @constructor
  *
  */
-YAHOO.widget.DataSource = function() {
+YAHOO.widget.DataSource = function() { 
     /* abstract class */
 };
 
@@ -1683,24 +1881,41 @@ YAHOO.widget.DataSource.prototype.queryMatchCase = false;
 /***************************************************************************
  * Public methods
  ***************************************************************************/
+ /**
+ * Public accessor to the unique name of the data source instance.
+ *
+ * @return {string} Unique name of the data source instance
+ */
+YAHOO.widget.DataSource.prototype.getName = function() {
+    return this._sName;
+};
+
+ /**
+ * Public accessor to the unique name of the data source instance.
+ *
+ * @return {string} Unique name of the data source instance
+ */
+YAHOO.widget.DataSource.prototype.toString = function() {
+    return "DataSource " + this._sName;
+};
+
 /**
  * Retrieves query results, first checking the local cache, then making the
  * query request to the live data source as defined by the function doQuery.
  *
  * @param {object} oCallbackFn Callback function defined by oParent object to
- *                             which to return results
+ *                             which to return results 
  * @param {string} sQuery Query string
  * @param {object} oParent The object instance that has requested data
  */
 YAHOO.widget.DataSource.prototype.getResults = function(oCallbackFn, sQuery, oParent) {
-
+    
     // First look in cache
     var aResults = this._doQueryCache(oCallbackFn,sQuery,oParent);
-
+    
     // Not in cache, so get results from server
     if(aResults.length === 0) {
         this.queryEvent.fire(this, oParent, sQuery);
-        //YAHOO.log("Data source for " + oParent.getName() + " made source query for '" + sQuery + "'.");
         this.doQuery(oCallbackFn, sQuery, oParent);
     }
 };
@@ -1711,12 +1926,12 @@ YAHOO.widget.DataSource.prototype.getResults = function(oCallbackFn, sQuery, oPa
  * query. Populates cache (if enabled).
  *
  * @param {object} oCallbackFn Callback function implemented by oParent to
- *                             which to return results
+ *                             which to return results 
  * @param {string} sQuery Query string
  * @param {object} oParent The object instance that has requested data
  */
 YAHOO.widget.DataSource.prototype.doQuery = function(oCallbackFn, sQuery, oParent) {
-    /* override this */
+    /* override this */ 
 };
 
 /**
@@ -1730,7 +1945,6 @@ YAHOO.widget.DataSource.prototype.flushCache = function() {
         this._aCacheHelper = [];
     }
     this.cacheFlushEvent.fire(this);
-    //YAHOO.log("Cache flushed");
 };
 
 /***************************************************************************
@@ -1763,7 +1977,7 @@ YAHOO.widget.DataSource.prototype.cacheQueryEvent = null;
  *     - args[3] Array of result objects
  */
 YAHOO.widget.DataSource.prototype.getResultsEvent = null;
-
+    
 /**
  * Fired when data is retrieved from the local cache. Subscribers receive the
  * following array :<br>
@@ -1795,6 +2009,22 @@ YAHOO.widget.DataSource.prototype.cacheFlushEvent = null;
  * Private member variables
  ***************************************************************************/
 /**
+ * Internal class variable to index multiple data source instances.
+ *
+ * @type number
+ * @private
+ */
+YAHOO.widget.DataSource._nIndex = 0;
+
+/**
+ * Name of data source instance.
+ *
+ * @type string
+ * @private
+ */
+YAHOO.widget.DataSource.prototype._sName = null;
+
+/**
  * Local cache of data result objects indexed chronologically.
  *
  * @type array
@@ -1808,7 +2038,7 @@ YAHOO.widget.DataSource.prototype._aCache = null;
  ***************************************************************************/
 /**
  * Initializes data source instance.
- *
+ *  
  * @private
  */
 YAHOO.widget.DataSource.prototype._init = function() {
@@ -1821,7 +2051,10 @@ YAHOO.widget.DataSource.prototype._init = function() {
     if(maxCacheEntries > 0 && !this._aCache) {
         this._aCache = [];
     }
-
+    
+    this._sName = "instance" + YAHOO.widget.DataSource._nIndex;
+    YAHOO.widget.DataSource._nIndex++;
+    
     this.queryEvent = new YAHOO.util.CustomEvent("query", this);
     this.cacheQueryEvent = new YAHOO.util.CustomEvent("cacheQuery", this);
     this.getResultsEvent = new YAHOO.util.CustomEvent("getResults", this);
@@ -1831,9 +2064,9 @@ YAHOO.widget.DataSource.prototype._init = function() {
 };
 
 /**
- * Adds a result object to the local cache, evicting the oldest element if the
+ * Adds a result object to the local cache, evicting the oldest element if the 
  * cache is full. Newer items will have higher indexes, the oldest item will have
- * index of 0.
+ * index of 0. 
  *
  * @param {object} resultObj  Object literal of data results, including internal
  *                            properties and an array of result objects
@@ -1845,12 +2078,12 @@ YAHOO.widget.DataSource.prototype._addCacheElem = function(resultObj) {
     if(!aCache || !resultObj || !resultObj.query || !resultObj.results) {
         return;
     }
-
+    
     // If the cache is full, make room by removing from index=0
     if(aCache.length >= this.maxCacheEntries) {
         aCache.shift();
     }
-
+        
     // Add to cache, at the end of the array
     aCache.push(resultObj);
 };
@@ -1858,15 +2091,15 @@ YAHOO.widget.DataSource.prototype._addCacheElem = function(resultObj) {
 /**
  * Queries the local cache for results. If query has been cached, the callback
  * function is called with the results, and the cached is refreshed so that it
- * is now the newest element.
+ * is now the newest element.  
  *
- * @param {object} oCallbackFn Callback function defined by oParent object to
- *                             which to return results
+ * @param {object} oCallbackFn Callback function defined by oParent object to 
+ *                             which to return results 
  * @param {string} sQuery Query string
  * @param {object} oParent The object instance that has requested data
- * @return {array} aResults Result object from local cache if found, otherwise
+ * @return {array} aResults Result object from local cache if found, otherwise 
  *                          null
- * @private
+ * @private 
  */
 YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, oParent) {
     var aResults = [];
@@ -1874,11 +2107,10 @@ YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, 
     var aCache = this._aCache;
     var nCacheLength = (aCache) ? aCache.length : 0;
     var bMatchContains = this.queryMatchContains;
-
+    
     // If cache is enabled...
     if((this.maxCacheEntries > 0) && aCache && (nCacheLength > 0)) {
         this.cacheQueryEvent.fire(this, oParent, sQuery);
-        //YAHOO.log("Data source for " + oParent.getName() + " made cache query for '" + sQuery + "'.");
         // If case is unimportant, normalize query now instead of in loops
         if(!this.queryMatchCase) {
             var sOrigQuery = sQuery;
@@ -1891,18 +2123,18 @@ YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, 
             var aAllResultItems = resultObj.results;
             // If case is unimportant, normalize match key for comparison
             var matchKey = (!this.queryMatchCase) ?
-                encodeURI(resultObj.query.toLowerCase()):
-                encodeURI(resultObj.query);
-
+                encodeURIComponent(resultObj.query.toLowerCase()):
+                encodeURIComponent(resultObj.query);
+            
             // If a cached match key exactly matches the query...
             if(matchKey == sQuery) {
                     // Stash all result objects into aResult[] and stop looping through the cache.
                     bMatchFound = true;
                     aResults = aAllResultItems;
-
+                    
                     // The matching cache element was not the most recent,
                     // so now we need to refresh the cache.
-                    if(i != nCacheLength-1) {
+                    if(i != nCacheLength-1) {                        
                         // Remove element from its original location
                         aCache.splice(i,1);
                         // Add element as newest
@@ -1915,18 +2147,18 @@ YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, 
                 // Loop through substrings of each cached element's query property...
                 for(var j = sQuery.length-1; j >= 0 ; j--) {
                     var subQuery = sQuery.substr(0,j);
-
+                    
                     // If a substring of a cached sQuery exactly matches the query...
-                    if(matchKey == subQuery) {
+                    if(matchKey == subQuery) {                    
                         bMatchFound = true;
-
+                        
                         // Go through each cached result object to match against the query...
                         for(var k = aAllResultItems.length-1; k >= 0; k--) {
                             var aRecord = aAllResultItems[k];
                             var sKeyIndex = (this.queryMatchCase) ?
-                                encodeURI(aRecord[0]).indexOf(sQuery):
-                                encodeURI(aRecord[0]).toLowerCase().indexOf(sQuery);
-
+                                encodeURIComponent(aRecord[0]).indexOf(sQuery):
+                                encodeURIComponent(aRecord[0]).toLowerCase().indexOf(sQuery);
+                            
                             // A STARTSWITH match is when the query is found at the beginning of the key string...
                             if((!bMatchContains && (sKeyIndex === 0)) ||
                             // A CONTAINS match is when the query is found anywhere within the key string...
@@ -1935,7 +2167,7 @@ YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, 
                                 aResults.unshift(aRecord);
                             }
                         }
-
+                        
                         // Add the subset match result set object as the newest element to cache,
                         // and stop looping through the cache.
                         resultObj = {};
@@ -1950,11 +2182,10 @@ YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, 
                 }
             }
         }
-
+        
         // If there was a match, send along the results.
         if(bMatchFound) {
             this.getCachedResultsEvent.fire(this, oParent, sOrigQuery, aResults);
-            //YAHOO.log("Data source for " + oParent.getName() + " got " + aResults.length + " results from cache.");
             oCallbackFn(sOrigQuery, aResults, oParent);
         }
     }
@@ -1971,9 +2202,9 @@ YAHOO.widget.DataSource.prototype._doQueryCache = function(oCallbackFn, sQuery, 
  * query results.
  * requires YAHOO.util.Connect XMLHTTPRequest library
  * extends YAHOO.widget.DataSource
- *
+ *  
  * @constructor
- * @param {string} sScriptURI Absolute or relative URI to script that returns
+ * @param {string} sScriptURI Absolute or relative URI to script that returns 
  *                            query results as JSON, XML, or delimited flat data
  * @param {array} aSchema Data schema definition of results
  * @param {object} oConfigs Optional object literal of config params
@@ -1985,10 +2216,10 @@ YAHOO.widget.DS_XHR = function(sScriptURI, aSchema, oConfigs) {
             this[sConfig] = oConfigs[sConfig];
         }
     }
-
+    
     // Initialization sequence
     if(!aSchema || (aSchema.constructor != Array)) {
-        //log this.ERROR_INIT
+        return;
     }
     else {
         this.schema = aSchema;
@@ -2037,6 +2268,17 @@ YAHOO.widget.DS_XHR.prototype.ERROR_DATAXHR = "XHR response failed";
 /***************************************************************************
  * Public member variables
  ***************************************************************************/
+/**
+ * Number of milliseconds the XHR connection will wait for a server response. A
+ * a value of zero indicates the XHR connection will wait forever. Any value
+ * greater than zero will use the Connection utility's Auto-Abort feature.
+ * Default: 0.
+ *
+ * @type number
+ */
+YAHOO.widget.DS_XHR.prototype.connTimeout = 0;
+
+
 /**
  * Absolute or relative URI to script that returns query results. For instance,
  * queries will be sent to
@@ -2090,9 +2332,9 @@ YAHOO.widget.DS_XHR.prototype.responseStripAfter = "\n<!--";
 /**
  * Queries the live data source defined by scriptURI for results. Results are
  * passed back to a callback function.
- *
- * @param {object} oCallbackFn Callback function defined by oParent object to
- *                             which to return results
+ *  
+ * @param {object} oCallbackFn Callback function defined by oParent object to 
+ *                             which to return results 
  * @param {string} sQuery Query string
  * @param {object} oParent The object instance that has requested data
  */
@@ -2102,9 +2344,8 @@ YAHOO.widget.DS_XHR.prototype.doQuery = function(oCallbackFn, sQuery, oParent) {
     if(this.scriptQueryAppend.length > 0) {
         sUri += "&" + this.scriptQueryAppend;
     }
-    //YAHOO.log("Data source query URL is " + sUri);
     var oResponse = null;
-
+    
     var oSelf = this;
     /**
      * Sets up ajax request callback
@@ -2113,48 +2354,64 @@ YAHOO.widget.DS_XHR.prototype.doQuery = function(oCallbackFn, sQuery, oParent) {
      * @private
      */
     var responseSuccess = function(oResp) {
+        // Response ID does not match last made request ID.
+        if(!oSelf._oConn || (oResp.tId != oSelf._oConn.tId)) {
+            oSelf.dataErrorEvent.fire(oSelf, oParent, sQuery, oSelf.ERROR_DATANULL);
+            return;
+        }
+//DEBUG
+for(var foo in oResp) {
+}
         if(!isXML) {
             oResp = oResp.responseText;
         }
-        else {
+        else { 
             oResp = oResp.responseXML;
         }
         if(oResp === null) {
             oSelf.dataErrorEvent.fire(oSelf, oParent, sQuery, oSelf.ERROR_DATANULL);
-            //YAHOO.log("Data source for " + oParent.getName() +
-            //    " experienced a data error for query \"" + sQuery +
-            //    "\": " + oSelf.ERROR_DATANULL, "error");
-            oCallbackFn(sQuery, null, oParent);
             return;
         }
 
+        var aResults = oSelf.parseResponse(sQuery, oResp, oParent);
         var resultObj = {};
-        resultObj.query = decodeURI(sQuery);
-        resultObj.results = oSelf.parseResponse(sQuery, oResp, oParent);
-        oSelf._addCacheElem(resultObj);
-        oCallbackFn(sQuery, resultObj.results, oParent);
+        resultObj.query = decodeURIComponent(sQuery);
+        resultObj.results = aResults;
+        if(aResults === null) {
+            oSelf.dataErrorEvent.fire(oSelf, oParent, sQuery, oSelf.ERROR_DATAPARSE);
+            return;
+        }
+        else {
+            oSelf.getResultsEvent.fire(oSelf, oParent, sQuery, aResults);
+            oSelf._addCacheElem(resultObj);
+            oCallbackFn(sQuery, aResults, oParent);
+        }
     };
 
     var responseFailure = function(oResp) {
         oSelf.dataErrorEvent.fire(oSelf, oParent, sQuery, oSelf.ERROR_DATAXHR);
-        //YAHOO.log("Data source for " + oParent.getName() +
-        //        " experienced a data error for query \"" + sQuery +
-        //        "\": " + oSelf.ERROR_DATAXHR, "error");
-        oCallbackFn(sQuery, null, oParent);
         return;
     };
-
+    
     var oCallback = {
         success:responseSuccess,
         failure:responseFailure
     };
-
-    YAHOO.util.Connect.asyncRequest("GET", sUri, oCallback, null);
+    
+    if(!isNaN(this.connTimeout) && this.connTimeout > 0) {
+        oCallback.timeout = this.connTimeout;
+    }
+    
+    if(this._oConn) {
+        YAHOO.util.Connect.abort(this._oConn);
+    }
+    
+    oSelf._oConn = YAHOO.util.Connect.asyncRequest("GET", sUri, oCallback, null);
 };
 
 /**
  * Parses raw response data into an array of result objects. The result data key
- * is always stashed in the [0] element of each result object.
+ * is always stashed in the [0] element of each result object. 
  *
  * @param {string} sQuery Query string
  * @param {object} oResponse The raw response data to parse
@@ -2175,7 +2432,10 @@ YAHOO.widget.DS_XHR.prototype.parseResponse = function(sQuery, oResponse, oParen
 
     switch (this.responseType) {
         case this.TYPE_JSON:
-            if(window.JSON) {
+            var jsonList;
+            // Divert KHTML clients from JSON lib
+            if(window.JSON && (navigator.userAgent.toLowerCase().indexOf('khtml')== -1)) {
+                // Use the JSON utility if available
                 var jsonObjParsed = JSON.parse(oResponse);
                 if(!jsonObjParsed) {
                     bError = true;
@@ -2183,70 +2443,101 @@ YAHOO.widget.DS_XHR.prototype.parseResponse = function(sQuery, oResponse, oParen
                 }
                 else {
                     // eval is necessary here since aSchema[0] is of unknown depth
-                    var jsonListParsed = eval("jsonObjParsed." + aSchema[0]);
-                    for(var i = jsonListParsed.length-1; i >= 0 ; i--) {
-                        // eval is necessary here since aSchema[1] is of unknown depth
-                        jsonListParsed[i][0] = eval("jsonListParsed[i]." + aSchema[1]);
-                        aResults[i] = jsonListParsed[i];
-                    }
-                    break;
+                    jsonList = eval("jsonObjParsed." + aSchema[0]);
                 }
             }
             else {
+                // Parse the JSON response as a string
                 try {
-                    // trim leading spaces
+                    // Trim leading spaces
                     while (oResponse.substring(0,1) == " ") {
                         oResponse = oResponse.substring(1, oResponse.length);
                     }
 
-                    // zero response
-                    if((oResponse.indexOf("{}") === 0) ||
-                        (oResponse.indexOf("{") < 0)) {
+                    // Invalid JSON response
+                    if(oResponse.indexOf("{") < 0) {
+                        bError = true;
                         break;
                     }
 
-                    // eval is necessary here
-                    var jsonObjRaw = eval('(' + oResponse + ')');
-
-                    // eval is necessary here since aSchema[0] is of unknown depth
-                    var jsonListRaw = eval("jsonObjRaw." + aSchema[0]);
-
-                    for(var j = jsonListRaw.length-1; j >= 0 ; j--) {
-                        // eval is probably not necessary here
-                        //jsonListRaw[j][0] = eval("jsonListRaw[j]." + aSchema[1]);
-                        jsonListRaw[j][0] = jsonListRaw[j][aSchema[1]];
-                        aResults[j] = jsonListRaw[j];
+                    // Empty (but not invalid) JSON response
+                    if(oResponse.indexOf("{}") === 0) {
+                        break;
                     }
-                    break;
+
+                    // Turn the string into an object literal...
+                    // ...eval is necessary here
+                    var jsonObjRaw = eval("(" + oResponse + ")");
+                    if(!jsonObjRaw) {
+                        bError = true;
+                        break;
+                    }
+
+                    // Grab the object member that contains an array of all reponses...
+                    // ...eval is necessary here since aSchema[0] is of unknown depth
+                    jsonList = eval("(jsonObjRaw." + aSchema[0]+")");
                 }
                 catch(e) {
                     bError = true;
                     break;
                }
             }
+
+            if(!jsonList) {
+                bError = true;
+                break;
+            }
+
+            // Loop through the array of all responses...
+            for(var i = jsonList.length-1; i >= 0 ; i--) {
+                var aResultItem = [];
+                var jsonResult = jsonList[i];
+                // ...and loop through each data field value of each response
+                for(var j = aSchema.length-1; j >= 1 ; j--) {
+                    // ...and capture data into an array mapped according to the schema...
+                    var dataFieldValue = jsonResult[aSchema[j]];
+                    if(!dataFieldValue) {
+                        dataFieldValue = "";
+                    }
+                    aResultItem.unshift(dataFieldValue);
+                }
+                // Capture the array of data field values in an array of results
+                aResults.unshift(aResultItem);
+            }
             break;
         case this.TYPE_XML:
-           var xmlList = oResponse.getElementsByTagName(aSchema[0]);
-             for(var k = xmlList.length-1; k >= 0 ; k--) {
-                var result = xmlList.item(k);//doLog(k+' is '+result.attributes.item(0).firstChild.nodeValue);
+            // Get the collection of results
+            var xmlList = oResponse.getElementsByTagName(aSchema[0]);
+            if(!xmlList) {
+                bError = true;
+                break;
+            }
+            // Loop through each result
+            for(var k = xmlList.length-1; k >= 0 ; k--) {
+                var result = xmlList.item(k);
                 var aFieldSet = [];
-                for(var m = aSchema.length-1; m >= 1 ; m--) {//doLog(aSchema[m]+' is '+result.attributes.getNamedItem(aSchema[m]).firstChild.nodeValue);
+                // Loop through each data field in each result using the schema
+                for(var m = aSchema.length-1; m >= 1 ; m--) {
                     var sValue = null;
-                    // Capture each data value into an array
-                    // Data may be held in an attribute...
+                    // Values may be held in an attribute...
                     var xmlAttr = result.attributes.getNamedItem(aSchema[m]);
                     if(xmlAttr) {
-                        sValue = xmlAttr.value;//doLog('attr'+sValue);
+                        sValue = xmlAttr.value;
                     }
-                    // Or in a node...
-                    else {
+                    // ...or in a node
+                    else{
                         var xmlNode = result.getElementsByTagName(aSchema[m]);
-                        if(xmlNode) {
-                            sValue = xmlNode.item(0).firstChild.nodeValue;// doLog('node'+sValue);
+                        if(xmlNode && xmlNode.item(0) && xmlNode.item(0).firstChild) {
+                            sValue = xmlNode.item(0).firstChild.nodeValue;
+                        }
+                        else {
+                            sValue = "";
                         }
                     }
+                    // Capture the schema-mapped data field values into an array
                     aFieldSet.unshift(sValue);
                 }
+                // Capture each array of values into an array of results
                 aResults.unshift(aFieldSet);
             }
             break;
@@ -2266,19 +2557,16 @@ YAHOO.widget.DS_XHR.prototype.parseResponse = function(sQuery, oResponse, oParen
         default:
             break;
     }
+    sQuery = null;
+    oResponse = null;
+    oParent = null;
     if(bError) {
-        this.dataErrorEvent.fire(this, oParent, sQuery, this.ERROR_DATAPARSE);
-        //YAHOO.log("Data source for " + oParent.getName() +
-        //        " experienced a data error for query \"" + sQuery +
-        //        "\": " + this.ERROR_DATAPARSE, "error");
         return null;
     }
     else {
-        this.getResultsEvent.fire(this, oParent, sQuery, aResults);
-        //YAHOO.log("Data source for " + oParent.getName() + " got " + aResults.length + " results from source.");
         return aResults;
     }
-};
+};            
 
 
 /***************************************************************************
@@ -2300,10 +2588,10 @@ YAHOO.widget.DS_XHR.prototype._oConn = null;
 /**
  * Implementation of YAHOO.widget.DataSource using a native Javascript struct as
  * its live data source.
- *
+ *  
  * @constructor
- * extends YAHOO.widget.DataSource
- *
+ * extends YAHOO.widget.DataSource 
+ *  
  * @param {string} oFunction In-memory Javascript function that returns query
  *                           results as an array of objects
  * @param {object} oConfigs Optional object literal of config params
@@ -2317,8 +2605,13 @@ YAHOO.widget.DS_JSFunction = function(oFunction, oConfigs) {
     }
 
     // Initialization sequence
-    this.dataFunction = oFunction;
-    this._init();
+    if(!oFunction  || (oFunction.constructor != Function)) {
+        return;
+    }
+    else {
+        this.dataFunction = oFunction;
+        this._init();
+    }
 };
 
 YAHOO.widget.DS_JSFunction.prototype = new YAHOO.widget.DataSource();
@@ -2340,33 +2633,28 @@ YAHOO.widget.DS_JSFunction.prototype.dataFunction = null;
 /**
  * Queries the live data source defined by function for results. Results are
  * passed back to a callback function.
- *
- * @param {object} oCallbackFn Callback function defined by oParent object to
- *                             which to return results
+ *  
+ * @param {object} oCallbackFn Callback function defined by oParent object to 
+ *                             which to return results 
  * @param {string} sQuery Query string
  * @param {object} oParent The object instance that has requested data
  */
 YAHOO.widget.DS_JSFunction.prototype.doQuery = function(oCallbackFn, sQuery, oParent) {
     var oFunction = this.dataFunction;
     var aResults = [];
-
+    
     aResults = oFunction(sQuery);
     if(aResults === null) {
         this.dataErrorEvent.fire(this, oParent, sQuery, this.ERROR_DATANULL);
-        //YAHOO.log("Data source for " + oParent.getName() +
-        //        " experienced a data error for query \"" + sQuery +
-        //        "\": " + oSelf.ERROR_DATANULL, "error");
-        oCallbackFn(sQuery, null, oParent);
         return;
     }
-
+    
     var resultObj = {};
-    resultObj.query = decodeURI(sQuery);
+    resultObj.query = decodeURIComponent(sQuery);
     resultObj.results = aResults;
     this._addCacheElem(resultObj);
-
+    
     this.getResultsEvent.fire(this, oParent, sQuery, aResults);
-    //YAHOO.log("Data source for " + oParent.getName() + " got " + aResults.length + " results from source.");
     oCallbackFn(sQuery, aResults, oParent);
     return;
 };
@@ -2394,8 +2682,13 @@ YAHOO.widget.DS_JSArray = function(aData, oConfigs) {
     }
 
     // Initialization sequence
-    this.data = aData;
-    this._init();
+    if(!aData || (aData.constructor != Array)) {
+        return;
+    }
+    else {
+        this.data = aData;
+        this._init();
+    }
 };
 
 YAHOO.widget.DS_JSArray.prototype = new YAHOO.widget.DataSource();
@@ -2442,8 +2735,8 @@ YAHOO.widget.DS_JSArray.prototype.doQuery = function(oCallbackFn, sQuery, oParen
         }
 
         var sKeyIndex = (this.queryMatchCase) ?
-            encodeURI(aDataset[0]).indexOf(sQuery):
-            encodeURI(aDataset[0]).toLowerCase().indexOf(sQuery);
+            encodeURIComponent(aDataset[0]).indexOf(sQuery):
+            encodeURIComponent(aDataset[0]).toLowerCase().indexOf(sQuery);
 
         // A STARTSWITH match is when the query is found at the beginning of the key string...
         if((!bMatchContains && (sKeyIndex === 0)) ||
@@ -2455,6 +2748,5 @@ YAHOO.widget.DS_JSArray.prototype.doQuery = function(oCallbackFn, sQuery, oParen
     }
 
     this.getResultsEvent.fire(this, oParent, sQuery, aResults);
-    //YAHOO.log("Data source for " + oParent.getName() + " got " + aResults.length + " results from source.");
     oCallbackFn(sQuery, aResults, oParent);
 };

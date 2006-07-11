@@ -1,3 +1,10 @@
+/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+Version 0.11.0
+*/
+
 .overlay {
 	position:absolute;
 	display:block;
@@ -37,13 +44,10 @@
     position:absolute;
     top:0;
     left:0;
-    background-color:#CCC;
     -moz-opacity: 0.5;
     opacity:.50;
     filter: alpha(opacity=50);
-    }
-.mask[id]{ /* IE6 and below Can't See This */
-    position:fixed;
+    background-color:#CCC;
 }
 
 .hide-scrollbars * {
@@ -110,8 +114,8 @@
 .panel .hd {
 	background-color:#3d77cb;
 	color:#FFF;
-	font-size:1em;
-	height:1em;
+	font-size:100%;
+	line-height:100%;
 	border:1px solid #FFF;
 	border-bottom:1px solid #000;
 	font-weight:bold;
