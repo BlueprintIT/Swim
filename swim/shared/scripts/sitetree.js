@@ -12,6 +12,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	items: null,
 	selected: null,
 	loading: null,
+	draggable: false,
 	
 	canHold: function(parent, child) {
 		if (parent.tree.getRoot() == parent)
@@ -68,6 +69,9 @@ BlueprintIT.widget.SiteTree.prototype = {
 			contains: []
 		};
 		
+		if (!details.label)
+			details.label = '[Unnamed]';
+			
 		if (node.getAttribute("id")) {
 			var id = node.getAttribute("id");
 			if (!this.items[id]) {
@@ -104,7 +108,11 @@ BlueprintIT.widget.SiteTree.prototype = {
 
 	loadFromDocument: function(doc) {
 		this.items = [];
-		var tree = new BlueprintIT.widget.DraggableTreeView(this.element, this);
+		var tree = null;
+		if (this.draggable)
+			tree = new BlueprintIT.widget.DraggableTreeView(this.element, this);
+		else
+			tree = new YAHOO.widget.TreeView(this.element);
 		this.loadCategory(doc.documentElement, tree.getRoot());
 		tree.draw();
 		this.loading = false;

@@ -161,7 +161,7 @@ function moveDown(item, field, link) {
 				</table>
 			</div>
 		</div>
-		{if $class->allowsLink()}
+		{if ($class->allowsLink() && $view !== null)}
 			<div class="section">
 				<div class="sectionheader">
 					<h3>View Options</h3>
@@ -245,8 +245,12 @@ function moveDown(item, field, link) {
 									{/if}
 									{assign var="itemclass" value=$rlitem->getClass()}
 									{assign var="itemname" value=$rlitem->getField('name')}
+									{assign var="itemname" value=$itemname->toString()}
+									{if $itemname==''}
+										{assign var="itemname" value="[Unnamed]"}
+									{/if}
 									<tr>
-										<td class="name"><a href="{encode method="admin" path="items/details.tpl" item=$subitem->getId()}">{$itemname->toString()}</a></td>
+										<td class="name"><a href="{encode method="admin" path="items/details.tpl" item=$subitem->getId()}">{$itemname}</a></td>
 										<td class="options">
 										{secure documents="write"}
 											<a class="option" href="#" onclick="moveUp({$item->getId()}, '{$field->getId()}', this)"><img alt="Move up" title="Move up" src="{$CONTENT}/icons/up-purple.gif"></a>

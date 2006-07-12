@@ -47,7 +47,7 @@ function submitForm(form)
 		</div>
 		<div class="body">
 			<div class="section first">
-			{if $class->allowsLink()}
+			{if ($class->allowsLink() && $view !== null)}
 					<div class="sectionheader">
 						<h3>View Options</h3>
 					</div>

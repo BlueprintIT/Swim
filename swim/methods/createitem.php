@@ -43,12 +43,9 @@ function method_createitem($request)
               if ($request->hasQueryVar('parentitem') && $request->hasQueryVar('parentsequence'))
               {
                 $parent = Item::getItem($request->getQueryVar('parentitem'));
-                $parent = $parent->getCurrentVersion($request->getQueryVar('targetvariant'));
-                $sequence = $parent->getField($request->getQueryVar('parentsequence'));
+                $sequence = $parent->getSequence($request->getQueryVar('parentsequence'));
                 if ($sequence != null)
-                {
                   $sequence->appendItem($item);
-                }
               }
               $req = new Request();
               $req->setMethod('admin');

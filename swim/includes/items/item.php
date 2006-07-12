@@ -70,6 +70,21 @@ class Item
     return $parents;
   }
   
+  public function getSequence($name)
+  {
+    global $_STORAGE;
+    
+    $results = $_STORAGE->query('SELECT variant,version FROM ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant WHERE ItemVariant.item='.$this->id.';');
+    if ($results->valid())
+    {
+      $details = $results->fetch();
+      $v = $this->getVariant($details['variant']);
+      $iv = $v->getVersion($details['version']);
+      return $iv->getField($name);
+    }
+    return null;
+  }
+  
   protected function getValidVariants($variant)
   {
     $valid = array();
@@ -340,6 +355,11 @@ class ItemVariant
     }
     else
       $view = $class->getDefaultView();
+    
+    if ($view !== null)
+      $viewid = '"'.$_STORAGE->escape($view->getId()).'"';
+    else
+      $viewid = 'NULL';
     $time = time();
     $results = $_STORAGE->query('SELECT MAX(version)+1 FROM VariantVersion WHERE itemvariant='.$this->id.' GROUP BY itemvariant;');
     if ($results->valid())
@@ -347,7 +367,7 @@ class ItemVariant
     else
       $version = 1;
     if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,class,modified,owner,current,complete) ' .
-      'VALUES ('.$this->id.','.$version.',"'.$_STORAGE->escape($view->getId()).'","'.$_STORAGE->escape($class->getId()).'",'.$time.',"'.$_USER->getUsername().'",0,0);'))
+      'VALUES ('.$this->id.','.$version.','.$viewid.',"'.$_STORAGE->escape($class->getId()).'",'.$time.',"'.$_USER->getUsername().'",0,0);'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE id='.$id.';');
