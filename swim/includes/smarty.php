@@ -468,9 +468,15 @@ function api_get($params, &$smarty)
 
 function item_wrap($params, &$smarty)
 {
-  if ((!empty($params['var'])) && (!empty($params['item'])))
+  if ((isset($params['var'])) && (isset($params['item'])))
   {
     $item = $params['item'];
+    if ($item === null)
+    {
+      $smarty->assign_by_ref($params['var'], null);
+      return;
+    }
+    
     if ($item instanceof Item)
       $item = $item->getCurrentVersion(Session::getCurrentVariant());
     else if ($item instanceof ItemVariant)
