@@ -13,6 +13,16 @@ BlueprintIT.widget.SiteTree.prototype = {
 	selected: null,
 	loading: null,
 	draggable: false,
+	dragging: false,
+	
+	onDragStart: function() {
+		this.dragging = true;
+	},
+	
+	onDragEnd: function() {
+		var self = this;
+		window,setTimeout(function() { self.dragging = false }, 100);
+	},
 	
 	canHold: function(parent, child) {
 		if (parent.tree.getRoot() == parent)
@@ -31,8 +41,8 @@ BlueprintIT.widget.SiteTree.prototype = {
 		return true;
 	},
 	
-	onDragDrop: function(node, point) {
-		console.log("Drop " + node.data.id + " on " + point.parent.data.id + " at " + point.position);
+	onDragDrop: function(node, parent, position) {
+		//console.log("Drop " + node.data.id + " on " + point.parent.data.id + " at " + point.position);
 	},
 	
 	init: function(event, obj) {

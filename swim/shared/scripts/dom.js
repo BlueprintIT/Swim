@@ -14,11 +14,12 @@ YAHOO.util.Dom.textContent = function(el) {
 // Gets a DOM compliant event
 YAHOO.util.Event.baseGetEvent = YAHOO.util.Event.getEvent;
 YAHOO.util.Event.getEvent = function (event) {
+	var result = YAHOO.util.Event.baseGetEvent(event);
 	if (window.event)
-		return new DOMEventWrapper();
-	if (event)
-		return event;
-	return YAHOO.util.Event.baseGetEvent(event);
+		result.wrapped = new DOMEventWrapper();
+	else if (event)
+		result.wrapped = event;
+	return result;
 }
 
 // Wraps the Microsoft window.event into a DOM compliant event. Not all properties are usable.

@@ -316,36 +316,36 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	keyPressEvent: function(ev)
 	{
-		if (ev.type=='keypress')
+		if (ev.wrapped.type=='keypress')
 		{
 			this.log("keyPressEvent");
-			if ((this.selected) && (ev.keyCode>=37) && (ev.keyCode<=40))
+			if ((this.selected) && (ev.wrapped.keyCode>=37) && (ev.wrapped.keyCode<=40))
 			{
-				if (this.selected.keyPress(ev.keyCode))
-					ev.preventDefault();
+				if (this.selected.keyPress(ev.wrapped.keyCode))
+					ev.wrapped.preventDefault();
 			}
 		}
 	},
 	
 	focusEvent: function(ev)
 	{
-		if (ev.type=='focus')
+		if (ev.wrapped.type=='focus')
 		{
 			this.log("focusEvent");
-			this.changeSelection(this.findMenuItem(ev.target, ev));
+			this.changeSelection(this.findMenuItem(ev.wrapped.target, ev.wrapped));
 		}
 	},
 	
 	mouseEvent: function(ev)
 	{
-		if (ev.type=='mouseover')
+		if (ev.wrapped.type=='mouseover')
 		{
-			var dest = this.findMenuItem(ev.target, ev);
+			var dest = this.findMenuItem(ev.wrapped.target, ev.wrapped);
 			this.changeSelection(dest);
 		}
-		else if (ev.type=='mouseout')
+		else if (ev.wrapped.type=='mouseout')
 		{
-			var dest = this.findMenuItem(ev.relatedTarget, ev);
+			var dest = this.findMenuItem(ev.wrapped.relatedTarget, ev.wrapped);
 			if (!dest)
 				this.changeSelection(null);
 		}
