@@ -264,6 +264,8 @@ class IntegerField extends SimpleField
 
 class TextField extends SimpleField
 {
+  protected $stylesheet;
+  
   public function getEditor()
   {
     global $_PREFS;
@@ -287,6 +289,15 @@ class TextField extends SimpleField
         $editor->Width  = '100%';
         $editor->Height = '400px';
         $editor->Config['SkinPath'] = $editor->BasePath.'editor/skins/office2003/';
+        $editor->Config['StylesXmlPath'] = $_PREFS->getPref('url.site.static').'/'.$this->id.'.xml';
+        if (isset($this->stylesheet))
+        {
+          $request = new Request();
+          $request->setQueryVar('CONTEXT', 'body');
+          $request->setMethod('layout');
+          $request->setPath($this->stylesheet);
+          $editor->Config['EditorAreaCSS'] = $request->encode();
+        }
         $request = new Request();
         $request->setMethod('admin');
         $request->setPath('browser/filebrowser.tpl');
@@ -306,6 +317,12 @@ class TextField extends SimpleField
     }
     else
       return parent::getEditor();
+  }
+  
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute('stylesheet'))
+      $this->stylesheet = $element->getAttribute('stylesheet');
   }
   
   public function copyFrom($item)
@@ -331,6 +348,25 @@ class TextField extends SimpleField
     if ($b instanceof TextField)
       return strcmp($this->toString(), $b->toString());
     return 0;
+  }
+  
+  public function output(&$smarty)
+  {
+    if ($this->type == 'html')
+    {
+      if (isset($this->stylesheet))
+      {
+        $request = new Request();
+        $request->setQueryVar('CONTEXT', 'div#field_content');
+        $request->setMethod('layout');
+        $request->setPath($this->stylesheet);
+        $head = $smarty->get_registered_object('HEAD');
+        $head->addStyleSheet($request->encode());
+      }
+      return '<div id="field_content" class="content">'.$this->toString().'</div>';
+    }
+    else
+      return $this->toString();
   }
   
   protected function getColumn()

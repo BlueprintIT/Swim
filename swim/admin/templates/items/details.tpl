@@ -199,7 +199,7 @@ function moveDown(item, field, link) {
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
 									<td class="label">{$field->getName()|escape}:</td>
-									<td class="details">{$field->output($this)}</td>
+									<td class="details">{$field->output($SMARTY)}</td>
 								</tr>
 							{/if}
 						{/foreach}
@@ -222,7 +222,7 @@ function moveDown(item, field, link) {
 						{if $field->getType()!='html' && $field->getType()!='sequence'}
 							<tr>
 								<td class="label">{$field->getName()|escape}:</td>
-								<td class="details">{$field->output($this)}</td>
+								<td class="details">{$field->output($SMARTY)}</td>
 							</tr>
 						{/if}
 					{/foreach}
@@ -284,7 +284,7 @@ function moveDown(item, field, link) {
 						<h3>{$field->getName()|escape}</h3>
 					</div>
 					<div class="sectionbody">
-						<div id="field_{$field->getId()}" class="content">{$field->output($this)}</div>
+						{$field->output($SMARTY)}
 					</div>
 				</div>
 			{/if}

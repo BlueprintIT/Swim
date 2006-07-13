@@ -565,6 +565,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->assign_by_ref('NESTED', $request->getNested());
   $smarty->assign_by_ref('PREFS', $_PREFS);
   $smarty->assign_by_ref('LOG', $log);
+  $smarty->assign_by_ref('SMARTY', $smarty);
   $smarty->register_resource('brand', array(
                              'brand_get_template',
                              'brand_get_timestamp',
