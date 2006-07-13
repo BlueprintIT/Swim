@@ -290,14 +290,14 @@ class TextField extends SimpleField
         $editor->Height = '400px';
         $editor->Config['SkinPath'] = $editor->BasePath.'editor/skins/office2003/';
         $editor->Config['StylesXmlPath'] = $_PREFS->getPref('url.site.static').'/'.$this->id.'.xml';
-        if (isset($this->stylesheet))
+        /*if (isset($this->stylesheet))
         {
           $request = new Request();
           $request->setQueryVar('CONTEXT', 'body');
           $request->setMethod('layout');
           $request->setPath($this->stylesheet);
           $editor->Config['EditorAreaCSS'] = $request->encode();
-        }
+        }*/
         $request = new Request();
         $request->setMethod('admin');
         $request->setPath('browser/filebrowser.tpl');

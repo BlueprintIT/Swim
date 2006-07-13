@@ -10,3 +10,8 @@ FCKConfig.ToolbarSets["Swim"] = [
 	['Style']
 ];
 FCKConfig.UseBROnCarriageReturn	= false;
+FCKConfig.EditorAreaCSS = [
+	"/swim/shared/yui/reset/reset-min.css",
+	"/swim/shared/yui/fonts/fonts-min.css",
+	"/layout/styles/text.css"
+];
