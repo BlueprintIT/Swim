@@ -1,1 +1,2 @@
-INHERIT:DENY
+DENY:DENY
+*:*:::
