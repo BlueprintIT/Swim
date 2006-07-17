@@ -42,6 +42,8 @@ $commit->resource=$page;
 $commit->query['version']=$version;
 $commit->nested = new Request($request->nested);
 $commit->nested->query['reloadtree']=true;
+if (isset($commit->nested->query['version']))
+  unset($commit->nested->query['version']);
 
 $cancel = new Request();
 $cancel->method='cancel';
