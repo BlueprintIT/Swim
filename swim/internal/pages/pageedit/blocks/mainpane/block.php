@@ -73,6 +73,9 @@ include 'image.php';
 <script>
 function submitForm(form, type)
 {
+  if (window.tinyMCE && window.tinyMCE.triggerSave)
+    window.tinyMCE.triggerSave(false, false);
+    
   if (type)
   {
     document.forms[form].elements[type].disabled=false;
