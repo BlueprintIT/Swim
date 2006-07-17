@@ -25,7 +25,14 @@ function onTreeItemClick(id)
 	}
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root section=$request.query.section}', 'categorytree');
+{if $request.query.root}
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root}', 'categorytree');
+{apiget var="root" type="item" id=$request.query.root}
+{else}
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' section=$request.query.section}', 'categorytree');
+{apiget var="section" type="section" id=$request.query.section}
+{assign var="root" value=$section->getRootItem()}
+{/if}
 SiteTree.draggable = true;
 </script>
 <div id="leftpane" class="pane">
@@ -40,7 +47,7 @@ SiteTree.draggable = true;
 </div>
 
 <div id="mainpane" class="pane">
-<iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$request.query.root}"></iframe>
+<iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$root->getId()}"></iframe>
 </div>
 {include file='includes/adminfooter.tpl'}
 {/secure}

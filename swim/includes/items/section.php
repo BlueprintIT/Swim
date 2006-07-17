@@ -99,7 +99,6 @@ class Section extends AdminSection
     $request = new Request();
     $request->setMethod('admin');
     $request->setPath('items/index.tpl');
-    $request->setQueryVar('root', $this->item);
     $request->setQueryVar('section', $this->id);
     return $request->encode();
   }

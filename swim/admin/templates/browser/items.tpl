@@ -39,7 +39,7 @@ function onTreeItemClick(id)
 		btn.removeAttribute("disabled");
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=1}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml'}', 'categorytree');
 </script>
 <table id="tabpanel">
   <tr>

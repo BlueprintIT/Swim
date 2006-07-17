@@ -1,7 +1,18 @@
 <?xml version="1.0"?>
 
 <tree>
-{apiget var="root" type="item" id=$request.query.root}
-{assign var="variant" value="default"}
-{include file="items/treeitem.tpl" item=$root}
+{if $request.query.root}
+  {apiget var="root" type="item" id=$request.query.root}
+  {include file="items/treeitem.tpl" item=$root}
+{elseif $request.query.section}
+  {apiget var="section" type="section" id=$request.query.section}
+  {assign var="root" value=$section->getRootItem()}
+  {include file="items/treeitem.tpl" item=$root}
+{else}
+  {apiget var="sections" type="section"}
+  {foreach from=$sections item="section"}
+    {assign var="root" value=$section->getRootItem()}
+    {include file="items/treeitem.tpl" item=$root}
+  {/foreach}
+{/if}
 </tree>
