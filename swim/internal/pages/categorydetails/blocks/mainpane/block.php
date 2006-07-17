@@ -280,14 +280,14 @@ foreach ($items as $item)
 		</td>
 	</tr>
 </table>
+<?
+}
+?>
 <p>
 <div class="toolbarbutton"><a href="<?= $createp->encode() ?>"><image src="/internal/file/icons/add-page-blue.gif"/> Add a new Page</a></div>
 <div class="toolbarbutton"><a href="<?= $createl->encode() ?>"><image src="/internal/file/icons/add-page-blue.gif"/> Add a new Link</a></div>
 <div class="toolbarbutton"><a href="<?= $createc->encode() ?>"><image src="/internal/file/icons/add-folder-blue.gif"/> Add a new Category</a></div>
 </p>
-<?
-}
-?>
 </div>
 </div>
 </div>
