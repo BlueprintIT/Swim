@@ -250,7 +250,7 @@ function setCacheInfo($date,$etag=false)
 		{
 			$log->debug('Resource is cached');
 			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
-			shutdown();
+			SwimEngine::shutdown();;
 		}
 	}
 }
