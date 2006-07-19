@@ -45,10 +45,12 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
   <tr>
     <td class="spacer"></td>
     <td class="tab selected" selected="true">Items</td>
+{if $request.query.type!='item'}
     <td class="spacer"></td>
     <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/attachments.tpl"}">Item Attachments</a></td>
     <td class="spacer"></td>
     <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/files.tpl"}">Files</a></td>
+{/if}
     <td class="remainder"></td>
   </tr>
 </table>

@@ -161,6 +161,8 @@ class Field
         return new DateField($el);
       if ($type == 'sequence')
         return new Sequence($el);
+      if ($type == 'item')
+        return new ItemField($el);
       if ($type == 'file')
         return new FileField($el);
     }
@@ -409,6 +411,60 @@ class DateField extends IntegerField
   }
 }
 
+class ItemField extends IntegerField
+{
+  protected $item;
+  
+  protected function retrieve()
+  {
+    if ($this->retrieved)
+      return;
+      
+    parent::retrieve();
+    $this->item = Item::getItem($this->value);
+  }
+  
+  public function getItem()
+  {
+    $this->retrieve();
+    
+    return $this->item();
+  }
+  
+  public function toString()
+  {
+    $this->retrieve();
+    
+  }
+  
+  public function getEditor()
+  {
+    $this->retrieve();
+    
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('browser/filebrowser.tpl');
+    $request->setQueryVar('type', 'item');
+
+    if ($this->item !== null)
+    {
+      $rlvalue = $this->toString();
+    }
+    else
+      $rlvalue = '[Nothing selected]';
+
+    echo '<input id="'.$this->id.'" name="'.$this->id.'" type="hidden" value="'.$this->value.'"> ';
+
+    echo '<input id="fbfake-'.$this->id.'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    echo '<div class="toolbarbutton">';
+    echo '<a href="javascript:showFileBrowser(\''.$this->id.'\',\''.$request->encode().'\')">Select...</a>';
+    echo '</div> ';
+    echo '<div class="toolbarbutton">';
+    echo '<a href="javascript:clearFileBrowser(\''.$this->id.'\')">Clear</a>';
+    echo '</div> ';
+  }
+}
+
 class FileField extends TextField
 {
   private $filetype;
@@ -439,7 +495,7 @@ class FileField extends TextField
         $rlvalue = substr($rlvalue, $pos+1);
     }
     else
-      $rlvalue = '[No file selected]';
+      $rlvalue = '[Nothing selected]';
 
     echo '<input id="'.$this->id.'" name="'.$this->id.'" type="hidden" value="'.$this->value.'"> ';
 

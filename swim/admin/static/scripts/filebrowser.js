@@ -20,5 +20,5 @@ function clearFileBrowser(id) {
 	field.value = "";
 	
 	var fake = document.getElementById("fbfake-"+id);
-	fake.value = "[No file selected]";
+	fake.value = "[Nothing selected]";
 }

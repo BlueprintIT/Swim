@@ -91,6 +91,6 @@ run_all_tests();
 
 $log=LoggerManager::getLogger('test');
 $log->info('Test end');
-//shutdown();
+//SwimEngine::shutdown();
 
 ?>
