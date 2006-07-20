@@ -13,5 +13,5 @@ FCKConfig.UseBROnCarriageReturn	= false;
 FCKConfig.EditorAreaCSS = [
 	"/swim/shared/yui/reset/reset-min.css",
 	"/swim/shared/yui/fonts/fonts-min.css",
-	"/layout/styles/text.css"
+	"/layout/styles/text.css?CONTEXT=body"
 ];

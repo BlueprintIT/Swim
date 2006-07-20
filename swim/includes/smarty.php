@@ -293,10 +293,7 @@ function encode_form($params, $content, &$smarty, &$repeat)
       $path = $request;
       $vars = '';
     }
-    print('<form '.$attrs.'method="'.$method.'" action="'.$path.'"');
-    foreach ($params as $key => $value)
-      print(' '.$key.'="'.$value.'"');
-    print('>');
+    print('<form '.$attrs.'method="'.$method.'" action="'.$path.'">');
     print($vars);
   }
   else

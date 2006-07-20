@@ -50,7 +50,7 @@ class FieldSet
         $fields[$name] = clone $field;
         $fields[$name]->setItemVersion($item);
       }
-    if ($this->parent != null)
+    if ($this->parent !== null)
       $this->parent->addMissingFields($fields, $item);
   }
   
@@ -61,6 +61,15 @@ class FieldSet
     return $fields;
   }
   
+  public function hasField($name)
+  {
+    if (isset($this->fields[$name]))
+      return true;
+    if ($this->parent !== null)
+      return $this->parent->hasField($name);
+    return false;
+  }
+  
   public function getField($item, $name)
   {
     if (isset($this->fields[$name]))
@@ -69,7 +78,7 @@ class FieldSet
       $field->setItemVersion($item);
       return $field;
     }
-    if ($this->parent != null)
+    if ($this->parent !== null)
       return $this->parent->getField($item, $name);
     return null;
   }

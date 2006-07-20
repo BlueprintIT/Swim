@@ -1,5 +1,4 @@
 [config_load file="styles.conf" scope="global"]
-[include file="styles/quirks.tpl.css"]
 
 html {
 	height: 100%;

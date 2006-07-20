@@ -675,6 +675,15 @@ class ItemVersion
     return $this->itemview->getFields($this);
   }
   
+  public function hasField($name)
+  {
+    if (($this->itemclass !== null) && ($this->itemclass->hasField($name)))
+      return true;
+    if (($this->itemview !== null) && ($this->itemview->hasField($name)))
+      return true;
+    return false;
+  }
+  
   public function getField($name)
   {
     $field = null;

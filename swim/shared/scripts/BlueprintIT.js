@@ -1,7 +1,8 @@
 var BlueprintIT = {
 	menus: {},
 	widget: {},
-	timing: {}
+	timing: {},
+	validation: {}
 }
 
 BlueprintIT.timing.startTimer = function(item,timeout,data)

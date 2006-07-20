@@ -287,7 +287,10 @@ class TextField extends SimpleField
         include_once($_PREFS->getPref('storage.fckeditor').'/fckeditor.php');
         $editor = new FCKeditor($this->id) ;
         $editor->BasePath = $_PREFS->getPref('url.fckeditor');
-        $editor->Value = $this->toString();
+        $value = $this->toString();
+        if (strlen($value)==0)
+          $value = "<p><br/>\n</p>";
+        $editor->Value = $value;
         $editor->Width  = '100%';
         $editor->Height = '400px';
         $editor->Config['SkinPath'] = $editor->BasePath.'editor/skins/office2003/';
@@ -473,6 +476,15 @@ class FileField extends TextField
   {
     if ($element->hasAttribute('filetype'))
       $this->filetype = $element->getAttribute('filetype');
+  }
+  
+  public function copyFrom($item)
+  {
+    parent::copyFrom($item);
+    $this->retrieve();
+    $newvalue = str_replace($item->getStorageUrl(), $this->itemversion->getStorageUrl(), $this->value);
+    if ($newvalue != $this->value)
+      $this->setValue($newvalue);
   }
   
   public function getEditor()
