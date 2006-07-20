@@ -39,6 +39,12 @@ function method_postback($request)
       $field = $itemversion->getField('email');
       $email = $field->toString();
       mail($email, $subject, $message, 'From: '.$from."\r\n");
+      
+      $request = new Request();
+      $request->setMethod('view');
+      $request->setPath($itemversion->getItem()->getId());
+      $request->setQueryVar('posted', 'true');
+      redirect($request);
     }
     else
       displayGeneralError($request, "No post form specified. This may indicate an attempt to hack this site, the developers have been notified.");

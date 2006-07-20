@@ -267,6 +267,7 @@ class IntegerField extends SimpleField
 class TextField extends SimpleField
 {
   protected $stylesheet;
+  protected $styles;
   
   public function getEditor()
   {
@@ -294,7 +295,8 @@ class TextField extends SimpleField
         $editor->Width  = '100%';
         $editor->Height = '400px';
         $editor->Config['SkinPath'] = $editor->BasePath.'editor/skins/office2003/';
-        $editor->Config['StylesXmlPath'] = $_PREFS->getPref('url.site.static').'/'.$this->id.'.xml';
+        if (isset($this->styles))
+          $editor->Config['StylesXmlPath'] = $_PREFS->getPref('url.site.static').'/'.$this->styles;
         /*if (isset($this->stylesheet))
         {
           $request = new Request();
@@ -328,6 +330,8 @@ class TextField extends SimpleField
   {
     if ($element->hasAttribute('stylesheet'))
       $this->stylesheet = $element->getAttribute('stylesheet');
+    if ($element->hasAttribute('styles'))
+      $this->styles = $element->getAttribute('styles');
   }
   
   public function copyFrom($item)
