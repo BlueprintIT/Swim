@@ -349,6 +349,24 @@ BlueprintIT.menus.MenuManager.prototype = {
 			if (!dest)
 				this.changeSelection(null);
 		}
+		else if ((ev.wrapped.type=='click') && (ev.wrapped.button==0))
+		{
+			this.log('Got click event - '+ev.wrapped.button);
+			var dest = this.findMenuItem(ev.wrapped.target, ev.wrapped);
+			if ((dest.focusElement) && (dest.focusElement != ev.wrapped.target))
+			{
+				this.log('Event might be a missed click');
+				var node = dest.focusElement.parentNode;
+				while (node && node != dest.element && node != ev.wrapped.target)
+					node = node.parentNode;
+				if (node == ev.wrapped.target)
+				{
+					this.log('Event was between focus and menuitem, passing to focus.');
+					YAHOO.util.Event.stopEvent(ev);
+					document.location.href = dest.focusElement.href;
+				}
+			}
+		}
 	},
 	
 	loadFrom: function(element,animator,orientation,depth,parentitem,parentmenu)
@@ -423,6 +441,7 @@ function Menu(manager,item,orientation,element,animator)
 		this.manager.log("Adding listener to "+element.id);
 		YAHOO.util.Event.addListener(element,'mouseover',this.manager.mouseEvent,this.manager,true);
 		YAHOO.util.Event.addListener(element,'mouseout',this.manager.mouseEvent,this.manager,true);
+		YAHOO.util.Event.addListener(element,'click',this.manager.mouseEvent,this.manager,true);
 	}
 	this.orientation=orientation;
 	this.element=element;

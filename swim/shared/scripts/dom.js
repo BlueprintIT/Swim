@@ -56,7 +56,10 @@ function DOMEventWrapper() {
 	}
 	else if (window.event.button & 4) {
 		this.button=1;
-	} else {
+	} else if (this.type == 'click') {
+		this.button=0;
+	}
+	else {
 		this.button=null;
 	}
 
