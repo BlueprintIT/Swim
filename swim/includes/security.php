@@ -146,6 +146,7 @@ class User
       default:
         return false;
     }
+    $this->log->debug('Checking '.$this->user.' for '.$perm.' '.$type);
     $results = $_STORAGE->query("SELECT Permission.".$type." FROM UserAccess JOIN Permission ON UserAccess.access=Permission.access WHERE section='".$_STORAGE->escape($perm)."' AND user=\"".$_STORAGE->escape($this->user)."\";");
     $result = 0;
     while ($results->valid())
@@ -157,6 +158,7 @@ class User
       }
       $result+=$id[0];
     }
+    $this->log->debug('Found '.$result);
     if ($result>0)
     {
       return true;

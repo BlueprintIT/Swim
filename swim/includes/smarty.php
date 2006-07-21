@@ -235,11 +235,14 @@ function check_security($params, $content, &$smarty, &$repeat)
     $valid = true;
     foreach ($params as $section => $types)
     {
-      $list = explode(',', $types);
-      foreach ($list as $type)
+      if ($section != 'login')
       {
-        if (!$_USER->hasPermission($section, $type))
-          $valid=false;
+        $list = explode(',', $types);
+        foreach ($list as $type)
+        {
+          if (!$_USER->hasPermission($section, $type))
+            $valid=false;
+        }
       }
     }
   }
