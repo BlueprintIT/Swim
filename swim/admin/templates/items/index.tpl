@@ -6,7 +6,7 @@
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dom/dom-min.js"}
+{script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/animation/animation`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
@@ -14,14 +14,22 @@
 {script href="$SHARED/scripts/treeview.js"}
 {script href="$SHARED/scripts/dom.js"}
 {script href="$SHARED/scripts/sitetree.js"}
-<script>{literal}
+<script>
+var section = '{$request.query.section}';
+{literal}
 function onTreeItemClick(id)
 {
 	if (!SiteTree.dragging) {
 		var request = new Request();
 		request.setMethod('admin');
-		request.setPath('items/details.tpl');
-		request.setQueryVar('item', id);
+		if (id == 'uncat') {
+			request.setPath('items/uncategorised.tpl');
+			request.setQueryVar('section', section);
+		}
+		else {
+			request.setPath('items/details.tpl');
+			request.setQueryVar('item', id);
+		}
 		document.getElementById('main').src = request.encode();
 	}
 }
@@ -34,6 +42,8 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
 {apiget var="section" type="section" id=$request.query.section}
 {assign var="root" value=$section->getRootItem()}
 {/if}
+//SiteTree.setExpandAnim(YAHOO.widget.TVAnim.FADE_IN);
+//SiteTree.setCollapseAnim(YAHOO.widget.TVAnim.FADE_OUT);
 SiteTree.draggable = true;
 </script>
 <div id="leftpane" class="pane">

@@ -8,11 +8,13 @@
   {apiget var="section" type="section" id=$request.query.section}
   {assign var="root" value=$section->getRootItem()}
   {include file="items/treeitem.tpl" item=$root}
+  {include file="items/uncattree.tpl"}
 {else}
   {apiget var="sections" type="section"}
   {foreach from=$sections item="section"}
     {assign var="root" value=$section->getRootItem()}
     {include file="items/treeitem.tpl" item=$root}
+    {include file="items/uncattree.tpl"}
   {/foreach}
 {/if}
 </tree>

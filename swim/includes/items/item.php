@@ -85,6 +85,21 @@ class Item
     return null;
   }
   
+  public function getMainSequence()
+  {
+    global $_STORAGE;
+    
+    $results = $_STORAGE->query('SELECT variant,version FROM ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant WHERE ItemVariant.item='.$this->id.';');
+    if ($results->valid())
+    {
+      $details = $results->fetch();
+      $v = $this->getVariant($details['variant']);
+      $iv = $v->getVersion($details['version']);
+      return $iv->getMainSequence();
+    }
+    return null;
+  }
+  
   protected function getValidVariants($variant)
   {
     $valid = array();

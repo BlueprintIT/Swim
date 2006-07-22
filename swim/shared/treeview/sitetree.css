@@ -12,6 +12,6 @@
   background-image: url('ctclsd.gif');
 }
 
-.ygtvitem .item_open, .ygtvitem .item_clsd {
+.ygtvitem .item {
   background-image: url('item.gif');
 }

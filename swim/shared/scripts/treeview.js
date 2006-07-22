@@ -207,6 +207,8 @@ BlueprintIT.widget.DraggableTreeView.getNodeLabelId = function(node) {
 		return node.labelElId;
 	if (node.contentElId)
 		return node.contentElId;
+	if (node.getElId)
+		return node.getElId();
 	return null;
 }
 
@@ -215,6 +217,8 @@ BlueprintIT.widget.DraggableTreeView.getNodeLabel = function(node) {
 		return node.getLabelEl();
 	if (node.getContentEl)
 		return node.getContentEl();
+	if (node.getEl)
+		return node.getEl();
 	var id = BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);
 	if (id)
 		return document.getElementById(id);
