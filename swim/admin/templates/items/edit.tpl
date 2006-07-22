@@ -53,7 +53,7 @@ function submitForm(form)
 					</div>
 					<div class="sectionbody">
 						<table class="admin">
-							{foreach from=$view->getFields($itemversion) item="field"}
+							{foreach from=$itemversion->getViewFields() item="field"}
 								{if $field->getType()!='html' && $field->getType()!='sequence'}
 									<tr>
 										<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
@@ -72,7 +72,7 @@ function submitForm(form)
 				</div>
 				<div class="sectionbody">
 					<table class="admin">
-						{foreach from=$class->getFields($itemversion) item="field"}
+						{foreach from=$itemversion->getClassFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
 									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
@@ -84,7 +84,7 @@ function submitForm(form)
 					</table>
 				</div>
 			</div>
-			{foreach name="fieldlist" from=$class->getFields($itemversion) item="field"}
+			{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 				{if $field->getType()=='html'}
 					<div class="section">
 						<div class="sectionheader">

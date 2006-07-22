@@ -44,7 +44,7 @@ function method_copyversion($request)
           $variant = $item->createVariant($request->getQueryVar('targetvariant'));
           if ($variant != null)
           {
-            $newversion = $variant->createNewVersion(null, $itemversion);
+            $newversion = $variant->createNewVersion($itemversion);
             if ($newversion != null)
             {
               $req = new Request();

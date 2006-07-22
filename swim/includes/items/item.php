@@ -18,7 +18,9 @@ class Item
   private $log;
   private $id;
   private $section;
+  private $itemclass;
   private $variants = array();
+  private $fields = array();
   
   private function __construct($details)
   {
@@ -26,6 +28,7 @@ class Item
     
     $this->id = $details['id'];
     $this->section = $details['section'];
+    $this->itemclass = FieldSetManager::getClass($details['class']);
   }
   
   public function getId()
@@ -36,6 +39,11 @@ class Item
   public function getSection()
   {
     return SectionManager::getSection($this->section);
+  }
+  
+  public function getClass()
+  {
+    return $this->itemclass;
   }
   
   public function getParents()
@@ -70,33 +78,30 @@ class Item
     return $parents;
   }
   
+  public function getField($name, $item = null)
+  {
+    if (isset($this->fields[$name]))
+      return $this->fields[$name];
+    if ($item === null)
+      $item = $this;
+    $field = $this->itemclass->getField($item, $name);
+    if (($field !== null) && ($field instanceof ClassField))
+      $this->fields[$name] = $field;
+    return $field;
+  }
+  
   public function getSequence($name)
   {
-    global $_STORAGE;
-    
-    $results = $_STORAGE->query('SELECT variant,version FROM ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant WHERE ItemVariant.item='.$this->id.';');
-    if ($results->valid())
-    {
-      $details = $results->fetch();
-      $v = $this->getVariant($details['variant']);
-      $iv = $v->getVersion($details['version']);
-      return $iv->getField($name);
-    }
+    if ($this->itemclass->getFieldType($name) == 'sequence')
+      return $this->getField($name);
     return null;
   }
   
   public function getMainSequence()
   {
-    global $_STORAGE;
-    
-    $results = $_STORAGE->query('SELECT variant,version FROM ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant WHERE ItemVariant.item='.$this->id.';');
-    if ($results->valid())
-    {
-      $details = $results->fetch();
-      $v = $this->getVariant($details['variant']);
-      $iv = $v->getVersion($details['version']);
-      return $iv->getMainSequence();
-    }
+    $name = $this->itemclass->getMainSequenceName();
+    if ($name !== null)
+      return $this->getField($name);
     return null;
   }
   
@@ -178,14 +183,14 @@ class Item
     return null;
   }
   
-  public static function createItem($section)
+  public static function createItem($section, $class)
   {
     global $_STORAGE;
     
-    if ($_STORAGE->queryExec('INSERT INTO Item (section) VALUES ("'.$section->getId().'");'))
+    if ($_STORAGE->queryExec('INSERT INTO Item (section,class) VALUES ("'.$_STORAGE->escape($section->getId()).'","'.$_STORAGE->escape($class->getId()).'");'))
     {
       $id = $_STORAGE->lastInsertRowid();
-      $details = array('id' => $id, 'section' => $section->getId());
+      $details = array('id' => $id, 'section' => $section->getId(), 'class' => $class->getId());
       $item = new Item($details);
       ObjectCache::setItem('dbitem', $id, $item);
       return $item;
@@ -349,19 +354,11 @@ class ItemVariant
     return $this->versions[$version];
   }
   
-  public function createNewVersion($class, $clone = null)
+  public function createNewVersion($clone = null)
   {
     global $_PREFS,$_STORAGE,$_USER;
 
-    if ($class != null)
-      $class = $class;
-    else if ($clone != null)
-      $class = $clone->getClass();
-    else
-    {
-      $this->log->error('Null class and clone, cannot create an unknown item.');
-      return null;
-    }
+    $class = $this->getItem()->getClass();
     if ($clone !== null)
     {
       $view = $clone->getView();
@@ -381,8 +378,8 @@ class ItemVariant
       $version = $results->fetchSingle();
     else
       $version = 1;
-    if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,class,modified,owner,current,complete) ' .
-      'VALUES ('.$this->id.','.$version.','.$viewid.',"'.$_STORAGE->escape($class->getId()).'",'.$time.',"'.$_USER->getUsername().'",0,0);'))
+    if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,modified,owner,current,complete) ' .
+      'VALUES ('.$this->id.','.$version.','.$viewid.','.$time.',"'.$_USER->getUsername().'",0,0);'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE id='.$id.';');
@@ -397,8 +394,8 @@ class ItemVariant
         $sourcefiles = $clone->getStoragePath();
         if (is_dir($sourcefiles))
         {
-          $_STORAGE->queryExec('INSERT INTO File (itemversion,file,type,description) ' .
-            'SELECT '.$id.',file,type,description FROM File WHERE itemversion='.$clone->getId().';');
+          $_STORAGE->queryExec('INSERT INTO File (itemversion,file,description) ' .
+            'SELECT '.$id.',file,description FROM File WHERE itemversion='.$clone->getId().';');
           $targetfiles = $iv->getStoragePath();
           recursiveMkDir($targetfiles);
           recursiveCopy($sourcefiles, $targetfiles);
@@ -411,7 +408,12 @@ class ItemVariant
         if ($clone == null)
           $field->initialise();
         else
-          $field->copyFrom($clone);
+        {
+          if ($field instanceof ClassField)
+            $field->copyFrom($clone->getItem());
+          else
+            $field->copyFrom($clone);
+        }
       }
       return $iv;
     }
@@ -430,7 +432,6 @@ class ItemVersion
   private $version;
   private $variant;
   private $variantid;
-  private $itemclass;
   private $itemview;
   private $owner;
   private $modified;
@@ -447,10 +448,9 @@ class ItemVersion
       $this->variant = $variant;
     $this->variantid = $details['itemvariant'];
     $this->version = $details['version'];
-    $this->itemclass = FieldSetManager::getClass($details['class']);
     $this->itemview = FieldSetManager::getView($details['view']);
     if ($this->itemview === null)
-      $this->itemview = $this->itemclass->getDefaultView();
+      $this->itemview = $this->getClass()->getDefaultView();
     $this->modified = $details['modified'];
     $this->owner = $details['owner'];
     if ($details['complete']==1)
@@ -600,7 +600,7 @@ class ItemVersion
     if ($this->itemview->getId() == $value->getId())
       return;
       
-    if (!$this->itemclass->isValidView($value))
+    if (!$this->getClass()->isValidView($value))
       return;
       
     $newtime = time();
@@ -613,37 +613,15 @@ class ItemVersion
   
   public function getClass()
   {
-    return $this->itemclass;
-  }
-  
-  public function setClass($value)
-  {
-    global $_STORAGE;
-    
-    if ($this->complete)
-      return;
-      
-    if ($this->itemclass->getId() == $value->getId())
-      return;
-      
-    $newview = $this->itemview;
-    if (!$value->isValidView($this->itemview))
-      $newview = $value->getDefaultView();
-    
-    $newtime = time();
-    if ($_STORAGE->queryExec('UPDATE VariantVersion SET view="'.$_STORAGE->escape($newview->getId()).'", class="'.$_STORAGE->escape($value->getId()).'", modified='.$newtime.' WHERE id='.$this->getId().';'))
-    {
-      $this->itemclass = $value;
-      $this->modified = $newtime;
-    }
+    return $this->getItem()->getClass();
   }
   
   public function getLinkTarget()
   {
-    if ($this->itemclass === null)
+    if ($this->getClass() === null)
       return $this;
     
-    if ($this->itemclass->allowsLink())
+    if ($this->getClass()->allowsLink())
       return $this;
       
     $sequence = $this->getMainSequence();
@@ -663,10 +641,7 @@ class ItemVersion
   
   public function getMainSequence()
   {
-    if ($this->itemclass == null)
-      return null;
-      
-    return $this->itemclass->getMainSequence($this);
+    return $this->getItem()->getMainSequence();
   }
   
   public function getFields()
@@ -676,10 +651,14 @@ class ItemVersion
   
   public function getClassFields()
   {
-    if ($this->itemclass == null)
+    if ($this->getClass() == null)
       return array();
     
-    return $this->itemclass->getFields($this);
+    $fields = array();
+    $names = $this->getClass()->getFields();
+    foreach ($names as $name)
+      $fields[$name] = $this->getField($name);
+    return $fields;
   }
   
   public function getViewFields()
@@ -687,12 +666,16 @@ class ItemVersion
     if ($this->itemview == null)
       return array();
     
-    return $this->itemview->getFields($this);
+    $fields = array();
+    $names = $this->itemview->getFields();
+    foreach ($names as $name)
+      $fields[$name] = $this->getField($name);
+    return $fields;
   }
   
   public function hasField($name)
   {
-    if (($this->itemclass !== null) && ($this->itemclass->hasField($name)))
+    if (($this->getClass() !== null) && ($this->getClass()->hasField($name)))
       return true;
     if (($this->itemview !== null) && ($this->itemview->hasField($name)))
       return true;
@@ -701,13 +684,17 @@ class ItemVersion
   
   public function getField($name)
   {
-    $field = null;
-    if ($this->itemclass !== null)
-      $field = $this->itemclass->getField($this, $name);
+    if (isset($this->fields[$name]))
+      return $this->fields[$name];
       
+    $field = $this->getItem()->getField($name, $this);
+
     if (($field === null) && ($this->itemview !== null))
       $field = $this->itemview->getField($this, $name);
     
+    if ($field !== null)
+      $this->fields[$name] = $field;
+      
     return $field;
   }
   

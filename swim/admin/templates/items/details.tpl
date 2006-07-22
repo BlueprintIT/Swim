@@ -195,7 +195,7 @@ function moveDown(item, field, link) {
 								</td>
 							{/if}
 						</tr>
-						{foreach from=$view->getFields($itemversion) item="field"}
+						{foreach from=$itemversion->getViewFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
 									<td class="label">{$field->getName()|escape}:</td>
@@ -218,7 +218,7 @@ function moveDown(item, field, link) {
 						<td class="details">{$class->getName()}</td>
 	
 					</tr>
-					{foreach from=$class->getFields($itemversion) item="field"}
+					{foreach from=$itemversion->getClassFields() item="field"}
 						{if $field->getType()!='html' && $field->getType()!='sequence'}
 							<tr>
 								<td class="label">{$field->getName()|escape}:</td>
@@ -229,7 +229,7 @@ function moveDown(item, field, link) {
 				</table>
 			</div>
 		</div>
-		{foreach name="fieldlist" from=$class->getFields($itemversion) item="field"}
+		{foreach name="fieldlist" from=$itemversion->getClassFields() item="field"}
 			{if $field->getType()=='sequence'}
 				<div class="section">
 					<div class="sectionheader">
@@ -277,7 +277,7 @@ function moveDown(item, field, link) {
 				</div>
 			{/if}
 		{/foreach}
-		{foreach name="fieldlist" from=$class->getFields($itemversion) item="field"}
+		{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 			{if $field->getType()=='html'}
 				<div class="section">
 					<div class="sectionheader">

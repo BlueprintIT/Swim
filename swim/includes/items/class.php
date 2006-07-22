@@ -20,11 +20,13 @@ class FieldSet
   protected $name = '';
   protected $description = '';
   protected $fields = array();
+  protected $log;
 
   public function __construct($id, $parent = null)
   {
     $this->id = $id;
     $this->parent = $parent;
+    $this->log = LoggerManager::getLogger('swim.fieldset');
   }
 
   public function getId()
@@ -42,22 +44,29 @@ class FieldSet
     return $this->description;
   }
   
-  protected function addMissingFields(&$fields, $item)
+  public function getFieldType($name)
   {
-    foreach ($this->fields as $name => $field)
-      if (!isset($fields[$name]))
-      {
-        $fields[$name] = clone $field;
-        $fields[$name]->setItemVersion($item);
-      }
+    if (isset($this->fields[$name]))
+      return $this->fields[$name]->getType();
     if ($this->parent !== null)
-      $this->parent->addMissingFields($fields, $item);
+      return $this->parent->getFieldType($name);
+    return null;
   }
   
-  public function getFields($item)
+  protected function addMissingFields(&$fields)
+  {
+    foreach ($this->fields as $name => $field)
+    {
+      array_push($fields, $name);
+    }
+    if ($this->parent !== null)
+      $this->parent->addMissingFields($fields);
+  }
+  
+  public function getFields()
   {
     $fields = array();
-    $this->addMissingFields($fields, $item);
+    $this->addMissingFields($fields);
     return $fields;
   }
   
@@ -74,9 +83,34 @@ class FieldSet
   {
     if (isset($this->fields[$name]))
     {
-      $field = clone $this->fields[$name];
-      $field->setItemVersion($item);
-      return $field;
+      if ($this->fields[$name] instanceof ClassField)
+      {
+        if (($item instanceof ItemVariant) || ($item instanceof ItemVersion))
+          $item = $item->getItem();
+
+        if ($item instanceof Item)
+        {
+          $field = clone $this->fields[$name];
+          $field->setItem($item);
+          return $field;
+        }
+        else
+        {
+          $this->log->errortrace('Attempt to retrieve a '.$this->fields[$name]->getType().' field for a '.get_class($item).'.');
+          return null;
+        }
+      }
+      else if ($item instanceof ItemVersion)
+      {
+        $field = clone $this->fields[$name];
+        $field->setItemVersion($item);
+        return $field;
+      }
+      else
+      {
+        $this->log->errortrace('Attempt to retrieve a '.$this->fields[$name]->getType().' field for a '.get_class($item).'.');
+        return null;
+      }
     }
     if ($this->parent !== null)
       return $this->parent->getField($item, $name);
@@ -105,7 +139,7 @@ class FieldSet
           $this->description=getDOMText($el);
         else if ($el->tagName=='field')
         {
-          $field = Field::getField($el);
+          $field = BaseField::getField($el);
           $this->fields[$field->getId()] = $field;
         }
         else
@@ -194,14 +228,12 @@ class ItemClass extends FieldSet
     return false;
   }
   
-  public function getMainSequence($item)
+  public function getMainSequenceName()
   {
     if (isset($this->mainsequence))
-      return $this->getField($item, $this->mainsequence);
-    
-    if ($this->parent !== null)
-      return $this->parent->getMainSequence($item);
-    
+      return $this->mainsequence;
+    if ($this->parent !==null)
+      return $this->parent->getMainSequenceName();
     return null;
   }
   

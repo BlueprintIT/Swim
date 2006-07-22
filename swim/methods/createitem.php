@@ -31,13 +31,13 @@ function method_createitem($request)
       $section = SectionManager::getSection($request->getQueryVar('targetsection'));
       if (($section != null) && ($class != null))
       {
-        $item = Item::createItem($section);
+        $item = Item::createItem($section, $class);
         if ($item != null)
         {
           $variant = $item->createVariant($request->getQueryVar('targetvariant'));
           if ($variant != null)
           {
-            $version = $variant->createNewVersion($class);
+            $version = $variant->createNewVersion();
             if ($version != null)
             {
               if ($request->hasQueryVar('parentitem') && $request->hasQueryVar('parentsequence'))

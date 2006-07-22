@@ -34,7 +34,7 @@ function onTreeItemClick(id)
 	}
 }
 {/literal}
-{if $request.query.root}
+{if isset($request.query.root)}
 var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root}', 'categorytree');
 {apiget var="root" type="item" id=$request.query.root}
 {else}

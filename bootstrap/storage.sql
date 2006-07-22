@@ -28,7 +28,9 @@ CREATE TABLE Permission (
 
 CREATE TABLE Item (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
-	section VARCHAR(20)
+	section VARCHAR(20),
+	class VARCHAR(30),
+	archived INTEGER
 );
 
 CREATE TABLE ItemVariant (
@@ -42,7 +44,6 @@ CREATE TABLE VariantVersion (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	itemvariant INTEGER,
 	version INTEGER,
-	class VARCHAR(30),
 	view VARCHAR(30),
 	modified INTEGER,
 	owner VARCHAR(20),
