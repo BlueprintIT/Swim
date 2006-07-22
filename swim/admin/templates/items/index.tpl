@@ -1,12 +1,13 @@
 {secure documents="read" login="true"}
 {include file='includes/adminheader.tpl' title="Content management"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
-{stylesheet href="$SHARED/treeview/treeview.css"}
+{stylesheet href="$SHARED/treeview/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dom/dom-min.js"}
+{script href="$SHARED/yui/animation/animation`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}

@@ -43,7 +43,7 @@ BlueprintIT.widget.StyledTextNode.prototype.getHoverStyle = function() {
 BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 	if (node) {
 		this.node = node;
-		this.init(node.labelElId, sGroup);
+		this.init(BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node), sGroup);
 		delete this.invalidHandleTypes["A"];
 		this.initFrame();
 	}
@@ -167,8 +167,11 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOver = function(e, id)
 				y = region.bottom;
 			}
 		}
-		region = YAHOO.util.Dom.getRegion(point.parent.getLabelEl());
+		var label = BlueprintIT.widget.DraggableTreeView.getNodeLabel(point.parent);
+		region = YAHOO.util.Dom.getRegion(label);
 		x = region.left;
+
+		region = YAHOO.util.Dom.getRegion(BlueprintIT.widget.DraggableTreeView.getNodeLabel(this.node));
 		width = region.right-region.left;
 		
 		var s = this.node.tree.indicatorDiv.style;
@@ -198,6 +201,25 @@ BlueprintIT.widget.DraggableTreeView = function(id, dd) {
 }
 
 BlueprintIT.widget.DraggableTreeView.prototype = new YAHOO.widget.TreeView();
+
+BlueprintIT.widget.DraggableTreeView.getNodeLabelId = function(node) {
+	if (node.labelElId)
+		return node.labelElId;
+	if (node.contentElId)
+		return node.contentElId;
+	return null;
+}
+
+BlueprintIT.widget.DraggableTreeView.getNodeLabel = function(node) {
+	if (node.getLabelEl)
+		return node.getLabelEl();
+	if (node.getContentEl)
+		return node.getContentEl();
+	var id = BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);
+	if (id)
+		return document.getElementById(id);
+	return null;
+}
 
 BlueprintIT.widget.DraggableTreeView.prototype.dragDropManager = null;
 

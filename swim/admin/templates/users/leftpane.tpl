@@ -1,5 +1,6 @@
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$SHARED/treeview/treeview.css"}
+{stylesheet href="$SHARED/treeview/users.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
@@ -12,9 +13,8 @@ function displayTree(event)
   var tree = new YAHOO.widget.TreeView("categorytree");
   var details = {ldelim}
     label: "Users",
-    iconClass: "category"
   {rdelim};
-  var root = new BlueprintIT.widget.StyledTextNode(details, tree.getRoot(), true);
+  var root = new YAHOO.widget.TextNode(details, tree.getRoot(), true);
 {php}
 $users = UserManager::getAllUsers();
 foreach ($users as $username => $user)
@@ -29,10 +29,9 @@ foreach ($users as $username => $user)
   $edit->setQueryVar('user',$username);
   print("  details = {\n");
   print("    label: \"".$name."\",\n");
-  print("    iconClass: \"user\",\n");
   print("    href: \"".$edit->encode()."\"\n");
   print("  };\n");
-  print("  new BlueprintIT.widget.StyledTextNode(details, root, false);\n");
+  print("  new YAHOO.widget.TextNode(details, root, false);\n");
 }
 {/php}
   tree.draw();

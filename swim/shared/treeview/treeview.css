@@ -1,9 +1,3 @@
-/* first or middle sibling, no children */
-.categorytn { background-image: url(categorytm.gif) !important; width:34px !important; }
-.pagetn     { background-image: url(pagetn.gif) !important; width:34px !important; }
-.linktn     { background-image: url(linktn.gif) !important; width:34px !important; }
-.usertn     { background-image: url(usertn.gif) !important; width:34px !important; }
-
 /* first or middle sibling, collapsable */
 .ygtvtm     { background-image: url(categorytm.gif) !important; width:34px !important; }
 
@@ -15,12 +9,6 @@
 
 /* first or middle sibling, expandable, hover */
 .ygtvtph    { background-image: url(categorytph.gif) !important; width:34px !important; }
-
-/* last sibling, no children */
-.categoryln { background-image: url(categorylm.gif) !important; width:34px !important; }
-.pageln     { background-image: url(pageln.gif) !important; width:34px !important; }
-.linkln     { background-image: url(linkln.gif) !important; width:34px !important; }
-.userln     { background-image: url(userln.gif) !important; width:34px !important; }
 
 /* Last sibling, collapsable */
 .ygtvlm     { background-image: url(categorylm.gif) !important; width:34px !important; }

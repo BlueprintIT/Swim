@@ -1,3 +1,20 @@
+YAHOO.util.Event.getButton = function(ev) {
+	if (window.event) {
+		if (window.event.button & 1)
+			return 0;
+		else if (window.event.button & 2)
+			return 2;
+		else if (window.event.button & 4)
+			return 1;
+		else if (this.type == 'click')
+			return 0;
+		else
+			return null;
+	}
+	else
+		return ev.button;
+}
+
 YAHOO.util.Dom.textContent = function(el) {
 	el = this.get(el);
 	var content = "";

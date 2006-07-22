@@ -207,16 +207,18 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	findMenuItemFromMenu: function(menu, event)
 	{
-		this.log('Seeking menu item for '+event.clientX+' '+event.clientY);
+		var pageX = YAHOO.util.Event.getPageX(event);
+		var pageY = YAHOO.util.Event.getPageY(event);
+		this.log('Seeking menu item for '+pageX+' '+pageY);
 		
 		var i;
 		for (i = 0; i<menu.menuItems.length; i++)
 		{
 			var region = YAHOO.util.Dom.getRegion(menu.menuItems[i].element);
 			this.log('Checking '+region.left+' '+region.right+' '+region.top+' '+region.bottom);
-			if ((event.clientX<region.left)||(event.clientX>region.right))
+			if ((pageX<region.left)||(pageX>region.right))
 				continue;
-			if ((event.clientY<region.top)||(event.clientY>region.bottom))
+			if ((pageY<region.top)||(pageY>region.bottom))
 				continue;
 			return menu.menuItems[i];
 		}
@@ -316,50 +318,50 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	keyPressEvent: function(ev)
 	{
-		if (ev.wrapped.type=='keypress')
+		if (ev.type=='keypress')
 		{
 			this.log("keyPressEvent");
-			if ((this.selected) && (ev.wrapped.keyCode>=37) && (ev.wrapped.keyCode<=40))
+			if ((this.selected) && (YAHOO.util.Event.getCharCode(ev)>=37) && (YAHOO.util.Event.getCharCode(ev)<=40))
 			{
-				if (this.selected.keyPress(ev.wrapped.keyCode))
-					ev.wrapped.preventDefault();
+				if (this.selected.keyPress(YAHOO.util.Event.getCharCode(ev)))
+					YAHOO.util.Event.preventDefault(ev);
 			}
 		}
 	},
 	
 	focusEvent: function(ev)
 	{
-		if (ev.wrapped.type=='focus')
+		if (ev.type=='focus')
 		{
 			this.log("focusEvent");
-			this.changeSelection(this.findMenuItem(ev.wrapped.target, ev.wrapped));
+			this.changeSelection(this.findMenuItem(YAHOO.util.Event.getTarget(ev), ev));
 		}
 	},
 	
 	mouseEvent: function(ev)
 	{
-		if (ev.wrapped.type=='mouseover')
+		if (ev.type=='mouseover')
 		{
-			var dest = this.findMenuItem(ev.wrapped.target, ev.wrapped);
+			var dest = this.findMenuItem(YAHOO.util.Event.getTarget(ev), ev);
 			this.changeSelection(dest);
 		}
-		else if (ev.wrapped.type=='mouseout')
+		else if (ev.type=='mouseout')
 		{
-			var dest = this.findMenuItem(ev.wrapped.relatedTarget, ev.wrapped);
+			var dest = this.findMenuItem(YAHOO.util.Event.getRelatedTarget(ev), ev);
 			if (!dest)
 				this.changeSelection(null);
 		}
-		else if ((ev.wrapped.type=='click') && (ev.wrapped.button==0))
+		else if ((ev.type=='click') && (YAHOO.util.Event.getButton(ev)==0))
 		{
-			this.log('Got click event - '+ev.wrapped.button);
-			var dest = this.findMenuItem(ev.wrapped.target, ev.wrapped);
-			if ((dest.focusElement) && (dest.focusElement != ev.wrapped.target))
+			this.log('Got click event - '+YAHOO.util.Event.getButton(ev));
+			var dest = this.findMenuItem(YAHOO.util.Event.getTarget(ev));
+			if ((dest.focusElement) && (dest.focusElement != YAHOO.util.Event.getTarget(ev)))
 			{
 				this.log('Event might be a missed click');
 				var node = dest.focusElement.parentNode;
-				while (node && node != dest.element && node != ev.wrapped.target)
+				while (node && node != dest.element && node != YAHOO.util.Event.getTarget(ev))
 					node = node.parentNode;
-				if (node == ev.wrapped.target)
+				if (node == YAHOO.util.Event.getTarget(ev))
 				{
 					this.log('Event was between focus and menuitem, passing to focus.');
 					YAHOO.util.Event.stopEvent(ev);

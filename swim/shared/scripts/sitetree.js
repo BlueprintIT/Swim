@@ -1,3 +1,52 @@
+BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oContents, oParent) {
+	var html = oLabel;
+	if (oId) {
+		html = '<a href="javascript:onTreeItemClick(\''+oId+'\')">' + html + '</a>';
+	}
+	oData = {
+		html: html,
+		type: oType,
+		contains: oContents
+	};
+	this.init(oData, oParent, false);
+  this.labelElId = "ygtvlabelel" + this.index;
+	oData.html = '<div id="'+this.labelElId+'">' + html + '</div>';
+	this.initContent(oData, true);
+};
+
+YAHOO.extend(BlueprintIT.widget.ItemNode, YAHOO.widget.HTMLNode);
+
+BlueprintIT.widget.ItemNode.prototype.labelElId = null;
+BlueprintIT.widget.ItemNode.prototype.getLabelEl = function() {
+	return document.getElementById(this.labelElId);
+}
+
+BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
+	var style = "";
+	var typ = "item";
+	if (this.hasChildren(true))
+		typ = "container";
+		
+	if (this.expanded)
+		style = "itemcontent " + typ + "_open icon_"+this.data.type+" icon_"+this.data.type+"_open";
+	else
+		style = "itemcontent " + typ + "_clsd icon_"+this.data.type+" icon_"+this.data.type+"_clsd";
+
+	return style;
+}
+
+BlueprintIT.widget.ItemNode.prototype.toggle = function() {
+	BlueprintIT.widget.ItemNode.superclass.toggle.call(this);
+
+	this.getContentEl().className = this.getContentStyle();
+}
+
+BlueprintIT.widget.ItemNode.prototype.getNodeHtml = function() {
+	this.contentStyle = this.getContentStyle();
+	
+	return BlueprintIT.widget.ItemNode.superclass.getNodeHtml.call(this);
+}
+
 BlueprintIT.widget.SiteTree = function(url, div) {
 	this.location=url;
 	this.element=div;
@@ -57,14 +106,14 @@ BlueprintIT.widget.SiteTree.prototype = {
 		
 		if (this.selected) {
 			for (var i = 0; i<this.items[this.selected].length; i++) {
-				var label = this.items[this.selected][i].getLabelEl();
+				var label = this.items[this.selected][i].getContentEl();
 				YAHOO.util.Dom.removeClass(label, "selected");
 			}
 			this.selected = null;
 		}
 		if (id && this.items[id]) {
 			for (var i = 0; i<this.items[id].length; i++) {
-				var label = this.items[id][i].getLabelEl();
+				var label = this.items[id][i].getContentEl();
 				YAHOO.util.Dom.addClass(label, "selected");
 			}
 			this.selected = id;
@@ -72,35 +121,29 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	loadItem: function(node, parentnode) {
-		var details = {
-			label: node.getAttribute("name"),
-			iconClass: node.getAttribute("class"),
-			type: node.getAttribute("class"),
-			contains: []
-		};
+		var label = node.getAttribute("name");
+		var type = node.getAttribute("class");
+		var contents = [];
 		
-		if (!details.label)
-			details.label = '[Unnamed]';
-			
-		if (node.getAttribute("id")) {
-			var id = node.getAttribute("id");
+		if (!label)
+			label = '[Unnamed]';
+		
+		var id = node.getAttribute("id");
+		if (id) {
 			if (!this.items[id]) {
 				this.items[id] = [];
 			}
-			details.id = id;
-			details.href = "javascript:onTreeItemClick('"+id+"')";
 		}
 		
 		if (node.getAttribute("contains")) {
 			var content = node.getAttribute("contains").split(",");
 			for (var i = 0; i<content.length; i++)
-				details.contains[content[i]] = true;
+				contents[content[i]] = true;
 		}
 			
-		var treenode = new BlueprintIT.widget.StyledTextNode(details, parentnode, false);
-		if (node.getAttribute("id")) {
+		var treenode = new BlueprintIT.widget.ItemNode(id, label, type, contents, parentnode);
+		if (id)
 			this.items[id].push(treenode);
-		}
 		
 		this.loadCategory(node, treenode);
 	},

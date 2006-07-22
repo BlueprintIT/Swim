@@ -61,6 +61,7 @@ body {
   margin: 0;
   padding: 10px;
   color: [#BLUE#];
+  font-size: 170%;
 }
 
 .body {
@@ -78,7 +79,11 @@ iframe.body {
   border: none 0px;
 }
 
-#categorytree .selected {
+#categorytree .itemcontent div {
+  padding: 2px 5px 2px 5px;
+}
+
+#categorytree .selected div {
   background-color: Highlight;
   color: HighlightText;
 }
