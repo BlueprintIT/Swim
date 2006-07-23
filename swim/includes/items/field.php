@@ -20,6 +20,8 @@ class BaseField
   protected $description;
   protected $type;
   protected $log;
+  protected $index = true;
+  protected $indexPriority = 1;
 
   public function __construct($metadata)
   {
@@ -54,6 +56,21 @@ class BaseField
   {
     return $this->description;
   }
+  
+  public function isIndexed()
+  {
+    return $this->index && $this->indexPriority>0;
+  }
+  
+  public function getIndexPriority()
+  {
+    return $this->indexPriority;
+  }
+  
+  public function getPlainText()
+  {
+    return "";
+  }
 
   protected function parseElement($element)
   {
@@ -66,6 +83,10 @@ class BaseField
   
   private function parse($metadata)
   {
+    if ($metadata->hasAttribute('index') && ($metadata->getAttribute('index') == 'false'))
+      $this->index = false;
+    if ($metadata->hasAttribute('priority'))
+      $this->indexPriority = $metadata->getAttribute('priority');
     $this->id = $metadata->getAttribute('id');
     $this->type = $metadata->getAttribute('type');
     $this->parseAttributes($metadata);

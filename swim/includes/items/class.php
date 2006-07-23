@@ -253,12 +253,11 @@ class ItemClass extends FieldSet
   {
     if ($element->hasAttribute('mainsequence'))
       $this->mainsequence = $element->getAttribute('mainsequence');
-    
     if ($element->hasAttribute('allowlink'))
       $this->allowlink = ($element->getAttribute('allowlink') == 'true');
-    
     if ($element->hasAttribute('versioning'))
       $this->versioning = $element->getAttribute('versioning');
+    parent::parseAttributes($element);
   }
 }
 

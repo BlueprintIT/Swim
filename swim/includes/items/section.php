@@ -28,6 +28,19 @@ class Section extends AdminSection
     $this->log = LoggerManager::getLogger('swim.section');
   }
 
+  public function getItems()
+  {
+    global $_STORAGE;
+    
+    $items = array();
+    $results = $_STORAGE->query('SELECT id FROM Item WHERE section="'.$_STORAGE->escape($this->id).'";');
+    while ($results->valid())
+    {
+      array_push($items, Item::getItem($results->fetchSingle()));
+    }
+    return $items;
+  }
+  
   public function getVisibleClasses()
   {
     if (isset($this->classes))

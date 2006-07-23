@@ -67,6 +67,11 @@ class SimpleField extends Field
     return '';
   }
   
+  public function getPlainText()
+  {
+    return $this->toString();
+  }
+  
   public function toString()
   {
     $this->retrieve();
@@ -169,6 +174,15 @@ class TextField extends SimpleField
       return parent::getEditor();
   }
   
+  public function getPlainText()
+  {
+    $text = $this->toString();
+    if ($this->type == 'html')
+      $text = html_entity_decode(strip_tags($text));
+
+    return $text;
+  }
+  
   protected function parseAttributes($element)
   {
     if ($element->hasAttribute('stylesheet'))
@@ -245,6 +259,11 @@ class DateField extends IntegerField
     return $text;
   }
   
+  public function getPlainText()
+  {
+    return date('l Y F j n', $this->toString());
+  }
+  
   public function output(&$smarty)
   {
     return date('d/m/Y', $this->toString());
@@ -272,6 +291,11 @@ class ItemField extends IntegerField
       
     parent::retrieve();
     $this->item = Item::getItem($this->value);
+  }
+  
+  public function isIndexed()
+  {
+    return false;
   }
   
   public function getItem()
@@ -323,6 +347,11 @@ class FileField extends TextField
   {
     if ($element->hasAttribute('filetype'))
       $this->filetype = $element->getAttribute('filetype');
+  }
+  
+  public function isIndexed()
+  {
+    return false;
   }
   
   public function copyFrom($item)

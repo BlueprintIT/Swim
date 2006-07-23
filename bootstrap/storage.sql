@@ -76,6 +76,13 @@ CREATE TABLE File (
 	UNIQUE (itemversion,file)
 );
 
+CREATE TABLE Keywords (
+	word VARCHAR(20),
+	item INTEGER,
+	weight FLOAT,
+	UNIQUE (word, item)
+);
+
 INSERT INTO User (id,password,name) VALUES ('blueprintit','ab9debd6b50c6d5b64c64f2c93a74580','Blueprint IT');
 INSERT INTO Access (id,name,description) VALUES ('root',NULL,NULL);
 INSERT INTO Access (id,name,description) VALUES ('admin','Full Access','Provides full control over the website.');

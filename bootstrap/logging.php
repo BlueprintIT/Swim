@@ -29,10 +29,10 @@ class LogOutput
 	protected $tracePattern;
 	private $level = LOG_LEVEL_ALL;
 	
-	function LogOutput()
+	function __construct()
 	{
-		$pattern='';
-		$tracePattern='';
+		$this->pattern='';
+		$this->tracePattern='';
 	}
 	
 	function setLevel($level)
@@ -159,13 +159,28 @@ class LogOutput
 	}
 }
 
+class StdOutLogOutput extends LogOutput
+{
+  function __construct()
+  {
+    parent::__construct();
+    $this->pattern='[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])';
+    $this->tracePattern='$[logger]: $[function]$[arglist] ($[file]:$[line])';
+  }
+  
+  function internalOutput($text)
+  {
+    print($text."\n");
+  }
+}
+
 class FileLogOutput extends LogOutput
 {
   private $filename;
   
-	function FileLogOutput($filename)
+	function __construct($filename)
 	{
-		$this->LogOutput();
+		parent::__construct();
 		$this->filename=$filename;
 		$this->pattern="[$[time+5] $[txtlevel+5] $[uid-4]] $[logger+30]: $[text] ($[file]:$[line])\n";
 		$this->tracePattern="                   $[logger+30]: $[function]$[arglist] ($[file]:$[line])\n";
@@ -183,11 +198,11 @@ class FileLogOutput extends LogOutput
 
 class PageLogOutput extends LogOutput
 {
-	function PageLogOutput()
+	function __construct()
 	{
-		$this->LogOutput();
+		parent::__construct();
 		$this->pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
-		$this->tracePattern="$[logger]: $[function]$[arglist] ($[file]:$[line])<br />\n";
+		$this->tracePattern='$[logger]: $[function]$[arglist] ($[file]:$[line])<br />';
 	}
 	
 	function internalOutput($text)
