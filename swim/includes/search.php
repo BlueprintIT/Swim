@@ -55,37 +55,40 @@ class SearchEngine
       $items = $section->getItems();
       foreach ($items as $item)
       {
-        $versioncount = 0;
-        $words = array();
-        $variants = $item->getVariants();
-        foreach ($variants as $variant)
+        if (!$item->isArchived())
         {
-          if (false)
+          $versioncount = 0;
+          $words = array();
+          $variants = $item->getVariants();
+          foreach ($variants as $variant)
           {
-            $versions = $variant->getVersions();
-            foreach ($versions as $version)
+            if (false)
             {
-              self::extractKeywords($version, $words);
-              $versioncount++;
+              $versions = $variant->getVersions();
+              foreach ($versions as $version)
+              {
+                self::extractKeywords($version, $words);
+                $versioncount++;
+              }
+            }
+            else
+            {
+              $version = $variant->getCurrentVersion();
+              if ($version !== null)
+              {
+                self::extractKeywords($version, $words);
+                $versioncount++;
+              }
             }
           }
-          else
+          $log->info('Item '.$item->getId().' has '.$versioncount.' valid versions.');
+          if ($versioncount>0)
           {
-            $version = $variant->getCurrentVersion();
-            if ($version !== null)
+            foreach ($words as $word => $count)
             {
-              self::extractKeywords($version, $words);
-              $versioncount++;
+              $count = $count/$versioncount;
+              $_STORAGE->queryExec('INSERT INTO Keywords (word,item,weight) VALUES ("'.$_STORAGE->escape($word).'",'.$item->getId().','.$count.');');
             }
-          }
-        }
-        $log->info('Item '.$item->getId().' has '.$versioncount.' valid versions.');
-        if ($versioncount>0)
-        {
-          foreach ($words as $word => $count)
-          {
-            $count = $count/$versioncount;
-            $_STORAGE->queryExec('INSERT INTO Keywords (word,item,weight) VALUES ("'.$_STORAGE->escape($word).'",'.$item->getId().','.$count.');');
           }
         }
       }
