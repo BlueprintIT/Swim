@@ -24,9 +24,10 @@ require_once $bootstrap.'/bootstrap.php';
 unset($bootstrap);
 
 LoggerManager::setLogOutput('',new StdOutLogOutput());
-LoggerManager::setLogLevel('',LOG_LEVEL_INFO);
 
 SwimEngine::ensureStarted();
+
+setContentType('text/plain');
 
 SearchEngine::buildIndex();
 

@@ -696,7 +696,7 @@ class UserAdminSection extends AdminSection
 
 // Start up the session
 session_name('SwimSession');
-session_start();
+@session_start();
 
 
 if (isset($_SESSION['Swim.User']))
