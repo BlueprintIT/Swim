@@ -89,26 +89,39 @@ function moveDown(item, field, link) {
 <div id="mainpane">
 	<div class="header">
 		{secure documents="write"}
-			<div class="toolbar">
-				{if $itemversion->isComplete()}
+			{if !$item->isArchived()}
+				<div class="toolbar">
+					{if $itemversion->isComplete()}
+						<div class="toolbarbutton">
+							<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/>
+							{if $class->getVersioning()=='simple'}
+								Edit
+							{else}
+								Create new version for editing
+							{/if}
+							</a>
+						</div>
+					{else}
+						<div class="toolbarbutton">
+							<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}"><img src="{$CONTENT}/icons/check-grey.gif"/> Mark as complete</a>
+						</div>
+						<div class="toolbarbutton">
+							<a href="{encode method="admin" path="items/edit.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Edit</a>
+						</div>
+					{/if}
+				</div>
+				{if $item !== $section->getRootItem()}
 					<div class="toolbarbutton">
-						<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/>
-						{if $class->getVersioning()=='simple'}
-							Edit
-						{else}
-							Create new version for editing
-						{/if}
-						</a>
-					</div>
-				{else}
-					<div class="toolbarbutton">
-						<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}"><img src="{$CONTENT}/icons/check-grey.gif"/> Mark as complete</a>
-					</div>
-					<div class="toolbarbutton">
-						<a href="{encode method="admin" path="items/edit.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Edit</a>
+						<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}"><img src="{$CONTENT}/icons/delete-page-blue.gif"/> Archive this item</a>
 					</div>
 				{/if}
-			</div>
+			{else}
+				{if $item !== $section->getRootItem()}
+					<div class="toolbarbutton">
+						<a href="{encode method="archive" item=$item->getId() archive="false" nestcurrent="true"}"><img src="{$CONTENT}/icons/delete-page-blue.gif"/> Restore this item</a>
+					</div>
+				{/if}
+			{/if}
 		{/secure}
 		<h2>Item Details</h2>
 	</div>
@@ -139,23 +152,25 @@ function moveDown(item, field, link) {
 									{/foreach}
 								</select>
 							{/html_form}
-							{html_form tag_name="versionform" tag_style="display: inline" method="saveitem" itemversion=$itemversion->getId() current="true" nestcurrent="true"}
-								{if !$itemversion->isCurrent()}
-									{if $itemversion->isComplete()}
-										<div class="toolbarbutton">
-											<a href="javascript:document.forms.versionform.submit();">
-												<img src="{$CONTENT}/icons/check-blue.gif"> Publish this version
-											</a>
-										</div>
+							{if !$item->isArchived()}
+								{html_form tag_name="versionform" tag_style="display: inline" method="saveitem" itemversion=$itemversion->getId() current="true" nestcurrent="true"}
+									{if !$itemversion->isCurrent()}
+										{if $itemversion->isComplete()}
+											<div class="toolbarbutton">
+												<a href="javascript:document.forms.versionform.submit();">
+													<img src="{$CONTENT}/icons/check-blue.gif"> Publish this version
+												</a>
+											</div>
+										{else}
+											Item must be marked complete before it can be published.
+										{/if}
 									{else}
-										Item must be marked complete before it can be published.
+										<div class="toolbarbutton disabled">
+											<img src="{$CONTENT}/icons/check-grey.gif"> Publish this version
+										</div>
 									{/if}
-								{else}
-									<div class="toolbarbutton disabled">
-										<img src="{$CONTENT}/icons/check-grey.gif"> Publish this version
-									</div>
-								{/if}
-							{/html_form}
+								{/html_form}
+							{/if}
 						</td>
 					</tr>
 				</table>

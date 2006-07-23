@@ -1,7 +1,7 @@
 {secure documents="read"}
 {include file="includes/singletabbedheader.tpl" title="Item Browser"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
-{stylesheet href="$SHARED/treeview/treeview.css"}
+{stylesheet href="$SHARED/treeview/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo-min.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}

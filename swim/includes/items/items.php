@@ -20,4 +20,39 @@ require $_PREFS->getPref('storage.includes').'/items/sequence.php';
 require $_PREFS->getPref('storage.includes').'/items/class.php';
 require $_PREFS->getPref('storage.includes').'/items/section.php';
 
+class ArchiveAdminSection extends AdminSection
+{
+  public function getName()
+  {
+    return "Archive";
+  }
+  
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_SECURITY;
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('items/archive.tpl');
+    return $request->encode();
+  }
+  
+  public function isAvailable()
+  {
+    return true;
+  }
+  
+  public function isSelected($request)
+  {
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,17)=='items/archive.tpl'))
+      return true;
+    return false;
+  }
+}
+
+AdminManager::addSection(new ArchiveAdminSection());
+
 ?>

@@ -19,9 +19,11 @@ function method_view($request)
   checkSecurity($request, false, false);
   
   $item = Item::getItem($request->getPath());
-  if ($item != null)
+  if ($item !== null && $item->isArchived())
+    $item = null;
+  if ($item !== null)
     $item = $item->getCurrentVersion(Session::getCurrentVariant());
-  if ($item != null)
+  if ($item !== null)
   {
     $smarty = createSmarty($request, 'text/html');
     if ($request->hasQueryVar('template'))

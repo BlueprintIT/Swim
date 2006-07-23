@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<tree>
+{apiget var="sections" type="section"}
+{foreach from=$sections item="section"}
+  <item class="section" name="{$section->getName()|escape}">
+{php}
+$items = array();
+$_STORAGE = $GLOBALS['_STORAGE'];
+$section = $this->get_template_vars('section');
+$results = $_STORAGE->query('SELECT Item.id FROM Item LEFT JOIN Sequence ON Item.id=Sequence.item WHERE ISNULL(Sequence.Item) AND section="'.$_STORAGE->escape($section->getId()).'" AND archived=1;');
+while ($results->valid())
+{
+  $item = Item::getItem($results->fetchSingle());
+  array_push($items, $item);
+}
+$this->assign('missing', $items);
+{/php}
+  {foreach from=$missing item="subitem"}
+    {include file="items/treeitem.tpl" item=$subitem}
+  {/foreach}
+  </item>
+{/foreach}
+</tree>

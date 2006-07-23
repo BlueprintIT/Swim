@@ -12,9 +12,11 @@
 {else}
   {apiget var="sections" type="section"}
   {foreach from=$sections item="section"}
+  <item class="section" name="{$section->getName()|escape}">
     {assign var="root" value=$section->getRootItem()}
     {include file="items/treeitem.tpl" item=$root}
     {include file="items/uncattree.tpl"}
+  </item>
   {/foreach}
 {/if}
 </tree>

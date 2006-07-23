@@ -53,20 +53,15 @@ class FieldSet
     return null;
   }
   
-  protected function addMissingFields(&$fields)
-  {
-    foreach ($this->fields as $name => $field)
-    {
-      array_push($fields, $name);
-    }
-    if ($this->parent !== null)
-      $this->parent->addMissingFields($fields);
-  }
-  
   public function getFields()
   {
-    $fields = array();
-    $this->addMissingFields($fields);
+    if ($this->parent !== null)
+      $fields = $this->parent->getFields();
+    else
+      $fields = array();
+    foreach ($this->fields as $name => $field)
+      $fields[$name] = $field;
+
     return $fields;
   }
   

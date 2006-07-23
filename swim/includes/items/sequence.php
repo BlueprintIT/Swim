@@ -57,14 +57,43 @@ class Sequence extends ClassField
 {
   protected $classes;  
   protected $sortfield;
+  protected $relationship = 'aggregation';
   
   public function __construct($metadata)
   {
     parent::__construct($metadata);
   }
   
+  public function onArchivedChanged($archived)
+  {
+    global $_STORAGE;
+    
+    if ($this->relationship == 'aggregation')
+    {
+      if ($archived)
+        $_STORAGE->query('DELETE FROM Sequence WHERE parent='.$this->item->getId().' AND field="'.$_STORAGE->escape($this->id).'";');
+    }
+    else if ($this->relationship == 'composition')
+    {
+      $items = $this->getItems();
+      foreach ($items as $item)
+        $item->setArchived($archived);
+    }
+  }
+  
   protected function parseAttributes($element)
   {
+    if ($element->hasAttribute('relationship'))
+    {
+      switch ($element->getAttribute('relationship'))
+      {
+        case 'composition':
+          $this->relationship = 'composition';
+          break;
+        default:
+          $this->relationship = 'aggregation';
+      }
+    }
   }
   
   protected function parseElement($el)

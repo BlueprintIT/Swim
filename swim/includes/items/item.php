@@ -19,6 +19,8 @@ class Item
   private $id;
   private $section;
   private $itemclass;
+  private $archived;
+  private $complete;
   private $variants = array();
   private $fields = array();
   
@@ -29,11 +31,58 @@ class Item
     $this->id = $details['id'];
     $this->section = $details['section'];
     $this->itemclass = FieldSetManager::getClass($details['class']);
+    if ($details['archived']==1)
+      $this->archived = true;
+    else
+      $this->archived = false;
   }
   
   public function getId()
   {
     return $this->id;
+  }
+  
+  public function isArchived()
+  {
+    return $this->archived;
+  }
+  
+  public function setArchived($value)
+  {
+    global $_STORAGE;
+    
+    if ($value == $this->archived)
+      return;
+      
+    if ($value)
+      $value = 1;
+    else
+      $value = 0;
+
+    if ($_STORAGE->queryExec('UPDATE Item SET archived='.$value.' WHERE id='.$this->getId().';'))
+      $this->archived = $value;
+      
+    $fields = $this->itemclass->getFields();
+    foreach ($fields as $name => $field)
+    {
+      if ($field->getType() == 'sequence')
+      {
+        $sequence = $this->getSequence($name);
+        $sequence->onArchivedChanged($value);
+      }
+    }
+    
+    if ($value)
+    {
+      $results = $_STORAGE->query('SELECT parent,field,position FROM Sequence WHERE item='.$this->getId().' ORDER BY position DESC;');
+      while ($results->valid())
+      {
+        $details = $results->fetch();
+        $item = Item::getItem($details['parent']);
+        $sequence = $item->getSequence($details['field']);
+        $sequence->removeItem($details['position']);
+      }
+    }
   }
   
   public function getSection()
@@ -103,6 +152,28 @@ class Item
     if ($name !== null)
       return $this->getField($name);
     return null;
+  }
+  
+  public function getVariants()
+  {
+    global $_STORAGE;
+    
+    if ($this->complete)
+      return $this->variants;
+      
+    $results = $_STORAGE->query('SELECT * FROM ItemVariant WHERE item='.$this->id.';');
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      if (!isset($this->variants[$details['variant']]))
+      {
+        $variant = new ItemVariant($details);
+        $this->variants[$details['variant']] = $variant;
+      }
+    }
+    krsort($this->variants);
+    $this->complete = true;
+    return $this->variants;
   }
   
   protected function getValidVariants($variant)
@@ -655,8 +726,8 @@ class ItemVersion
       return array();
     
     $fields = array();
-    $names = $this->getClass()->getFields();
-    foreach ($names as $name)
+    $bases = $this->getClass()->getFields();
+    foreach ($bases as $name => $field)
       $fields[$name] = $this->getField($name);
     return $fields;
   }
@@ -667,8 +738,8 @@ class ItemVersion
       return array();
     
     $fields = array();
-    $names = $this->itemview->getFields();
-    foreach ($names as $name)
+    $bases = $this->itemview->getFields();
+    foreach ($bases as $name => $field)
       $fields[$name] = $this->getField($name);
     return $fields;
   }
