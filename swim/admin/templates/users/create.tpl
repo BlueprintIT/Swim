@@ -45,7 +45,7 @@ function submitForm(form)
 					<table class="admin">
 						<tr>
 							<td class="label"><label for="username">Username:</label></td>
-							<td class="details"><input type="input" name="username" id="username" value=""></td>
+							<td class="details"><input type="input" maxlength="20" name="username" id="username" value=""></td>
 							<td class="description">The username is used to log in to the administration area.</td>
 						</tr>
 						<tr>
