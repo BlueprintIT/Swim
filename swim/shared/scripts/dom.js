@@ -15,6 +15,21 @@ YAHOO.util.Event.getButton = function(ev) {
 		return ev.button;
 }
 
+YAHOO.util.Dom.allTextContent = function(el) {
+	el = this.get(el);
+	var content = "";
+	var node = el.firstChild;
+	while (node) {
+		if (node.nodeType == 3)
+			content+=node.nodeValue;
+		else if (node.nodeType == 1)
+			content+=YAHOO.util.Dom.allTextContent(node);
+			
+		node = node.nextSibling;
+	}
+	return content;
+}
+
 YAHOO.util.Dom.textContent = function(el) {
 	el = this.get(el);
 	var content = "";

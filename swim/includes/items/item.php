@@ -398,7 +398,7 @@ class ItemVariant
             'SELECT '.$id.',file,description FROM File WHERE itemversion='.$clone->getId().';');
           $targetfiles = $iv->getStoragePath();
           recursiveMkDir($targetfiles);
-          recursiveCopy($sourcefiles, $targetfiles);
+          recursiveCopy($sourcefiles, $targetfiles, true);
         }
       }
       

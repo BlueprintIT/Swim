@@ -33,6 +33,11 @@ function onTreeItemClick(id)
 		document.getElementById('main').src = request.encode();
 	}
 }
+
+function updateDragMode(input)
+{
+	SiteTree.setDragMode(input.value);
+}
 {/literal}
 {if isset($request.query.root)}
 var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml' root=$request.query.root}', 'categorytree');
@@ -51,6 +56,10 @@ SiteTree.draggable = true;
 		<h2>Structure</h2>
 	</div>
 	<div class="body">
+		<div style="margin-bottom: 10px;">
+			<p><input type="radio" onchange="updateDragMode(this)" id="mode_move" name="mode" value="0" checked="checked"> <label for="mode_move">Drags move items.</label></p>
+			<p><input type="radio" onchange="updateDragMode(this)" id="mode_copy" name="mode" value="1"> <label for="mode_copy">Drags copy items.</label></p>
+		</div>
 		<div id="categorytree">
 			<p>Loading Site...</p>
 		</div>

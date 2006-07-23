@@ -40,7 +40,7 @@ function recursiveMkDir($dir)
 	}
 }
 
-function recursiveDelete($dir,$ignorelock=false)
+function recursiveDelete($dir)
 {
 	global $_PREFS;
 	
@@ -48,16 +48,10 @@ function recursiveDelete($dir,$ignorelock=false)
 	$log->debug('Deleting '.$dir);
 	if ($res=@opendir($dir))
 	{
-		$lockfiles=LockManager::getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
 			if (($file!='.')&&($file!='..'))
 			{
-				if (((in_array($file,$lockfiles))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
-				{
-					$log->debug('Ignoring lock file '.$file);
-					continue;
-				}
 				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
 				{
 					unlink($dir.'/'.$file);
@@ -78,7 +72,7 @@ function recursiveDelete($dir,$ignorelock=false)
 	}
 }
 
-function recursiveCopy($dir,$target,$ignorelock=false)
+function recursiveCopy($dir, $target, $uselinks = false)
 {
 	global $_PREFS;
 	
@@ -86,24 +80,19 @@ function recursiveCopy($dir,$target,$ignorelock=false)
 	$log->debug('Copying files from '.$dir.' to '.$target);
 	if ($res=@opendir($dir))
 	{
-		$lockfiles=LockManager::getLockFiles();
 		while (($file=readdir($res))!== false)
 		{
 			if (($file!='.')&&($file!='..'))
 			{
-				if (((in_array($file,$lockfiles))||($file==$_PREFS->getPref('locking.templockfile')))&&($ignorelock))
-				{
-					$log->debug('Ignoring lock file '.$file);
-					continue;
-				}
 				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
 				{
-					copy($dir.'/'.$file,$target.'/'.$file);
+          if (!link($dir.'/'.$file,$target.'/'.$file))
+  					copy($dir.'/'.$file,$target.'/'.$file);
 				}
 				else if (is_dir($dir.'/'.$file))
 				{
 					mkdir($target.'/'.$file);
-					recursiveCopy($dir.'/'.$file,$target.'/'.$file,$ignorelock);
+					recursiveCopy($dir.'/'.$file,$target.'/'.$file, $uselinks);
 				}
 				else
 				{

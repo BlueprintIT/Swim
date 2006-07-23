@@ -1,17 +1,21 @@
-.ygtvitem .itemcontent {
+.site_itemcontent {
   background-repeat: no-repeat;
   padding: 0 0 0 20px;
   background-position: 2px 2px;
 }
 
-.ygtvitem .container_open {
+.dragframe {
+  background-position: 2px 0px !important;
+}
+
+.site_container_open {
   background-image: url('ctopen.gif');
 }
 
-.ygtvitem .container_clsd {
+.site_container_clsd {
   background-image: url('ctclsd.gif');
 }
 
-.ygtvitem .item {
+.site_item {
   background-image: url('item.gif');
 }

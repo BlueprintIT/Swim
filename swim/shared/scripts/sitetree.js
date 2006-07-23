@@ -27,16 +27,15 @@ BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
 	if (this.data.contains)
 	{
 		if (this.expanded)
-			style = "itemcontent container_open icon_"+this.data.type+" icon_"+this.data.type+"_open";
+			style = "site_itemcontent site_container_open site_icon_"+this.data.type+" site_icon_"+this.data.type+"_open";
 		else
-			style = "itemcontent container_clsd icon_"+this.data.type+" icon_"+this.data.type+"_clsd";
+			style = "site_itemcontent site_container_clsd site_icon_"+this.data.type+" site_icon_"+this.data.type+"_clsd";
 	}
 	else
 	{
-		style = "itemcontent item icon_"+this.data.type;
+		style = "site_itemcontent site_item site_icon_"+this.data.type;
 	}
-		
-
+	
 	return style;
 }
 
@@ -71,6 +70,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	tree: null,
 	expandAnim: null,
 	collapseAnim: null,
+	dragMode: null,
 	
 	onDragStart: function() {
 		this.dragging = true;
@@ -81,14 +81,20 @@ BlueprintIT.widget.SiteTree.prototype = {
 		window,setTimeout(function() { self.dragging = false }, 100);
 	},
 	
-	canHold: function(parent, child) {
+	canHold: function(parent, child, mode) {
 		// Cannot drop at root level
 		if (parent.tree.getRoot() == parent)
 			return false;
 		
-		// Uncategorised cannot be reordered
-		if ((parent.data.id == 'uncat') && (child.parent == parent))
-			return false;
+		if (parent.data.id == 'uncat') {
+			// Cannot copy to uncategorised
+			if (mode == BlueprintIT.widget.DraggableTreeView.DRAG_COPY)
+				return false;
+
+			// Uncategorised cannot be reordered
+			if (child.parent == parent)
+				return false;
+		}
 		
 		//console.log("Checking drop of "+child.data.id+" on "+parent.data.id);
 		if (parent.data.contains && child.data.type && parent.data.contains[child.data.type])
@@ -104,13 +110,13 @@ BlueprintIT.widget.SiteTree.prototype = {
 		return true;
 	},
 	
-	onDragDrop: function(node, parent, position) {
+	onDragDrop: function(node, parent, position, mode) {
 		var valid = false;
 		var request = new Request();
 		request.setMethod("mutatesequence");
 		request.setQueryVar("item", node.data.id);
 		request.setQueryVar("action", "move");
-		if (node.parent.data.id != 'uncat') {
+		if ((mode == BlueprintIT.widget.DraggableTreeView.DRAG_MOVE) && (node.parent.data.id != 'uncat')) {
 			var findpos = node;
 			var pos = 0;
 			while (findpos.previousSibling) {
@@ -121,10 +127,10 @@ BlueprintIT.widget.SiteTree.prototype = {
 			request.setQueryVar("removeitem", node.parent.data.id);
 			request.setQueryVar("removepos", pos);
 			valid = true;
-		}
-		if (parent.data.id != 'uncat') {
 			if ((parent == node.parent) && (pos < position))
 				position--;
+		}
+		if (parent.data.id != 'uncat') {
 			//console.log("Add " + node.data.id + " to " + parent.data.id + " at " + position);
 			request.setQueryVar("insertitem", parent.data.id);
 			request.setQueryVar("insertpos", position);
@@ -150,6 +156,12 @@ BlueprintIT.widget.SiteTree.prototype = {
 	
 	init: function(event, obj) {
 		this.loadTree();
+	},
+	
+	setDragMode: function(mode) {
+		if (this.tree)
+			this.tree.setDefaultDragMode(mode);
+		this.dragMode = mode;
 	},
 	
 	setExpandAnim: function(anim) {
@@ -234,6 +246,8 @@ BlueprintIT.widget.SiteTree.prototype = {
 		else
 			this.tree = new YAHOO.widget.TreeView(this.element);
 		this.loadCategory(doc.documentElement, this.tree.getRoot());
+		if (this.dragMode)
+			this.tree.setDefaultDragMode(this.dragMode);
 		if (this.expandAnim)
 			this.tree.setExpandAnim(this.expandAnim);
 		if (this.collapseAnim)
