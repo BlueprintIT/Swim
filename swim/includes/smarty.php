@@ -93,6 +93,7 @@ class HtmlHeader
 {
   private $stylesheets = array();
   private $scripts = array();
+  private $headers = array();
   
   public function addStyleSheet($path)
   {
@@ -106,6 +107,25 @@ class HtmlHeader
       $this->scripts[$path]=true;
   }
   
+  public function addMeta($name, $content)
+  {
+    array_push($this->headers, '<meta name="'.$name.'" content="'.$content.'">');
+  }
+  
+  public function addLink($params)
+  {
+    if (count($params)>0)
+    {
+      $line = '<link';
+      foreach ($params as $name => $value)
+      {
+        $line.=' '.$name.'="'.$value.'"';
+      }
+      $line.='>';
+      array_push($this->headers, $line);
+    }
+  }
+  
   public function getHtml()
   {
     $result = '';
@@ -116,6 +136,10 @@ class HtmlHeader
     foreach ($this->scripts as $path => $val)
     {
       $result.='<script src="'.$path.'" type="text/javascript"></script>'."\n";
+    }
+    foreach ($this->headers as $line)
+    {
+      $result.=$line."\n";
     }
     $result.='<meta name="generator" content="SWIM 3.0">'."\n";
     return $result;
@@ -204,24 +228,31 @@ function sort_array($params, &$smarty)
     $order = true;
     if ((!empty($params['order'])) && ($params['order'] == 'descending'))
       $order = false;
-      
-    $index = true;
-    if ((!empty($params['index'])) && ($params['index'] == 'key'))
+    
+    if (!empty($params['field']))
     {
-      if ($order)
-        ksort($source);
-      else
-        krsort($source);
+      $source = ItemSorter::sortItems($source, $params['field'], $order);
     }
     else
     {
-      if ($order)
-        asort($source);
+      $index = true;
+      if ((!empty($params['index'])) && ($params['index'] == 'key'))
+      {
+        if ($order)
+          ksort($source);
+        else
+          krsort($source);
+      }
       else
-        arsort($source);
+      {
+        if ($order)
+          asort($source);
+        else
+          arsort($source);
+      }
     }
   
-    $smarty->assign($params['var'], $source);
+    $smarty->assign_by_ref($params['var'], $source);
   }
 }
 
@@ -328,6 +359,32 @@ function encode_script($params, &$smarty)
   $head->addScript($path);
 }
 
+function encode_meta($params, &$smarty)
+{
+  if (!empty($params['name']) && !empty($params['content']))
+  {
+    $head = $smarty->get_registered_object('HEAD');
+    $head->addMeta($params['name'], $params['content']);
+  }
+}
+
+function encode_link($params, &$smarty)
+{
+  $tparams = array();
+  foreach ($params as $name => $value)
+  {
+    if (substr($name,0,4)=='tag_')
+    {
+      unset($params[$name]);
+      $tparams[substr($name,4)] = $value;
+    }
+  }
+  $request = get_params_request($params, $smarty);
+  $tparams['href'] = $request->encode();
+  $head = $smarty->get_registered_object('HEAD');
+  $head->addLink($tparams);
+}
+
 function header_outputfilter($tpl_output, &$smarty)
 {
   $pos = strpos($tpl_output, '</head>');
@@ -340,6 +397,48 @@ function header_outputfilter($tpl_output, &$smarty)
     return $start.$extra.$end;
   }
   return $tpl_output;
+}
+
+function getSubitems($item, $depth, $types, &$items)
+{
+  $sequence = $item->getMainSequence();
+  if ($sequence !== null)
+  {
+    foreach ($sequence->getItems() as $subitem)
+    {
+      if (($types === null) || (in_array($subitem->getClass()->getId(), $types)))
+      {
+        $iv = $subitem->getCurrentVersion(Session::getCurrentVariant());
+        if ($iv !== null)
+          array_push($items, new ItemWrapper($iv));
+      }
+      if ($depth>0)
+        getSubitems($subitem, $depth-1, $types, $items);
+    }
+  }
+}
+
+function fetch_subitems($params, &$smarty)
+{
+  if (!empty($params['item']) && !empty($params['var']))
+  {
+    $item = $params['item'];
+    if ($item instanceof ItemWrapper)
+      $item = $item->item;
+    
+    if (isset($params['types']))
+      $types = explode(',', $params['types']);
+    else
+      $types = null;
+      
+    $depth = -1;
+    if (isset($params['depth']))
+      $depth = $params['depth'];
+
+    $items = array();
+    getSubitems($item, $depth, $types, $items);
+    $smarty->assign_by_ref($params['var'], $items);
+  }
 }
 
 function retrieve_rss($params, &$smarty)
@@ -575,12 +674,15 @@ function configureSmarty($smarty, $request, $type)
                              'brand_get_trusted'));
   $smarty->register_function('wrap', 'item_wrap');
   $smarty->register_function('getfiles', 'get_files');
+  $smarty->register_function('meta', 'encode_meta');
+  $smarty->register_function('link', 'encode_link');
   $smarty->register_function('retrieverss', 'retrieve_rss');
   $smarty->register_function('stylesheet', 'encode_stylesheet');
   $smarty->register_function('script', 'encode_script');
   $smarty->register_function('encode', 'encode_url');
   $smarty->register_function('apiget', 'api_get');
   $smarty->register_function('sort', 'sort_array');
+  $smarty->register_function('subitems', 'fetch_subitems');
   $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');

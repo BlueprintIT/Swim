@@ -24,10 +24,23 @@ class ItemSorter
     $this->ascending = $ascending;
   }
   
+  public function getItemVersion($i)
+  {
+    if ($i instanceof Item)
+      return $i->getCurrentVersion(Session::getCurrentVariant());
+    else if ($i instanceof ItemVersion)
+      return $i;
+    else if ($i instanceof ItemWrapper)
+      return $i->item;
+    return null;
+  }
+  
   public function compare($a, $b)
   {
-    $a = $a->getCurrentVersion(Session::getCurrentVariant());
-    $b = $b->getCurrentVersion(Session::getCurrentVariant());
+    if ($a instanceof ItemWrapper)
+      
+    $a = $this->getItemVersion($a);
+    $b = $this->getItemVersion($b);
     if ($a != null)
       $a = $a->getField($this->field);
     if ($b != null)
@@ -46,10 +59,11 @@ class ItemSorter
     return $result;
   }
   
-  public static function sortItems($items, $field)
+  public static function sortItems($items, $field, $ascending = true)
   {
-    $sorter = new ItemSorter($field);
+    $sorter = new ItemSorter($field, $ascending);
     usort($items, array($sorter, 'compare'));
+    return $items;
   }
 }
 
