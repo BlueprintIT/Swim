@@ -24,11 +24,13 @@ class SearchEngine
       {
         $text = $field->getPlainText();
         $text = strtolower($text);
+        $text = str_replace('\'', '', $text);
+        $text = str_replace(' & ', ' and ', $text);
         $text = preg_replace('/[^a-z0-9]+/', ' ', $text);
         $list = explode(' ', $text);
         foreach ($list as $word)
         {
-          if (strlen($word)>3)
+          if (strlen($word)>0)
           {
             if (isset($words[$word]))
               $words[$word] += $field->getIndexPriority();
