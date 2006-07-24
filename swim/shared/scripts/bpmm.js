@@ -178,8 +178,7 @@ BlueprintIT.menus.MenuManager = function()
 	this.fadeAnimator = new BlueprintIT.menus.FadeAnimator();
 	this.animator = this.instantAnimator;
 	
-	YAHOO.util.Event.addListener(document,'focus',this.focusEvent,this,true);
-	YAHOO.util.Event.addListener(document,'keypress',this.keyPressEvent,this,true);
+	YAHOO.util.Event.addListener(document, 'keydown', this.keyPressEvent, this, true);
 }
 
 BlueprintIT.menus.MenuManager.prototype = {
@@ -318,24 +317,18 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	keyPressEvent: function(ev)
 	{
-		if (ev.type=='keypress')
+		this.log("keyPressEvent "+ev.keyCode);
+		if ((this.selected) && (ev.keyCode>=37) && (ev.keyCode<=40))
 		{
-			this.log("keyPressEvent");
-			if ((this.selected) && (YAHOO.util.Event.getCharCode(ev)>=37) && (YAHOO.util.Event.getCharCode(ev)<=40))
-			{
-				if (this.selected.keyPress(YAHOO.util.Event.getCharCode(ev)))
-					YAHOO.util.Event.preventDefault(ev);
-			}
+			if (this.selected.keyPress(ev.keyCode))
+				YAHOO.util.Event.preventDefault(ev);
 		}
 	},
 	
 	focusEvent: function(ev)
 	{
-		if (ev.type=='focus')
-		{
-			this.log("focusEvent");
-			this.changeSelection(this.findMenuItem(YAHOO.util.Event.getTarget(ev), ev));
-		}
+		this.log("focusEvent");
+		this.changeSelection(this.findMenuItem(YAHOO.util.Event.getTarget(ev), ev));
 	},
 	
 	mouseEvent: function(ev)
@@ -638,6 +631,20 @@ MenuItem.prototype = {
 	setFocusElement: function(el)
 	{
 		this.focusElement=el;
+		YAHOO.util.Event.addListener(this.focusElement, 'focus', this.focusEvent, this, true);
+		YAHOO.util.Event.addListener(this.focusElement, 'blur', this.blurEvent, this, true);
+	},
+	
+	focusEvent: function(ev)
+	{
+		this.manager.log("focusEvent");
+		this.manager.changeSelection(this);
+	},
+	
+	blurEvent: function(ev)
+	{
+		this.manager.log("blurEvent");
+		this.manager.changeSelection(null);
 	},
 	
 	focus: function()

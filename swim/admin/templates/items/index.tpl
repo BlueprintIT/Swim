@@ -1,6 +1,7 @@
 {secure documents="read" login="true"}
 {include file='includes/adminheader.tpl' title="Content management"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
+{stylesheet href="$SHARED/yui/container/assets/container.css"}
 {stylesheet href="$SHARED/treeview/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
@@ -11,8 +12,11 @@
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/animation/animation`$smarty.config.YUI`.js"}
+{script href="$SHARED/yui/container/container`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/treeview.js"}
 {script href="$SHARED/scripts/dom.js"}
+{script href="$SHARED/scripts/dialogs.js"}
 {script href="$SHARED/scripts/sitetree.js"}
 <script>
 var section = '{$request.query.section}';

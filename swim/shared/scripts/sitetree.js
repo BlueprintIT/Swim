@@ -78,7 +78,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	
 	onDragEnd: function() {
 		var self = this;
-		window,setTimeout(function() { self.dragging = false }, 100);
+		window.setTimeout(function() { self.dragging = false }, 100);
 	},
 	
 	canHold: function(parent, child, mode) {
@@ -155,6 +155,19 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	init: function(event, obj) {
+		this.loaddlg = new YAHOO.widget.Panel("loaddlg", {
+				width: "240px",
+				fixedcenter: true,
+				underlay: "shadow",
+				close: false,
+				visible: false,
+				draggable: false,
+				modal: false
+			});
+		this.loaddlg.setHeader("Updating Site Structure...");
+		this.loaddlg.setBody("<img src=\"/swim/shared/images/loading.gif\"/>");
+		this.loaddlg.render(document.body);
+
 		this.loadTree();
 	},
 	
@@ -253,7 +266,6 @@ BlueprintIT.widget.SiteTree.prototype = {
 		if (this.collapseAnim)
 			this.tree.setCollapseAnim(this.collapseAnim);
 		this.tree.draw();
-		this.loading = false;
 		if (this.selected) {
 			var selected = this.selected;
 			this.selected = null;
@@ -262,10 +274,18 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	loadTree: function() {
+		this.loaddlg.show();
 		this.loading = true;
 		var callback = {
 			success: function(obj) {
 				this.loadFromDocument(obj.responseXML);
+				this.loaddlg.hide();
+				this.loading = false;
+			},
+			failure: function(obj) {
+				this.loaddlg.hide();
+				this.loading = false;
+				BlueprintIT.dialog.Alert.show("Error", "There was a problem retrieving the site structure.<br>Please try logging out and in again.");
 			},
 			argument: null,
 			scope: null

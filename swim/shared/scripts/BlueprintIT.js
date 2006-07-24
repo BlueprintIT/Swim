@@ -1,5 +1,6 @@
 var BlueprintIT = {
 	menus: {},
+	dialog: {},
 	widget: {},
 	timing: {},
 	validation: {}
