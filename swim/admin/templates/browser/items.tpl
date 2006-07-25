@@ -9,6 +9,7 @@
 {script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/dialogs.js"}
 {script href="$SHARED/scripts/treeview.js"}
 {script href="$SHARED/scripts/dom.js"}
 {script href="$SHARED/scripts/sitetree.js"}

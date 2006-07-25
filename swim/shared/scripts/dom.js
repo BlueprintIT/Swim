@@ -6,7 +6,7 @@ YAHOO.util.Event.getButton = function(ev) {
 			return 2;
 		else if (window.event.button & 4)
 			return 1;
-		else if (this.type == 'click')
+		else if (ev.type == 'click')
 			return 0;
 		else
 			return null;
