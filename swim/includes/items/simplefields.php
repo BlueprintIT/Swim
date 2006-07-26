@@ -125,7 +125,7 @@ class TextField extends SimpleField
     if (!$this->isEditable())
       $state = 'disabled="true" ';
     if ($this->type == 'multiline')
-      return '<textarea '.$state.'style="width: 100%; height: 50px;" id="field:'.$this->id.'" name="'.$this->id.'">'.htmlentities($this->toString()).'</textarea>';
+      return '<textarea '.$state.'style="width: 100%; height: 100px;" id="field:'.$this->id.'" name="'.$this->id.'">'.htmlentities($this->toString()).'</textarea>';
     else if ($this->type == 'html')
     {
       if (!$this->isEditable())
@@ -263,7 +263,7 @@ class DateField extends IntegerField
   public function getEditor()
   {
     $text = '';
-    $text.='<input type="text" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
+    $text.='<input type="hidden" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
     $text.='<div id="calendar_'.$this->id.'"></div>'."\n";
     $text.='<script type="text/javascript">var cal_'.$this->id.' = displayCalendar("'.$this->id.'",'.$this->toString().');</script>'."\n";
     return $text;
