@@ -556,7 +556,7 @@ function api_get($params, &$smarty)
       else if ($params['type']=='group')
         $result = UserManager::getAllGroups();
       else if ($params['type']=='section')
-        $result = SectionManager::getSections($params['id']);
+        $result = SectionManager::getSections();
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }

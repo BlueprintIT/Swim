@@ -696,18 +696,21 @@ class ItemVersion
       return $this;
       
     $sequence = $this->getMainSequence();
-    $items = $sequence->getItems();
-    foreach ($items as $item)
+    if ($sequence !== null)
     {
-      $iv = $item->getCurrentVersion(Session::getCurrentVariant());
-      if ($iv !== null)
+      $items = $sequence->getItems();
+      foreach ($items as $item)
       {
-        $link = $iv->getLinkTarget();
-        if ($link !== null)
-          return $link;
+        $iv = $item->getCurrentVersion(Session::getCurrentVariant());
+        if ($iv !== null)
+        {
+          $link = $iv->getLinkTarget();
+          if ($link !== null)
+            return $link;
+        }
       }
     }
-    return null;
+    return $this;
   }
   
   public function getMainSequence()

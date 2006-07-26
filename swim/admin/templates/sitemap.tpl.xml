@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">
+  {apiget type="section" var="sections"}
+  {foreach from=$sections item="section"}
+    {foreach from=$section->getItems() item="item"}
+      {if !$item->isArchived()}
+        {wrap var="wrapped" item=$item->getCurrentVersion($session.variant)}
+        {if ($wrapped !== null)}
+          <url>
+            <loc>http://{$SERVER.HTTP_HOST}{$wrapped->url|escape}</loc>
+            <lastmod>{$wrapped->modified|date_format:"%c"}</lastmod>
+          </url>
+        {/if}
+      {/if}
+    {/foreach}
+  {/foreach}
+</urlset>

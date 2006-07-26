@@ -1,5 +1,6 @@
+FCKConfig.SpellChecker = 'SpellerPages';
 FCKConfig.ToolbarSets["Swim"] = [
-	['Source','Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
+	['Source','Undo','Redo','-','SpellCheck','-','Find','Replace','-','SelectAll','RemoveFormat'],
 	['Cut','Copy','Paste','PasteText','PasteWord','-','Print'],
 	['Link','Unlink'],
 	['Image','Table','Rule','SpecialChar','UniversalKey'],
