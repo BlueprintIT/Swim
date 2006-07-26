@@ -235,6 +235,16 @@ class TextField extends SimpleField
       return $this->toString();
   }
   
+  public function toString()
+  {
+    $result = parent::toString();
+    if ($this->type =='html')
+    {
+      $result = str_replace('<br />', '<br>', $result);
+    }
+    return $result;
+  }
+  
   protected function getColumn()
   {
     return "textValue";
