@@ -129,6 +129,61 @@ class StorageConnection
     $this->log = LoggerManager::getLogger('swim.storage.connection');
 	}
 	
+  public function buildQuery($fields, $tables, $where = array(), $order = array())
+  {
+    $query = 'SELECT ';
+    if (!is_array($fields))
+      $fields = array($fields);
+    $first = true;
+    foreach ($fields as $field)
+    {
+      if (!$first)
+        $query.=',';
+      $query.=$field;
+      $first = false;
+    }
+    $query.=' FROM ';
+    
+    if (!is_array($tables))
+      $tables = array($tables);
+    $first = true;
+    foreach ($tables as $table)
+    {
+      if (!$first)
+        $query.=',';
+      $query.=$table;
+      $first = false;
+    }
+    
+    if (!is_array($where))
+      $tables = array($where);
+    $first = true;
+    foreach ($where as $q)
+    {
+      if ($first)
+        $query.=' WHERE ';
+      else
+        $query.=' AND ';
+      $query.=$q;
+      $first = false;
+    }
+    
+    if (!is_array($order))
+      $order = array($order);
+    $first = true;
+    foreach ($order as $o)
+    {
+      if ($first)
+        $query.=' ORDER BY ';
+      else
+        $query.=',';
+      $query.=$o;
+      $first = false;
+    }
+    
+    return $query.';';
+  }
+  
   public function getQueryCount()
   {
     return $this->querycount+$this->execcount;

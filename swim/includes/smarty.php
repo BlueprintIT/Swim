@@ -406,14 +406,17 @@ function getSubitems($item, $depth, $types, &$items)
   {
     foreach ($sequence->getItems() as $subitem)
     {
-      if (($types === null) || (in_array($subitem->getClass()->getId(), $types)))
+      if (!isset($items[$subitem->getId()]))
       {
-        $iv = $subitem->getCurrentVersion(Session::getCurrentVariant());
-        if ($iv !== null)
-          array_push($items, new ItemWrapper($iv));
+        if (($types === null) || (in_array($subitem->getClass()->getId(), $types)))
+        {
+          $iv = $subitem->getCurrentVersion(Session::getCurrentVariant());
+          if ($iv !== null)
+            $items[$subitem->getId()] = new ItemWrapper($iv);
+        }
+        if ($depth>0)
+          getSubitems($subitem, $depth-1, $types, $items);
       }
-      if ($depth>0)
-        getSubitems($subitem, $depth-1, $types, $items);
     }
   }
 }
@@ -592,6 +595,40 @@ function item_wrap($params, &$smarty)
   }
 }
 
+function search_items($params, &$smarty)
+{
+  if (isset($params['var']) && isset($params['query']))
+  {
+    $section = null;
+    if (isset($params['section']))
+      $section = SectionManager::getSection($params['section']);
+    $classes = null;
+    if (isset($params['classes']))
+    {
+      $classes = array();
+      foreach (explode(',',$params['classes']) as $classname)
+      {
+        $class = FieldSetManager::getClass($classname);
+        if ($class !== null)
+          $classes[] = $class;
+      }
+    }
+    $item = null;
+    if (isset($params['item']))
+      $item = $params['item'];
+    $items = SearchEngine::search($params['query'], $item, $classes, $section);
+    $rlitems = array();
+    foreach ($items as $item)
+    {
+      $item = $item->getCurrentVersion(Session::getCurrentVariant());
+      if ($item !== null)
+        $rlitems[] = new ItemWrapper($item);
+    }
+
+    $smarty->assign_by_ref($params['var'], $rlitems);
+  }
+}
+
 function get_files($params, &$smarty)
 {
   global $_STORAGE,$_PREFS;
@@ -682,6 +719,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('encode', 'encode_url');
   $smarty->register_function('apiget', 'api_get');
   $smarty->register_function('sort', 'sort_array');
+  $smarty->register_function('search', 'search_items');
   $smarty->register_function('subitems', 'fetch_subitems');
   $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_block('html_form', 'encode_form');

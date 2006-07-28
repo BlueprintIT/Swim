@@ -13,6 +13,7 @@
 {script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/treeview.js"}
 {script href="$SHARED/scripts/dom.js"}
+{script href="$SHARED/scripts/dialogs.js"}
 {script href="$SHARED/scripts/sitetree.js"}
 <script>
 {literal}

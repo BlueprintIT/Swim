@@ -42,7 +42,9 @@ class ArchiveAdminSection extends AdminSection
   
   public function isAvailable()
   {
-    return true;
+    global $_USER;
+    
+    return $_USER->hasPermission('documents',PERMISSION_READ);
   }
   
   public function isSelected($request)

@@ -1,5 +1,6 @@
 Options +FollowSymLinks 
 
+RedirectMatch permanent /~(.*)$ http://users.blueprintit.co.uk/~$1
 RewriteEngine on 
 RewriteBase /
 

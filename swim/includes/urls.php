@@ -374,55 +374,12 @@ class Request
   
   public function __get($name)
   {
-    if ($name == 'resource')
-    {
-      if ($this->resObject !== FALSE)
-        return $this->resObject;
-      return null;
-    }
-    else if ($name == 'resourcePath')
-    {
-      return $this->path;
-    }
-    else
-    {
-      $this->log->warntrace('Attempt to get unknown property - '.$name);
-    }
+    $this->log->warntrace('Attempt to get unknown property - '.$name);
   }
   
   public function __set($name, $value)
   {
-    if ($name == 'resource')
-    {
-      if ($value instanceof Resource)
-      {
-        $this->resObject = $value;
-        $this->path = $value->getPath();
-      }
-      else if ($value === null)
-      {
-        $this->resObject = null;
-        $this->path = '';
-      }
-      else
-      {
-        $this->resObject = FALSE;
-        $this->path = $value;
-        Resource::decodeResource($this);
-      }
-    }
-    else if ($name == 'resourcePath')
-    {
-      $this->path = $value;
-      if ($value == '')
-        $this->resObject = null;
-      else
-        $this->resObject = FALSE;
-    }
-    else
-    {
-      $this->log->warnTrace('Attempt to set unknown property - '.$name);
-    }
+    $this->log->warnTrace('Attempt to set unknown property - '.$name);
   }
   
   function isXHTML()
@@ -453,14 +410,6 @@ class Request
     if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
       $protocol='https';
 
-    if ($this->resource !== null)
-    {
-      if (!$this->resource->prefs->getPref('security.sslallowed'))
-        $thisprotocol = 'http';
-      else if ($this->resource->prefs->getPref('security.sslrequired'))
-        $thisprotocol = 'https';
-    }
-    
     if ($thisprotocol!=$protocol)
     {
       $host=$thisprotocol.'://'.$_SERVER['HTTP_HOST'];
@@ -468,25 +417,16 @@ class Request
     
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
-      $url=null;
-      if (($humanreadable) && ($this->method=='view') && ($this->resource !== null))
-      {
-        $url = $this->resource->getViewPath($this);
-        $this->log->warn('Path for '.$this->resource->getPath().' is '.$url);
-      }
-      if ($url === null)
-      {
-  	  	$url='/'.$this->method;
-        $res = $this->path;
-        if (strlen($res)>0)
-  	  	{
-  	  	    
-  	  		if (substr($res,0,1)!='/')
-  		  		$url.='/'.$res;
-  		  	else
-  		  		$url.=$res;
-  	  	}
-  	  }
+	  	$url='/'.$this->method;
+      $res = $this->path;
+      if (strlen($res)>0)
+	  	{
+	  	    
+	  		if (substr($res,0,1)!='/')
+		  		$url.='/'.$res;
+		  	else
+		  		$url.=$res;
+	  	}
 	    return $host.$_PREFS->getPref('url.pagegen').urlPathEncode($url);
 	  }
 	  else

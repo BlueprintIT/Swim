@@ -65,20 +65,21 @@ class AddonAdminSection extends AdminSection
   public function getURL()
   {
     $request = new Request();
-    $request->method='view';
-    $request->resource='internal/page/external';
-    $request->query['url']=$this->url;
+    $request->setMethod('admin');
+    $request->setPath('external.tpl');
+    $request->setQueryVar('url', $this->url);
+    $request->setQueryVar('title', $this->name);
 
     return $request->encode();
   }
   
   public function isSelected($request)
   {
-    if ($request->method!='view')
+    if ($request->getMethod()!='admin')
       return false;
-    if ($request->resourcePath!='internal/page/external')
+    if ($request->getPath()!='external.tpl')
       return false;
-    if ($request->query['url']!=$this->url)
+    if ($request->getQueryVar('url')!=$this->url)
       return false;
       
     return true;
