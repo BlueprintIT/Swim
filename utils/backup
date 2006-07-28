@@ -1,15 +1,16 @@
 #! /bin/sh
 
+BACKUPS=../backups/
 cd ~/public_html
 
 if [ "$1" ]; then
 	BASE=$1
 else
-	BASE=`date +backups/backup-%Y%m%d-%H%M`
+	BASE=`date +backup-%Y%m%d-%H%M`
 fi
 
-TEMP_FILE=$BASE.tar
-TARGET=$BASE.tar.gz
+TEMP_FILE=$BACKUPS$BASE.tar
+TARGET=$BACKUPS$BASE.tar.gz
 
 rm -f $TARGET
 rm -f $TEMP_FILE
@@ -26,3 +27,5 @@ tar -rf $TEMP_FILE database.sql
 rm -f database.sql
 
 gzip $TEMP_FILE
+
+utils/purge.pl $BACKUPS
