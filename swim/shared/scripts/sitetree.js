@@ -3,7 +3,7 @@ BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oContents, oParent) {
 	if (oId) {
 		html = '<a href="javascript:onTreeItemClick(\''+oId+'\')">' + html + '</a>';
 	}
-	oData = {
+	var oData = {
 		id: oId,
 		html: html,
 		type: oType,
@@ -253,6 +253,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 		if (this.collapseAnim)
 			this.tree.setCollapseAnim(this.collapseAnim);
 		this.tree.draw();
+		this.loading = false;
 		if (this.selected) {
 			var selected = this.selected;
 			this.selected = null;
@@ -267,7 +268,6 @@ BlueprintIT.widget.SiteTree.prototype = {
 			success: function(obj) {
 				this.loadFromDocument(obj.responseXML);
 				BlueprintIT.dialog.Wait.hide();
-				this.loading = false;
 			},
 			failure: function(obj) {
 				BlueprintIT.dialog.Wait.hide();

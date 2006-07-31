@@ -85,7 +85,6 @@ iframe.body {
 
 #categorytree .selected div {
   background-color: Highlight;
-  color: HighlightText;
 }
 
 #categorytree a,
@@ -94,6 +93,13 @@ iframe.body {
 .categorytree a:visited {
   color: WindowText;
   text-decoration: none;
+}
+
+#categorytree .selected a,
+#categorytree .selected a:active,
+#categorytree .selected a:hover,
+.categorytree .selected a:visited {
+  color: HighlightText;
 }
 
 #tabpanel {
