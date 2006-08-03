@@ -12,7 +12,7 @@ function displayTree(event)
 {ldelim}
   var tree = new YAHOO.widget.TreeView("categorytree");
   var details = {ldelim}
-    label: "Users",
+    label: "Users"
   {rdelim};
   var root = new YAHOO.widget.TextNode(details, tree.getRoot(), true);
 {php}
