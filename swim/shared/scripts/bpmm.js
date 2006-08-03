@@ -13,6 +13,7 @@ BlueprintIT.menus.InstantAnimator.prototype = {
 	startAnimateIn: function(item)
 	{
 		item.setVisible(true);
+		YAHOO.util.Dom.removeClass(item.element, 'hidden');
 		item.state=3;
 	},
 	
@@ -22,12 +23,15 @@ BlueprintIT.menus.InstantAnimator.prototype = {
 	
 	startAnimateOut: function(item)
 	{
-		item.setVisible(false);
-		item.state=0;
+		YAHOO.util.Dom.addClass(item.element, 'hidden');
+		item.state=5;
+		item.timer=BlueprintIT.timing.startTimer(item,5);
 	},
 	
 	animateOut: function(item)
 	{
+		item.setVisible(false);
+		item.state=0;
 	}
 }
 
@@ -43,6 +47,7 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 	{
 		item.clippos=0;
 		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
+		YAHOO.util.Dom.removeClass(item.element, 'hidden');
 		item.setVisible(true);
 		item.state=2;
 		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
@@ -73,7 +78,7 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 	{
 		var region = YAHOO.util.Dom.getRegion(item.element);
 		item.clippos=region.bottom-region.top;
-		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, auto, auto)');
+		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
 		item.state=5;
 		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
 	},
@@ -88,10 +93,18 @@ BlueprintIT.menus.SlideAnimator.prototype = {
 		
 		if (item.clippos<=0)
 		{
-			item.clippos=0;
-			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, 0px, auto)');
-			item.setVisible(false);
-			item.state=0;
+			if (YAHOO.util.Dom.hasClass(item.element, 'hidden'))
+			{
+				item.clippos=0;
+				YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, 0px, auto)');
+				item.setVisible(false);
+				item.state=0;
+			}
+			else
+			{
+				YAHOO.util.Dom.addClass(item.element, 'hidden');
+				BlueprintIT.timing.startTimer(item,5);
+			}
 		}
 		else
 		{
@@ -113,6 +126,7 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 	{
 		YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
 		item.setVisible(true);
+		YAHOO.util.Dom.removeClass(item.element, 'hidden');
 		item.state=2;
 		item.opacpos = 0;
 		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
@@ -154,10 +168,18 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 
 		if (next<=0)
 		{
-			YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
-			item.opacpos = 0;
-			item.setVisible(false);
-			item.state=0;
+			if (YAHOO.util.Dom.hasClass(item.element, 'hidden'))
+			{
+				YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
+				item.opacpos = 0;
+				item.setVisible(false);
+				item.state=0;
+			}
+			else
+			{
+				YAHOO.util.Dom.addClass(item.element, 'hidden');
+				BlueprintIT.timing.startTimer(item,5);
+			}
 		}
 		else
 		{
@@ -179,6 +201,19 @@ BlueprintIT.menus.MenuManager = function()
 	this.animator = this.instantAnimator;
 	
 	YAHOO.util.Event.addListener(document, 'keydown', this.keyPressEvent, this, true);
+	var ua = navigator.userAgent.toLowerCase();
+  if (ua.indexOf('opera') != -1) // Opera (check first in case of spoof)
+	 this.browser = 'opera';
+  else if (ua.indexOf('msie 7') != -1) // IE7
+	 this.browser = 'ie7';
+  else if (ua.indexOf('msie') != -1) // IE
+	 this.browser = 'ie';
+  else if (ua.indexOf('safari') != -1) // Safari (check before Gecko because it includes "like Gecko")
+	 this.browser = 'safari';
+  else if (ua.indexOf('gecko') != -1) // Gecko
+	 this.browser = 'gecko';
+  else
+	 this.browser = 'unknown';
 }
 
 BlueprintIT.menus.MenuManager.prototype = {
@@ -190,6 +225,8 @@ BlueprintIT.menus.MenuManager.prototype = {
 	slideAnimator: null,
 	fadeAnimator: null,
 	instantAnimator: null,
+	
+	browser: 'unknown',
 	
 	textarea: null,
 	
@@ -441,14 +478,16 @@ function Menu(manager,item,orientation,element,animator)
 	this.orientation=orientation;
 	this.element=element;
 
- 	this.iframe = document.createElement("iframe");
- 	this.iframe.className = "menuframe";
- 	this.iframe.frameBorder = "0";
- 	this.iframe.src = "javascript:false;";
- 	this.iframe.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';
- 	YAHOO.util.Dom.setStyle(this.iframe, "position", "absolute");
- 	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
- 	document.body.insertBefore(this.iframe, document.body.firstChild);
+	if (manager.browser == 'ie') {
+	 	this.iframe = document.createElement("iframe");
+	 	this.iframe.className = "menuframe";
+	 	this.iframe.frameBorder = "0";
+	 	YAHOO.util.Dom.setStyle(this.iframe, "position", "absolute");
+	 	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
+	 	YAHOO.util.Dom.setStyle(this.iframe, "zIndex", "0");
+	 	YAHOO.util.Dom.setStyle(this.iframe, "opacity", "0");
+	 	document.body.insertBefore(this.iframe, document.body.firstChild);
+	}
 }
 
 /*
@@ -492,13 +531,15 @@ Menu.prototype = {
 	  if (value)
 	  {
 	  	YAHOO.util.Dom.setStyle(this.element, "display", "block");
-	  	YAHOO.util.Dom.setStyle(this.iframe, "display", "block");
+	  	if (this.iframe)
+		  	YAHOO.util.Dom.setStyle(this.iframe, "display", "block");
   	  this.parentItem.setMenuPosition();
   	}
   	else
   	{
 	  	YAHOO.util.Dom.setStyle(this.element, "display", "none");
-	  	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
+	  	if (this.iframe)
+		  	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
 
 			YAHOO.util.Dom.removeClass(this.parentItem.element, 'opened');
 			if (this.parentItem.focusElement)
@@ -819,9 +860,11 @@ MenuItem.prototype = {
 				top = 0;
 			this.manager.log("setMenuPosition "+left+" "+top);
 			YAHOO.util.Dom.setXY(this.submenu.element, [left, top]);
-			this.submenu.iframe.style.width = width+"px";
-			this.submenu.iframe.style.height = height+"px";
-			YAHOO.util.Dom.setXY(this.submenu.iframe, [left, top]);
+			if (this.submenu.iframe) {
+				this.submenu.iframe.style.width = width+"px";
+				this.submenu.iframe.style.height = height+"px";
+				YAHOO.util.Dom.setXY(this.submenu.iframe, [left, top]);
+			}
 		}
 	}
 }
