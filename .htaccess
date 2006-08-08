@@ -5,7 +5,7 @@ RewriteEngine on
 RewriteBase /
 
 RewriteRule ^stats$ redirect.php
-RewriteRule ^stats/(.*) site/addons/stats$1
+RewriteRule ^stats/(.*) site/addons/stats/$1
 
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d

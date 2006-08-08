@@ -20,6 +20,11 @@ define('ADMIN_PRIORITY_EXTERNAL',30);
 
 class AdminSection
 {
+  public function getIcon()
+  {
+    return "";
+  }
+  
   public function getName()
   {
   }
@@ -45,11 +50,18 @@ class AdminSection
 class AddonAdminSection extends AdminSection
 {
   private $url;
+  private $icon;
   
-  public function AddonAdminSection($name, $url)
+  public function AddonAdminSection($name, $url, $icon)
   {
     $this->name = $name;
     $this->url = $url;
+    $this->icon = $icon;
+  }
+  
+  public function getIcon()
+  {
+    return $this->icon;
   }
   
   public function getName()

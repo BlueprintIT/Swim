@@ -49,9 +49,9 @@ body {
         {if $section->isAvailable()}
           <td class="spacer"></td>
           {if $section->isSelected($REQUEST)}
-            <td class="tab selected" selected="true">{$section->getName()|escape}</td>
+            <td class="tab selected" selected="true"><img src="{$section->getIcon()}" alt="{$section->getName()|escape}"> {$section->getName()|escape}</td>
           {else}
-            <td class="tab unselected"><a href="{$section->getUrl()}">{$section->getName()|escape}</a></td>
+            <td class="tab unselected"><a href="{$section->getUrl()}"><img src="{$section->getIcon()}" alt="{$section->getName()|escape}"> {$section->getName()|escape}</a></td>
           {/if}
         {/if}
       {/foreach}

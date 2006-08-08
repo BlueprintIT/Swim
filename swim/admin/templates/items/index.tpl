@@ -53,13 +53,13 @@ SiteTree.draggable = true;
 </script>
 <div id="leftpane" class="pane">
 	<div class="header">
-		<h2>Structure</h2>
+		<div style="float: left; text-align: left; margin: 5px 0 0 5px">
+			<p><img src="{$CONTENT}/icons/drag-move.jpg" alt="Move" style="margin-right: 5px"><input type="radio" onchange="updateDragMode(this)" id="mode_move" name="mode" value="0" checked="checked"> <label for="mode_move">Drag to move</label></p>
+			<p><img src="{$CONTENT}/icons/drag-copy.jpg" alt="Copy" style="margin-right: 5px"><input type="radio" onchange="updateDragMode(this)" id="mode_copy" name="mode" value="1"> <label for="mode_copy">Drag to copy</label></p>
+		</div>
+		<h2>Menu</h2>
 	</div>
 	<div class="body">
-		<div style="margin-bottom: 10px;">
-			<p><input type="radio" onchange="updateDragMode(this)" id="mode_move" name="mode" value="0" checked="checked"> <label for="mode_move">Drags move items.</label></p>
-			<p><input type="radio" onchange="updateDragMode(this)" id="mode_copy" name="mode" value="1"> <label for="mode_copy">Drags copy items.</label></p>
-		</div>
 		<div id="categorytree">
 			<p>Loading Site...</p>
 		</div>

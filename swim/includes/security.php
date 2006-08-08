@@ -660,6 +660,13 @@ class UserManager
 
 class UserAdminSection extends AdminSection
 {
+  public function getIcon()
+  {
+    global $_PREFS;
+    
+    return $_PREFS->getPref('url.admin.static').'/icons/user-group2.gif';
+  }
+  
   public function getName()
   {
     return 'User Management';

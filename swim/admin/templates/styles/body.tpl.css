@@ -8,6 +8,51 @@ a:hover, a:visited:hover {
 	color: [#PURPLE#];
 }
 
+.pane {
+  height: 100%;
+  border: 1px solid ThreeDShadow;
+  overflow: auto;
+  text-align: center;
+  background-color: Window;
+  color: WindowText;
+}
+
+.header {
+  border-bottom: 1px solid ThreeDShadow;
+  background-color: ThreeDFace;
+  text-align: right;
+}
+
+.header form {
+  margin: 0;
+  padding: 0;
+}
+
+.header input[ldelim]type="submit"[rdelim], .header button {
+  float: left;
+  margin: 10px;
+}
+
+.header .toolbarbutton {
+  float: left;
+  margin: 10px;
+  display: block;
+}
+
+.header h2 {
+  margin: 0;
+  padding: 10px;
+  color: [#BLUE#];
+  font-size: 170%;
+}
+
+.body {
+  padding: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: justify;
+}
+
 div.first {
   margin-top: 0;
 }

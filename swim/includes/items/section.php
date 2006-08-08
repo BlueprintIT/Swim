@@ -102,6 +102,13 @@ class Section extends AdminSection
     }
   }
 
+  public function getIcon()
+  {
+    global $_PREFS;
+    
+    return $_PREFS->getPref('url.admin.static').'/icons/sitemap-blue.gif';
+  }
+  
   public function getPriority()
   {
     return ADMIN_PRIORITY_CONTENT;

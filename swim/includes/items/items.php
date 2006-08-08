@@ -22,6 +22,13 @@ require $_PREFS->getPref('storage.includes').'/items/section.php';
 
 class ArchiveAdminSection extends AdminSection
 {
+  public function getIcon()
+  {
+    global $_PREFS;
+    
+    return $_PREFS->getPref('url.admin.static').'/icons/user-group2.gif';
+  }
+  
   public function getName()
   {
     return "Archive";
