@@ -1,0 +1,17 @@
+#! /bin/bash
+
+SWIM=/home/blueprin/shared/Swim
+FCKeditor=/home/blueprin/shared/FCKeditor
+
+mkdir swim
+mkdir swim/admin
+ln -s $SWIM/admin/static swim/admin/static -s
+ln -s $SWIM/shared swim/shared -s
+
+if [ ! -d branding ]; then
+	mkdir branding
+	ln -s $SWIM/branding/static branding/static -s
+fi
+
+ln -s $FCKeditor FCKeditor -s
+
