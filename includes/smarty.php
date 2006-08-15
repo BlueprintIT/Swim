@@ -451,7 +451,7 @@ function retrieve_rss($params, &$smarty)
   if ((!empty($params['items'])) && (!empty($params['src'])))
   {
     $source = '';
-    $filename = $_PREFS->getPref('storage.cache').'/'.urlencode($params['src']);
+    $filename = $_PREFS->getPref('storage.sitecache').'/'.urlencode($params['src']);
     
     $handle = @fopen($params['src'], 'r');
     if ($handle !== FALSE)
