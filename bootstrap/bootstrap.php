@@ -52,7 +52,6 @@ function loadSitePreferences()
   
   $confdir = $_PREFSCOPES['host']->getPref('storage.config');
 
-  LockManager::lockResourceRead($confdir);
   $_PREFSCOPES['site'] = new Preferences();
   if (is_readable($confdir.'/site.conf'))
   {
@@ -68,7 +67,6 @@ function loadSitePreferences()
     fclose($file);
   }
   $_PREFSCOPES['site']->setParent($_PREFSCOPES['host']);
-  LockManager::unlockResource($confdir);
   
   $_PREFSCOPES['default']->setDelegate($_PREFSCOPES['site']);
   

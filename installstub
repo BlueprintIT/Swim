@@ -5,13 +5,15 @@ FCKeditor=/home/blueprin/shared/FCKeditor
 
 mkdir swim
 mkdir swim/admin
-ln -s $SWIM/admin/static swim/admin/static -s
-ln -s $SWIM/shared swim/shared -s
+ln -s $SWIM/admin/static swim/admin/static
+ln -s $SWIM/shared swim/shared
+cp $SWIM/.htaccess .
+ln -s $SWIM/swim.php swim.php
+ln -s $SWIM/swim.php index.php
+ln -s $SWIM/redirect.php redirect.php
+ln -s $SWIM/cron.php cron.php
 
-if [ ! -d branding ]; then
-	mkdir branding
-	ln -s $SWIM/branding/static branding/static -s
-fi
+mkdir swim/branding
+ln -s $SWIM/branding/static swim/branding/static
 
-ln -s $FCKeditor FCKeditor -s
-
+ln -s $FCKeditor FCKeditor
