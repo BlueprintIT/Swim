@@ -757,7 +757,7 @@ function createAdminSmarty($request, $type = 'text/html')
 
   configureSmarty($smarty, $request, $type);
   $smarty->assign('CONTENT', $_PREFS->getPref('url.admin.static'));
-  $smarty->assign('BRAND', $_PREFS->getPref('storage.branding.static'));
+  $smarty->assign('BRAND', $_PREFS->getPref('url.branding.static'));
   
   /*if (($type == 'text/css') || ($type == 'text/javascript'))
     $smarty->caching = true;*/
