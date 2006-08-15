@@ -15,7 +15,7 @@
 
 $source = __FILE__;
 $sitebase = dirname($source);
-if (is_dir($sitebase.'/swim'))
+if (is_dir($sitebase.'/swim/bootstrap'))
 {
   $swimbase = $sitebase.'/swim';
 }

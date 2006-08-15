@@ -32,10 +32,6 @@ function loadBasePreferences()
   fclose($file);
   $_PREFSCOPES['default']->setPref('storage.basedir', $swimbase);
   $_PREFSCOPES['default']->setPref('storage.sitedir', $sitebase);
-  if (is_dir($sitebase.'/branding'))
-    $_PREFSCOPES['default']->setPref('storage.branding', $sitebase.'/branding');
-  else
-    $_PREFSCOPES['default']->setPref('storage.branding', $swimbase.'/branding');
   
   $_PREFSCOPES['host'] = new Preferences();
   if (is_readable($swimbase.'/bootstrap/host.conf'))
