@@ -23,54 +23,58 @@ define('STATE_COMPLETE', STATE_SHUTDOWN+1);
 
 function loadBasePreferences()
 {
-	global $bootstrap, $_PREFS, $_PREFSCOPES;
-	
-	$_PREFSCOPES = array();
-	$_PREFSCOPES['default'] = new Preferences();
-	$file=fopen($bootstrap.'/default.conf','r');
-	$_PREFSCOPES['default']->loadPreferences($file);
-	fclose($file);
-	$_PREFSCOPES['default']->setPref('storage.basedir',dirname($bootstrap));
-	
-	$_PREFSCOPES['host'] = new Preferences();
-	if (is_readable($bootstrap.'/host.conf'))
-	{
-		$file=fopen($bootstrap.'/host.conf','r');
-		$_PREFSCOPES['host']->loadPreferences($file);
-		fclose($file);
-	}
-	$_PREFSCOPES['host']->setParent($_PREFSCOPES['default']);
-	$_PREFSCOPES['default']->setDelegate($_PREFSCOPES['host']);
-	$confdir = $_PREFSCOPES['host']->getPref('storage.config');
-	
-	if (is_readable($confdir.'/host.conf'))
-	{
-	  $file=fopen($confdir.'/host.conf','r');
-	  $_PREFSCOPES['host']->loadPreferences($file, '', true);
-	  fclose($file);
-	}
-	
-	$_PREFS=$_PREFSCOPES['host'];
+  global $swimbase, $sitebase, $_PREFS, $_PREFSCOPES;
+  
+  $_PREFSCOPES = array();
+  $_PREFSCOPES['default'] = new Preferences();
+  $file=fopen($swimbase.'/bootstrap/default.conf','r');
+  $_PREFSCOPES['default']->loadPreferences($file);
+  fclose($file);
+  $_PREFSCOPES['default']->setPref('storage.basedir', $swimbase);
+  $_PREFSCOPES['default']->setPref('storage.sitedir', $sitebase);
+  if (is_dir($sitebase.'/branding'))
+    $_PREFSCOPES['default']->setPref('storage.branding', $sitebase.'/branding');
+  else
+    $_PREFSCOPES['default']->setPref('storage.branding', $swimbase.'/branding');
+  
+  $_PREFSCOPES['host'] = new Preferences();
+  if (is_readable($swimbase.'/bootstrap/host.conf'))
+  {
+    $file=fopen($swimbase.'/bootstrap/host.conf','r');
+    $_PREFSCOPES['host']->loadPreferences($file);
+    fclose($file);
+  }
+  $_PREFSCOPES['host']->setParent($_PREFSCOPES['default']);
+  $_PREFSCOPES['default']->setDelegate($_PREFSCOPES['host']);
+  
+  $_PREFS=$_PREFSCOPES['host'];
 }
 
-function loadUserPreferences()
+function loadSitePreferences()
 {
-	global $bootstrap, $_PREFS, $_PREFSCOPES;
-	
-	$confdir = $_PREFSCOPES['host']->getPref('storage.config');
+  global $bootstrap, $_PREFS, $_PREFSCOPES;
+  
+  $confdir = $_PREFSCOPES['host']->getPref('storage.config');
 
-	LockManager::lockResourceRead($confdir);
-	$_PREFSCOPES['site'] = new Preferences();
-	if (is_readable($confdir.'/site.conf'))
-	{
-		$file=fopen($confdir.'/site.conf','r');
-		$_PREFSCOPES['site']->loadPreferences($file);
-		fclose($file);
-	}
-	$_PREFSCOPES['site']->setParent($_PREFSCOPES['host']);
-	LockManager::unlockResource($confdir);
-	
-	$_PREFSCOPES['default']->setDelegate($_PREFSCOPES['site']);
+  LockManager::lockResourceRead($confdir);
+  $_PREFSCOPES['site'] = new Preferences();
+  if (is_readable($confdir.'/site.conf'))
+  {
+    $file=fopen($confdir.'/site.conf','r');
+    $_PREFSCOPES['site']->loadPreferences($file);
+    fclose($file);
+  }
+
+  if (is_readable($confdir.'/settings.conf'))
+  {
+    $file=fopen($confdir.'/settings.conf','r');
+    $_PREFSCOPES['host']->loadPreferences($file, '', true);
+    fclose($file);
+  }
+  $_PREFSCOPES['site']->setParent($_PREFSCOPES['host']);
+  LockManager::unlockResource($confdir);
+  
+  $_PREFSCOPES['default']->setDelegate($_PREFSCOPES['site']);
   
   $_PREFS=$_PREFSCOPES['site'];
 }
@@ -78,7 +82,7 @@ function loadUserPreferences()
 $_STATE=STATE_BOOTSTRAP;
 
 // Load the logging engine
-require_once $bootstrap.'/logging.php';
+require_once $swimbase.'/bootstrap/logging.php';
 error_reporting(E_ALL);
 
 LoggerManager::setLogLevel('',LOG_LEVEL_WARN);
@@ -87,15 +91,14 @@ LoggerManager::setLogLevel('swim.storage',LOG_LEVEL_WARN);
 LoggerManager::setLogLevel('swim.utils.shutdown',LOG_LEVEL_WARN);
 
 // Load the preferences engine
-require_once $bootstrap.'/prefs.php';
+require_once $swimbase.'/bootstrap/prefs.php';
 
 loadBasePreferences();
+loadSitePreferences();
 
 LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
 LoggerManager::setBaseDir($_PREFS->getPref('storage.basedir'));
 
-require_once $bootstrap.'/baseincludes.php';
-
-loadUserPreferences();
+require_once $swimbase.'/bootstrap/baseincludes.php';
 
 ?>
