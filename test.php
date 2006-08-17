@@ -51,15 +51,25 @@ function run_all_tests()
   }
 }
 
-$source = __FILE__;
-while (is_link($source))
+$source = $_SERVER["SCRIPT_FILENAME"];
+$sitebase = dirname($source);
+if (is_dir($sitebase.'/swim/bootstrap'))
 {
-  $source=readlink($source);
+  $swimbase = $sitebase.'/swim';
 }
-$bootstrap=dirname($source).'/bootstrap';
+else
+{
+  while (is_link($source))
+  {
+    $source=readlink($source);
+  }
+  $swimbase = dirname($source);
+}
 unset($source);
-require_once $bootstrap.'/bootstrap.php';
-unset($bootstrap);
+require_once $swimbase.'/bootstrap/bootstrap.php';
+unset($swimbase);
+unset($sitebase);
+
 SwimEngine::startup();
 AddonManager::disable();
 SwimEngine::ensureStarted();

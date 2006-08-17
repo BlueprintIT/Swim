@@ -13,9 +13,9 @@
  * $Revision$
  */
 
-$source = __FILE__;
+$source = $_SERVER["SCRIPT_FILENAME"];
 $sitebase = dirname($source);
-if (is_dir($sitebase.'/swim'))
+if (is_dir($sitebase.'/swim/bootstrap'))
 {
   $swimbase = $sitebase.'/swim';
 }

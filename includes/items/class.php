@@ -286,7 +286,7 @@ class FieldSetManager
     
     self::$log = LoggerManager::getLogger('swim.classmanager');
     
-    $cache = $_PREFS->getPref('storage.cache').'/fieldsets.ser';
+    $cache = $_PREFS->getPref('storage.sitecache').'/fieldsets.ser';
     $files = array($_PREFS->getPref('storage.config').'/views.xml', $_PREFS->getPref('storage.config').'/classes.xml');
     if (self::isCacheValid($cache, $files))
     {

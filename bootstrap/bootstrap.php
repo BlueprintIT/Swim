@@ -32,10 +32,6 @@ function loadBasePreferences()
   fclose($file);
   $_PREFSCOPES['default']->setPref('storage.basedir', $swimbase);
   $_PREFSCOPES['default']->setPref('storage.sitedir', $sitebase);
-  if (is_dir($sitebase.'/branding'))
-    $_PREFSCOPES['default']->setPref('storage.branding', $sitebase.'/branding');
-  else
-    $_PREFSCOPES['default']->setPref('storage.branding', $swimbase.'/branding');
   
   $_PREFSCOPES['host'] = new Preferences();
   if (is_readable($swimbase.'/bootstrap/host.conf'))
@@ -56,7 +52,6 @@ function loadSitePreferences()
   
   $confdir = $_PREFSCOPES['host']->getPref('storage.config');
 
-  LockManager::lockResourceRead($confdir);
   $_PREFSCOPES['site'] = new Preferences();
   if (is_readable($confdir.'/site.conf'))
   {
@@ -72,7 +67,6 @@ function loadSitePreferences()
     fclose($file);
   }
   $_PREFSCOPES['site']->setParent($_PREFSCOPES['host']);
-  LockManager::unlockResource($confdir);
   
   $_PREFSCOPES['default']->setDelegate($_PREFSCOPES['site']);
   
