@@ -127,6 +127,8 @@ class BaseField
         return new ItemField($el);
       if ($type == 'file')
         return new FileField($el);
+      if ($type == 'compound')
+        return new CompoundField($el);
     }
     return new TextField($el);
   }
