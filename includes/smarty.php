@@ -13,6 +13,30 @@
  * $Revision$
  */
 
+class RowWrapper
+{
+  private $row;
+  
+  public function __construct($row)
+  {
+    $this->row = $row;
+  }
+
+  public function __get($name)
+  {
+    switch($name)
+    {
+      default:
+        $field = $this->row->getField($name);
+        if ($field != null)
+        {
+          return $field->toString();
+        }
+        return '';
+    }
+  }
+}
+
 class ItemWrapper
 {
   private $itemversion;
@@ -80,6 +104,15 @@ class ItemWrapper
               }
             }
             return $result;
+          }
+          else if ($field->getType() == 'compound')
+          {
+            $rows = $field->getRows();
+            foreach ($rows as $key => $row)
+            {
+              $rows[$key] = new RowWrapper($row);
+            }
+            return $rows;
           }
           else
             return $field->toString();

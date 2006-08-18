@@ -245,4 +245,179 @@ class Field extends VersionField
   }
 }
 
+class CompoundField extends Field
+{
+  private $fields = array();
+  private $rows = array();
+  
+  public function __construct($metadata)
+  {
+    parent::__construct($metadata);
+    $this->exists = true;
+  }
+
+  public function setItemVersion($item)
+  {
+    $this->rows = array();
+    parent::setItemVersion($item);
+  }
+  
+  public function getRows()
+  {
+    $count = $this->count();
+    $result = array();
+    for ($i=0; $i<$count; $i++)
+    {
+      $result[$i] = $this->getRow($i);
+    }
+    return $result;
+  }
+  
+  public function getRow($index)
+  {
+    if (!isset($this->rows[$index]))
+    {
+      $fields = array();
+      foreach ($this->fields as $name => $field)
+      {
+        $field = clone $field;
+        $field->setItemVersion($this->itemversion);
+        $field->setPosition($index);
+        $fields[$name] = $field;
+      }
+      $this->rows[$index] = new CompoundRow($index, $fields);
+    }
+    return $this->rows[$index];
+  }
+  
+  public function count()
+  {
+    global $_STORAGE;
+    
+    $result = $_STORAGE->query('SELECT MAX(pos)+1 FROM Field WHERE itemversion='.$this->itemversion->getId().' AND basefield="'.$_STORAGE->escape($this->getId()).'";');
+    $result = $result->fetchSingle();
+    if ($result === false)
+      return 0;
+    else
+      return $result;
+  }
+  
+  public function appendRow()
+  {
+    if ($this->isEditable())
+      return $this->getRow($this->count());
+  }
+  
+  public function removeRow($index)
+  {
+    global $_STORAGE;
+    
+    if ($this->isEditable())
+    {
+      $count = $this->count();
+      $_STORAGE->queryExec('DELETE FROM Field WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->getId()).'" AND pos='.$index.';');
+      if (isset($this->rows[$index]))
+        unset($this->rows[$index]);
+      for ($i=$index+1; $i<$count; $i++)
+      {
+        $_STORAGE->queryExec('UPDATE Field SET pos='.($i-1).' WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->getId()).'" AND pos='.$i.';');
+        if (isset($this->rows[$i]))
+        {
+          $this->rows[$i]->setPosition($i-1);
+          $this->rows[$i-1] = $this->rows[$i];
+          unset($this->rows[$i]);
+        }
+      }
+    }
+  }
+  
+  public function moveRow($from, $to)
+  {
+    if ($this->isEditable())
+    {
+      $_STORAGE->queryExec('UPDATE Field SET pos=-1 WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->getId()).'" AND pos='.$from.';');
+      if (isset($this->rows[$from]))
+      {
+        $row = $this->rows[$from];
+        unset($this->rows[$from]);
+      }
+      if ($from<$to)
+      {
+        for ($i=$from+1; $i<=$to; $i++)
+        {
+          $_STORAGE->queryExec('UPDATE Field SET pos='.($i-1).' WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->getId()).'" AND pos='.$i.';');
+          if (isset($this->rows[$i]))
+          {
+            $this->rows[$i]->setPosition($i-1);
+            $this->rows[$i-1] = $this->rows[$i];
+            unset($this->rows[$i]);
+          }
+        }
+      }
+      else
+      {
+        for ($i=$from-1; $i>=$to; $i--)
+        {
+          $_STORAGE->queryExec('UPDATE Field SET pos='.($i+1).' WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->getId()).'" AND pos='.$i.';');
+          if (isset($this->rows[$i]))
+          {
+            $this->rows[$i]->setPosition($i+1);
+            $this->rows[$i+1] = $this->rows[$i];
+            unset($this->rows[$i]);
+          }
+        }
+      }
+      $_STORAGE->queryExec('UPDATE Field SET pos='.$to.' WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->getId()).'" AND pos=-1;');
+      if (isset($row))
+      {
+        $row->setPosition($to);
+        $this->rows[$to] = $row;
+      }
+    }
+  }
+
+  protected function parseElement($element)
+  {
+    if ($element->tagName=='field')
+    {
+      $field = BaseField::getField($element);
+      if ($field instanceof SimpleField)
+      {
+        $field->setBaseField($this->getId());
+        $this->fields[$field->getId()] = $field;
+      }
+      else
+        $this->log->error('Invalid field type specified as part of compound field '.$this->getId());
+    }
+    else
+      parent::parseElement($element);
+  }
+}
+
+class CompoundRow
+{
+  private $fields = array();
+  private $position = 0;
+  
+  public function __construct($pos, $fields)
+  {
+    $this->fields = $fields;
+    $this->position = $pos;
+  }
+  
+  public function setPosition($pos)
+  {
+    $this->position = $pos;
+    foreach ($this->fields as $field)
+    {
+      $field->setPosition($pos);
+    }
+  }
+  
+  public function getField($name)
+  {
+    return $this->fields[$name];
+  }
+}
+
 ?>

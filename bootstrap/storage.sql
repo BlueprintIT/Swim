@@ -54,11 +54,13 @@ CREATE TABLE VariantVersion (
 
 CREATE TABLE Field (
 	itemversion INTEGER,
+	basefield VARCHAR(30),
+	pos INTEGER,
 	field VARCHAR(30),
 	intValue INTEGER,
 	textValue TEXT,
 	dateValue INTEGER,
-	UNIQUE (itemversion,field)
+	UNIQUE (itemversion,basefield,pos,field)
 );
 
 CREATE TABLE Sequence (

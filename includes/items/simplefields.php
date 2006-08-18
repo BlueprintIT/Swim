@@ -16,7 +16,19 @@
 class SimpleField extends Field
 {
   protected $value = '';
+  protected $basefield = 'base';
+  protected $pos = 0;
+
+  public function setBaseField($name)
+  {
+    $this->basefield = $name;
+  }
   
+  public function setPosition($pos)
+  {
+    $this->pos = $pos;
+  }
+    
   protected function retrieve()
   {
     global $_STORAGE;
@@ -24,7 +36,7 @@ class SimpleField extends Field
     if ($this->retrieved)
       return;
       
-    $results = $_STORAGE->query('SELECT '.$this->getColumn().' FROM Field WHERE itemversion='.$this->itemversion->getId().' AND field="'.$_STORAGE->escape($this->id).'";');
+    $results = $_STORAGE->query('SELECT '.$this->getColumn().' FROM Field WHERE itemversion='.$this->itemversion->getId().' AND basefield="'.$_STORAGE->escape($this->basefield).'" AND pos='.$this->pos.' AND field="'.$_STORAGE->escape($this->id).'";');
     if ($results->valid())
     {
       $this->exists = true;
@@ -44,7 +56,7 @@ class SimpleField extends Field
     if ($this->isEditable())
     {
       $col = $this->getColumn();
-      if ($_STORAGE->query('REPLACE INTO Field (itemversion,field,'.$col.') VALUES ('.$this->itemversion->getId().',"'.$_STORAGE->escape($this->id).'",'.$this->escapeValue($value).');'))
+      if ($_STORAGE->query('REPLACE INTO Field (itemversion,basefield,pos,field,'.$col.') VALUES ('.$this->itemversion->getId().',"'.$_STORAGE->escape($this->basefield).'",'.$this->pos.',"'.$_STORAGE->escape($this->id).'",'.$this->escapeValue($value).');'))
       {
         $this->value = $value;
         $this->exists = true;
