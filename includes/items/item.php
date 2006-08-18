@@ -317,6 +317,7 @@ class ItemVariant
   private $variant;
   private $item;
   private $current;
+  private $draft;
   private $versions = array();
   private $complete = false;
   
@@ -345,6 +346,8 @@ class ItemVariant
     if ($this->complete)
       return $this->versions;
       
+    $this->current = null;
+    $this->draft = null;
     $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE itemvariant='.$this->id.';');
     while ($results->valid())
     {
@@ -355,6 +358,8 @@ class ItemVariant
         $this->versions[$details['version']] = $version;
         if ($version->isCurrent())
           $this->current = $version;
+        if (!$version->isComplete())
+          $this->draft = $version;
       }
     }
     krsort($this->versions);
@@ -390,11 +395,28 @@ class ItemVariant
     }
   }
   
+  public function getDraftVersion()
+  {
+    global $_STORAGE;
+    
+    if (isset($this->draft) || $this->complete)
+      return $this->draft;
+      
+    $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE itemvariant='.$this->id.' AND complete=0;');
+    if ($results->valid())
+    {
+      $version = new ItemVersion($results->fetch(), $this);
+      $this->draft = $version;
+      $this->versions[$version->getVersion()] = $version;
+    }
+    return $this->draft;
+  }
+  
   public function getCurrentVersion()
   {
     global $_STORAGE;
     
-    if (isset($this->current))
+    if (isset($this->current) || $this->complete)
       return $this->current;
       
     $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE itemvariant='.$this->id.' AND current=1;');
