@@ -264,6 +264,52 @@ class CompoundField extends Field
     parent::setItemVersion($item);
   }
   
+  public function getEditor()
+  {
+    $result = "<table>\n<thead><tr>";
+    foreach ($this->fields as $field)
+    {
+      $result.='<th>'.$field->getName().'</th>';
+    }
+    $result.="</tr></thead>\n<tbody>\n";
+    $rows = $this->getRows();
+    foreach ($rows as $row)
+    {
+      $result.='<tr>';
+      foreach ($this->fields as $field)
+      {
+        $rlfield = $row->getField($field->getId());
+        $result.='<td>'.$rlfield->getEditor().'</td>';
+      }
+      $result.="</tr>\n";
+    }
+    $result.="</tbody>\n</table>\n";
+    return $result;
+  }
+  
+  public function output(&$smarty)
+  {
+    $result = "<table>\n<thead><tr>";
+    foreach ($this->fields as $field)
+    {
+      $result.='<th>'.$field->getName().'</th>';
+    }
+    $result.="</tr></thead>\n<tbody>\n";
+    $rows = $this->getRows();
+    foreach ($rows as $row)
+    {
+      $result.='<tr>';
+      foreach ($this->fields as $field)
+      {
+        $rlfield = $row->getField($field->getId());
+        $result.='<td>'.$rlfield->output($smarty).'</td>';
+      }
+      $result.="</tr>\n";
+    }
+    $result.="</tbody>\n</table>\n";
+    return $result;
+  }
+
   public function getRows()
   {
     $count = $this->count();

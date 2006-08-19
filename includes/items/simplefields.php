@@ -66,12 +66,28 @@ class SimpleField extends Field
     }
   }
   
+  protected function getFieldName()
+  {
+    if ($this->basefield == 'base')
+      return $this->id;
+    else
+      return $this->basefield.'['.$this->pos.'].'.$this->id;
+  }
+  
+  protected function getFieldId()
+  {
+    if ($this->basefield == 'base')
+      return 'field_'.$this->id;
+    else
+      return 'field_'.$this->basefield.'_'.$this->pos.'_'.$this->id;
+  }
+  
   public function getEditor()
   {
     $state = '';
     if (!$this->isEditable())
       $state = 'disabled="true" ';
-    return '<input '.$state.'style="width: 100%" type="input" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
+    return '<input '.$state.'style="width: 100%" type="input" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->toString().'">';
   }
   
   protected function getDefaultValue()
@@ -137,7 +153,7 @@ class TextField extends SimpleField
     if (!$this->isEditable())
       $state = 'disabled="true" ';
     if ($this->type == 'multiline')
-      return '<textarea '.$state.'style="width: 100%; height: 100px;" id="field:'.$this->id.'" name="'.$this->id.'">'.htmlentities($this->toString()).'</textarea>';
+      return '<textarea '.$state.'style="width: 100%; height: 100px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.htmlentities($this->toString()).'</textarea>';
     else if ($this->type == 'html')
     {
       if (!$this->isEditable())
@@ -146,7 +162,7 @@ class TextField extends SimpleField
       {
         recursiveMkDir($this->itemversion->getStoragePath());
         include_once($_PREFS->getPref('storage.fckeditor').'/fckeditor.php');
-        $editor = new FCKeditor($this->id) ;
+        $editor = new FCKeditor($this->getFieldName()) ;
         $editor->BasePath = $_PREFS->getPref('url.fckeditor');
         $value = $this->toString();
         if (strlen($value)==0)
@@ -275,9 +291,9 @@ class DateField extends IntegerField
   public function getEditor()
   {
     $text = '';
-    $text.='<input type="hidden" id="field:'.$this->id.'" name="'.$this->id.'" value="'.$this->toString().'">';
-    $text.='<div id="calendar_'.$this->id.'"></div>'."\n";
-    $text.='<script type="text/javascript">var cal_'.$this->id.' = displayCalendar("'.$this->id.'",'.$this->toString().');</script>'."\n";
+    $text.='<input type="hidden" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->toString().'">';
+    $text.='<div id="calendar_'.$this->getFieldId().'"></div>'."\n";
+    $text.='<script type="text/javascript">var cal_'.$this->getFieldId().' = displayCalendar("'.$this->getFieldId().'",'.$this->toString().');</script>'."\n";
     return $text;
   }
   
@@ -349,14 +365,14 @@ class ItemField extends IntegerField
     else
       $rlvalue = '[Nothing selected]';
 
-    echo '<input id="'.$this->id.'" name="'.$this->id.'" type="hidden" value="'.$this->value.'"> ';
+    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$this->value.'"> ';
 
-    echo '<input id="fbfake-'.$this->id.'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    echo '<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
     echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:showFileBrowser(\''.$this->id.'\',\''.$request->encode().'\')">Select...</a>';
+    echo '<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
     echo '</div> ';
     echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:clearFileBrowser(\''.$this->id.'\')">Clear</a>';
+    echo '<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
     echo '</div> ';
   }
 }
@@ -407,14 +423,14 @@ class FileField extends TextField
     else
       $rlvalue = '[Nothing selected]';
 
-    echo '<input id="'.$this->id.'" name="'.$this->id.'" type="hidden" value="'.$this->value.'"> ';
+    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$this->value.'"> ';
 
-    echo '<input id="fbfake-'.$this->id.'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    echo '<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
     echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:showFileBrowser(\''.$this->id.'\',\''.$request->encode().'\')">Select...</a>';
+    echo '<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
     echo '</div> ';
     echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:clearFileBrowser(\''.$this->id.'\')">Clear</a>';
+    echo '<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
     echo '</div> ';
   }
 }

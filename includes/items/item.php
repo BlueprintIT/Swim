@@ -482,8 +482,8 @@ class ItemVariant
       
       if ($clone != null)
       {
-        $_STORAGE->queryExec('INSERT INTO Field (itemversion,field,textValue,intValue,dateValue) ' .
-          'SELECT '.$id.',field,textValue,intValue,dateValue FROM Field WHERE itemversion='.$clone->getId().';');
+        $_STORAGE->queryExec('INSERT INTO Field (itemversion,basefield,pos,field,textValue,intValue,dateValue) ' .
+          'SELECT '.$id.',basefield,pos,field,textValue,intValue,dateValue FROM Field WHERE itemversion='.$clone->getId().';');
         $sourcefiles = $clone->getStoragePath();
         if (is_dir($sourcefiles))
         {
