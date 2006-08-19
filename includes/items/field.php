@@ -310,6 +310,21 @@ class CompoundField extends Field
     return $result;
   }
 
+  public function getPlainText()
+  {
+    $result = '';
+    $rows = $this->getRows();
+    foreach ($rows as $row)
+    {
+      foreach ($this->fields as $field)
+      {
+        $rlfield = $row->getField($field->getId());
+        $result.=$rlfield->getPlainText().' ';
+      }
+    }
+    return $result;
+  }
+
   public function getRows()
   {
     $count = $this->count();
