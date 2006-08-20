@@ -272,6 +272,7 @@ class CompoundField extends Field
     {
       $result.=$field->getId().": '".$field->getType()."',";
     }
+    $result = substr($result,0,-1);
     $result.="} };";
     $result.= "\n-->\n</script>\n";
     $result.= "<table class=\"compound\">\n<thead><tr>";

@@ -79,6 +79,8 @@ div.first {
 
 .sectionbody table.admin {
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 5px;
 }
 
 .sectionbody td.label {
@@ -145,6 +147,6 @@ table.compound th {
 
 table.compound {
   border-collapse: separate;
-  cell-spacing: 5px;
+  border-spacing: 5px;
   width: 100%;
 }

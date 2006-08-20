@@ -6,7 +6,6 @@ function create_simple_field(basefield, position, field, container)
 	input.setAttribute("type", "text");
 	input.setAttribute("id", "field_"+basefield+"_"+position+"_"+field);
 	input.setAttribute("name", basefield+"["+position+"]."+field);
-	input.setAttribute("style", "width: 100%");
 	container.appendChild(input);
 }
 
@@ -99,23 +98,11 @@ function createCompoundRow(compound)
   cell = document.createElement('td');
   row.appendChild(cell);
   
-  var link = document.createElement('a');
-  link.setAttribute("href", "#");
-  cell.appendChild(link);
-  link.onclick = function() { moveCompoundRow(compound, this.parentNode.parentNode, true); return false; }
-  link.innerHTML = "Up";
-  
-  link = document.createElement('a');
-  link.setAttribute("href", "#");
-  cell.appendChild(link);
-  link.onclick = function() { moveCompoundRow(compound, this.parentNode.parentNode, false); return false; }
-  link.innerHTML = "Down";
-  
-  link = document.createElement('a');
-  link.setAttribute("href", "#");
-  cell.appendChild(link);
-  link.onclick = function() { deleteCompoundRow(compound, this.parentNode.parentNode); return false; }
-  link.innerHTML = "-";
+  buttons = "<a href=\"#\" onclick=\"moveCompoundRow(compound_"+compound.id+", this.parentNode.parentNode, true); return false\">Up</a> ";
+  buttons+= "<a href=\"#\" onclick=\"moveCompoundRow(compound_"+compound.id+", this.parentNode.parentNode, false); return false\">Down</a> ";
+  buttons+= "<a href=\"#\" onclick=\"deleteCompoundRow(compound_"+compound.id+", this.parentNode.parentNode); return false\">-</a>";
+	
+	cell.innerHTML = buttons;
 }
 
 function switchCompoundRows(compound, row1, row2)
