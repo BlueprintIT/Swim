@@ -266,7 +266,7 @@ class CompoundField extends Field
   
   public function getEditor()
   {
-    $result = "<table>\n<thead><tr>";
+    $result = "<table class=\"compound\">\n<thead><tr>";
     foreach ($this->fields as $field)
     {
       $result.='<th>'.$field->getName().'</th>';
@@ -289,7 +289,7 @@ class CompoundField extends Field
   
   public function output(&$smarty)
   {
-    $result = "<table>\n<thead><tr>";
+    $result = "<table class=\"compound\">\n<thead><tr>";
     foreach ($this->fields as $field)
     {
       $result.='<th>'.$field->getName().'</th>';
@@ -325,6 +325,22 @@ class CompoundField extends Field
     return $result;
   }
 
+  public function setValue($value)
+  {
+    global $_STORAGE;
+    
+    if ($this->isEditable() && is_array($value))
+    {
+      $_STORAGE->queryExec('DELETE FROM Field WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->id).'";');
+      $this->rows = array();
+      foreach ($value as $key => $val)
+      {
+        $row = $this->getRow($key);
+        $row->setValue($val);
+      }
+    }
+  }
+  
   public function getRows()
   {
     $count = $this->count();
@@ -461,9 +477,11 @@ class CompoundRow
 {
   private $fields = array();
   private $position = 0;
+  private $log;
   
   public function __construct($pos, $fields)
   {
+    $this->log = LoggerManager::getLogger('swim.field.'.get_class($this));
     $this->fields = $fields;
     $this->position = $pos;
   }
@@ -474,6 +492,17 @@ class CompoundRow
     foreach ($this->fields as $field)
     {
       $field->setPosition($pos);
+    }
+  }
+  
+  public function setValue($value)
+  {
+    foreach ($value as $field => $val)
+    {
+      if (!isset($this->fields[$field]))
+        $this->log->error('Attempt to set unknown field '.$field);
+      else
+        $this->fields[$field]->setValue($val);
     }
   }
   

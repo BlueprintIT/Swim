@@ -56,35 +56,46 @@ function cleanVariable($text)
   return $text;
 }
 
+function buildArray(&$current, $parts, $pos, $value)
+{
+  $part = $parts[$pos];
+  if ($pos == count($parts)-1)
+  {
+    if (strlen($part) == 0)
+      $current[] = cleanVariable($value);
+    else
+      $current[$part] = cleanVariable($value);
+  }
+  else
+  {
+    if (strlen($part) == 0)
+    {
+      $next = array();
+      $current[] = &$next;
+    }
+    else if (isset($current[$part]))
+    {
+      $next = &$current[$part];
+    }
+    else
+    {
+      $next = array();
+      $current[$part] = &$next;
+    }
+    buildArray($next, $parts, $pos+1, $value);
+  }
+}
+
 function extractVariable(&$array,$name,$value)
 {
-	$spos=strpos($name,'[');
-	$epos=strpos($name,']',$spos);
-	if (($spos>=0)&&($epos>0))
-	{
-		$sub=substr($name,0,$spos);
-		$remains=substr($name,$epos+1);
-		$name=substr($name,$spos+1,$epos).$remains;
-		if (strlen($sub)==0)
-		{
-			$next=array();
-			$array[]=&$next;
-		}
-		else if (isset($array[$sub]))
-		{
-			$next=&$array[$sub];
-		}
-		else
-		{
-			$next=array();
-			$array[$sub]=&$next;
-		}
-		extractVariable($next,$name,$value);
-	}
-	else
-	{
-		$array[$name]=cleanVariable($value);
-	}
+  $name = str_replace('].', '.', $name);
+  $name = str_replace('][', '.', $name);
+  $name = str_replace(']', '.', $name);
+  $name = str_replace('[', '.', $name);
+  
+  $parts = explode('.', $name);
+  
+  buildArray($array, $parts, 0, $value);
 }
 
 function decodeQuery($query)
