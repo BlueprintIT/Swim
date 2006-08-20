@@ -87,7 +87,7 @@ class SimpleField extends Field
     $state = '';
     if (!$this->isEditable())
       $state = 'disabled="true" ';
-    return '<input '.$state.'style="width: 100%" type="input" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->toString().'">';
+    return '<input '.$state.'style="width: 100%" type="text" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->toString().'">';
   }
   
   protected function getDefaultValue()

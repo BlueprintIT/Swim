@@ -266,12 +266,20 @@ class CompoundField extends Field
   
   public function getEditor()
   {
-    $result = "<table class=\"compound\">\n<thead><tr>";
+    $result = "<script type=\"text/javascript\">\n<!--\n";
+    $result.= "var compound_".$this->getId()." = { id: '".$this->getId()."', fields: {";
+    foreach ($this->fields as $field)
+    {
+      $result.=$field->getId().": '".$field->getType()."',";
+    }
+    $result.="} };";
+    $result.= "\n-->\n</script>\n";
+    $result.= "<table class=\"compound\">\n<thead><tr>";
     foreach ($this->fields as $field)
     {
       $result.='<th>'.$field->getName().'</th>';
     }
-    $result.="</tr></thead>\n<tbody>\n";
+    $result.="<th></th></tr></thead>\n<tbody id=\"tbody_".$this->id."\">\n";
     $rows = $this->getRows();
     foreach ($rows as $row)
     {
@@ -281,9 +289,15 @@ class CompoundField extends Field
         $rlfield = $row->getField($field->getId());
         $result.='<td>'.$rlfield->getEditor().'</td>';
       }
-      $result.="</tr>\n";
+      $result.="<td>";
+      $result.="<a href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, true); return false\">Up</a> ";
+      $result.="<a href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, false); return false\">Down</a> ";
+      $result.="<a href=\"#\" onclick=\"deleteCompoundRow(compound_".$this->id.", this.parentNode.parentNode); return false\">-</a>";
+      $result.="</td></tr>\n";
     }
-    $result.="</tbody>\n</table>\n";
+    $result.="</tbody>\n<tfoot>\n<tr>";
+    $result.="<td colspan=\"".count($this->fields)."\"></td><td><a onclick=\"createCompoundRow(compound_".$this->id."); return false\" href=\"#\">+</a></td>";
+    $result.="</tr>\n</tfoot>\n</table>\n";
     return $result;
   }
   
@@ -331,7 +345,7 @@ class CompoundField extends Field
     
     if ($this->isEditable() && is_array($value))
     {
-      $_STORAGE->queryExec('DELETE FROM Field WHERE itemversion='.$this->itemversion.' AND basefield="'.$_STORAGE->escape($this->id).'";');
+      $_STORAGE->queryExec('DELETE FROM Field WHERE itemversion='.$this->itemversion->getId().' AND basefield="'.$_STORAGE->escape($this->id).'";');
       $this->rows = array();
       foreach ($value as $key => $val)
       {

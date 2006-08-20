@@ -98,7 +98,7 @@ div.first {
 .sectionbody td.description {
   vertical-align: middle;
   padding-right: 5px;
-  width: 35%;
+  width: 10%;
 }
 
 div.content {
@@ -137,4 +137,14 @@ table.sequencelist td.name {
 
 table.sequencelist td.options img {
   border: 0;
+}
+
+table.compound th {
+  font-weight: bold;
+}
+
+table.compound {
+  border-collapse: separate;
+  cell-spacing: 5px;
+  width: 100%;
 }
