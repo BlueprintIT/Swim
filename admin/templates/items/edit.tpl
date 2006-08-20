@@ -35,15 +35,22 @@ function submitForm(form)
 			<input type="hidden" name="current" value="true">
 		{/if}
 		<div class="header">
-			<div class="toolbar">
-				<div class="toolbarbutton">
-					<a href="javascript:submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
-				</div>
-				<div class="toolbarbutton">
-					<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/check-grey.gif"/> Cancel</a>
-				</div>
-			</div>
+			<table class="toolbar">
+				<tr>
+					<td>
+						<div class="toolbarbutton">
+							<a href="javascript:submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
+						</div>
+					</td>
+					<td>
+						<div class="toolbarbutton">
+							<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/check-grey.gif"/> Cancel</a>
+						</div>
+					</td>
+				</tr>
+			</table>
 			<h2>Item Editor</h2>
+			<div style="clear: left"></div>
 		</div>
 		<div class="body">
 			<div class="section first">

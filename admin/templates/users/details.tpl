@@ -4,22 +4,31 @@
 <div id="mainpane" class="pane">
 	{apiget var="selected" type="user" id=$request.query.user}
 	<div class="header">
-		<div class="toolbar">
-			<div class="toolbarbutton">
-				<a href="{encode method="admin" path="users/create.tpl" nestcurrent="true"}"><image src="{$CONTENT}/icons/add-user-blue.gif"/> Create new User</a>
-			</div>
-			{if $selected->getUserName() ne 'blueprintit'}
-				<div class="toolbarbutton">
-					<a href="{encode method="admin" path="users/edit.tpl" user=$selected->getUsername() nestcurrent="true"}"><image src="{$CONTENT}/icons/edit-grey.gif"/> Edit this User</a>
-				</div>
-				{if $selected->getUsername() ne $USER->getUsername()}
+		<table class="toolbar">
+			<tr>
+				<td>
 					<div class="toolbarbutton">
-						<a href="{encode method="deleteuser" user=$selected->getUsername()}">Delete this User</a>
+						<a href="{encode method="admin" path="users/create.tpl" nestcurrent="true"}"><image src="{$CONTENT}/icons/add-user-blue.gif"/> Create new User</a>
 					</div>
+				</td>
+				{if $selected->getUserName() ne 'blueprintit'}
+					<td>
+						<div class="toolbarbutton">
+							<a href="{encode method="admin" path="users/edit.tpl" user=$selected->getUsername() nestcurrent="true"}"><image src="{$CONTENT}/icons/edit-grey.gif"/> Edit this User</a>
+						</div>
+					</td>
+					{if $selected->getUsername() ne $USER->getUsername()}
+						<td>
+							<div class="toolbarbutton">
+								<a href="{encode method="deleteuser" user=$selected->getUsername()}">Delete this User</a>
+							</div>
+						</td>
+					{/if}
 				{/if}
-			{/if}
-		</div>
+			</tr>
+		</table>
 		<h2>User Details</h2>
+		<div style="clear: left"></div>
 	</div>
 	<div class="body">
 		<div class="section first">

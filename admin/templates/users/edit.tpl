@@ -11,15 +11,22 @@ function submitForm(form)
 	{apiget var='selected' type='user' id=$request.query.user}
 	{html_form tag_name="mainform" method="saveuser" username=$selected->getUsername() nestcurrent="true"}
 		<div class="header">
-			<div class="toolbar">
-				<div class="toolbarbutton">
-					<a href="javascript:submitForm('mainform')">Save</a>
-				</div>
-				<div class="toolbarbutton">
-					<a href="{$NESTED->encode()}">Cancel</a>
-				</div>
-			</div>
+			<table class="toolbar">
+				<tr>
+					<td>
+						<div class="toolbarbutton">
+							<a href="javascript:submitForm('mainform')">Save</a>
+						</div>
+					</td>
+					<td>
+						<div class="toolbarbutton">
+							<a href="{$NESTED->encode()}">Cancel</a>
+						</div>
+					</td>
+				</tr>
+			</table>
 			<h2>Create User</h2>
+			<div style="clear: left"></div>
 		</div>
 		<div class="body">
 			<div class="section first">

@@ -90,40 +90,179 @@ function moveDown(item, field, link) {
 	<div class="header">
 		{secure documents="write"}
 			{if !$item->isArchived()}
-				<div class="toolbar">
-					{if $itemversion->isComplete()}
-						<div class="toolbarbutton">
-							<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}"><img src="{$CONTENT}/icons/edit-grey.gif"/>
-							{if $class->getVersioning()=='simple'}
-								Edit
+				<table class="toolbar">
+					<tr>
+						{assign var="sequence" value=$itemversion->getMainSequence()}
+						<td>
+							{if false}
+								<div class="toolbarbutton">
+									<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
+									New category
+								</div>
 							{else}
-								Create new version for editing
+								<div class="toolbarbutton disabledtoolbarbutton">
+									<img src="{$CONTENT}/icons/add-folder-grey.gif" alt="New category">
+									New category
+								</div>
 							{/if}
-							</a>
-						</div>
-					{else}
-						<div class="toolbarbutton">
-							<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}"><img src="{$CONTENT}/icons/check-grey.gif"/> Mark as complete</a>
-						</div>
-						<div class="toolbarbutton">
-							<a href="{encode method="admin" path="items/edit.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/edit-grey.gif"/> Edit</a>
-						</div>
-					{/if}
-				</div>
-				{if $item !== $section->getRootItem()}
-					<div class="toolbarbutton">
-						<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}"><img src="{$CONTENT}/icons/delete-page-blue.gif"/> Archive this item</a>
-					</div>
-				{/if}
+						</td>
+						<td>
+							{if $sequence !== null}
+								{assign var="choices" value=$sequence->getVisibleClasses()}
+							{/if}
+							{if $sequence!==null && count($choices)>0}
+								{html_form method="createitem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}
+									<p class="toolbarbutton"><a onclick="this.parentNode.parentNode.submit(); return false;" href="#">New <img src="{$CONTENT}/icons/add-page-blue.gif"></a></p>
+									<div><select name="class">
+									{foreach from=$choices item="choice"}
+										<option value="{$choice->getId()}">{$choice->getName()}</option>
+									{/foreach}
+									</select></div>
+								{/html_form}
+							{else}
+								<p class="toolbarbutton disabledtoolbarbutton">New <img src="{$CONTENT}/icons/add-page-grey.gif"></p>
+								<div><select disabled="disabled" style="width: 100px"></select></div>
+							{/if}
+						</td>
+						<td class="separator"></td>
+						<td>
+							{if $class->getVersioning()=='simple'}
+								<div class="toolbarbutton">
+									<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}">
+										<img src="{$CONTENT}/icons/edit-page-blue.gif"/>
+										Edit options
+									</a>
+								</div>
+							{else}
+								{if $itemversion->isComplete()}
+									{assign var="draft" value=$itemvariant->getDraftVersion()}
+									{if $draft !== null}
+										<div class="toolbarbutton">
+											<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$draft->getVersion()}">
+												<img src="{$CONTENT}/icons/edit-page-blue.gif"/>
+												Goto draft
+											</a>
+										</div>
+									{else}
+										<div class="toolbarbutton">
+											<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}">
+												<img src="{$CONTENT}/icons/add-page-red.gif"/>
+												New version
+											</a>
+										</div>
+									{/if}
+								{else}
+									<div class="toolbarbutton disabledtoolbarbutton">
+										<img src="{$CONTENT}/icons/add-page-grey.gif"/>
+										New version
+									</div>
+								{/if}
+							{/if}
+						</td>
+						<td class="separator"></td>
+						{if $class->getVersioning()!='simple'}
+							{if !$itemversion->isComplete()}
+								<td>
+									<div class="toolbarbutton">
+										<a href="{encode method="admin" path="items/edit.tpl" item=$item->getId() version=$itemversion->getVersion()}">
+											<img src="{$CONTENT}/icons/draft-edit.gif"/>
+											Edit draft
+										</a>
+									</div>
+								</td>
+								<td>
+									<img src="{$CONTENT}/icons/arrow-blue.gif">
+								</td>
+								<td>
+									<div class="toolbarbutton">
+										<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}">
+											<img src="{$CONTENT}/icons/complete-grey.gif"/>
+											Mark complete
+										</a>
+									</div>
+								</td>
+								<td>
+									<img src="{$CONTENT}/icons/arrow-grey.gif">
+								</td>
+								<td>
+									<div class="toolbarbutton disabledtoolbarbutton">
+										<img src="{$CONTENT}/icons/complete-grey.gif"/>
+										Publish
+									</div>
+								</td>
+							{else}
+								<td>
+									<div class="toolbarbutton">
+										<img src="{$CONTENT}/icons/draft-done.gif"/>
+										Draft done
+									</div>
+								</td>
+								<td>
+									<img src="{$CONTENT}/icons/arrow-blue.gif">
+								</td>
+								<td>
+									<div class="toolbarbutton">
+										<img src="{$CONTENT}/icons/complete-done.gif"/>
+										Complete
+									</div>
+								</td>
+								<td>
+									<img src="{$CONTENT}/icons/arrow-blue.gif">
+								</td>
+								<td>
+									{if $itemversion->isCurrent()}
+										<div class="toolbarbutton">
+											<img src="{$CONTENT}/icons/publish-done.gif"/>
+											Published
+										</div>
+									{else}
+										<div class="toolbarbutton">
+											<a href="{encode method="saveitem" itemversion=$itemversion->getId() current="true" nestcurrent="true"}">
+												<img src="{$CONTENT}/icons/complete-grey.gif"/>
+												Publish
+											</a>
+										</div>
+									{/if}
+								</td>
+							{/if}
+							<td class="separator"></td>
+						{/if}
+						<td>
+							{if $item !== $section->getRootItem()}
+								<div class="toolbarbutton">
+									<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}">
+										<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
+										Delete
+									</a>
+								</div>
+							{else}
+								<div class="toolbarbutton disabledtoolbarbutton">
+									<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}">
+										<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
+										Delete
+									</a>
+								</div>
+							{/if}
+						</td>
+					</tr>
+				</table>
 			{else}
-				{if $item !== $section->getRootItem()}
-					<div class="toolbarbutton">
-						<a href="{encode method="archive" item=$item->getId() archive="false" nestcurrent="true"}"><img src="{$CONTENT}/icons/delete-page-blue.gif"/> Restore this item</a>
-					</div>
-				{/if}
+				<table class="toolbar">
+					<tr>
+						<td>
+							<div class="toolbarbutton">
+								<a href="{encode method="archive" item=$item->getId() archive="false" nestcurrent="true"}">
+									<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
+									Restore this item
+								</a>
+							</div>
+						</td>
+					</tr>
+				</table>
 			{/if}
 		{/secure}
 		<h2>Item Details</h2>
+		<div style="clear: left"></div>
 	</div>
 	<div class="body">
 		<div class="section first">
@@ -152,25 +291,6 @@ function moveDown(item, field, link) {
 									{/foreach}
 								</select>
 							{/html_form}
-							{if !$item->isArchived()}
-								{html_form tag_name="versionform" tag_style="display: inline" method="saveitem" itemversion=$itemversion->getId() current="true" nestcurrent="true"}
-									{if !$itemversion->isCurrent()}
-										{if $itemversion->isComplete()}
-											<div class="toolbarbutton">
-												<a href="javascript:document.forms.versionform.submit();">
-													<img src="{$CONTENT}/icons/check-blue.gif"> Publish this version
-												</a>
-											</div>
-										{else}
-											Item must be marked complete before it can be published.
-										{/if}
-									{else}
-										<div class="toolbarbutton disabled">
-											<img src="{$CONTENT}/icons/check-grey.gif"> Publish this version
-										</div>
-									{/if}
-								{/html_form}
-							{/if}
 						</td>
 					</tr>
 				</table>
@@ -245,7 +365,7 @@ function moveDown(item, field, link) {
 			</div>
 		</div>
 		{foreach name="fieldlist" from=$itemversion->getClassFields() item="field"}
-			{if $field->getType()=='sequence'}
+			{if $field->getType()=='sequence' && $field != $itemversion->getMainSequence()}
 				<div class="section">
 					<div class="sectionheader">
 						<h3>{$field->getName()|escape}</h3>

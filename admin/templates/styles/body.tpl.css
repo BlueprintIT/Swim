@@ -39,6 +39,29 @@ a:hover, a:visited:hover {
   display: block;
 }
 
+.header .toolbar {
+  clear: left;
+  float: left;
+  margin: 5px;
+}
+
+.header .toolbar .toolbarbutton {
+  text-align: center;
+  margin: 0;
+  float: none;
+  border: 0 none;
+}
+
+.header .toolbar div.toolbarbutton img {
+  display: block;
+  margin: 0 auto 0 auto;
+}
+
+.header .toolbar .separator {
+  width: 1px;
+  background-color: black;
+}
+
 .header h2 {
   margin: 0;
   padding: 10px;
@@ -108,24 +131,25 @@ div.content {
   padding: 5px;
 }
 
-div.toolbarbutton.disabled {
-  color: GrayText;
+.toolbarbutton.disabled,  .disabledtoolbarbutton {
+  color: GrayText !important;
 }
 
-div.toolbarbutton a,
-div.toolbarbutton a:visited,
-div.toolbarbutton a:hover,
-div.toolbarbutton a:active {
+.toolbarbutton a,
+.toolbarbutton a:visited,
+.toolbarbutton a:hover,
+.toolbarbutton a:active {
   text-decoration: none;
 }
 
-div.toolbarbutton {
+.toolbarbutton {
   border: 1px solid ThreeDShadow;
   background-color: ThreeDFace;
   padding: 3px;
   display: inline;
   white-space: nowrap;
   margin-right: 3px;
+  color: [#BLUE#];
 }
 
 div.toolbarbutton img {

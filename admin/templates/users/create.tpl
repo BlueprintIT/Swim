@@ -26,15 +26,22 @@ function submitForm(form)
 {/literal}</script>
 	{html_form tag_name="mainform" method="saveuser" nestcurrent="true"}
 		<div class="header">
-			<div class="toolbar">
-				<div class="toolbarbutton">
-					<a href="javascript:submitForm('mainform')">Create</a>
-				</div>
-				<div class="toolbarbutton">
-					<a href="{$NESTED->encode()}">Cancel</a>
-				</div>
-			</div>
+			<table class="toolbar">
+				<tr>
+					<td>
+						<div class="toolbarbutton">
+							<a href="javascript:submitForm('mainform')">Create</a>
+						</div>
+					</td>
+					<td>
+						<div class="toolbarbutton">
+							<a href="{$NESTED->encode()}">Cancel</a>
+						</div>
+					</td>
+				</tr>
+			</table>
 			<h2>Create User</h2>
+			<div style="clear: left"></div>
 		</div>
 		<div class="body">
 			<div class="section first">
