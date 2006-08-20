@@ -1,5 +1,6 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
+{script method="admin" path="scripts/request.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}

@@ -1,3 +1,5 @@
+var CONTENT = "{[$CONTENT]}";
+
 function Request()
 {
   this.query = [];

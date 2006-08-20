@@ -82,22 +82,30 @@ function recursiveCopy($dir, $target, $uselinks = false)
 	{
 		while (($file=readdir($res))!== false)
 		{
-			if (($file!='.')&&($file!='..'))
+			if (($file!='.') && ($file!='..'))
 			{
-				if ((is_file($dir.'/'.$file))||(is_link($dir.'/'.$file)))
-				{
-          if (!link($dir.'/'.$file,$target.'/'.$file))
-  					copy($dir.'/'.$file,$target.'/'.$file);
-				}
+        if (is_link($dir.'/'.$file))
+        {
+          $target = $dir.'/'.$file;
+          while (is_link($target))
+            $target = readlink($target);
+          if ((!$uselinks) || (!symlink($target, $target.'/'.$file)))
+            copy($dir.'/'.$file, $target.'/'.$file);
+        }
+        else if (is_file($dir.'/'.$file))
+        {
+          if ((!$uselinks) || (!link($dir.'/'.$file, $target.'/'.$file)))
+            copy($dir.'/'.$file, $target.'/'.$file);
+        }
 				else if (is_dir($dir.'/'.$file))
 				{
 					mkdir($target.'/'.$file);
-					recursiveCopy($dir.'/'.$file,$target.'/'.$file, $uselinks);
+					recursiveCopy($dir.'/'.$file, $target.'/'.$file, $uselinks);
 				}
 				else
 				{
 					$log->warn('Found unknown directory entry at '.$dir.'/'.$file);
-					copy($dir.'/'.$file,$target.'/'.$file);
+					copy($dir.'/'.$file, $target.'/'.$file);
 				}
 			}
 		}

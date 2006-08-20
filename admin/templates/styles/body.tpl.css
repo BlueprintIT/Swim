@@ -137,7 +137,7 @@ table.sequencelist td.name {
   width: 150px;
 }
 
-table.sequencelist td.options img {
+table.sequencelist td.options img, table.compound td.options img {
   border: 0;
 }
 

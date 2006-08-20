@@ -98,9 +98,15 @@ function createCompoundRow(compound)
   cell = document.createElement('td');
   row.appendChild(cell);
   
-  buttons = "<a href=\"#\" onclick=\"moveCompoundRow(compound_"+compound.id+", this.parentNode.parentNode, true); return false\">Up</a> ";
-  buttons+= "<a href=\"#\" onclick=\"moveCompoundRow(compound_"+compound.id+", this.parentNode.parentNode, false); return false\">Down</a> ";
-  buttons+= "<a href=\"#\" onclick=\"deleteCompoundRow(compound_"+compound.id+", this.parentNode.parentNode); return false\">-</a>";
+  buttons = "<a href=\"#\" onclick=\"moveCompoundRow(compound_"+compound.id+", this.parentNode.parentNode, true); return false\">";
+  buttons+= "<img alt=\"Move up\" title=\"Move up\" src=\""+CONTENT+"/icons/up-purple.gif\">";
+  buttons+= "</a>";
+  buttons+= "<a href=\"#\" onclick=\"moveCompoundRow(compound_"+compound.id+", this.parentNode.parentNode, false); return false\">";
+  buttons+= "<img alt=\"Move down\" title=\"Move down\" src=\""+CONTENT+"/icons/down-purple.gif\">";
+  buttons+= "</a>";
+  buttons+= "<a href=\"#\" onclick=\"deleteCompoundRow(compound_"+compound.id+", this.parentNode.parentNode); return false\">";
+  buttons+= "<img alt=\"Delete row\" title=\"Delete row\" src=\""+CONTENT+"/icons/delete-page-purple.gif\">";
+  buttons+= "</a>";
 	
 	cell.innerHTML = buttons;
 }

@@ -266,6 +266,8 @@ class CompoundField extends Field
   
   public function getEditor()
   {
+    global $_PREFS;
+    
     $result = "<script type=\"text/javascript\">\n<!--\n";
     $result.= "var compound_".$this->getId()." = { id: '".$this->getId()."', fields: {";
     foreach ($this->fields as $field)
@@ -290,14 +292,23 @@ class CompoundField extends Field
         $rlfield = $row->getField($field->getId());
         $result.='<td>'.$rlfield->getEditor().'</td>';
       }
-      $result.="<td>";
-      $result.="<a href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, true); return false\">Up</a> ";
-      $result.="<a href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, false); return false\">Down</a> ";
-      $result.="<a href=\"#\" onclick=\"deleteCompoundRow(compound_".$this->id.", this.parentNode.parentNode); return false\">-</a>";
+      $result.="<td class=\"options\">";
+      $result.="<a class=\"option\" href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, true); return false\">";
+      $result.="<img alt=\"Move up\" title=\"Move up\" src=\"".$_PREFS->getPref('url.admin.static')."/icons/up-purple.gif\">";
+      $result.="</a>";
+      $result.="<a class=\"option\" href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, false); return false\">";
+      $result.="<img alt=\"Move down\" title=\"Move down\" src=\"".$_PREFS->getPref('url.admin.static')."/icons/down-purple.gif\">";
+      $result.="</a>";
+      $result.="<a class=\"option\" href=\"#\" onclick=\"deleteCompoundRow(compound_".$this->id.", this.parentNode.parentNode); return false\">";
+      $result.="<img alt=\"Delete row\" title=\"Delete row\" src=\"".$_PREFS->getPref('url.admin.static')."/icons/delete-page-purple.gif\">";
+      $result.="</a>";
       $result.="</td></tr>\n";
     }
     $result.="</tbody>\n<tfoot>\n<tr>";
-    $result.="<td colspan=\"".count($this->fields)."\"></td><td><a onclick=\"createCompoundRow(compound_".$this->id."); return false\" href=\"#\">+</a></td>";
+    $result.="<td colspan=\"".count($this->fields)."\"></td><td class=\"options\">";
+    $result.="<a class=\"option\" onclick=\"createCompoundRow(compound_".$this->id."); return false\" href=\"#\">";
+    $result.="<img alt=\"Add row\" title=\"Add row\" src=\"".$_PREFS->getPref('url.admin.static')."/icons/add-page-purple.gif\">";
+    $result.="</a></td>";
     $result.="</tr>\n</tfoot>\n</table>\n";
     return $result;
   }
