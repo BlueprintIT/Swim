@@ -75,7 +75,7 @@ function submitForm(form)
 				<div class="section">
 			{/if}
 				<div class="sectionheader">
-					<h3>Item Options</h3>
+					<h3>{$class->getName()} content</h3>
 				</div>
 				<div class="sectionbody">
 					<table class="admin">
@@ -93,14 +93,8 @@ function submitForm(form)
 			</div>
 			{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 				{if $field->getType()=='html'}
-					<div class="section">
-						<div class="sectionheader">
-							<h3>{$field->getName()|escape}</h3>
-						</div>
-						<div class="sectionbody">
-							<div id="field_{$field->getId()}">{$field->getEditor()}</div>
-						</div>
-					</div>
+					<p class="htmlfield">{$field->getName()|escape}:</p>
+					<div id="field_{$field->getId()}">{$field->getEditor()}</div>
 				{/if}
 			{/foreach}
 		</div>

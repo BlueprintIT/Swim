@@ -31,7 +31,7 @@ class ArchiveAdminSection extends AdminSection
   
   public function getName()
   {
-    return "Archive";
+    return "Recycle Bin";
   }
   
   public function getPriority()

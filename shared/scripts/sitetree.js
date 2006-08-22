@@ -1,4 +1,4 @@
-BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oContents, oParent) {
+BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oPublished, oContents, oParent) {
 	var html = oLabel;
 	if (oId) {
 		html = '<a href="javascript:onTreeItemClick(\''+oId+'\')">' + html + '</a>';
@@ -6,6 +6,7 @@ BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oContents, oParent) {
 	var oData = {
 		id: oId,
 		html: html,
+		published: oPublished,
 		type: oType,
 		contains: oContents
 	};
@@ -23,17 +24,23 @@ BlueprintIT.widget.ItemNode.prototype.getLabelEl = function() {
 }
 
 BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
-	var style = "";
+	var style = "site_itemcontent";
+	var parg = "";
+	if (this.data.published)
+		parg="_published";
 	if (this.data.contains)
 	{
+		var state = "clsd";
 		if (this.expanded)
-			style = "site_itemcontent site_container_open site_icon_"+this.data.type+" site_icon_"+this.data.type+"_open";
-		else
-			style = "site_itemcontent site_container_clsd site_icon_"+this.data.type+" site_icon_"+this.data.type+"_clsd";
+			state = "open";
+		
+		style+= " site_container_"+state+parg;
+		style+= " site_icon_"+this.data.type+parg+" site_icon_"+this.data.type+"_"+state+parg;
 	}
 	else
 	{
-		style = "site_itemcontent site_item site_icon_"+this.data.type;
+		style+= " site_item"+parg;
+		style+= " site_icon_"+this.data.type+parg;
 	}
 	
 	return style;
@@ -201,6 +208,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	loadItem: function(node, parentnode) {
 		var label = node.getAttribute("name");
 		var type = node.getAttribute("class");
+		var published = node.getAttribute("published")=="true";
 		var contents = null;
 		
 		if (!label)
@@ -220,7 +228,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 				contents[content[i]] = true;
 		}
 			
-		var treenode = new BlueprintIT.widget.ItemNode(id, label, type, contents, parentnode);
+		var treenode = new BlueprintIT.widget.ItemNode(id, label, type, published, contents, parentnode);
 		if (id)
 			this.items[id].push(treenode);
 		

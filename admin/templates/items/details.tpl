@@ -1,5 +1,6 @@
 {secure documents="read" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
+{stylesheet href="$SHARED/treeview/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
@@ -160,7 +161,28 @@ function moveDown(item, field, link) {
 							{/if}
 						</td>
 						<td class="separator"></td>
-						{if $class->getVersioning()!='simple'}
+						<td>
+							{if $item !== $section->getRootItem()}
+								<div class="toolbarbutton">
+									<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}">
+										<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
+										Delete
+									</a>
+								</div>
+							{else}
+								<div class="toolbarbutton disabledtoolbarbutton">
+									<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}">
+										<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
+										Delete
+									</a>
+								</div>
+							{/if}
+						</td>
+					</tr>
+				</table>
+				{if $class->getVersioning()!='simple'}
+					<table class="toolbar">
+						<tr>
 							{if !$itemversion->isComplete()}
 								<td>
 									<div class="toolbarbutton">
@@ -225,27 +247,9 @@ function moveDown(item, field, link) {
 									{/if}
 								</td>
 							{/if}
-							<td class="separator"></td>
-						{/if}
-						<td>
-							{if $item !== $section->getRootItem()}
-								<div class="toolbarbutton">
-									<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}">
-										<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
-										Delete
-									</a>
-								</div>
-							{else}
-								<div class="toolbarbutton disabledtoolbarbutton">
-									<a href="{encode method="archive" item=$item->getId() archive="true" nestcurrent="true"}">
-										<img src="{$CONTENT}/icons/delete-page-blue.gif"/>
-										Delete
-									</a>
-								</div>
-							{/if}
-						</td>
-					</tr>
-				</table>
+						</tr>
+					</table>
+				{/if}
 			{else}
 				<table class="toolbar">
 					<tr>
@@ -266,13 +270,17 @@ function moveDown(item, field, link) {
 	</div>
 	<div class="body">
 		<div class="section first">
-			<div class="sectionheader">
-				<h3>Version Control</h3>
-			</div>
 			<div class="sectionbody">
+				{assign var="namefield" value=$itemversion->getField("name")}
+				{assign var="sequence" value=$itemversion->getMainSequence()}
+				{if $sequence === null}
+					<h2 class="site_itemcontent site_item site_icon_{$class->getId()}">{$namefield->output($SMARTY)}</h2>
+				{else}
+					<h2 class="site_itemcontent site_container_open site_icon_{$class->getId()} site_icon_{$class->getId()}_open">{$namefield->output($SMARTY)}</h2>
+				{/if}
 				<table class="admin">
 					<tr>
-					    <td class="label"><label for="title">Version:</label></td>
+					    <td class="label"><label for="title">Version control:</label></td>
 					    <td class="details">
 							{html_form tag_style="display: inline" method="admin" path="items/details.tpl" item=$item->getId() formmethod="GET"}
 								<select name="version" onchange="this.form.submit();">
@@ -297,7 +305,7 @@ function moveDown(item, field, link) {
 			</div>
 		</div>
 		{if ($class->allowsLink() && $view !== null)}
-			<div class="section">
+			<div class="section first">
 				<div class="sectionheader">
 					<h3>View Options</h3>
 				</div>
@@ -344,17 +352,16 @@ function moveDown(item, field, link) {
 		{/if}
 		<div class="section">
 			<div class="sectionheader">
-				<h3>Item Options</h3>
+				<h3>{$class->getName()} content</h3>
 			</div>
 			<div class="sectionbody">
 				<table class="admin">
 					<tr>
-						<td class="label">Class:</td>
+						<td class="label">Type:</td>
 						<td class="details">{$class->getName()}</td>
-	
 					</tr>
 					{foreach from=$itemversion->getClassFields() item="field"}
-						{if $field->getType()!='html' && $field->getType()!='sequence'}
+						{if $field->getType()!='html' && $field->getType()!='sequence' && $field->getId()!='name'}
 							<tr>
 								<td class="label">{$field->getName()|escape}:</td>
 								<td class="details">{$field->output($SMARTY)}</td>
@@ -414,14 +421,8 @@ function moveDown(item, field, link) {
 		{/foreach}
 		{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 			{if $field->getType()=='html'}
-				<div class="section">
-					<div class="sectionheader">
-						<h3>{$field->getName()|escape}</h3>
-					</div>
-					<div class="sectionbody">
-						{$field->output($SMARTY)}
-					</div>
-				</div>
+				<p class="htmlfield">{$field->getName()|escape}:</p>
+				{$field->output($SMARTY)}
 			{/if}
 		{/foreach}
 	</div>
