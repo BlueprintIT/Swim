@@ -56,10 +56,22 @@ function switch_date_field(basefield, field, pos1, pos2)
 
 function switch_item_field(basefield, field, pos1, pos2)
 {
+	switch_simple_field(basefield, field, pos1, pos2);
+	var field1 = document.getElementById("fbfake-field_"+basefield+"_"+pos1+"_"+field);
+	var field2 = document.getElementById("fbfake-field_"+basefield+"_"+pos2+"_"+field);
+	var temp = field1.value;
+	field1.value = field2.value;
+	field2.value = temp;
 }
 
 function switch_file_field(basefield, field, pos1, pos2)
 {
+	switch_simple_field(basefield, field, pos1, pos2);
+	var field1 = document.getElementById("fbfake-field_"+basefield+"_"+pos1+"_"+field);
+	var field2 = document.getElementById("fbfake-field_"+basefield+"_"+pos2+"_"+field);
+	var temp = field1.value;
+	field1.value = field2.value;
+	field2.value = temp;
 }
 
 function switchCompoundField(type, basefield, field, pos1, pos2)
