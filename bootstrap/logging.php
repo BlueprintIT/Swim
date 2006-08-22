@@ -626,6 +626,8 @@ LoggerManager::init();
 
 function caught_error($type,$text,$file,$line)
 {
+  global $_PREFS;
+  
 	// Filter out lines marked with @ for expected errors.
 	if (ini_get('error_reporting')==0)
 		return;
@@ -645,6 +647,17 @@ function caught_error($type,$text,$file,$line)
 	}
 	else if (($type==E_NOTICE)||($type==E_USER_WARNING))
 	{
+    if ($_PREFS !== null)
+    {
+      $lfile = str_replace('\\', '/', $file);
+      $cache = $_PREFS->getPref('storage.admin.compiled');
+      if (substr($lfile, 0, strlen($cache)) == $cache)
+        return;
+      $cache = $_PREFS->getPref('storage.site.compiled');
+      if (substr($lfile, 0, strlen($cache)) == $cache)
+        return;
+    }
+
 		$log->log(LOG_LEVEL_WARN,$text,$trace);
 	}
 	else if ($type==E_USER_NOTICE)
