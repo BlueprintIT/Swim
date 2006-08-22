@@ -160,6 +160,25 @@ function moveDown(item, field, link) {
 								{/if}
 							{/if}
 						</td>
+						<td>
+							{if ($class->allowsLink() && $view !== null && (!$itemversion->isComplete() || $class->getVersioning()=='simple'))}
+								<div class="toolbarbutton">
+									{if !$itemversion->isComplete()}
+										<a href="{encode method="admin" path="items/editview.tpl" item=$item->getId() version=$itemversion->getVersion()}">
+									{else}
+										<a href="{encode method="copyversion" action="editview" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}">
+									{/if}
+										<img src="{$CONTENT}/icons/view-edit.gif"/>
+										Edit view
+									</a>
+								</div>
+							{else}
+								<div class="toolbarbutton disabledtoolbarbutton">
+									<img src="{$CONTENT}/icons/view-edit-grey.gif"/>
+									Edit view
+								</div>
+							{/if}
+						</td>
 						<td class="separator"></td>
 						<td>
 							{if $item !== $section->getRootItem()}

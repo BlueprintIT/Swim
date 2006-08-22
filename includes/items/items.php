@@ -26,7 +26,7 @@ class ArchiveAdminSection extends AdminSection
   {
     global $_PREFS;
     
-    return $_PREFS->getPref('url.admin.static').'/icons/user-group2.gif';
+    return $_PREFS->getPref('url.admin.static').'/icons/bin.gif';
   }
   
   public function getName()

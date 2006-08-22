@@ -51,7 +51,10 @@ function method_copyversion($request)
             {
               $req = new Request();
               $req->setMethod('admin');
-              $req->setPath('items/edit.tpl');
+              if ($request->hasQueryVar('action'))
+                $req->setPath('items/'.$request->getQueryVar('action').'.tpl');
+              else
+                $req->setPath('items/edit.tpl');
               $req->setQueryVar('item', $item->getId());
               $req->setQueryVar('version', $newversion->getVersion());
               $req->setQueryVar('reloadtree', 'true');

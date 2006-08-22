@@ -315,24 +315,31 @@ class CompoundField extends Field
   
   public function output(&$smarty)
   {
-    $result = "<table class=\"compound\">\n<thead><tr>";
-    foreach ($this->fields as $field)
-    {
-      $result.='<th>'.$field->getName().'</th>';
-    }
-    $result.="</tr></thead>\n<tbody>\n";
     $rows = $this->getRows();
-    foreach ($rows as $row)
+    if (count($rows)>0)
     {
-      $result.='<tr>';
+      $result = "<table class=\"compound\">\n<thead><tr>";
       foreach ($this->fields as $field)
       {
-        $rlfield = $row->getField($field->getId());
-        $result.='<td>'.$rlfield->output($smarty).'</td>';
+        $result.='<th>'.$field->getName().'</th>';
       }
-      $result.="</tr>\n";
+      $result.="</tr></thead>\n<tbody>\n";
+      foreach ($rows as $row)
+      {
+        $result.='<tr>';
+        foreach ($this->fields as $field)
+        {
+          $rlfield = $row->getField($field->getId());
+          $result.='<td>'.$rlfield->output($smarty).'</td>';
+        }
+        $result.="</tr>\n";
+      }
+      $result.="</tbody>\n</table>\n";
     }
-    $result.="</tbody>\n</table>\n";
+    else
+    {
+      $result = "None";
+    }
     return $result;
   }
 

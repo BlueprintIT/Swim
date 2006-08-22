@@ -55,11 +55,11 @@ function submitForm(form)
 		<div class="body">
 			<div class="section first">
 				<div class="sectionheader">
-					<h3>{$class->getName()} content</h3>
+					<h3>View Options</h3>
 				</div>
 				<div class="sectionbody">
 					<table class="admin">
-						{foreach from=$itemversion->getClassFields() item="field"}
+						{foreach from=$itemversion->getViewFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
 									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
@@ -71,12 +71,6 @@ function submitForm(form)
 					</table>
 				</div>
 			</div>
-			{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
-				{if $field->getType()=='html'}
-					<p class="htmlfield">{$field->getName()|escape}:</p>
-					<div id="field_{$field->getId()}">{$field->getEditor()}</div>
-				{/if}
-			{/foreach}
 		</div>
 	</div>
 {/html_form}
