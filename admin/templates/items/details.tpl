@@ -261,7 +261,7 @@ function moveDown(item, field, link) {
 				</table>
 			{/if}
 		{/secure}
-		<h2>Item Details</h2>
+		<h2>Details</h2>
 		<div style="clear: left"></div>
 	</div>
 	<div class="body">

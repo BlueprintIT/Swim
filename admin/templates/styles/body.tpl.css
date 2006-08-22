@@ -50,6 +50,11 @@ a:hover, a:visited:hover {
   margin: 0;
   float: none;
   border: 0 none;
+  width: 7em;
+}
+
+.header .toolbar .toolbarbutton a:hover {
+  text-align: center;
 }
 
 .header .toolbar div.toolbarbutton img {
