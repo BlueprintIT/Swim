@@ -262,6 +262,10 @@ class CompoundField extends Field
   {
     $this->rows = array();
     parent::setItemVersion($item);
+    foreach ($this->fields as $field)
+    {
+      $field->setItemVersion($item);
+    }
   }
   
   public function getEditor(&$request, &$smarty)
@@ -280,7 +284,14 @@ class CompoundField extends Field
     $result.= "var compound_".$this->getId()." = { id: '".$this->getId()."', fields: {";
     foreach ($this->fields as $field)
     {
-      $result.=$field->getId().": '".$field->getType()."',";
+      $result.=$field->getId().": {";
+      $attrs = $field->getClientAttributes();
+      foreach ($attrs as $name => $value)
+      {
+        $result.=" ".$name.": '".$value."',";
+      }
+      $result = substr($result,0,-1);
+      $result.=" },";
     }
     $result = substr($result,0,-1);
     $result.="} };";

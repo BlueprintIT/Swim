@@ -1,94 +1,114 @@
 // Generic field creators
 
-function create_simple_field(basefield, position, field, container)
+function getFieldId(basefield, position, field)
+{
+	return "field_"+basefield+"_"+position+"_"+field;
+}
+
+function getFieldName(basefield, position, field)
+{
+	return basefield+"["+position+"]."+field;
+}
+
+function create_simple_field(basefield, position, field, container, fielddata)
 {
 	var input = document.createElement("input");
 	input.setAttribute("type", "text");
-	input.setAttribute("id", "field_"+basefield+"_"+position+"_"+field);
-	input.setAttribute("name", basefield+"["+position+"]."+field);
+	input.setAttribute("id", getFieldId(basefield, position, field));
+	input.setAttribute("name", getFieldName(basefield, position, field));
 	container.appendChild(input);
 }
 
-function create_date_field(basefield, position, field, container)
+function create_date_field(basefield, position, field, container, fielddata)
 {
 }
 
-function create_item_field(basefield, position, field, container)
+function create_item_field(basefield, position, field, container, fielddata)
 {
 }
 
-function create_file_field(basefield, position, field, container)
+function create_file_field(basefield, position, field, container, fielddata)
 {
+  var content = '<input id="'+getFieldId(basefield, position, field)+'" name="'+getFieldName(basefield, position, field)+'" type="hidden" value=""> ';
+  content+= '<input id="fbfake-'+getFieldId(basefield, position, field)+'" disabled="true" type="text" value="[Nothing selected]"> ';
+  content+= '<div class="toolbarbutton">';
+  content+= '<a href="javascript:showFileBrowser(\''+getFieldId(basefield, position, field)+'\',\''+fielddata.request+'\')">Select...</a>';
+  content+= '</div> ';
+  content+= '<div class="toolbarbutton">';
+  content+= '<a href="javascript:clearFileBrowser(\''+getFieldId(basefield, position, field)+'\')">Clear</a>';
+  content+= '</div> ';
+
+  container.innerHTML = content;
 }
 
-function createCompoundField(type, basefield, position, field, container)
+function createCompoundField(basefield, position, field, container, fielddata)
 {
-	switch (type)
+	switch (fielddata.type)
 	{
 		case 'file':
-			create_file_field(basefield, position, field, container);
+			create_file_field(basefield, position, field, container, fielddata);
 			break;
 		case 'item':
-			create_item_field(basefield, position, field, container);
+			create_item_field(basefield, position, field, container, fielddata);
 			break;
 		case 'date':
-			create_date_field(basefield, position, field, container);
+			create_date_field(basefield, position, field, container, fielddata);
 			break;
 		default:
-			create_simple_field(basefield, position, field, container);
+			create_simple_field(basefield, position, field, container, fielddata);
 	}
 }
 
 // Generic field switchers
 
-function switch_simple_field(basefield, field, pos1, pos2)
+function switch_simple_field(basefield, field, pos1, pos2, fielddata)
 {
-	var field1 = document.getElementById("field_"+basefield+"_"+pos1+"_"+field);
-	var field2 = document.getElementById("field_"+basefield+"_"+pos2+"_"+field);
+	var field1 = document.getElementById(getFieldId(basefield, pos1, field));
+	var field2 = document.getElementById(getFieldId(basefield, pos2, field));
 	var temp = field1.value;
 	field1.value = field2.value;
 	field2.value = temp;
 }
 
-function switch_date_field(basefield, field, pos1, pos2)
+function switch_date_field(basefield, field, pos1, pos2, fielddata)
 {
 }
 
-function switch_item_field(basefield, field, pos1, pos2)
+function switch_item_field(basefield, field, pos1, pos2, fielddata)
 {
-	switch_simple_field(basefield, field, pos1, pos2);
-	var field1 = document.getElementById("fbfake-field_"+basefield+"_"+pos1+"_"+field);
-	var field2 = document.getElementById("fbfake-field_"+basefield+"_"+pos2+"_"+field);
+	switch_simple_field(basefield, field, pos1, pos2, fielddata);
+	var field1 = document.getElementById("fbfake-"+getFieldId(basefield, pos1, field));
+	var field2 = document.getElementById("fbfake-"+getFieldId(basefield, pos2, field));
 	var temp = field1.value;
 	field1.value = field2.value;
 	field2.value = temp;
 }
 
-function switch_file_field(basefield, field, pos1, pos2)
+function switch_file_field(basefield, field, pos1, pos2, fielddata)
 {
-	switch_simple_field(basefield, field, pos1, pos2);
-	var field1 = document.getElementById("fbfake-field_"+basefield+"_"+pos1+"_"+field);
-	var field2 = document.getElementById("fbfake-field_"+basefield+"_"+pos2+"_"+field);
+	switch_simple_field(basefield, field, pos1, pos2, fielddata);
+	var field1 = document.getElementById("fbfake-"+getFieldId(basefield, pos1, field));
+	var field2 = document.getElementById("fbfake-"+getFieldId(basefield, pos2, field));
 	var temp = field1.value;
 	field1.value = field2.value;
 	field2.value = temp;
 }
 
-function switchCompoundField(type, basefield, field, pos1, pos2)
+function switchCompoundField(basefield, field, pos1, pos2, fielddata)
 {
-	switch (type)
+	switch (fielddata.type)
 	{
 		case 'file':
-			switch_file_field(basefield, field, pos1, pos2);
+			switch_file_field(basefield, field, pos1, pos2, fielddata);
 			break;
 		case 'item':
-			switch_item_field(basefield, field, pos1, pos2);
+			switch_item_field(basefield, field, pos1, pos2, fielddata);
 			break;
 		case 'date':
-			switch_date_field(basefield, field, pos1, pos2);
+			switch_date_field(basefield, field, pos1, pos2, fielddata);
 			break;
 		default:
-			switch_simple_field(basefield, field, pos1, pos2);
+			switch_simple_field(basefield, field, pos1, pos2, fielddata);
 	}
 }
 
@@ -105,7 +125,7 @@ function createCompoundRow(compound)
   {
     cell = document.createElement('td');
     row.appendChild(cell);
-    createCompoundField(compound.fields[i], compound.id, rowcount, i, cell);
+    createCompoundField(compound.id, rowcount, i, cell, compound.fields[i]);
   }
   cell = document.createElement('td');
   row.appendChild(cell);
@@ -127,7 +147,7 @@ function switchCompoundRows(compound, row1, row2)
 {
   for (var i in compound.fields)
   {
-    switchCompoundField(compound.fields[i], compound.id, i, row1, row2);
+    switchCompoundField(compound.id, i, row1, row2, compound.fields[i]);
   }
 }
 

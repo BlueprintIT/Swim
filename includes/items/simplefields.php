@@ -66,6 +66,11 @@ class SimpleField extends Field
     }
   }
   
+  public function getClientAttributes()
+  {
+    return array('type' => $this->type);
+  }
+
   protected function getPassedValue($request)
   {
     if ($this->basefield == 'base')
@@ -429,6 +434,23 @@ class FileField extends TextField
     $newvalue = str_replace($item->getStorageUrl(), $this->itemversion->getStorageUrl(), $this->value);
     if ($newvalue != $this->value)
       $this->setValue($newvalue);
+  }
+  
+  public function getClientAttributes()
+  {
+    $attrs = parent::getClientAttributes();
+    
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('browser/filebrowser.tpl');
+    $request->setQueryVar('item', $this->itemversion->getItem()->getId());
+    $request->setQueryVar('variant', $this->itemversion->getVariant()->getVariant());
+    $request->setQueryVar('version', $this->itemversion->getVersion());
+    $request->setQueryVar('type', $this->filetype);
+    
+    $attrs['request'] = $request->encode();
+    
+    return $attrs;
   }
   
   public function getEditor(&$request, &$smarty)
