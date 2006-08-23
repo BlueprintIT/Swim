@@ -95,11 +95,26 @@ function moveDown(item, field, link) {
 					<tr>
 						{assign var="sequence" value=$itemversion->getMainSequence()}
 						<td>
-							{if false}
-								<div class="toolbarbutton">
-									<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
-									New category
-								</div>
+							{if $sequence !== null}
+								{assign var="choices" value=$sequence->getVisibleClasses()}
+								{assign var="found" value="false"}
+								{foreach from=$choices item="choice"}
+									{if strtolower($choice->getName())=='category'}
+										{assign var="found" value="true"}
+										<div class="toolbarbutton">
+											<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
+												<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
+												New category
+											</a>
+										</div>
+									{/if}
+								{/foreach}
+								{if $found=='false'}
+									<div class="toolbarbutton disabledtoolbarbutton">
+										<img src="{$CONTENT}/icons/add-folder-grey.gif" alt="New category">
+										New category
+									</div>
+								{/if}
 							{else}
 								<div class="toolbarbutton disabledtoolbarbutton">
 									<img src="{$CONTENT}/icons/add-folder-grey.gif" alt="New category">
@@ -116,7 +131,9 @@ function moveDown(item, field, link) {
 									<p class="toolbarbutton"><a onclick="this.parentNode.parentNode.submit(); return false;" href="#">New <img src="{$CONTENT}/icons/add-page-blue.gif"></a></p>
 									<div><select name="class">
 									{foreach from=$choices item="choice"}
-										<option value="{$choice->getId()}">{$choice->getName()}</option>
+										{if strtolower($choice->getName())!='category'}
+											<option value="{$choice->getId()}">{$choice->getName()}</option>
+										{/if}
 									{/foreach}
 									</select></div>
 								{/html_form}
