@@ -296,12 +296,17 @@ class CompoundField extends Field
     $result = substr($result,0,-1);
     $result.="} };";
     $result.= "\n-->\n</script>\n";
-    $result.= "<table class=\"compound\">\n<thead><tr>";
-    foreach ($this->fields as $field)
+    $result.= "<table class=\"compound\">\n";
+    if (count($this->fields)>1)
     {
-      $result.='<th>'.$field->getName().'</th>';
+      $result.= "<thead><tr>";
+      foreach ($this->fields as $field)
+      {
+        $result.='<th>'.$field->getName().'</th>';
+      }
+      $result.="<th></th></tr></thead>\n";
     }
-    $result.="<th></th></tr></thead>\n<tbody id=\"tbody_".$this->id."\">\n";
+    $result.="<tbody id=\"tbody_".$this->id."\">\n";
     for ($pos = 0; $pos<$rowcount; $pos++)
     {
       $row = $this->getRow($rowcount);
@@ -337,12 +342,17 @@ class CompoundField extends Field
     $rows = $this->getRows();
     if (count($rows)>0)
     {
-      $result = "<table class=\"compound\">\n<thead><tr>";
-      foreach ($this->fields as $field)
+      $result.= "<table class=\"compound\">\n";
+      if (count($this->fields)>1)
       {
-        $result.='<th>'.$field->getName().'</th>';
+        $result.= "<thead><tr>";
+        foreach ($this->fields as $field)
+        {
+          $result.='<th>'.$field->getName().'</th>';
+        }
+        $result.="<th></th></tr></thead>\n";
       }
-      $result.="</tr></thead>\n<tbody>\n";
+      $result.="<tbody>\n";
       foreach ($rows as $row)
       {
         $result.='<tr>';
