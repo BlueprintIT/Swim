@@ -66,6 +66,29 @@ class SimpleField extends Field
     }
   }
   
+  protected function getPassedValue($request)
+  {
+    if ($this->basefield == 'base')
+    {
+      if ($request->hasQueryVar($this->id))
+        return $request->getQueryVar($this->id);
+    }
+    else
+    {
+      if ($request->hasQueryVar($this->basefield))
+      {
+        $passed = $request->getQueryVar($this->basefield);
+        if ((is_array($passed)) && (isset($passed[$this->pos])))
+        {
+          $passed = $passed[$this->pos];
+          if ((is_array($passed)) && (isset($passed[$this->id])))
+            return $passed[$this->id];
+        }
+      }
+    }
+    return $this->toString();
+  }
+  
   protected function getFieldName()
   {
     if ($this->basefield == 'base')
@@ -82,12 +105,12 @@ class SimpleField extends Field
       return 'field_'.$this->basefield.'_'.$this->pos.'_'.$this->id;
   }
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
     $state = '';
     if (!$this->isEditable())
       $state = 'disabled="true" ';
-    return '<input '.$state.'type="text" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->toString().'">';
+    return '<input '.$state.'type="text" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->getPassedValue($request).'">';
   }
   
   protected function getDefaultValue()
@@ -145,7 +168,7 @@ class TextField extends SimpleField
   protected $stylesheet;
   protected $styles;
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
     global $_PREFS;
     
@@ -153,18 +176,18 @@ class TextField extends SimpleField
     if (!$this->isEditable())
       $state = 'disabled="true" ';
     if ($this->type == 'multiline')
-      return '<textarea '.$state.'style="width: 100%; height: 100px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.htmlentities($this->toString()).'</textarea>';
+      return '<textarea '.$state.'style="width: 100%; height: 100px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.htmlentities($this->getPassedValue($request)).'</textarea>';
     else if ($this->type == 'html')
     {
       if (!$this->isEditable())
-        return '<div id="'.$this->id.'">'.$this->toString().'</div>';
+        return '<div id="'.$this->id.'">'.$this->getPassedValue($request).'</div>';
       else
       {
         recursiveMkDir($this->itemversion->getStoragePath());
         include_once($_PREFS->getPref('storage.fckeditor').'/fckeditor.php');
         $editor = new FCKeditor($this->getFieldName()) ;
         $editor->BasePath = $_PREFS->getPref('url.fckeditor');
-        $value = $this->toString();
+        $value = $this->getPassedValue($request);
         if (strlen($value)==0)
           $value = "<p><br/>\n</p>";
         $editor->Value = $value;
@@ -199,7 +222,7 @@ class TextField extends SimpleField
       }
     }
     else
-      return parent::getEditor();
+      return parent::getEditor($request, $smarty);
   }
   
   public function getPlainText()
@@ -244,7 +267,7 @@ class TextField extends SimpleField
     return 0;
   }
   
-  public function output(&$smarty)
+  public function output(&$request, &$smarty)
   {
     if ($this->type == 'html')
     {
@@ -288,12 +311,12 @@ class DateField extends IntegerField
     return 0;
   }
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
     $text = '';
-    $text.='<input type="hidden" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->toString().'">';
+    $text.='<input type="hidden" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="'.$this->getPassedValue($request).'">';
     $text.='<div id="calendar_'.$this->getFieldId().'"></div>'."\n";
-    $text.='<script type="text/javascript">var cal_'.$this->getFieldId().' = displayCalendar("'.$this->getFieldId().'",'.$this->toString().');</script>'."\n";
+    $text.='<script type="text/javascript">var cal_'.$this->getFieldId().' = displayCalendar("'.$this->getFieldId().'",'.$this->getPassedValue($request).');</script>'."\n";
     return $text;
   }
   
@@ -302,7 +325,7 @@ class DateField extends IntegerField
     return date('l Y F j n', $this->toString());
   }
   
-  public function output(&$smarty)
+  public function output(&$request, &$smarty)
   {
     return date('d/m/Y', $this->toString());
   }
@@ -328,7 +351,10 @@ class ItemField extends IntegerField
       return;
       
     parent::retrieve();
-    $this->item = Item::getItem($this->value);
+    if ($this->value == -1)
+      $this->item = null;
+    else
+      $this->item = Item::getItem($this->value);
   }
   
   public function isIndexed()
@@ -346,10 +372,13 @@ class ItemField extends IntegerField
   public function toString()
   {
     $this->retrieve();
-    
+    if ($this->item !== null)
+      return $this->item->getId();
+    else
+      return -1;
   }
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
     $this->retrieve();
     
@@ -358,14 +387,15 @@ class ItemField extends IntegerField
     $request->setPath('browser/filebrowser.tpl');
     $request->setQueryVar('type', 'item');
 
-    if ($this->item !== null)
+    $value = $this->getPassedValue($request);
+    if ($value>=0)
     {
-      $rlvalue = $this->toString();
+      $rlvalue = $value;
     }
     else
       $rlvalue = '[Nothing selected]';
 
-    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$this->value.'"> ';
+    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
 
     echo '<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
     echo '<div class="toolbarbutton">';
@@ -401,10 +431,8 @@ class FileField extends TextField
       $this->setValue($newvalue);
   }
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
-    $this->retrieve();
-    
     $request = new Request();
     $request->setMethod('admin');
     $request->setPath('browser/filebrowser.tpl');
@@ -413,9 +441,10 @@ class FileField extends TextField
     $request->setQueryVar('version', $this->itemversion->getVersion());
     $request->setQueryVar('type', $this->filetype);
 
-    if (strlen($this->value)>0)
+    $value = $this->getPassedValue($request);
+    if (strlen($value)>0)
     {
-      $rlvalue = $this->value;
+      $rlvalue = $value;
       $pos = strrpos($rlvalue, '/');
       if ($pos!==false)
         $rlvalue = substr($rlvalue, $pos+1);
@@ -423,7 +452,7 @@ class FileField extends TextField
     else
       $rlvalue = '[Nothing selected]';
 
-    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$this->value.'"> ';
+    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
 
     echo '<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
     echo '<div class="toolbarbutton">';

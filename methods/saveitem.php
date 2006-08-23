@@ -47,7 +47,8 @@ function method_saveitem($request)
           else if (($name != 'complete') && ($name != 'current'))
           {
             $field = $itemversion->getField($name);
-            $field->setValue($value);
+            if ($field !== null)
+              $field->setValue($value);
           }
         }
         if (isset($query['complete']))

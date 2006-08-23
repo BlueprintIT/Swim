@@ -17,7 +17,11 @@
 	{assign var="itemversion" value=$itemvariant->getVersions()[0]}
 {/if}
 {assign var="class" value=$itemversion->getClass()}
-{assign var="view" value=$itemversion->getView()}
+{if isset($request.query.view)}
+	{apiget var="view" type="view" id=$request.query.view}
+{else}
+	{assign var="view" value=$itemversion->getView()}
+{/if}
 <script>
 {if isset($request.query.reloadtree)}
   window.top.SiteTree.loadTree();
@@ -29,7 +33,7 @@ function submitForm(form)
 }
 {/literal}</script>
 <div id="mainpane">
-	{html_form tag_name="mainform" method="saveitem" itemversion=$itemversion->getId()}
+	{html_form tag_name="mainform" method="saveitem" item=$item->getId() version=$itemversion->getVersion() itemversion=$itemversion->getId()}
 		{if $class->getVersioning()=='simple'}
 			<input type="hidden" name="complete" value="true">
 			<input type="hidden" name="current" value="true">
@@ -54,16 +58,39 @@ function submitForm(form)
 		</div>
 		<div class="body">
 			<div class="section first">
+				<div class="sectionbody">
+					<table>
+						<tr>
+						    <td class="label"><label for="title">View:</label></td>
+						    <td class="details">
+								<select name="view" onchange="this.form.action='{encode method="admin" path="items/editview.tpl"}'; this.form.submit();">
+									{foreach from=$class->getViews() item="nview"}
+										{if $nview === $view}
+												<option value="{$nview->getId()}" selected="true">
+										{else}
+												<option value="{$nview->getId()}">
+										{/if}
+											{$nview->getName()}
+										</option>
+									{/foreach}
+								</select>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="section first">
 				<div class="sectionheader">
 					<h3>View Options</h3>
 				</div>
 				<div class="sectionbody">
 					<table class="admin">
-						{foreach from=$itemversion->getViewFields() item="field"}
+						{foreach from=$view->getFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
+								{assign var="field" value=$view->getField($itemversion, $field->getId())}
 								<tr>
 									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
-									<td class="details">{$field->getEditor()}</td>
+									<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
 									<td class="description">{$field->getDescription()|escape}</td>
 								</tr>
 							{/if}

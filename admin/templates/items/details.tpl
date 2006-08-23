@@ -293,9 +293,9 @@ function moveDown(item, field, link) {
 				{assign var="namefield" value=$itemversion->getField("name")}
 				{assign var="sequence" value=$itemversion->getMainSequence()}
 				{if $sequence === null}
-					<h2 class="site_itemcontent site_item site_icon_{$class->getId()}">{$namefield->output($SMARTY)}</h2>
+					<h2 class="site_itemcontent site_item site_icon_{$class->getId()}">{$namefield->output($REQUEST,$SMARTY)}</h2>
 				{else}
-					<h2 class="site_itemcontent site_container_open site_icon_{$class->getId()} site_icon_{$class->getId()}_open">{$namefield->output($SMARTY)}</h2>
+					<h2 class="site_itemcontent site_container_open site_icon_{$class->getId()} site_icon_{$class->getId()}_open">{$namefield->output($REQUEST,$SMARTY)}</h2>
 				{/if}
 				<table class="admin">
 					<tr>
@@ -330,38 +330,11 @@ function moveDown(item, field, link) {
 				</div>
 				<div class="sectionbody">
 					<table class="admin">
-						<tr>
-							<td class="label">View:</td>
-							{if ($itemversion->isComplete() || !$class->isValidView($view))}
-								<td class="details">{$view->getName()}</td>
-							{else}
-								<td class="details">
-									{html_form tag_name="viewform" tag_style="display: inline" method="saveitem" itemversion=$itemversion->getId() formmethod="POST"}
-										<select name="view">
-											{foreach from=$class->getViews() item="nview"}
-												{if $nview === $itemversion->getView()}
-														<option value="{$nview->getId()}" selected="true">
-												{else}
-														<option value="{$nview->getId()}">
-												{/if}
-													{$nview->getName()}
-												</option>
-											{/foreach}
-										</select>
-										<div class="toolbarbutton">
-											<a href="javascript:document.forms.viewform.submit();">
-												<img src="{$CONTENT}/icons/check-blue.gif"> Change View
-											</a>
-										</div>
-									{/html_form}
-								</td>
-							{/if}
-						</tr>
 						{foreach from=$itemversion->getViewFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
 									<td class="label">{$field->getName()|escape}:</td>
-									<td class="details">{$field->output($SMARTY)}</td>
+									<td class="details">{$field->output($REQUEST,$SMARTY)}</td>
 								</tr>
 							{/if}
 						{/foreach}
@@ -383,7 +356,7 @@ function moveDown(item, field, link) {
 						{if $field->getType()!='html' && $field->getType()!='sequence' && $field->getId()!='name'}
 							<tr>
 								<td class="label">{$field->getName()|escape}:</td>
-								<td class="details">{$field->output($SMARTY)}</td>
+								<td class="details">{$field->output($REQUEST,$SMARTY)}</td>
 							</tr>
 						{/if}
 					{/foreach}
@@ -441,7 +414,7 @@ function moveDown(item, field, link) {
 		{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 			{if $field->getType()=='html'}
 				<p class="htmlfield">{$field->getName()|escape}:</p>
-				{$field->output($SMARTY)}
+				{$field->output($REQUEST,$SMARTY)}
 			{/if}
 		{/foreach}
 	</div>

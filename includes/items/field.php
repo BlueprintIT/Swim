@@ -218,7 +218,7 @@ class Field extends VersionField
     return $this->exists;
   }
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
   }
   
@@ -226,7 +226,7 @@ class Field extends VersionField
   {
   }
   
-  public function output(&$smarty)
+  public function output(&$request, &$smarty)
   {
     return $this->toString();
   }
@@ -264,9 +264,17 @@ class CompoundField extends Field
     parent::setItemVersion($item);
   }
   
-  public function getEditor()
+  public function getEditor(&$request, &$smarty)
   {
     global $_PREFS;
+    
+    $rowcount = $this->count();
+    if ($request->hasQueryVar($this->getId()))
+    {
+      $passed = $request->getQueryVar($this->getId());
+      if (is_array($passed))
+        $rowcount = count($passed);
+    }
     
     $result = "<script type=\"text/javascript\">\n<!--\n";
     $result.= "var compound_".$this->getId()." = { id: '".$this->getId()."', fields: {";
@@ -283,14 +291,14 @@ class CompoundField extends Field
       $result.='<th>'.$field->getName().'</th>';
     }
     $result.="<th></th></tr></thead>\n<tbody id=\"tbody_".$this->id."\">\n";
-    $rows = $this->getRows();
-    foreach ($rows as $row)
+    for ($pos = 0; $pos<$rowcount; $pos++)
     {
+      $row = $this->getRow($rowcount);
       $result.='<tr>';
       foreach ($this->fields as $field)
       {
         $rlfield = $row->getField($field->getId());
-        $result.='<td>'.$rlfield->getEditor().'</td>';
+        $result.='<td>'.$rlfield->getEditor($request, $smarty).'</td>';
       }
       $result.="<td class=\"options\">";
       $result.="<a class=\"option\" href=\"#\" onclick=\"moveCompoundRow(compound_".$this->id.", this.parentNode.parentNode, true); return false\">";
@@ -313,7 +321,7 @@ class CompoundField extends Field
     return $result;
   }
   
-  public function output(&$smarty)
+  public function output(&$request, &$smarty)
   {
     $rows = $this->getRows();
     if (count($rows)>0)
@@ -330,7 +338,7 @@ class CompoundField extends Field
         foreach ($this->fields as $field)
         {
           $rlfield = $row->getField($field->getId());
-          $result.='<td>'.$rlfield->output($smarty).'</td>';
+          $result.='<td>'.$rlfield->output($request, $smarty).'</td>';
         }
         $result.="</tr>\n";
       }

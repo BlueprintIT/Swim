@@ -140,6 +140,10 @@ function api_get($params, &$smarty)
         $result = Item::getItem($params['id']);
       else if ($params['type']=='section')
         $result = SectionManager::getSection($params['id']);
+      else if ($params['type']=='class')
+        $result = FieldSetManager::getClass($params['id']);
+      else if ($params['type']=='view')
+        $result = FieldSetManager::getView($params['id']);
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }
