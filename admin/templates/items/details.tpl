@@ -349,6 +349,10 @@ function moveDown(item, field, link) {
 				</div>
 				<div class="sectionbody">
 					<table class="admin">
+						<tr>
+							<td class="label">View:</td>
+							<td class="details">{$view->getName()}</td>
+						</tr>
 						{foreach from=$itemversion->getViewFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
