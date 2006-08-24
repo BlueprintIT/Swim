@@ -330,6 +330,8 @@ function moveDown(item, field, link) {
 										{$version->getVersion()} last modified {$version->getModified()|date_format}
 										{if $version->isCurrent()}
 											(Published version)
+										{elseif !$version->isComplete()}
+											(Draft version)
 										{/if}
 										</option>
 									{/foreach}
