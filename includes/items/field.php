@@ -309,7 +309,7 @@ class CompoundField extends Field
     $result.="<tbody id=\"tbody_".$this->id."\">\n";
     for ($pos = 0; $pos<$rowcount; $pos++)
     {
-      $row = $this->getRow($rowcount);
+      $row = $this->getRow($pos);
       $result.='<tr>';
       foreach ($this->fields as $field)
       {
@@ -342,7 +342,7 @@ class CompoundField extends Field
     $rows = $this->getRows();
     if (count($rows)>0)
     {
-      $result.= "<table class=\"compound\">\n";
+      $result = "<table class=\"compound\">\n";
       if (count($this->fields)>1)
       {
         $result.= "<thead><tr>";
