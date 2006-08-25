@@ -36,15 +36,16 @@ function method_saveitem($request)
         $req->setQueryVar('reloadtree', 'true');
         $query = $request->getQuery();
         unset($query['itemversion']);
+        if (isset($query['view']))
+        {
+          $view = FieldSetManager::getView($query['view']);
+          if ($view !== null)
+            $itemversion->setView($view);
+          unset($query['view']);
+        }
         foreach ($query as $name => $value)
         {
-          if ($name == 'view')
-          {
-            $view = FieldSetManager::getView($value);
-            if ($view !== null)
-              $itemversion->setView($view);
-          }
-          else if (($name != 'complete') && ($name != 'current'))
+          if (($name != 'complete') && ($name != 'current'))
           {
             $field = $itemversion->getField($name);
             if ($field !== null)

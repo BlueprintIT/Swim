@@ -230,6 +230,16 @@ class TextField extends SimpleField
       return parent::getEditor($request, $smarty);
   }
   
+  public function setValue($value)
+  {
+    if ($this->type == 'html')
+    {
+      $value = str_replace('href="http://'.$_SERVER['HTTP_HOST'].'/', 'href="/', $value);
+      $value = str_replace('src="http://'.$_SERVER['HTTP_HOST'].'/', 'src="/', $value);
+    }
+    parent::setValue($value);
+  }
+  
   public function getPlainText()
   {
     $text = $this->toString();
