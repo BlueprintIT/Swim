@@ -39,7 +39,7 @@ function selectRow(row)
 		row.className = 'selected';
 		document.getElementById("preview").src = row.getAttribute("path");
 		var btn = document.getElementById("okbtn");
-		if (btn.hasAttribute("disabled"))
+		if (btn.getAttribute("disabled"))
 			btn.removeAttribute("disabled");
 	}
 }
