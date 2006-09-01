@@ -77,6 +77,22 @@ class ItemWrapper
           return new ItemWrapper($parents[0]);
         return null;
         break;
+      case 'parentPath':
+        $parents = $this->itemversion->getItem()->getParentPath();
+        if ($parents !== null)
+        {
+          for ($i=0; $i<count($parents); $i++)
+          {
+            $itemv = $parents[$i]->getCurrentVersion(Session::getCurrentVariant());
+            if ($itemv != null)
+              $parents[$i] = new ItemWrapper($itemv);
+            else
+              $parents[$i] = null;
+          }
+          return $parents;
+        }
+        return null;
+        break;
       case 'url':
         $target = $this->itemversion->getLinkTarget();
         if ($target == null)

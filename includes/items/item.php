@@ -31,7 +31,7 @@ class Item
     $this->id = $details['id'];
     $this->section = $details['section'];
     $this->itemclass = FieldSetManager::getClass($details['class']);
-    if ($details['archived']==1)
+    if (isset($details['archived']) && $details['archived']==1)
       $this->archived = true;
     else
       $this->archived = false;
@@ -108,6 +108,85 @@ class Item
       array_push($parents, array('item' => $item, 'field' => $details['field']));
     }
     return $parents;
+  }
+  
+  private function findParentPaths(&$seen)
+  {
+    $paths = array();
+    $seen[$this->id] = true;
+    $parents = $this->getParents();
+    if (count($parents)>0)
+    {
+      foreach ($parents as $parentd)
+      {
+        $parent = $parentd['item'];
+        if ($parent->getMainSequence()->getId()==$parentd['field'])
+        {
+          if (!isset($seen[$parent->getId()]))
+          {
+            $newpaths = $parent->findParentPaths($seen);
+            foreach ($newpaths as $path)
+            {
+              array_push($path, $this);
+              array_push($paths, $path);
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      array_push($paths, array($this));
+    }
+    return $paths;
+  }
+  
+  public static function itemPathSort($a, $b)
+  {
+    if (count($a)<count($b))
+      return -1;
+    else if (count($a)>count($b))
+      return 1;
+    else
+    {
+      $pos = 0;
+      while ($pos<count($a) && $a[$pos]===$b[$pos])
+      {
+        $pos++;
+      }
+      if ($pos<count($a))
+      {
+        if ($pos>0)
+        {
+          $seq = $a[$pos-1]->getMainSequence();
+          $pos1 = $seq->indexOf($a[$pos]);
+          $pos2 = $seq->indexOf($b[$pos]);
+          return $pos1-$pos2;
+        }
+        if ($a[0]->getSection()->getRootItem()===$a[0])
+          return -1;
+        if ($b[0]->getSection()->getRootItem()===$b[0])
+          return 1;
+      }
+      return 0;
+    }
+  }
+  
+  public function getParentPaths()
+  {
+    $seen = array();
+    $paths = $this->findParentPaths($seen);
+    usort($paths, array("Item", "itemPathSort"));
+    return $paths;
+  }
+  
+  public function getParentPath()
+  {
+    $paths = $this->getParentPaths();
+    if (count($paths)>0)
+      return $paths[0];
+    else
+      return null;
   }
   
   public function getMainParents()

@@ -203,12 +203,15 @@ class AddonManager
     if (!self::$disabled)
     {
       $dir = $_PREFS->getPref('storage.addons');
-      $addons = opendir($dir);
-      while (($addon = readdir($addons)) !== false)
+      if (is_dir($dir))
       {
-        if ((is_dir($dir.'/'.$addon))&&(is_readable($dir.'/'.$addon.'/swimaddon.php')))
+        $addons = opendir($dir);
+        while (($addon = readdir($addons)) !== false)
         {
-          require_once $dir.'/'.$addon.'/swimaddon.php';
+          if ((is_dir($dir.'/'.$addon))&&(is_readable($dir.'/'.$addon.'/swimaddon.php')))
+          {
+            require_once $dir.'/'.$addon.'/swimaddon.php';
+          }
         }
       }
       self::startup();
