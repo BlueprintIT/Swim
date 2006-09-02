@@ -170,9 +170,6 @@ class IntegerField extends SimpleField
 
 class TextField extends SimpleField
 {
-  protected $stylesheet;
-  protected $styles;
-  
   public function getEditor(&$request, &$smarty)
   {
     global $_PREFS;
@@ -182,91 +179,13 @@ class TextField extends SimpleField
       $state = 'disabled="true" ';
     if ($this->type == 'multiline')
       return '<textarea '.$state.'style="width: 100%; height: 100px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.htmlentities($this->getPassedValue($request)).'</textarea>';
-    else if ($this->type == 'html')
-    {
-      if (!$this->isEditable())
-        return '<div id="'.$this->id.'">'.$this->getPassedValue($request).'</div>';
-      else
-      {
-        recursiveMkDir($this->itemversion->getStoragePath());
-        include_once($_PREFS->getPref('storage.fckeditor').'/fckeditor.php');
-        $editor = new FCKeditor($this->getFieldName()) ;
-        $editor->BasePath = $_PREFS->getPref('url.fckeditor');
-        $value = $this->getPassedValue($request);
-        if (strlen($value)==0)
-          $value = "<p><br/>\n</p>";
-        $editor->Value = $value;
-        $editor->Width  = '100%';
-        $editor->Height = '400px';
-        $editor->Config['SkinPath'] = $editor->BasePath.'editor/skins/office2003/';
-        if (isset($this->styles))
-          $editor->Config['StylesXmlPath'] = $_PREFS->getPref('url.site.static').'/'.$this->styles;
-        /*if (isset($this->stylesheet))
-        {
-          $request = new Request();
-          $request->setQueryVar('CONTEXT', 'body');
-          $request->setMethod('layout');
-          $request->setPath($this->stylesheet);
-          $editor->Config['EditorAreaCSS'] = $request->encode();
-        }*/
-        $request = new Request();
-        $request->setMethod('admin');
-        $request->setPath('browser/filebrowser.tpl');
-        $request->setQueryVar('item', $this->itemversion->getItem()->getId());
-        $request->setQueryVar('variant', $this->itemversion->getVariant()->getVariant());
-        $request->setQueryVar('version', $this->itemversion->getVersion());
-        $request->setQueryVar('type', 'link');
-        $editor->Config['LinkBrowserURL'] = $request->encode();
-        $request->setQueryVar('type', 'image');
-        $editor->Config['ImageBrowserURL'] = $request->encode();
-        $request->setQueryVar('type', 'flash');
-        $editor->Config['FlashBrowserURL'] = $request->encode();
-        $editor->Config['CustomConfigurationsPath'] = $_PREFS->getPref('url.admin.static').'/scripts/fckeditor.js';
-        $editor->ToolbarSet = 'Swim';
-        return $editor->CreateHtml();
-      }
-    }
     else
       return parent::getEditor($request, $smarty);
   }
   
-  public function setValue($value)
-  {
-    if ($this->type == 'html')
-    {
-      $value = str_replace('href="http://'.$_SERVER['HTTP_HOST'].'/', 'href="/', $value);
-      $value = str_replace('src="http://'.$_SERVER['HTTP_HOST'].'/', 'src="/', $value);
-    }
-    parent::setValue($value);
-  }
-  
   public function getPlainText()
   {
-    $text = $this->toString();
-    if ($this->type == 'html')
-      $text = html_entity_decode(strip_tags($text));
-
-    return $text;
-  }
-  
-  protected function parseAttributes($element)
-  {
-    if ($element->hasAttribute('stylesheet'))
-      $this->stylesheet = $element->getAttribute('stylesheet');
-    if ($element->hasAttribute('styles'))
-      $this->styles = $element->getAttribute('styles');
-  }
-  
-  public function copyFrom($item)
-  {
-    parent::copyFrom($item);
-    if ($this->type == 'html')
-    {
-      $this->retrieve();
-      $newvalue = str_replace($item->getStorageUrl(), $this->itemversion->getStorageUrl(), $this->value);
-      if ($newvalue != $this->value)
-        $this->setValue($newvalue);
-    }
+    return $this->toString();
   }
   
   protected function escapeValue($value)
@@ -284,36 +203,71 @@ class TextField extends SimpleField
   
   public function output(&$request, &$smarty)
   {
-    if ($this->type == 'html')
-    {
-      if (isset($this->stylesheet))
-      {
-        $request = new Request();
-        $request->setQueryVar('CONTEXT', 'div#field_content');
-        $request->setMethod('layout');
-        $request->setPath($this->stylesheet);
-        $head = $smarty->get_registered_object('HEAD');
-        $head->addStyleSheet($request->encode());
-      }
-      return '<div id="field_content" class="content">'.$this->toString().'</div>';
-    }
-    else
-      return $this->toString();
-  }
-  
-  public function toString()
-  {
-    $result = parent::toString();
-    if ($this->type =='html')
-    {
-      $result = str_replace('<br />', '<br>', $result);
-    }
-    return $result;
+    return $this->toString();
   }
   
   protected function getColumn()
   {
     return "textValue";
+  }
+}
+
+class BaseHTMLField extends TextField
+{
+  protected $stylesheet;
+  protected $styles;
+  
+  public function setValue($value)
+  {
+    $value = str_replace('href="http://'.$_SERVER['HTTP_HOST'].'/', 'href="/', $value);
+    $value = str_replace('src="http://'.$_SERVER['HTTP_HOST'].'/', 'src="/', $value);
+    parent::setValue($value);
+  }
+  
+  public function getPlainText()
+  {
+    $text = $this->toString();
+    $text = html_entity_decode(strip_tags($text));
+
+    return $text;
+  }
+  
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute('stylesheet'))
+      $this->stylesheet = $element->getAttribute('stylesheet');
+    if ($element->hasAttribute('styles'))
+      $this->styles = $element->getAttribute('styles');
+  }
+  
+  public function copyFrom($item)
+  {
+    parent::copyFrom($item);
+    $this->retrieve();
+    $newvalue = str_replace($item->getStorageUrl(), $this->itemversion->getStorageUrl(), $this->value);
+    if ($newvalue != $this->value)
+      $this->setValue($newvalue);
+  }
+  
+  public function output(&$request, &$smarty)
+  {
+    if (isset($this->stylesheet))
+    {
+      $request = new Request();
+      $request->setQueryVar('CONTEXT', 'div#field_content');
+      $request->setMethod('layout');
+      $request->setPath($this->stylesheet);
+      $head = $smarty->get_registered_object('HEAD');
+      $head->addStyleSheet($request->encode());
+    }
+    return '<div id="field_content" class="content">'.$this->toString().'</div>';
+  }
+  
+  public function toString()
+  {
+    $result = parent::toString();
+    $result = str_replace('<br />', '<br>', $result);
+    return $result;
   }
 }
 

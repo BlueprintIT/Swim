@@ -127,7 +127,7 @@ class BaseField
       if ($type == 'multiline')
         return new TextField($el);
       if ($type == 'html')
-        return new TextField($el);
+        return new HTMLField($el);
       if ($type == 'integer')
         return new IntegerField($el);
       if ($type == 'date')
