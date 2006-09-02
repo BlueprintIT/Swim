@@ -337,7 +337,7 @@ class Item
   {
     global $_STORAGE;
     
-    if ($_STORAGE->queryExec('INSERT INTO Item (section,class) VALUES ("'.$_STORAGE->escape($section->getId()).'","'.$_STORAGE->escape($class->getId()).'");'))
+    if ($_STORAGE->queryExec('INSERT INTO Item (section,class,created) VALUES ("'.$_STORAGE->escape($section->getId()).'","'.$_STORAGE->escape($class->getId()).'",'.time().');'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $details = array('id' => $id, 'section' => $section->getId(), 'class' => $class->getId());
@@ -550,8 +550,8 @@ class ItemVariant
       $version = $results->fetchSingle();
     else
       $version = 1;
-    if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,modified,owner,current,complete) ' .
-      'VALUES ('.$this->id.','.$version.','.$viewid.','.$time.',"'.$_USER->getUsername().'",0,0);'))
+    if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,created,modified,owner,current,complete) ' .
+      'VALUES ('.$this->id.','.$version.','.$viewid.','.$time.','.$time.',"'.$_USER->getUsername().'",0,0);'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE id='.$id.';');
@@ -753,7 +753,7 @@ class ItemVersion
       return;
       
     if (($_STORAGE->queryExec('UPDATE VariantVersion SET current=0 WHERE current=1 AND itemvariant="'.$this->variantid.'";'))
-      && ($_STORAGE->queryExec('UPDATE VariantVersion SET current=1 WHERE id='.$this->getId().';')))
+      && ($_STORAGE->queryExec('UPDATE VariantVersion SET current=1, published='.time().' WHERE id='.$this->getId().';')))
       $this->current = true;
   }
   

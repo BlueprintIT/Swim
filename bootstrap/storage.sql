@@ -30,6 +30,7 @@ CREATE TABLE Item (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	section VARCHAR(20),
 	class VARCHAR(30),
+	created INTEGER,
 	archived INTEGER
 );
 
@@ -45,7 +46,9 @@ CREATE TABLE VariantVersion (
 	itemvariant INTEGER,
 	version INTEGER,
 	view VARCHAR(30),
+	created INTEGER,
 	modified INTEGER,
+	published INTEGER,
 	owner VARCHAR(20),
 	current INTEGER,
 	complete INTEGER,

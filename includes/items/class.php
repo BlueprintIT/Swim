@@ -166,6 +166,30 @@ class ItemClass extends FieldSet
   private $mainsequence;
   private $allowlink;
   private $versioning;
+  private $type;
+  private $mimetypes;
+  
+  public function getType()
+  {
+    if (isset($this->type))
+      return $this->type;
+
+    if ($this->parent !== null)
+      return $this->parent->getType();
+      
+    return 'normal';
+  }
+  
+  public function getMimeTypes()
+  {
+    if (isset($this->mimetypes))
+      return $this->mimetypes;
+
+    if ($this->parent !== null)
+      return $this->parent->getMimeTypes();
+      
+    return array();
+  }
   
   public function getVersioning()
   {
@@ -258,6 +282,10 @@ class ItemClass extends FieldSet
           LoggerManager::getLogger('swim.itemclass')->warn('Invalid view '.$viewid.' specified for '.$this->getId());
       }
     }
+    else if ($element->tagName=='mimetypes')
+    {
+      $this->mimetypes = explode(",", getDOMText($element));
+    }
   }
   
   protected function parseAttributes($element)
@@ -268,6 +296,8 @@ class ItemClass extends FieldSet
       $this->allowlink = ($element->getAttribute('allowlink') == 'true');
     if ($element->hasAttribute('versioning'))
       $this->versioning = $element->getAttribute('versioning');
+    if ($element->hasAttribute('type'))
+      $this->tyoe = $element->getAttribute('type');
     parent::parseAttributes($element);
   }
 }
