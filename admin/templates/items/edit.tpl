@@ -20,8 +20,15 @@
 {assign var="view" value=$itemversion->getView()}
 <script>
 {if isset($request.query.reloadtree)}
-  //window.top.SiteTree.loadTree();
+window.top.SiteTree.loadTree();
+
 {/if}
+var item = {ldelim}
+	item: {$item->getId()},
+	variant: "{$itemvariant->getVariant()}",
+	version: {$itemversion->getVersion()}
+{rdelim};
+
 {literal}
 function submitForm(form)
 {

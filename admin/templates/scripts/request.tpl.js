@@ -101,7 +101,8 @@ Request.prototype = {
     {[/if]}
       
     var protocol = document.location.protocol;
-
+    protocol = protocol.substring(0, protocol.length-1);
+    
     if (thisprotocol != protocol)
       host = thisprotocol + '://{[$SERVER.HTTP_HOST]}';
     

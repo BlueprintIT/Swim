@@ -19,6 +19,7 @@ tinyMCEparams = {
 
 	// Callbacks
 	init_instance_callback: "tinyMCEEditorInit",
+	file_browser_callback: "tinyMCEFileBrowser",
 	
 	// Layout
 	content_css: "../../swim/shared/yui/reset/reset-min.css,../../swim/shared/yui/fonts/fonts-min.css",
@@ -26,7 +27,6 @@ tinyMCEparams = {
 	// Theme
 	theme_advanced_toolbar_location: "top",
 	theme_advanced_toolbar_align: "left",
-	theme_advanced_statusbar_location: "bottom",
 	theme_advanced_buttons1: "undo,redo,separator,spellchecker,separator,"
 	                        +"search,replace,separator,"
 	                        +"selectall,removeformat,separator,"
@@ -39,9 +39,25 @@ tinyMCEparams = {
 	                        +"bullist,numlist,separator,"
 	                        +"outdent,indent,separator,"
 	                        +"justifyleft,justifycenter,justifyfull,separator",
-	theme_advanced_buttons3: "",
-	theme_advanced_path: true
+	theme_advanced_buttons3: ""
 };
+
+function tinyMCEFileBrowser(field, url, type, win)
+{
+	var request = new Request();
+	request.setMethod('admin');
+	request.setPath('browser/filebrowser.tpl');
+	request.setQueryVar('item', item.item);
+	request.setQueryVar('variant', item.variant);
+	request.setQueryVar('version', item.version);
+	request.setQueryVar('api', 'tinymce');
+	request.setQueryVar('field', field);
+	if (type == "file")
+		request.setQueryVar('type', 'link');
+	else
+		request.setQueryVar('type', 'image');
+	win.open(request.encode(),"_blank","modal");
+}
 
 function tinyMCEEditorInit(inst)
 {

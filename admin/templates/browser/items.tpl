@@ -20,7 +20,7 @@ function selectUrl(url)
 	var request = new Request();
 	request.setMethod("view");
 	request.setPath(SiteTree.selected);
-	window.parent.opener.SetUrl(request.encode());
+	window.parent.setUrl(request.encode());
 	window.parent.close();
 }
 

@@ -3,6 +3,24 @@
 <html>
 	<head>
 		<title>Swim Resources Browser</title>
+<script type="text/javascript">
+{if $request.query.api=='fckeditor'}
+{literal}
+function setUrl(url)
+{
+	window.opener.SetUrl(url);
+}
+{/literal}
+{elseif $request.query.api=='tinymce'}
+var field = "{$request.query.field}";
+{literal}
+function setUrl(url)
+{
+	window.opener.document.forms[0].elements[field].value = url;
+}
+{/literal}
+{/if}
+</script>
 	</head>
 	<frameset cols="*" frameborder="0">
 {if $request.query.type=='link' || $request.query.type=='item'}

@@ -9,7 +9,7 @@ function selectUrl()
 	{
 		if ((node.nodeType == 1) && (node.className == "selected"))
 		{
-			window.parent.opener.SetUrl(node.getAttribute("path"));
+			window.parent.setUrl(node.getAttribute("path"));
 			window.parent.close();
 			break;
 		}

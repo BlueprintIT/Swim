@@ -51,6 +51,7 @@ class HTMLField extends BaseHTMLField
       $request->setQueryVar('variant', $this->itemversion->getVariant()->getVariant());
       $request->setQueryVar('version', $this->itemversion->getVersion());
       $request->setQueryVar('type', 'link');
+      $request->setQueryVar('api', 'fckeditor');
       $editor->Config['LinkBrowserURL'] = $request->encode();
       $request->setQueryVar('type', 'image');
       $editor->Config['ImageBrowserURL'] = $request->encode();
