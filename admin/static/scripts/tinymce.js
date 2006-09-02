@@ -22,8 +22,10 @@ tinyMCEparams = {
 	file_browser_callback: "tinyMCEFileBrowser",
 	
 	// Layout
-	content_css: "../../swim/shared/yui/reset/reset-min.css,../../swim/shared/yui/fonts/fonts-min.css",
-
+	content_css: "../../swim/shared/yui/reset/reset-min.css,../../swim/shared/yui/fonts/fonts-min.css,../../swim/admin/static/styles/tinyMCEEditor.css",
+	popup_css: "../../swim/admin/static/styles/tinyMCEPopup.css",
+	editor_css: "../../swim/admin/static/styles/tinyMCEUI.css",
+	
 	// Theme
 	theme_advanced_toolbar_location: "top",
 	theme_advanced_toolbar_align: "left",
@@ -38,7 +40,7 @@ tinyMCEparams = {
 	                        +"sub,sup,separator,"
 	                        +"bullist,numlist,separator,"
 	                        +"outdent,indent,separator,"
-	                        +"justifyleft,justifycenter,justifyfull,separator",
+	                        +"justifyleft,justifycenter,justifyright,justifyfull,separator",
 	theme_advanced_buttons3: ""
 };
 
