@@ -1,8 +1,9 @@
 tinyMCEparams = {
 	// General
 	mode: "textareas",
-	editor_selector: "HTMLEditor",
 	theme: "advanced",
+	plugins: "print,spellchecker,paste,searchreplace,table",
+	editor_selector: "HTMLEditor",
 	button_tile_map: true,
 	dialog_type: "modal",
 	
@@ -20,7 +21,26 @@ tinyMCEparams = {
 	init_instance_callback: "tinyMCEEditorInit",
 	
 	// Layout
-	content_css: "../../swim/shared/yui/reset/reset-min.css,../../swim/shared/yui/fonts/fonts-min.css"
+	content_css: "../../swim/shared/yui/reset/reset-min.css,../../swim/shared/yui/fonts/fonts-min.css",
+
+	// Theme
+	theme_advanced_toolbar_location: "top",
+	theme_advanced_toolbar_align: "left",
+	theme_advanced_statusbar_location: "bottom",
+	theme_advanced_buttons1: "undo,redo,separator,spellchecker,separator,"
+	                        +"search,replace,separator,"
+	                        +"selectall,removeformat,separator,"
+	                        +"cut,copy,paste,pastetext,pasteword,separator,"
+	                        +"print,separator,"
+	                        +"link,unlink,separator,"
+	                        +"image,table,charmap",
+	theme_advanced_buttons2: "bold,italic,underline,strikethrough,separator,"
+	                        +"sub,sup,separator,"
+	                        +"bullist,numlist,separator,"
+	                        +"outdent,indent,separator,"
+	                        +"justifyleft,justifycenter,justifyfull,separator",
+	theme_advanced_buttons3: "",
+	theme_advanced_path: true
 };
 
 function tinyMCEEditorInit(inst)
