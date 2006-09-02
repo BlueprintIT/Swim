@@ -29,6 +29,17 @@ class FieldSet
     $this->log = LoggerManager::getLogger('swim.fieldset');
   }
 
+  public function __sleep()
+  {
+    $this->log = null;
+    return array_keys(get_object_vars($this));
+  }
+  
+  public function __wakeup()
+  {
+    $this->log = LoggerManager::getLogger('swim.fieldset');
+  }
+  
   public function getId()
   {
     return $this->id;

@@ -29,6 +29,17 @@ class BaseField
     $this->parse($metadata);
   }
 
+  public function __sleep()
+  {
+    $this->log = null;
+    return array_keys(get_object_vars($this));
+  }
+  
+  public function __wakeup()
+  {
+    $this->log = LoggerManager::getLogger('swim.field.'.get_class($this));
+  }
+  
   public function initialise()
   {
   }
