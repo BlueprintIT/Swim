@@ -1,12 +1,12 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
+{stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {script method="admin" path="scripts/request.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/calendar/calendar`$smarty.config.YUI`.js"}
 {script href="$CONTENT/scripts/fields.js"}
-{stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="itemvariant" value=$item->getVariant($session.variant)}
 {if isset($request.query.version)}
@@ -20,7 +20,7 @@
 {assign var="view" value=$itemversion->getView()}
 <script>
 {if isset($request.query.reloadtree)}
-  window.top.SiteTree.loadTree();
+  //window.top.SiteTree.loadTree();
 {/if}
 {literal}
 function submitForm(form)
@@ -74,9 +74,10 @@ function submitForm(form)
 			{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 				{if $field->getType()=='html'}
 					<p class="htmlfield">{$field->getName()|escape}:</p>
-					<div id="field_{$field->getId()}">{$field->getEditor($REQUEST,$SMARTY)}</div>
+					<div id="outer_field_{$field->getId()}">{$field->getEditor($REQUEST,$SMARTY)}</div>
 				{/if}
 			{/foreach}
+<script type="text/javascript">if (initialiseTinyMCE) initialiseTinyMCE();</script>
 		</div>
 	</div>
 {/html_form}
