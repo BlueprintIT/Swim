@@ -43,18 +43,34 @@ body {
   </div>
 
 {php}$this->assign_by_ref('sections', AdminManager::$sections);{/php}
-  <table id="tabpanel">
-    <tr>
-      {foreach from=$sections item='section'}
-        {if $section->isAvailable()}
-          <td class="spacer"></td>
-          {if $section->isSelected($REQUEST)}
-            <td class="tab selected" selected="true"><img src="{$section->getIcon()}" alt="{$section->getName()|escape}"> {$section->getName()|escape}</td>
-          {else}
-            <td class="tab unselected"><a href="{$section->getUrl()}"><img src="{$section->getIcon()}" alt="{$section->getName()|escape}"> {$section->getName()|escape}</a></td>
-          {/if}
-        {/if}
-      {/foreach}
-      <td class="remainder"></td>
-    </tr>
-  </table>
+  <div id="tabpanel">
+	  <table>
+	    <tr>
+	      {foreach from=$sections item='section'}
+	        {if $section->isAvailable()}
+	          <td class="spacer"></td>
+	          {if $section->isSelected($REQUEST)}
+	            <td class="tab selected" selected="true">
+	            	<div class="tableft">
+	            		<div class="tabright">
+	            			<img src="{$section->getIcon()}" alt="{$section->getName()|escape}">{$section->getName()|escape}
+	            		</div>
+	            	</div>
+	            </td>
+	          {else}
+	            <td class="tab unselected" onclick="document.location.href='{$section->getUrl()}'" onmouseover="this.className='tab hover'" onmouseout="this.className='tab unselected'">
+	            	<div class="tableft">
+	            		<div class="tabright">
+	            			<a href="{$section->getUrl()}">
+	            				<img src="{$section->getIcon()}" alt="{$section->getName()|escape}">{$section->getName()|escape}
+	            			</a>
+	            		</div>
+	            	</div>
+	            </td>
+	          {/if}
+	        {/if}
+	      {/foreach}
+	    </tr>
+	  </table>
+  </div>
+  

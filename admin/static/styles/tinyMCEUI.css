@@ -1,1 +1,15 @@
 @import url("../../../../tinymce/jscripts/tiny_mce/themes/advanced/css/editor_ui.css");
+/*
+.mceEditor tr {
+  background-image: url(../images/toolbar.bg.gif);
+  background-repeat: repeat-x;
+}
+
+.mceToolbar {
+  height: 25px;
+  background-image: url(../images/toolbar.start.gif);
+  background-repeat: no-repeat;
+  background-position: 3px center;
+  padding-left: 7px;
+}
+*/

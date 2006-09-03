@@ -2,7 +2,7 @@ tinyMCEparams = {
 	// General
 	mode: "textareas",
 	theme: "advanced",
-	plugins: "print,spellchecker,paste,searchreplace,table",
+	plugins: "print,spellchecker,paste,searchreplace,table,advblockformat",
 	editor_selector: "HTMLEditor",
 	button_tile_map: true,
 	dialog_type: "modal",
@@ -23,25 +23,32 @@ tinyMCEparams = {
 	
 	// Layout
 	content_css: "../../swim/shared/yui/reset/reset-min.css,../../swim/shared/yui/fonts/fonts-min.css,../../swim/admin/static/styles/tinyMCEEditor.css",
-	popup_css: "../../swim/admin/static/styles/tinyMCEPopup.css",
+	popups_css: "../../swim/admin/static/styles/tinyMCEPopups.css",
 	editor_css: "../../swim/admin/static/styles/tinyMCEUI.css",
 	
 	// Theme
 	theme_advanced_toolbar_location: "top",
 	theme_advanced_toolbar_align: "left",
-	theme_advanced_buttons1: "undo,redo,separator,spellchecker,separator,"
-	                        +"search,replace,separator,"
-	                        +"selectall,removeformat,separator,"
-	                        +"cut,copy,paste,pastetext,pasteword,separator,"
-	                        +"print,separator,"
-	                        +"link,unlink,separator,"
-	                        +"image,table,charmap",
-	theme_advanced_buttons2: "bold,italic,underline,strikethrough,separator,"
-	                        +"sub,sup,separator,"
-	                        +"bullist,numlist,separator,"
-	                        +"outdent,indent,separator,"
-	                        +"justifyleft,justifycenter,justifyright,justifyfull,separator",
-	theme_advanced_buttons3: ""
+	theme_advanced_layout_manager: "RowLayout",
+	theme_advanced_containers: "toolbar1,toolbar2,mceEditor,mceStatusbar",
+	theme_advanced_containers_default_class: "mceToolbar",
+	theme_advanced_containers_default_align: "left",
+	theme_advanced_container_toolbar1: "undo,redo,separator,spellchecker,separator,"
+	                                 + "search,replace,separator,"
+	                                 + "selectall,removeformat,separator,"
+	                                 + "cut,copy,paste,pastetext,pasteword,separator,"
+	                                 + "print,separator,"
+	                                 + "link,unlink,separator,"
+	                                 + "image,table,charmap,endtoolbar",
+	theme_advanced_container_toolbar2: "bold,italic,underline,strikethrough,separator,"
+	                                 + "sub,sup,separator,"
+	                                 + "bullist,numlist,separator,"
+	                                 + "outdent,indent,separator,"
+	                                 + "justifyleft,justifycenter,justifyright,justifyfull,separator,"
+	                                 + "advblockformat,endtoolbar",
+	
+	// Plugins
+	advblockformat_stylesurl: ""
 };
 
 function tinyMCEFileBrowser(field, url, type, win)

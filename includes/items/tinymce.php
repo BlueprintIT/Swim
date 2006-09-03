@@ -24,7 +24,7 @@ class HTMLField extends BaseHTMLField
     else
     {
       $head = $smarty->get_registered_object('HEAD');
-      $head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce_gzip.php');
+      $head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce_src.js');
       $head->addScript($_PREFS->getPref('url.admin.static').'/scripts/tinymce.js');
       $result = '<textarea class="HTMLEditor" style="width: 100%; height: 400px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.$this->getPassedValue($request).'</textarea>';
       $result.= "\n".'<script type="text/javascript">'."\n";
@@ -34,7 +34,11 @@ class HTMLField extends BaseHTMLField
         $request->setQueryVar('CONTEXT', '.'.$this->getFieldName());
         $request->setMethod('layout');
         $request->setPath($this->stylesheet);
-        $result.= 'tinyMCEparams.content_css+=",'.$request->encode().'"';
+        $result.= 'tinyMCEparams.content_css+=",'.$request->encode().'";'."\n";
+      }
+      if (isset($this->styles))
+      {
+        $result.= 'tinyMCEparams.advblockformat_stylesurl="'.$_PREFS->getPref('url.site.static').'/'.$this->styles.'";'."\n";
       }
       $result.='</script>';
       return $result;
