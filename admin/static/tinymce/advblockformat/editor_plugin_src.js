@@ -149,37 +149,50 @@ var TinyMCE_AdvBlockFormatPlugin = {
 			case "mceAdvFormatBlock":
 				if (plugin.loaded && plugin.formats[value]) {
 					var editor = tinyMCE.getInstanceById(editor_id);
-					var block = tinyMCE.getParentBlockElement(editor.getFocusElement());
-					var oldformat = null;
-					if (block) {
-						oldformat = plugin.findMatchingFormat(block);
-						if (oldformat)
-							oldformat = plugin.formats[oldformat];
-					}
-					var newformat = plugin.formats[value];
-
-					if (oldformat != newformat) {
-						if (!block || block.tagName != newformat.tag) {
-							// Change the block using standard commands.
-							tinyMCE.execInstanceCommand(editor_id, "FormatBlock", user_interface, "<" + newformat.tag + ">");
-							block = tinyMCE.getParentBlockElement(editor.getFocusElement());
-						}
-	
-						// Set attributes from new format
-						for (var attr in newformat.attributes) {
-							block.setAttribute(attr, newformat.attributes[attr]);
-						}
-						
-						if (oldformat) {
-							// Remove any unnecessary attributes from old format
-							for (var attr in oldformat.attributes) {
-								if (!newformat.attributes[attr])
-									block.removeAttribute(attr);
+					
+					// Find the current blocks and remove any style set attributes on them
+					var selection = editor.getSel();
+					var doc = editor.getDoc();
+					var nodes = plugin.getTextNodes(plugin.getSelectionStart(doc, selection), plugin.getSelectionEnd(doc, selection));
+					var block = null;
+					for (var i = 0; i<nodes.length; i++) {
+						var next = tinyMCE.getParentBlockElement(nodes[i]);
+						if (next != block) {
+							oldformat = plugin.findMatchingFormat(next);
+							if (oldformat) {
+								for (var attr in plugin.formats[oldformat].attributes) {
+									next.removeAttribute(attr);
+								}
 							}
+							block = next;
 						}
-						
-						tinyMCE.triggerNodeChange();
 					}
+
+					var newformat = plugin.formats[value];
+					tinyMCE.execInstanceCommand(editor_id, "FormatBlock", user_interface, "<" + newformat.tag + ">");
+
+					// Find the new blocks and set attributes as appropriate
+					var selection = editor.getSel();
+					var doc = editor.getDoc();
+					var nodes = plugin.getTextNodes(plugin.getSelectionStart(doc, selection), plugin.getSelectionEnd(doc, selection));
+					var block = null;
+					var changed = false;
+					for (var i = 0; i<nodes.length; i++) {
+						var next = tinyMCE.getParentBlockElement(nodes[i]);
+						if (next != block) {
+							if (next.tagName.toLowerCase() == newformat.tag) {
+								for (var attr in newformat.attributes) {
+									next.setAttribute(attr, newformat.attributes[attr]);
+									changed = true;
+								}
+							}
+							else
+								alert("Possible issue, found a block "+next.tagName.toLowerCase()+" expected a "+newformat.tag);
+							block = next;
+						}
+					}
+					if (changed)
+						tinyMCE.triggerNodeChange();
 				}
 				return true;
 		}
@@ -205,9 +218,31 @@ var TinyMCE_AdvBlockFormatPlugin = {
 		var select = document.getElementById(editor_id + "_advblockformat");
 		if (plugin.loaded && select) {
 			var format = null;
-			var block = tinyMCE.getParentBlockElement(node);
-			if (block)
-				format = plugin.findMatchingFormat(block);
+			var editor = tinyMCE.getInstanceById(editor_id);
+			
+			// Check all parent blocks. If they are all the same format then display it.
+			var selection = editor.getSel();
+			var doc = editor.getDoc();
+			var nodes = plugin.getTextNodes(plugin.getSelectionStart(doc, selection), plugin.getSelectionEnd(doc, selection));
+			var block = null;
+			for (var i = 0; i<nodes.length; i++) {
+				var next = tinyMCE.getParentBlockElement(nodes[i]);
+				if (next != block) {
+					var foundformat = plugin.findMatchingFormat(next);
+					if (!foundformat) {
+						format = null;
+						break;
+					}
+					if (!block)
+						format = foundformat;
+					else if (format != foundformat) {
+						format = null;
+						break;
+					}
+					block = next;
+				}
+			}
+
 			if (format)
 				select.value = format;
 			else
@@ -285,6 +320,150 @@ var TinyMCE_AdvBlockFormatPlugin = {
 		return null;
 	},
 	
+	seekRangeStart: function(context, seeker, range)
+	{
+		if (!context.hasChildNodes)
+			return context;
+		
+		var lastel = context.firstChild;
+		var check = lastel;
+		while (check) {
+			if (check.nodeType == 1) {
+				seeker.moveToElementText(check);
+				var stcheck = seeker.compareEndPoints("StartToStart", range);
+				var edcheck = seeker.compareEndPoints("EndToStart", range);
+				if (stcheck > 0)
+					return lastel;
+				if (edcheck >= 0)
+					return this.seekRangeEnd(check, seeker, range);
+				lastel = check.nextSibling;
+			}
+			check = check.nextSibling;
+		}
+		return lastel;
+	},
+	
+	seekRangeEnd: function(context, seeker, range)
+	{
+		if (!context.hasChildNodes)
+			return context;
+		
+		var lastel = context.lastChild;
+		var check = lastel;
+		while (check) {
+			if (check.nodeType == 1) {
+				seeker.moveToElementText(check);
+				var stcheck = seeker.compareEndPoints("StartToEnd", range);
+				var edcheck = seeker.compareEndPoints("EndToEnd", range);
+				if (edcheck < 0)
+					return lastel;
+				if (stcheck <= 0)
+					return this.seekRangeEnd(check, seeker, range);
+				lastel = check.previousSibling;
+			}
+			check = check.previousSibling;
+		}
+		return lastel;
+	},
+	
+	getSelectionStart: function(doc, selection)
+	{
+		if (selection.getRangeAt)
+			return selection.getRangeAt(0).endContainer;
+		
+		var range = selection.createRange();
+		var seeker = range.duplicate();
+		seeker.moveToElementText(doc.body);
+		if (seeker.compareEndPoints("StartToStart", range)==0)
+			return doc.body;
+		
+		return this.seekRangeStart(doc.body, seeker, range);
+	},
+	
+	getSelectionEnd: function(doc, selection)
+	{
+		if (selection.getRangeAt)
+			return selection.getRangeAt(0).endContainer;
+		
+		var range = selection.createRange();
+		var seeker = range.duplicate();
+		seeker.moveToElementText(doc.body);
+		if (seeker.compareEndPoints("EndToEnd", range)==0)
+			return doc.body;
+		
+		return this.seekRangeEnd(doc.body, seeker, range);
+	},
+	
+	/**
+	 * Scans from a start node to an end node and returns all the
+	 * non-ignorable text nodes in order.
+	 */
+	getTextNodes: function(start, end)
+	{
+		var nodes = [];
+		if (!end)
+			end = start;
+		var context = start;
+		var ignorable = false;
+		if (start.firstChild) {
+			context = start.firstChild;
+			ignorable = true;
+		}
+		var whitespace = /^\s*$/;
+		while (true) {
+		
+			// Push text node onto stack if not ignorable
+			if (context.nodeType == 3) {
+				if (ignorable && !whitespace.test(context.nodeValue))
+					ignorable = false;
+				if (!ignorable)
+					nodes.push(context);
+			}
+			
+			// Recurse into node if necessary
+			if (context.firstChild) {
+				// Backtrack and remove any ignorable text nodes
+				if (!ignorable) {
+					var backtrack = context;
+					while ((backtrack) && (backtrack.nodeType == 3) && (whitespace.test(backtrack.nodeValue))) {
+						nodes.pop();
+						backtrack = backtrack.previousSibling;
+					}
+					ignorable = true;
+				}
+				
+				context = context.firstChild;
+				continue;
+			}
+			
+			// At the end of this node, bail if it's the last			
+			if (context == end)
+				return nodes;
+			
+			if (context.nextSibling)
+				context = context.nextSibling;
+			else {
+				// Backtrack and remove any ignorable text nodes
+				if (!ignorable) {
+					var backtrack = context;
+					while ((backtrack) && (backtrack.nodeType == 3) && (whitespace.test(backtrack.nodeValue))) {
+						nodes.pop();
+						backtrack = backtrack.previousSibling;
+					}
+					ignorable = true;
+				}
+				
+				// Find the next node to check
+				while (!context.nextSibling) {
+					if (context == end)
+						return nodes;
+					context = context.parentNode;
+				}
+				context = context.nextSibling;
+			}
+		}
+	},
+	
 	/**
 	 * Creates an XMLHttpRequest in most browsers.
 	 */
@@ -313,6 +492,9 @@ var TinyMCE_AdvBlockFormatPlugin = {
 		return null;
 	},
 	
+	/**
+	 * Checks the http request to see if its done and if so load the formats.
+	 */
 	processReqChange: function() {
 		var plugin = TinyMCE_AdvBlockFormatPlugin;
 		if (plugin.request.readyState == 4) {
@@ -324,7 +506,7 @@ var TinyMCE_AdvBlockFormatPlugin = {
 				for (var i=0; i<nodes.length; i++) {
 					var style = {};
 					style.name = nodes[i].getAttribute("name");
-					style.tag = nodes[i].getAttribute("element");
+					style.tag = nodes[i].getAttribute("element").toLowerCase();
 					style.attributes = {};
 					var attrs = nodes[i].getElementsByTagName("Attribute");
 					for (var j=0; j<attrs.length; j++) {
