@@ -161,7 +161,10 @@ var TinyMCE_AdvBlockFormatPlugin = {
 							oldformat = plugin.findMatchingFormat(next);
 							if (oldformat) {
 								for (var attr in plugin.formats[oldformat].attributes) {
-									next.removeAttribute(attr);
+									if (attr == "class")
+										next.className="";
+									else
+										next.removeAttribute(attr);
 								}
 							}
 							block = next;
@@ -182,7 +185,10 @@ var TinyMCE_AdvBlockFormatPlugin = {
 						if (next != block) {
 							if (next.tagName.toLowerCase() == newformat.tag) {
 								for (var attr in newformat.attributes) {
-									next.setAttribute(attr, newformat.attributes[attr]);
+									if (attr == "class")
+										next.className = newformat.attributes[attr];
+									else
+										next.setAttribute(attr, newformat.attributes[attr]);
 									changed = true;
 								}
 							}
