@@ -31,8 +31,9 @@ class BaseField extends XMLSerialized
 
   public function __sleep()
   {
-    $this->log = null;
-    return array_keys(get_object_vars($this));
+    $vars = get_object_vars($this);
+    unset($vars['log']);
+    return array_keys($vars);
   }
   
   public function __wakeup()

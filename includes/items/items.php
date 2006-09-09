@@ -42,7 +42,7 @@ class ArchiveAdminSection extends AdminSection
   
   public function getPriority()
   {
-    return ADMIN_PRIORITY_SECURITY;
+    return ADMIN_PRIORITY_CONTENT;
   }
   
   public function getURL()

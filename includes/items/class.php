@@ -295,6 +295,7 @@ class OptionSet extends XMLSerialized
   private $id;
   private $log;
   private $name;
+  private $usename = true;
   private $options = array();
   
   public function __construct($id)
@@ -327,6 +328,41 @@ class OptionSet extends XMLSerialized
     return $this->name;
   }
   
+  public function useName()
+  {
+    return $this->usename;
+  }
+  
+  public function createOption($name, $value)
+  {
+    global $_STORAGE;
+    
+    if ($name == null)
+      $name = 'NULL';
+    else
+      $name = '"'.$_STORAGE->escape($name).'"';
+
+    $_STORAGE->queryExec('INSERT INTO OptionSet (optionset, name, value) VALUES ("'.$_STORAGE->escape($this->id).'", '.$name.', "'.$_STORAGE->escape($value).'");');
+    return $this->getOption($_STORAGE->lastInsertRowid());
+  }
+  
+  public function getOptions()
+  {
+    global $_STORAGE;
+    
+    $results = $_STORAGE->query('SELECT * FROM OptionSet WHERE optionset="'.$_STORAGE->escape($this->id).'";');
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      if (!isset($this->options[$details['id']]))
+      {
+        $option = new Option($this, $details);
+        $this->options[$details['id']] = $option;
+      }
+    }
+    return $this->options;
+  }
+  
   public function getOption($id)
   {
     global $_STORAGE;
@@ -356,12 +392,19 @@ class OptionSet extends XMLSerialized
         $result[$this->options[$details['id']]->getName()] = $this->options[$details['id']];
       else
       {
-        $option = new Option($this, $results->fetch());
+        $option = new Option($this, $details);
         $this->options[$details['id']] = $option;
         $result[$option->getName()] = $option;
       }
     }
     return $result;
+  }
+  
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute("usename") && $element->getAttribute("usename")=="false")
+      $this->usename = false;
+    parent::parseAttributes($element);
   }
   
   protected function parseElement($element)
@@ -395,9 +438,25 @@ class Option
     return $this->id;
   }
   
+  public function setName($value)
+  {
+    global $_STORAGE;
+    
+    $_STORAGE->queryExec('UPDATE OptionSet SET name="'.$_STORAGE->escape($value).'" WHERE id='.$this->id.';');
+    $this->name = $value;
+  }
+  
   public function getName()
   {
     return $this->name;
+  }
+  
+  public function setValue($value)
+  {
+    global $_STORAGE;
+    
+    $_STORAGE->queryExec('UPDATE OptionSet SET value="'.$_STORAGE->escape($value).'" WHERE id='.$this->id.';');
+    $this->value = $value;
   }
   
   public function getValue()
