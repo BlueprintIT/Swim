@@ -26,15 +26,16 @@ function guessContentType($extension)
 	return $_TYPEMAP->getPref($extension,'text/plain');
 }
 
-function determineContentType($file)
+function determineContentType($file, $filename = "")
 {
+  if ($filename == "")
+    $filename = basename($file);
 	if (function_exists('mime_content_type'))
 	{
     $type = mime_content_type($file);
     if ($type != false)
       return $type;
 	}
-	$filename=basename($file);
 	$parts=explode('.',$filename);
 	if (count($parts)==1)
 	{

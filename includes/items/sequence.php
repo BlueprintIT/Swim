@@ -128,6 +128,30 @@ class Sequence extends ClassField
       parent::parseElement($el);
   }
   
+  public function getClassForMimetype($mimetype)
+  {
+    list($major,$minor) = explode('/', $mimetype);
+    
+    $classes = $this->getVisibleClasses();
+    foreach ($classes as $class)
+    {
+      if ($class->getType() == 'file')
+      {
+        $types = $class->getMimetypes();
+        foreach ($types as $type)
+        {
+          if ($type == '*')
+            return $class;
+            
+          list($maj,$min) = explode('/', $type);
+          if (($maj == $major) && ((!isset($min)) || ($min == $minor)))
+            return $class;
+        }
+      }
+    }
+    return null;
+  }
+  
   public function getVisibleClasses()
   {
     if (!isset($this->classes))

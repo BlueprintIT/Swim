@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Creates a new item of a give class, optionally inserting into a sequence.
+ * Creates a new item of a given class, optionally inserting into a sequence.
  *
  * Copyright Blueprint IT Ltd. 2006
  *
@@ -89,6 +89,5 @@ function method_createitem($request)
     displayAdminLogin($request);
   }
 }
-
 
 ?>

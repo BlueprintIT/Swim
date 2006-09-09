@@ -285,7 +285,7 @@ class ItemClass extends FieldSet
     if ($element->hasAttribute('versioning'))
       $this->versioning = $element->getAttribute('versioning');
     if ($element->hasAttribute('type'))
-      $this->tyoe = $element->getAttribute('type');
+      $this->type = $element->getAttribute('type');
     parent::parseAttributes($element);
   }
 }

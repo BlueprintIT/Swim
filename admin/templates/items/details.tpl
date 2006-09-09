@@ -420,13 +420,29 @@ function moveDown(item, field, link) {
 						{/if}
 						{secure documents="write"}
 						{assign var="choices" value=$field->getVisibleClasses()}
-						{if count($choices)>0}
-							{html_form method="createitem"  targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$field->getId()}
+						{assign var="classcount" value=0}
+						{assign var="filecount" value=0}
+						{foreach from=$choices item="choice"}
+							{if $choice->getType()=='normal'}
+								{assign var="classcount" value=$classcount+1}
+							{elseif $choice->getType()=='file'}
+								{assign var="filecount" value=$classcount+1}
+							{/if}
+						{/foreach}
+						{if $classcount>0}
+							{html_form method="createitem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$field->getId()}
 								<p>Add a new <select name="class">
 								{foreach from=$choices item="choice"}
-									<option value="{$choice->getId()}">{$choice->getName()}</option>
+									{if $choice->getType()=='normal'}
+										<option value="{$choice->getId()}">{$choice->getName()}</option>
+									{/if}
 								{/foreach}
 								</select> <input type="submit" value="Add..."></p>
+							{/html_form}
+						{/if}
+						{if $filecount>0}
+							{html_form tag_enctype="multipart/form-data" method="uploaditem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$field->getId()}
+								<p>Upload a new item: <input type="file" name="file"> <input type="submit" value="Upload..."></p>
 							{/html_form}
 						{/if}
 						{/secure}
