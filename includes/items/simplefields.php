@@ -311,6 +311,95 @@ class DateField extends IntegerField
   }
 }
 
+class OptionField extends IntegerField
+{
+  protected $option;
+  
+  public function getClientAttributes()
+  {
+    $attrs = parent::getClientAttributes();
+    $result = array();
+    $optionset = FieldSetManager::getOptionSet($this->id);
+    $options = $optionset->getOptions();
+    if (count($options)>0)
+    {
+      foreach ($options as $id => $option)
+      {
+        $result[$id] = $option->getValue();
+      }
+    }
+    $attrs['options'] = $result;
+    return $attrs;
+  }
+  
+  public function getEditor(&$request, &$smarty)
+  {
+    $this->retrieve();
+    $text = '';
+    $text.= '<select id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">';
+    $optionset = FieldSetManager::getOptionSet($this->id);
+    $options = $optionset->getOptions();
+    foreach ($options as $id => $option)
+    {
+      $text.='  <option value="'.$id.'"';
+      if ($id == $this->value)
+        $text.=' selected="selected"';
+      $text.='>'.addslashes($option->getValue()).'</option>';
+    }
+    $text.= '</select>';
+    return $text;
+  }
+
+  protected function getDefaultValue()
+  {
+    $optionset = FieldSetManager::getOptionSet($this->id);
+    $options = $optionset->getOptions();
+    $option = reset($options);
+    return $option->getId();
+  }
+  
+  public function setValue($value)
+  {
+    $option = null;
+    $optionset = FieldSetManager::getOptionSet($this->id);
+    if ($value != -1)
+      $option = $optionset->getOption($value);
+
+    if ($option == null)
+    {
+      $options = $optionset->getOptions();
+      if (count($options)>0)
+      {
+        $option = reset($options);
+        $value = $option->getId();
+      }
+      else
+        $value = -1;
+    }
+    parent::setValue($value);
+    $this->option = $option;
+  }
+  
+  protected function retrieve()
+  {
+    parent::retrieve();
+    $optionset = FieldSetManager::getOptionSet($this->id);
+    if ($this->value != -1)
+      $this->option = $optionset->getOption($this->value);
+    if ($this->option == null)
+      $this->setValue($this->value);
+  }
+  
+  public function toString()
+  {
+    $this->retrieve();
+    if ($this->option !== null)
+      return $this->option->getValue();
+    else
+      return '';
+  }
+}
+
 class ItemField extends IntegerField
 {
   protected $item;

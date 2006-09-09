@@ -41,6 +41,20 @@ function create_file_field(basefield, position, field, container, fielddata)
   container.innerHTML = content;
 }
 
+function create_option_field(basefield, position, field, container, fielddata)
+{
+	var select = document.createElement("select");
+	select.setAttribute("id", getFieldId(basefield, position, field));
+	select.setAttribute("name", getFieldName(basefield, position, field));
+	container.appendChild(select);
+	for (var id in fielddata.options) {
+		var option = document.createElement("option");
+		option.setAttribute("value", id);
+		select.appendChild(option);
+		option.innerHTML = fielddata.options[id];
+	}
+}
+
 function createCompoundField(basefield, position, field, container, fielddata)
 {
 	switch (fielddata.type)
@@ -53,6 +67,9 @@ function createCompoundField(basefield, position, field, container, fielddata)
 			break;
 		case 'date':
 			create_date_field(basefield, position, field, container, fielddata);
+			break;
+		case 'optionset':
+			create_option_field(basefield, position, field, container, fielddata);
 			break;
 		default:
 			create_simple_field(basefield, position, field, container, fielddata);

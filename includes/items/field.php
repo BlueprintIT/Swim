@@ -125,6 +125,8 @@ class BaseField extends XMLSerialized
         return new ItemField($el);
       if ($type == 'file')
         return new FileField($el);
+      if ($type == 'optionset')
+        return new OptionField($el);
       if ($type == 'compound')
         return new CompoundField($el);
     }
@@ -266,6 +268,25 @@ class CompoundField extends Field
     }
   }
   
+  public function getJSVar($value)
+  {
+    if (is_array($value))
+    {
+      $result = '{';
+      if (count($value)>0)
+      {
+        foreach ($value as $key => $val)
+        {
+          $result.=$key.':'.$this->getJSVar($val).',';
+        }
+        $result = substr($result,0,-1);
+      }
+      return $result.'}';
+    }
+    else
+      return '"'.addslashes($value).'"';
+  }
+  
   public function getEditor(&$request, &$smarty)
   {
     global $_PREFS;
@@ -286,7 +307,7 @@ class CompoundField extends Field
       $attrs = $field->getClientAttributes();
       foreach ($attrs as $name => $value)
       {
-        $result.=" ".$name.": '".$value."',";
+        $result.=" ".$name.": ".$this->getJSVar($value).",";
       }
       $result = substr($result,0,-1);
       $result.=" },";
