@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-class BaseField
+class BaseField extends XMLSerialized
 {
   protected $id;
   protected $name;
@@ -26,7 +26,7 @@ class BaseField
   public function __construct($metadata)
   {
     $this->log = LoggerManager::getLogger('swim.field.'.get_class($this));
-    $this->parse($metadata);
+    $this->load($metadata);
   }
 
   public function __sleep()
@@ -85,38 +85,24 @@ class BaseField
 
   protected function parseElement($element)
   {
-    $this->log->warn('Unknown element in field declaration: '.$element->tagName);
+    if ($element->tagName=='name')
+      $this->name=getDOMText($element);
+    else if ($element->tagName=='description')
+      $this->description=getDOMText($element);
+    else
+      parent::parseElement($element);
   }
   
   protected function parseAttributes($element)
   {
+    if ($element->hasAttribute('index') && ($element->getAttribute('index') == 'false'))
+      $this->index = false;
+    if ($element->hasAttribute('priority'))
+      $this->indexPriority = $element->getAttribute('priority');
+    $this->id = $element->getAttribute('id');
+    $this->type = $element->getAttribute('type');
   }
   
-  private function parse($metadata)
-  {
-    if ($metadata->hasAttribute('index') && ($metadata->getAttribute('index') == 'false'))
-      $this->index = false;
-    if ($metadata->hasAttribute('priority'))
-      $this->indexPriority = $metadata->getAttribute('priority');
-    $this->id = $metadata->getAttribute('id');
-    $this->type = $metadata->getAttribute('type');
-    $this->parseAttributes($metadata);
-    $el=$metadata->firstChild;
-    while ($el!==null)
-    {
-      if ($el->nodeType==XML_ELEMENT_NODE)
-      {
-        if ($el->tagName=='name')
-          $this->name=getDOMText($el);
-        else if ($el->tagName=='description')
-          $this->description=getDOMText($el);
-        else
-          $this->parseElement($el);
-      }
-      $el=$el->nextSibling;
-    }
-  }
-
   public static function getField($el)
   {
     if (($el != null) && ($el->hasAttribute('type')))

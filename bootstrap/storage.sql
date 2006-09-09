@@ -81,6 +81,14 @@ CREATE TABLE File (
 	UNIQUE (itemversion,file)
 );
 
+CREATE TABLE OptionSet (
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	optionset VARCHAR(30),
+	name VARCHAR(30),
+	value VARCHAR(50),
+	UNIQUE (optionset,value)
+);
+
 CREATE TABLE Keywords (
 	word VARCHAR(20),
 	item INTEGER,

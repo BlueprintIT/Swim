@@ -4,7 +4,7 @@ $items = array();
 $_STORAGE = $GLOBALS['_STORAGE'];
 $section = $this->get_template_vars('section');
 $root = $section->getRootItem();
-$results = $_STORAGE->query('SELECT Item.id FROM Item LEFT JOIN Sequence ON Item.id=Sequence.item WHERE ISNULL(Sequence.Item) AND section="'.$_STORAGE->escape($section->getId()).'" AND id!='.$root->getId().' AND archived=0;');
+$results = $_STORAGE->query('SELECT Item.id FROM Item LEFT JOIN Sequence ON Item.id=Sequence.item WHERE ISNULL(Sequence.Item) AND section="'.$_STORAGE->escape($section->getId()).'" AND id!='.$root->getId().' AND (ISNULL(archived) OR archived<>1);');
 while ($results->valid())
 {
 	$item = Item::getItem($results->fetchSingle());

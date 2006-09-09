@@ -13,7 +13,9 @@
  * $Revision$
  */
 
-class FieldSet
+define('SWIM_FIELDSET_CACHE_VERSION',1);
+
+class FieldSet extends XMLSerialized
 {
   protected $id;
   protected $parent = null;
@@ -31,8 +33,9 @@ class FieldSet
 
   public function __sleep()
   {
-    $this->log = null;
-    return array_keys(get_object_vars($this));
+    $vars = get_object_vars($this);
+    unset($vars['log']);
+    return array_keys($vars);
   }
   
   public function __wakeup()
@@ -125,34 +128,17 @@ class FieldSet
   
   protected function parseElement($element)
   {
-  }
-  
-  protected function parseAttributes($element)
-  {
-  }
-
-  public function load($element)
-  {
-    $this->parseAttributes($element);
-    $el=$element->firstChild;
-    while ($el!==null)
+    if ($element->tagName=='name')
+      $this->name=getDOMText($element);
+    else if ($element->tagName=='description')
+      $this->description=getDOMText($element);
+    else if ($element->tagName=='field')
     {
-      if ($el->nodeType==XML_ELEMENT_NODE)
-      {
-        if ($el->tagName=='name')
-          $this->name=getDOMText($el);
-        else if ($el->tagName=='description')
-          $this->description=getDOMText($el);
-        else if ($el->tagName=='field')
-        {
-          $field = BaseField::getField($el);
-          $this->fields[$field->getId()] = $field;
-        }
-        else
-          $this->parseElement($el);
-      }
-      $el=$el->nextSibling;
+      $field = BaseField::getField($element);
+      $this->fields[$field->getId()] = $field;
     }
+    else
+      parent::parseElement($element);
   }
 }
 
@@ -286,6 +272,8 @@ class ItemClass extends FieldSet
     {
       $this->mimetypes = explode(",", getDOMText($element));
     }
+    else
+      parent::parseElement($element);
   }
   
   protected function parseAttributes($element)
@@ -302,10 +290,127 @@ class ItemClass extends FieldSet
   }
 }
 
+class OptionSet extends XMLSerialized
+{
+  private $id;
+  private $log;
+  private $name;
+  private $options = array();
+  
+  public function __construct($id)
+  {
+    $this->id = $id;
+    $this->log = LoggerManager::getLogger('swim.tag');
+  }
+
+  public function __sleep()
+  {
+    $vars = get_object_vars($this);
+    unset($vars['log']);
+    unset($vars['options']);
+    return array_keys($vars);
+  }
+  
+  public function __wakeup()
+  {
+    $this->log = LoggerManager::getLogger('swim.tag');
+    $this->options = array();
+  }
+  
+  public function getId()
+  {
+    return $this->id;
+  }
+  
+  public function getName()
+  {
+    return $this->name;
+  }
+  
+  public function getOption($id)
+  {
+    global $_STORAGE;
+    
+    if (!isset($this->options[$id]))
+    {
+      $results = $_STORAGE->query('SELECT * FROM OptionSet WHERE optionset="'.$_STORAGE->escape($this->id).'" AND id='.$id.';');
+      if ($results->valid())
+      {
+        $option = new Option($this, $results->fetch());
+        $this->options[$id] = $option;
+      }
+    }
+    return $this->options[$id];
+  }
+  
+  public function getOptionsByName($name)
+  {
+    global $_STORAGE;
+    
+    $result = array();
+    $results = $_STORAGE->query('SELECT * FROM OptionSet WHERE optionset="'.$_STORAGE->escape($this->id).'" AND name="'.$_STORAGE->escape($name).'";');
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      if (isset($this->options[$details['id']]))
+        $result[$this->options[$details['id']]->getName()] = $this->options[$details['id']];
+      else
+      {
+        $option = new Option($this, $results->fetch());
+        $this->options[$details['id']] = $option;
+        $result[$option->getName()] = $option;
+      }
+    }
+    return $result;
+  }
+  
+  protected function parseElement($element)
+  {
+    if ($element->tagName=='name')
+    {
+      $this->name = getDOMText($element);
+    }
+    else
+      parent::parseElement($element);
+  }
+}
+
+class Option
+{
+  private $id;
+  private $name;
+  private $value;
+  private $tagset;
+  
+  public function __construct($tagset, $details)
+  {
+    $this->tagset = $tagset;
+    $this->id = $details['id'];
+    $this->name = $details['name'];
+    $this->value = $details['value'];
+  }
+  
+  public function getId()
+  {
+    return $this->id;
+  }
+  
+  public function getName()
+  {
+    return $this->name;
+  }
+  
+  public function getValue()
+  {
+    return $this->value;
+  }
+}
+
 class FieldSetManager
 {
   private static $classes = array();
   private static $views = array();
+  private static $options = array();
   private static $log;
   
   public static function isCacheValid($cache, $files)
@@ -321,6 +426,29 @@ class FieldSetManager
     return true;
   }
   
+  public static function loadFromCache($cache, $files)
+  {
+    $results = unserialize(file_get_contents($cache));
+    if (!is_array($results))
+      return false;
+    if ((!isset($results['version'])) || ($results['version'] != SWIM_FIELDSET_CACHE_VERSION))
+      return false;
+      
+    if ((!isset($results['classes'])) || (!is_array($results['classes'])))
+      return false;
+    if ((!isset($results['views'])) || (!is_array($results['views'])))
+      return false;
+    if ((!isset($results['options'])) || (!is_array($results['options'])))
+      return false;
+
+    self::$classes = $results['classes'];
+    self::$views = $results['views'];
+    self::$options = $results['options'];
+
+    self::$log->debug('Loaded '.count(self::$views).' views, '.count(self::$classes).' classes and '.count(self::$options).' optionsets from cache.');
+    return true;
+  }
+  
   public static function init()
   {
     global $_PREFS;
@@ -328,20 +456,13 @@ class FieldSetManager
     self::$log = LoggerManager::getLogger('swim.classmanager');
     
     $cache = $_PREFS->getPref('storage.sitecache').'/fieldsets.ser';
-    $files = array($_PREFS->getPref('storage.config').'/views.xml', $_PREFS->getPref('storage.config').'/classes.xml');
-    if (self::isCacheValid($cache, $files))
-    {
-      $results = unserialize(file_get_contents($cache));
-      self::$classes = $results['classes'];
-      self::$views = $results['views'];
-      self::$log->debug('Loaded '.count(self::$views).' views and '.count(self::$classes).' classes from cache.');
-    }
-    else
+    $files = array($_PREFS->getPref('storage.config').'/optionsets.xml', $_PREFS->getPref('storage.config').'/views.xml', $_PREFS->getPref('storage.config').'/classes.xml');
+    if (!self::isCacheValid($cache, $files) || !self::loadFromCache($cache, $files))
     {
       self::loadFieldSets($files);
-      $results = array('views' => self::$views, 'classes' => self::$classes);
+      $results = array('version' => SWIM_FIELDSET_CACHE_VERSION, 'views' => self::$views, 'classes' => self::$classes, 'options' => self::$options);
       file_put_contents($cache, serialize($results));
-      self::$log->debug('Loaded '.count(self::$views).' views and '.count(self::$classes).' classes.');
+      self::$log->debug('Loaded '.count(self::$views).' views, '.count(self::$classes).' classes and '.count(self::$options).' optionsets.');
     }
   }
   
@@ -389,6 +510,13 @@ class FieldSetManager
               self::$views[$id]=$view;
               $view->load($el);
             }
+            else if ($el->tagName=='optionset')
+            {
+              $id = $el->getAttribute('id');
+              $tag = new OptionSet($id);
+              self::$options[$id] = $tag;
+              $tag->load($el);
+            }
           }
           $el=$el->nextSibling;
         }
@@ -400,6 +528,19 @@ class FieldSetManager
     }
   }
   
+  public static function getOptionSets()
+  {
+    return self::$options;
+  }
+  
+  public static function getOptionSet($id)
+  {
+    if (isset(self::$options[$id]))
+      return self::$options[$id];
+    else
+      return null;
+  }
+  
   public static function getClasses()
   {
     return self::$classes;
@@ -408,13 +549,9 @@ class FieldSetManager
   public static function getClass($id)
   {
     if (isset(self::$classes[$id]))
-    {
       return self::$classes[$id];
-    }
     else
-    {
       return null;
-    }
   }
   
   public static function getViews()
@@ -425,13 +562,9 @@ class FieldSetManager
   public static function getView($id)
   {
     if (isset(self::$views[$id]))
-    {
       return self::$views[$id];
-    }
     else
-    {
       return null;
-    }
   }
 }
 

@@ -1,0 +1,18 @@
+Index: container/assets/container.css
+===================================================================
+--- container/assets/container.css	(revision 861)
++++ container/assets/container.css	(revision 862)
+@@ -147,11 +147,11 @@
+ }
+ 
+ .panel .close.nonsecure {
+-	background-image:url(http://us.i1.yimg.com/us.yimg.com/i/nt/ic/ut/alt3/close12_1.gif);
++	background-image:url(close12_1.gif);
+ }
+ 
+ .panel .close.secure {
+-	background-image:url(https://a248.e.akamai.net/sec.yimg.com/i/nt/ic/ut/alt3/close12_1.gif);
++	background-image:url(close12_1.gif);
+ }
+ 
+ .panel .ft {

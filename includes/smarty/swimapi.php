@@ -144,6 +144,8 @@ function api_get($params, &$smarty)
         $result = FieldSetManager::getClass($params['id']);
       else if ($params['type']=='view')
         $result = FieldSetManager::getView($params['id']);
+      else if ($params['type']=='optionset')
+        $result = FieldSetManager::getOptionSet($params['id']);
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }
@@ -156,6 +158,8 @@ function api_get($params, &$smarty)
         $result = UserManager::getAllGroups();
       else if ($params['type']=='section')
         $result = SectionManager::getSections();
+      else if ($params['type']=='optionset')
+        $result = FieldSetManager::getOptionSets();
       $smarty->assign_by_ref($params['var'], $result);
       return "";
     }

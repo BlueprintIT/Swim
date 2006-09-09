@@ -25,27 +25,33 @@ function displayTree(event)
     type: "users"
   {rdelim};
   var root = new BlueprintIT.widget.IconNode(details, tree.getRoot(), true);
-{php}
-$users = UserManager::getAllUsers();
-foreach ($users as $username => $user)
-{
-  if (strlen($user->getName())>0)
-    $name = $user->getName();
-  else
-    $name = $username;
-  $edit = new Request();
-  $edit->setMethod('admin');
-  $edit->setPath('users/details.tpl');
-  $edit->setQueryVar('user',$username);
-  print("  details = {\n");
-  print("    type: \"user\",\n");
-  print("    target: \"main\",\n");
-  print("    label: \"".$name."\",\n");
-  print("    href: \"".$edit->encode()."\"\n");
-  print("  };\n");
-  print("  new BlueprintIT.widget.IconNode(details, root, false);\n");
-}
-{/php}
+{apiget var="users" type="user"}
+{foreach from=$users item="user"}
+  details = {ldelim}
+    type: "user",
+    target: "main",
+    label: "{$user->getName()|default:$user->getUsername()}",
+    href: "{encode method="admin" path="users/details.tpl" user=$user->getUsername()}"
+  {rdelim};
+  new BlueprintIT.widget.IconNode(details, root, false);
+{/foreach}
+{apiget var="optionsets" type="optionset"}
+{if count($optionsets)>0}
+  details = {ldelim}
+    label: "Option Sets",
+    type: "optionsets"
+  {rdelim};
+  root = new BlueprintIT.widget.IconNode(details, tree.getRoot(), true);
+{foreach from=$optionsets item="optionset"}
+  details = {ldelim}
+    type: "optionset",
+    target: "main",
+    label: "{$optionset->getName()}",
+    href: "{encode method="admin" path="options/optionsetdetails.tpl" optionset=$optionset->getId()}"
+  {rdelim};
+  new BlueprintIT.widget.IconNode(details, root, false);
+{/foreach}
+{/if}
   tree.draw();
 {rdelim}
 

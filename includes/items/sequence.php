@@ -108,6 +108,7 @@ class Sequence extends ClassField
           $this->relationship = 'aggregation';
       }
     }
+    parent::parseAttributes($element);
   }
   
   protected function parseElement($el)

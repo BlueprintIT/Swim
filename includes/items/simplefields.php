@@ -238,6 +238,7 @@ class BaseHTMLField extends TextField
       $this->stylesheet = $element->getAttribute('stylesheet');
     if ($element->hasAttribute('styles'))
       $this->styles = $element->getAttribute('styles');
+    parent::parseAttributes($element);
   }
   
   public function copyFrom($item)

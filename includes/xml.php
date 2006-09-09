@@ -28,4 +28,31 @@ function getDOMText($element)
   return $text;
 }
 
+class XMLSerialized
+{
+  protected function parseElement($element)
+  {
+    if (isset($this->log))
+      $this->log->warn('Unhandler element '.$element->tagName);
+  }
+  
+  protected function parseAttributes($element)
+  {
+  }
+
+  public function load($element)
+  {
+    $this->parseAttributes($element);
+    $el=$element->firstChild;
+    while ($el!==null)
+    {
+      if ($el->nodeType==XML_ELEMENT_NODE)
+      {
+        $this->parseElement($el);
+      }
+      $el=$el->nextSibling;
+    }
+  }
+}
+
 ?>
