@@ -1,7 +1,7 @@
 {secure documents="read" login="true"}
 {include file='includes/adminheader.tpl' title="Content management"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
-{stylesheet href="$SHARED/treeview/sitetree.css"}
+{stylesheet href="$CONTENT/styles/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}

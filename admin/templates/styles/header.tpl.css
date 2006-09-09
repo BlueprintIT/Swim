@@ -34,7 +34,7 @@ iframe.body {
   border: none 0px;
 }
 
-#categorytree .itemcontent div {
+#categorytree .itemcontent div, #categorytree .iconnode_content div {
   padding: 2px 5px 2px 5px;
 }
 

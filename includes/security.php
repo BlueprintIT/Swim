@@ -658,49 +658,6 @@ class UserManager
   }
 }
 
-class UserAdminSection extends AdminSection
-{
-  public function getIcon()
-  {
-    global $_PREFS;
-    
-    return $_PREFS->getPref('url.admin.static').'/icons/user-group2.gif';
-  }
-  
-  public function getName()
-  {
-    return 'User Management';
-  }
-  
-  public function getPriority()
-  {
-    return ADMIN_PRIORITY_SECURITY;
-  }
-  
-  public function getURL()
-  {
-    $request = new Request();
-    $request->setMethod('admin');
-    $request->setPath('users/');
-    return $request->encode();
-  }
-  
-  public function isAvailable()
-  {
-    global $_USER;
-    
-    return $_USER->hasPermission('users',PERMISSION_READ);
-  }
-  
-  public function isSelected($request)
-  {
-    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,6)=='users/'))
-      return true;
-      
-    return false;
-  }
-}
-
 // Start up the session
 session_name('SwimSession');
 @session_start();
@@ -715,7 +672,5 @@ else
 {
 	$GLOBALS['_USER'] = new User();
 }
-
-AdminManager::addSection(new UserAdminSection());
 
 ?>

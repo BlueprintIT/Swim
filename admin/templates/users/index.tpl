@@ -1,7 +1,6 @@
 {secure users="read" login="true"}
-{include file='includes/adminheader.tpl' title="User management"}
-{include file='users/leftpane.tpl'}
-<div id="mainpane" class="pane">
+{include file='includes/frameheader.tpl' title="User management"}
+<div id="mainpane">
 	<div class="header">
 		{secure users="write"}
 		<table class="toolbar">
@@ -21,5 +20,5 @@
 		<p>Welcome to the SWIM administration interface.</p>
 	</div>
 </div>
-{include file='includes/adminfooter.tpl'}
+{include file='includes/framefooter.tpl'}
 {/secure}

@@ -1,0 +1,8 @@
+.iconnode_branch_users_open,
+.iconnode_branch_users_clsd {
+  background-image: url('../icons/user-group2.gif');
+}
+
+.iconnode_leaf_user {
+  background-image: url('../icons/user.gif');
+}

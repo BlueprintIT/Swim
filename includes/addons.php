@@ -13,10 +13,11 @@
  * $Revision$
  */
 
-define('ADMIN_PRIORITY_CONTENT',0);
-define('ADMIN_PRIORITY_SECURITY',10);
-define('ADMIN_PRIORITY_ADDON',20);
-define('ADMIN_PRIORITY_EXTERNAL',30);
+define('ADMIN_PRIORITY_GENERAL',0);
+define('ADMIN_PRIORITY_CONTENT',10);
+define('ADMIN_PRIORITY_SECURITY',20);
+define('ADMIN_PRIORITY_ADDON',30);
+define('ADMIN_PRIORITY_EXTERNAL',40);
 
 class AdminSection
 {
@@ -176,6 +177,49 @@ class AdminManager
   }
 }
 
+class OptionsAdminSection extends AdminSection
+{
+  public function getIcon()
+  {
+    global $_PREFS;
+    
+    return $_PREFS->getPref('url.admin.static').'/icons/web-page-blue.gif';
+  }
+  
+  public function getName()
+  {
+    return 'General Options';
+  }
+  
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_GENERAL;
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('options/index.tpl');
+    return $request->encode();
+  }
+  
+  public function isAvailable()
+  {
+    global $_USER;
+    
+    return true;
+  }
+  
+  public function isSelected($request)
+  {
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,8)=='options/'))
+      return true;
+      
+    return false;
+  }
+}
+
 class AddonManager
 {
   private static $addons = array();
@@ -235,5 +279,7 @@ class AddonManager
     self::$addons = array();
   }
 }
+
+AdminManager::addSection(new OptionsAdminSection());
 
 ?>

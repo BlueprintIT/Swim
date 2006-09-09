@@ -1,7 +1,6 @@
 {secure users="read" login="true"}
-{include file='includes/adminheader.tpl' title="User management"}
-{include file='users/leftpane.tpl'}
-<div id="mainpane" class="pane">
+{include file='includes/frameheader.tpl' title="User management"}
+<div id="mainpane">
 	{apiget var="selected" type="user" id=$request.query.user}
 	<div class="header">
 		<table class="toolbar">
@@ -58,5 +57,5 @@
 		</div>
 	</div>
 </div>
-{include file='includes/adminfooter.tpl'}
+{include file='includes/framefooter.tpl'}
 {/secure}

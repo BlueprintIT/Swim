@@ -1,27 +1,18 @@
 BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oPublished, oContents, oParent) {
-	var html = oLabel;
-	if (oId) {
-		html = '<a href="javascript:onTreeItemClick(\''+oId+'\')">' + html + '</a>';
-	}
 	var oData = {
 		id: oId,
-		html: html,
+		label: oLabel,
 		published: oPublished,
 		type: oType,
 		contains: oContents
 	};
+	if (oId) {
+		oData.href = 'javascript:onTreeItemClick(\''+oId+'\')'
+	}
 	this.init(oData, oParent, false);
-  this.labelElId = "ygtvlabelel" + this.index;
-	oData.html = '<div id="'+this.labelElId+'">' + html + '</div>';
-	this.initContent(oData, true);
 };
 
-YAHOO.extend(BlueprintIT.widget.ItemNode, YAHOO.widget.HTMLNode);
-
-BlueprintIT.widget.ItemNode.prototype.labelElId = null;
-BlueprintIT.widget.ItemNode.prototype.getLabelEl = function() {
-	return document.getElementById(this.labelElId);
-}
+YAHOO.extend(BlueprintIT.widget.ItemNode, BlueprintIT.widget.IconNode);
 
 BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
 	var style = "site_itemcontent";
@@ -44,18 +35,6 @@ BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
 	}
 	
 	return style;
-}
-
-BlueprintIT.widget.ItemNode.prototype.toggle = function() {
-	BlueprintIT.widget.ItemNode.superclass.toggle.call(this);
-
-	this.getContentEl().className = this.getContentStyle();
-}
-
-BlueprintIT.widget.ItemNode.prototype.getNodeHtml = function() {
-	this.contentStyle = this.getContentStyle();
-	
-	return BlueprintIT.widget.ItemNode.superclass.getNodeHtml.call(this);
 }
 
 BlueprintIT.widget.SiteTree = function(url, div) {

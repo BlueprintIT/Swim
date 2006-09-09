@@ -1,7 +1,6 @@
 {secure users="write" login="true"}
-{include file='includes/adminheader.tpl' title="User management"}
-{include file='users/leftpane.tpl'}
-<div id="mainpane" class="pane">
+{include file='includes/frameheader.tpl' title="User management"}
+<div id="mainpane">
 <script>{literal}
 function checkForm(form)
 {
@@ -81,5 +80,5 @@ function submitForm(form)
 		</div>
 	{/html_form}
 </div>
-{include file='includes/adminfooter.tpl'}
+{include file='includes/framefooter.tpl'}
 {/secure}

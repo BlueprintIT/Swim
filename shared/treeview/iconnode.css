@@ -1,0 +1,17 @@
+.iconnode_content {
+  background-repeat: no-repeat;
+  padding: 0 0 0 20px;
+  background-position: 2px 2px;
+}
+
+.iconnode_branch_open {
+  background-image: url('ctopen.gif');
+}
+
+.iconnode_branch_clsd {
+  background-image: url('ctclsd.gif');
+}
+
+.iconnode_leaf {
+  background-image: url('item.gif');
+}

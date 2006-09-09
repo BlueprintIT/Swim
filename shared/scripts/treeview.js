@@ -1,3 +1,67 @@
+BlueprintIT.widget.IconNode = function(oData, oParent, expanded) {
+	this.init(oData, oParent, expanded);
+};
+
+YAHOO.extend(BlueprintIT.widget.IconNode, YAHOO.widget.HTMLNode);
+
+BlueprintIT.widget.IconNode.prototype.labelElId = null;
+BlueprintIT.widget.IconNode.prototype.getLabelEl = function() {
+	return document.getElementById(this.labelElId);
+}
+
+BlueprintIT.widget.IconNode.prototype.init = function(oData, oParent, expanded) {
+	var html;
+	if (oData.href) {
+		html = '<a href="' + oData.href + '"';
+		if (oData.target)
+			html += ' target="' + oData.target + '"';
+		html += '>' + oData.label + '</a>';
+	}
+	else
+		html = oData.label;
+	oData.html = html;
+
+	BlueprintIT.widget.IconNode.superclass.init.call(this, oData, oParent, expanded);
+
+  this.labelElId = "ygtvlabelel" + this.index;
+	oData.html = '<div id="'+this.labelElId+'">' + html + '</div>';
+	this.initContent(oData, true);
+}
+
+BlueprintIT.widget.IconNode.prototype.getContentStyle = function() {
+	var style = "iconnode_content";
+	if (this.hasChildren(false))
+	{
+		var state = "clsd";
+		if (this.expanded)
+			state = "open";
+		
+		style+= " iconnode_branch_"+state;
+		if (this.data.type)
+			style+= " iconnode_branch_"+this.data.type+" iconnode_branch_"+this.data.type+"_"+state;
+	}
+	else
+	{
+		style+= " iconnode_leaf";
+		if (this.data.type)
+			style+= " iconnode_leaf_"+this.data.type;
+	}
+	
+	return style;
+}
+
+BlueprintIT.widget.IconNode.prototype.toggle = function() {
+	BlueprintIT.widget.IconNode.superclass.toggle.call(this);
+
+	this.getContentEl().className = this.getContentStyle();
+}
+
+BlueprintIT.widget.IconNode.prototype.getNodeHtml = function() {
+	this.contentStyle = this.getContentStyle();
+	
+	return BlueprintIT.widget.IconNode.superclass.getNodeHtml.call(this);
+}
+
 BlueprintIT.widget.StyledTextNode = function(oData, oParent, expanded) {
 	if (oParent) {
 		this.init(oData, oParent, expanded);

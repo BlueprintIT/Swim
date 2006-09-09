@@ -9,17 +9,17 @@
 }
 
 .site_container_open, .site_container_open_published {
-  background-image: url('ctopen.gif');
+  background-image: url('../icons/ctopen.gif');
 }
 
 .site_container_clsd, .site_container_clsd_published {
-  background-image: url('ctclsd.gif');
+  background-image: url('../icons/ctclsd.gif');
 }
 
 .site_item {
-  background-image: url('item.gif');
+  background-image: url('../icons/item.gif');
 }
 
 .site_item_published {
-  background-image: url('published-item.gif');
+  background-image: url('../icons/published-item.gif');
 }
