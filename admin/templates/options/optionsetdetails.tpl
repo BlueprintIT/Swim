@@ -20,7 +20,7 @@
 				<h3>{$selected->getName()}</h3>
 			</div>
 			<div class="sectionbody">
-				<table>
+				<table style="width: 100%">
 					<thead>
 						<tr>
 							{if $selected->useName()}

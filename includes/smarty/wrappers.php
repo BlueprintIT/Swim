@@ -24,6 +24,9 @@ class RowWrapper
 
   public function __get($name)
   {
+    if ($this->option == null)
+      return '';
+      
     switch($name)
     {
       default:
@@ -34,6 +37,30 @@ class RowWrapper
         }
         return '';
     }
+  }
+}
+
+class OptionWrapper
+{
+  private $option;
+  
+  public function __construct($option)
+  {
+    $this->option = $option;
+  }
+  
+  public function __get($name)
+  {
+    switch ($name)
+    {
+      case 'name':
+        return $this->option->getName();
+        break;
+      case 'value':
+        return $this->option->getValue();
+        break;
+    }
+    return '';
   }
 }
 
@@ -129,6 +156,11 @@ class ItemWrapper
               $rows[$key] = new RowWrapper($row);
             }
             return $rows;
+          }
+          else if ($field->getType() == 'optionset')
+          {
+            $option = $field->getOption();
+            return new OptionWrapper($option);
           }
           else
             return $field->toString();

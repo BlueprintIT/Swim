@@ -390,6 +390,12 @@ class OptionField extends IntegerField
       $this->setValue($this->value);
   }
   
+  public function getOption()
+  {
+    $this->retrieve();
+    return $this->option;
+  }
+  
   public function toString()
   {
     $this->retrieve();

@@ -72,13 +72,14 @@ function createRow()
 					<h3>{$selected->getName()}</h3>
 				</div>
 				<div class="sectionbody">
-					<table id="optionset">
+					<table id="optionset" style="width: 100%">
 						<thead>
 							<tr>
 								{if $selected->useName()}
 									<th>Name</th>
 								{/if}
 								<th>Value</th>
+								<th style="width: 10%"></th>
 							</tr>
 						</thead>
 						<tbody>
