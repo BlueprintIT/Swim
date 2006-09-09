@@ -1,10 +1,9 @@
-
-/*                                                                                                                                                      
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.                                                                                                    
-Code licensed under the BSD License:                                                                                                                    
-http://developer.yahoo.net/yui/license.txt                                                                                                              
-version: 0.11.0                                                                                                                                         
-*/ 
+/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 0.11.3
+*/
 
 /**
  * Contains the tree view state data and the root node.  This is an
@@ -89,7 +88,7 @@ YAHOO.widget.TreeView.prototype = {
     /**
      * Sets up the animation for expanding children
      *
-     * @param {string} the type of animation (acceptable values defined in 
+     * @param {string} the type of animation (acceptable values defined in
      * YAHOO.widget.TVAnim)
      */
     setExpandAnim: function(type) {
@@ -101,7 +100,7 @@ YAHOO.widget.TreeView.prototype = {
     /**
      * Sets up the animation for collapsing children
      *
-     * @param {string} the type of animation (acceptable values defined in 
+     * @param {string} the type of animation (acceptable values defined in
      * YAHOO.widget.TVAnim)
      */
     setCollapseAnim: function(type) {
@@ -123,9 +122,9 @@ YAHOO.widget.TreeView.prototype = {
         if (this._expandAnim && this._animCount < this.maxAnim) {
             // this.locked = true;
             var tree = this;
-            var a = YAHOO.widget.TVAnim.getAnim(this._expandAnim, el, 
+            var a = YAHOO.widget.TVAnim.getAnim(this._expandAnim, el,
                             function() { tree.expandComplete(); });
-            if (a) { 
+            if (a) {
                 ++this._animCount;
                 a.animate();
             }
@@ -149,9 +148,9 @@ YAHOO.widget.TreeView.prototype = {
         if (this._collapseAnim && this._animCount < this.maxAnim) {
             // this.locked = true;
             var tree = this;
-            var a = YAHOO.widget.TVAnim.getAnim(this._collapseAnim, el, 
+            var a = YAHOO.widget.TVAnim.getAnim(this._collapseAnim, el,
                             function() { tree.collapseComplete(); });
-            if (a) { 
+            if (a) {
                 ++this._animCount;
                 a.animate();
             }
@@ -252,11 +251,11 @@ YAHOO.widget.TreeView.prototype = {
      *
      * @param {function} fnDataLoader the function that will be called to get the data
      * @param iconMode {int} configures the icon that is displayed when a dynamic
-     * load node is expanded the first time without children.  By default, the 
+     * load node is expanded the first time without children.  By default, the
      * "collapse" icon will be used.  If set to 1, the leaf node icon will be
      * displayed.
      */
-    setDynamicLoad: function(fnDataLoader, iconMode) { 
+    setDynamicLoad: function(fnDataLoader, iconMode) {
         this.root.setDynamicLoad(fnDataLoader, iconMode);
     },
 
@@ -266,18 +265,18 @@ YAHOO.widget.TreeView.prototype = {
      * do not allow multiple siblings to be displayed, only the last sibling
      * will be expanded.
      */
-    expandAll: function() { 
+    expandAll: function() {
         if (!this.locked) {
-            this.root.expandAll(); 
+            this.root.expandAll();
         }
     },
 
     /**
      * Collapses all expanded child nodes in the entire tree.
      */
-    collapseAll: function() { 
+    collapseAll: function() {
         if (!this.locked) {
-            this.root.collapseAll(); 
+            this.root.collapseAll();
         }
     },
 
@@ -314,8 +313,8 @@ YAHOO.widget.TreeView.prototype = {
     },
 
     /**
-     * Returns a collection of nodes that have a matching property 
-     * and value in the data object that was passed into its constructor.  
+     * Returns a collection of nodes that have a matching property
+     * and value in the data object that was passed into its constructor.
      *
      * @param {object} property the property to search (usually a string)
      * @param {object} value the value we want to find (usuall an int or string)
@@ -334,13 +333,13 @@ YAHOO.widget.TreeView.prototype = {
     },
 
     /**
-     * Removes the node and its children, and optionally refreshes the branch 
-     * of the tree that was affected.
+     * Removes the node and its children, and optionally refreshes the
+     * branch of the tree that was affected.
      * @param {Node} The node to remove
      * @param {boolean} autoRefresh automatically refreshes branch if true
      * @return {boolean} False is there was a problem, true otherwise.
      */
-    removeNode: function(node, autoRefresh) { 
+    removeNode: function(node, autoRefresh) {
 
         // Don't delete the root node
         if (node.isRoot()) {
@@ -371,7 +370,7 @@ YAHOO.widget.TreeView.prototype = {
      * dynamically again.
      * @param {Node} node the node to purge
      */
-    removeChildren: function(node) { 
+    removeChildren: function(node) {
         this.logger.log("Removing children for " + node);
         while (node.children.length) {
              this._deleteNode(node.children[0]);
@@ -388,7 +387,7 @@ YAHOO.widget.TreeView.prototype = {
      * Deletes the node and recurses children
      * @private
      */
-    _deleteNode: function(node) { 
+    _deleteNode: function(node) {
         // Remove all the child nodes first
         this.removeChildren(node);
 
@@ -397,12 +396,12 @@ YAHOO.widget.TreeView.prototype = {
     },
 
     /**
-     * Removes the branch from the tree.  This differs from removeNode in
-     * that the child collection is preserved to make it possible to
-     * insert the branch into another part of the tree, or another tree.
+     * Removes the node from the tree, preserving the child collection
+     * to make it possible to insert the branch into another part of the
+     * tree, or another tree.
      * @param {Node} the node to remove
      */
-    popNode: function(node) { 
+    popNode: function(node) {
         var p = node.parent;
 
         // Update the parent's collection of children
@@ -428,7 +427,12 @@ YAHOO.widget.TreeView.prototype = {
             node.nextSibling.previousSibling = node.previousSibling;
         }
 
-        // Update the tree's node collection 
+        node.parent = null;
+        node.previousSibling = null;
+        node.nextSibling = null;
+        node.tree = null;
+
+        // Update the tree's node collection
         delete this._nodes[node.index];
     },
 
@@ -536,8 +540,8 @@ YAHOO.widget.TreeView.preload = function(prefix) {
     var styles = ["tn","tm","tmh","tp","tph","ln","lm","lmh","lp","lph","loading"];
 
     var sb = [];
-    
-    for (var i = 0; i < styles.length; ++i) { 
+
+    for (var i = 0; i < styles.length; ++i) {
         sb[sb.length] = '<span class="' + prefix + styles[i] + '">&#160;</span>';
     }
 
@@ -551,7 +555,7 @@ YAHOO.widget.TreeView.preload = function(prefix) {
     document.body.appendChild(f);
 };
 
-YAHOO.widget.TreeView.addHandler(window, 
+YAHOO.widget.TreeView.addHandler(window,
                 "load", YAHOO.widget.TreeView.preload);
 
 /**
@@ -580,7 +584,7 @@ YAHOO.widget.Node.prototype = {
     /**
      * This node's child node collection.
      *
-     * @type Node[] 
+     * @type Node[]
      */
     children: null,
 
@@ -644,7 +648,7 @@ YAHOO.widget.Node.prototype = {
 
     /**
      * Should we render children for a collapsed node?  It is possible that the
-     * implementer will want to render the hidden data...  @todo verify that we 
+     * implementer will want to render the hidden data...  @todo verify that we
      * need this, and implement it if we do.
      *
      * @type boolean
@@ -762,6 +766,7 @@ YAHOO.widget.Node.prototype = {
      * the parent is also applied to this node's children in order to
      * make it possible to move a branch from one tree to another.
      * @param {Node} parentNode this node's parent node
+     * @return {boolean} true if the application was successful
      */
     applyParent: function(parentNode) {
         if (!parentNode) {
@@ -813,6 +818,7 @@ YAHOO.widget.Node.prototype = {
     /**
      * Appends this node to the supplied node's child collection
      * @param parentNode {Node} the node to append to.
+     * @return {Node} The appended node
      */
     appendTo: function(parentNode) {
         return parentNode.appendChild(this);
@@ -848,7 +854,7 @@ YAHOO.widget.Node.prototype = {
 
         return this;
     },
- 
+
     /**
     * Inserts this node after the supplied node
     *
@@ -888,7 +894,7 @@ YAHOO.widget.Node.prototype = {
     * Returns true if the Node is a child of supplied Node
     *
     * @param parentNode {Node} the Node to check
-    * @return {boolean} The node index if this Node is a child of 
+    * @return {boolean} The node index if this Node is a child of
     *                   supplied Node, else -1.
     * @private
     */
@@ -971,7 +977,7 @@ YAHOO.widget.Node.prototype = {
     /*
     getSpacerId: function() {
         return "ygtvspacer" + this.index;
-    }, 
+    },
     */
 
     /**
@@ -1029,7 +1035,7 @@ YAHOO.widget.Node.prototype = {
      * @return {string} the javascript url for toggling this node
      */
     getToggleLink: function() {
-        return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," + 
+        return "YAHOO.widget.TreeView.getNode(\'" + this.tree.id + "\'," +
             this.index + ").toggle()";
     },
 
@@ -1113,8 +1119,8 @@ YAHOO.widget.Node.prototype = {
         if (! this.multiExpand) {
             var sibs = this.getSiblings();
             for (var i=0; i<sibs.length; ++i) {
-                if (sibs[i] != this && sibs[i].expanded) { 
-                    sibs[i].collapse(); 
+                if (sibs[i] != this && sibs[i].expanded) {
+                    sibs[i].collapse();
                 }
             }
         }
@@ -1152,10 +1158,10 @@ YAHOO.widget.Node.prototype = {
      * Returns the hover style for the icon
      * @return {string} the css class hover state
      */
-    getHoverStyle: function() { 
+    getHoverStyle: function() {
         var s = this.getStyle();
-        if (this.hasChildren(true) && !this.isLoading) { 
-            s += "h"; 
+        if (this.hasChildren(true) && !this.isLoading) {
+            s += "h";
         }
         return s;
     },
@@ -1163,7 +1169,7 @@ YAHOO.widget.Node.prototype = {
     /**
      * Recursively expands all of this node's children.
      */
-    expandAll: function() { 
+    expandAll: function() {
         for (var i=0;i<this.children.length;++i) {
             var c = this.children[i];
             if (c.isDynamic()) {
@@ -1182,7 +1188,7 @@ YAHOO.widget.Node.prototype = {
     /**
      * Recursively collapses all of this node's children.
      */
-    collapseAll: function() { 
+    collapseAll: function() {
         for (var i=0;i<this.children.length;++i) {
             this.children[i].collapse();
             this.children[i].collapseAll();
@@ -1196,11 +1202,11 @@ YAHOO.widget.Node.prototype = {
      *
      * @param fmDataLoader {function} the function that will be used to get the data.
      * @param iconMode {int} configures the icon that is displayed when a dynamic
-     * load node is expanded the first time without children.  By default, the 
+     * load node is expanded the first time without children.  By default, the
      * "collapse" icon will be used.  If set to 1, the leaf node icon will be
      * displayed.
      */
-    setDynamicLoad: function(fnDataLoader, iconMode) { 
+    setDynamicLoad: function(fnDataLoader, iconMode) {
         if (fnDataLoader) {
             this.dataLoader = fnDataLoader;
             this._dynLoad = true;
@@ -1219,7 +1225,7 @@ YAHOO.widget.Node.prototype = {
      *
      * @return {boolean} true if this is the root node
      */
-    isRoot: function() { 
+    isRoot: function() {
         return (this == this.tree.root);
     },
 
@@ -1231,7 +1237,7 @@ YAHOO.widget.Node.prototype = {
      *
      * @return {boolean} true if this node's children are to be loaded dynamically
      */
-    isDynamic: function() { 
+    isDynamic: function() {
         var lazy = (!this.isRoot() && (this._dynLoad || this.tree.root._dynLoad));
         // this.logger.log("isDynamic: " + lazy);
         return lazy;
@@ -1245,7 +1251,7 @@ YAHOO.widget.Node.prototype = {
      * Checks if this node has children.  If this node is lazy-loading and the
      * children have not been rendered, we do not know whether or not there
      * are actual children.  In most cases, we need to assume that there are
-     * children (for instance, the toggle needs to show the expandable 
+     * children (for instance, the toggle needs to show the expandable
      * presentation state).  In other times we want to know if there are rendered
      * children.  For the latter, "checkForLazyLoad" should be false.
      *
@@ -1253,8 +1259,8 @@ YAHOO.widget.Node.prototype = {
      * @return {boolean} true if this has children or if it might and we are
      * checking for this condition.
      */
-    hasChildren: function(checkForLazyLoad) { 
-        return ( this.children.length > 0 || 
+    hasChildren: function(checkForLazyLoad) {
+        return ( this.children.length > 0 ||
                 (checkForLazyLoad && this.isDynamic() && !this.dynamicLoadComplete) );
     },
 
@@ -1330,22 +1336,22 @@ YAHOO.widget.Node.prototype = {
             if (this.dataLoader) {
                 this.logger.log("Using dynamic loader defined for this node");
 
-                setTimeout( 
+                setTimeout(
                     function() {
-                        node.dataLoader(node, 
-                            function() { 
-                                node.loadComplete(); 
+                        node.dataLoader(node,
+                            function() {
+                                node.loadComplete();
                             });
                     }, 10);
-                
+
             } else if (this.tree.root.dataLoader) {
                 this.logger.log("Using the tree-level dynamic loader");
 
-                setTimeout( 
+                setTimeout(
                     function() {
-                        node.tree.root.dataLoader(node, 
-                            function() { 
-                                node.loadComplete(); 
+                        node.tree.root.dataLoader(node,
+                            function() {
+                                node.loadComplete();
                             });
                     }, 10);
 
@@ -1373,7 +1379,7 @@ YAHOO.widget.Node.prototype = {
             this.children[i].childrenRendered = false;
             sb[sb.length] = this.children[i].getHtml();
         }
-        
+
         this.childrenRendered = true;
 
         return sb.join("");
@@ -1405,7 +1411,7 @@ YAHOO.widget.Node.prototype = {
         }
 
         var p = this.parent;
-        
+
         while (p.depth > depth) {
             p = p.parent;
         }
@@ -1423,7 +1429,7 @@ YAHOO.widget.Node.prototype = {
      * @return {string} the css class for the spacer
      */
     getDepthStyle: function(depth) {
-        return (this.getAncestor(depth).nextSibling) ? 
+        return (this.getAncestor(depth).nextSibling) ?
             "ygtvdepthcell" : "ygtvblankdepthcell";
     },
 
@@ -1433,9 +1439,9 @@ YAHOO.widget.Node.prototype = {
      *
      * @return {string} The HTML that will render this node.
      */
-    getNodeHtml: function() { 
+    getNodeHtml: function() {
         this.logger.log("Generating html");
-        return ""; 
+        return "";
     },
 
     /**
@@ -1465,7 +1471,7 @@ YAHOO.widget.Node.prototype = {
 };
 
 /**
- * A custom YAHOO.widget.Node that handles the unique nature of 
+ * A custom YAHOO.widget.Node that handles the unique nature of
  * the virtual, presentationless root node.
  *
  * @extends YAHOO.widget.Node
@@ -1476,7 +1482,7 @@ YAHOO.widget.RootNode = function(oTree) {
 	// special case where the node has no presentation.  So we have
 	// to alter the standard properties a bit.
 	this.init(null, null, true);
-	
+
 	/**
 	 * For the root node, we get the tree reference from as a param
 	 * to the constructor instead of from the parent element.
@@ -1489,15 +1495,15 @@ YAHOO.widget.RootNode = function(oTree) {
 YAHOO.widget.RootNode.prototype = new YAHOO.widget.Node();
 
 // overrides YAHOO.widget.Node
-YAHOO.widget.RootNode.prototype.getNodeHtml = function() { 
-	return ""; 
+YAHOO.widget.RootNode.prototype.getNodeHtml = function() {
+	return "";
 };
 
-YAHOO.widget.RootNode.prototype.toString = function() { 
+YAHOO.widget.RootNode.prototype.toString = function() {
     return "RootNode";
 };
 
-YAHOO.widget.RootNode.prototype.loadComplete = function() { 
+YAHOO.widget.RootNode.prototype.loadComplete = function() {
     this.tree.draw();
 };
 /**
@@ -1518,7 +1524,7 @@ YAHOO.widget.RootNode.prototype.loadComplete = function() {
 YAHOO.widget.TextNode = function(oData, oParent, expanded) {
     // this.type = "TextNode";
 
-    if (oData) { 
+    if (oData) {
         this.init(oData, oParent, expanded);
         this.setUpLabel(oData);
     }
@@ -1557,15 +1563,15 @@ YAHOO.widget.TextNode.prototype.label = null;
 
 /**
  * Sets up the node label
- * 
+ *
  * @param oData string containing the label, or an object with a label property
  */
-YAHOO.widget.TextNode.prototype.setUpLabel = function(oData) { 
+YAHOO.widget.TextNode.prototype.setUpLabel = function(oData) {
     if (typeof oData == "string") {
         oData = { label: oData };
     }
     this.label = oData.label;
-    
+
     // update the link
     if (oData.href) {
         this.href = oData.href;
@@ -1588,18 +1594,18 @@ YAHOO.widget.TextNode.prototype.setUpLabel = function(oData) {
  *
  * @return {object} the element
  */
-YAHOO.widget.TextNode.prototype.getLabelEl = function() { 
+YAHOO.widget.TextNode.prototype.getLabelEl = function() {
     return document.getElementById(this.labelElId);
 };
 
 // overrides YAHOO.widget.Node
-YAHOO.widget.TextNode.prototype.getNodeHtml = function() { 
+YAHOO.widget.TextNode.prototype.getNodeHtml = function() {
     this.logger.log("Generating html");
     var sb = [];
 
     sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';
     sb[sb.length] = '<tr>';
-    
+
     for (i=0;i<this.depth;++i) {
         // sb[sb.length] = '<td class="ygtvdepthcell">&#160;</td>';
         sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '">&#160;</td>';
@@ -1666,23 +1672,23 @@ YAHOO.widget.TextNode.prototype.getNodeHtml = function() {
  * @scope the anchor tag clicked
  * @return false to cancel the anchor click
  */
-YAHOO.widget.TextNode.prototype.onLabelClick = function(me) { 
+YAHOO.widget.TextNode.prototype.onLabelClick = function(me) {
     me.logger.log("onLabelClick " + this.label);
     //return true;
 };
 
-YAHOO.widget.TextNode.prototype.toString = function() { 
+YAHOO.widget.TextNode.prototype.toString = function() {
     return "TextNode (" + this.index + ") " + this.label;
 };
 
 /**
- * A menu-specific implementation that differs from TextNode in that only 
+ * A menu-specific implementation that differs from TextNode in that only
  * one sibling can be expanded at a time.
  * @extends YAHOO.widget.TextNode
  * @constructor
  */
 YAHOO.widget.MenuNode = function(oData, oParent, expanded) {
-	if (oData) { 
+	if (oData) {
 		this.init(oData, oParent, expanded);
 		this.setUpLabel(oData);
 	}
@@ -1702,7 +1708,7 @@ YAHOO.widget.MenuNode = function(oData, oParent, expanded) {
 
 YAHOO.widget.MenuNode.prototype = new YAHOO.widget.TextNode();
 
-YAHOO.widget.MenuNode.prototype.toString = function() { 
+YAHOO.widget.MenuNode.prototype.toString = function() {
     return "MenuNode (" + this.index + ") " + this.label;
 };
 
@@ -1723,7 +1729,7 @@ YAHOO.widget.MenuNode.prototype.toString = function() {
  * have an icon
  */
 YAHOO.widget.HTMLNode = function(oData, oParent, expanded, hasIcon) {
-    if (oData) { 
+    if (oData) {
         this.init(oData, oParent, expanded);
         this.initContent(oData, hasIcon);
     }
@@ -1732,7 +1738,7 @@ YAHOO.widget.HTMLNode = function(oData, oParent, expanded, hasIcon) {
 YAHOO.widget.HTMLNode.prototype = new YAHOO.widget.Node();
 
 /**
- * The CSS class for the html content container.  Defaults to ygtvhtml, but 
+ * The CSS class for the html content container.  Defaults to ygtvhtml, but
  * can be overridden to provide a custom presentation for a specific node.
  *
  * @type string
@@ -1760,7 +1766,7 @@ YAHOO.widget.HTMLNode.prototype.content = null;
  * @param {boolean} hasIcon determines if the node will be rendered with an
  * icon or not
  */
-YAHOO.widget.HTMLNode.prototype.initContent = function(oData, hasIcon) { 
+YAHOO.widget.HTMLNode.prototype.initContent = function(oData, hasIcon) {
     if (typeof oData == "string") {
         oData = { html: oData };
     }
@@ -1780,18 +1786,18 @@ YAHOO.widget.HTMLNode.prototype.initContent = function(oData, hasIcon) {
  *
  * @return {HTMLElement} the element
  */
-YAHOO.widget.HTMLNode.prototype.getContentEl = function() { 
+YAHOO.widget.HTMLNode.prototype.getContentEl = function() {
     return document.getElementById(this.contentElId);
 };
 
 // overrides YAHOO.widget.Node
-YAHOO.widget.HTMLNode.prototype.getNodeHtml = function() { 
+YAHOO.widget.HTMLNode.prototype.getNodeHtml = function() {
     this.logger.log("Generating html");
     var sb = [];
 
     sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';
     sb[sb.length] = '<tr>';
-    
+
     for (i=0;i<this.depth;++i) {
         sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '">&#160;</td>';
     }
@@ -1824,7 +1830,7 @@ YAHOO.widget.HTMLNode.prototype.getNodeHtml = function() {
     return sb.join("");
 };
 
-YAHOO.widget.HTMLNode.prototype.toString = function() { 
+YAHOO.widget.HTMLNode.prototype.toString = function() {
     return "HTMLNode (" + this.index + ")";
 };
 
@@ -1837,14 +1843,14 @@ YAHOO.widget.TVAnim = function() {
     return {
         /**
          * Constant for the fade in animation
-         * 
+         *
          * @type string
          */
         FADE_IN: "TVFadeIn",
 
         /**
          * Constant for the fade out animation
-         * 
+         *
          * @type string
          */
         FADE_OUT: "TVFadeOut",
@@ -1917,7 +1923,7 @@ YAHOO.widget.TVFadeIn.prototype = {
         s.display = "";
 
         // var dur = ( navigator.userAgent.match(/msie/gi) ) ? 0.05 : 0.4;
-        var dur = 0.4; 
+        var dur = 0.4;
         // this.logger.log("duration: " + dur);
         // var a = new ygAnim_Fade(this.el, dur, 1);
         // a.setStart(0.1);

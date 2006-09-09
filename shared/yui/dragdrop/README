@@ -1,5 +1,26 @@
 Drag and Drop Release Notes
 
+0.11.3
+ 
+   * Fixed a JavaScript error that would be generated when trying to implement
+     DDProxy using the default settings and a tiny element.
+
+   * Fixed an error that resulted when constraints were applied to DragDrop 
+     instances.
+
+0.11.2
+
+   * Drag and drop will no longer interfere with selecting text on elements
+     that are not involved in drag and drop.
+
+   * The shared drag and drop proxy element now resizes correctly when autoResize
+     is enabled.
+
+0.11.1
+
+   * Fixes an issue where the setXY cache could get out of sync if the element's
+     offsetParent is changed during onDragDrop.
+
 0.11.0
 
    * The Dom.util.setXY calculation for the initial placement of the dragged

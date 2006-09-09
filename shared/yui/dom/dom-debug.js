@@ -2,7 +2,7 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 0.11.0
+Version: 0.11.3
 */
 
 /**
@@ -67,6 +67,8 @@ YAHOO.util.Dom = function() {
        * @return {HTMLElement/Array} A DOM reference to an HTML element or an array of HTMLElements.
        */
       get: function(el) {
+         if (!el) { return null; } // nothing to work with
+
          if (typeof el != 'string' && !(el instanceof Array) ) { // assuming HTMLElement or HTMLCollection, so pass back as is
             logger.log('get(' + el + ') returning ' + el, 'info', 'Dom');
             return el;
@@ -187,7 +189,7 @@ YAHOO.util.Dom = function() {
          var f = function(el) {
 
          // has to be part of document to have pageXY
-            if (el.parentNode === null || this.getStyle(el, 'display') == 'none') {
+            if (el.offsetParent === null || this.getStyle(el, 'display') == 'none') {
                logger.log('getXY failed: element not available', 'error', 'Dom');
                return false;
             }
@@ -199,11 +201,14 @@ YAHOO.util.Dom = function() {
             if (el.getBoundingClientRect) { // IE
                box = el.getBoundingClientRect();
                var doc = document;
-               if ( !this.inDocument(el) ) {// might be in a frame, need to get its scroll
-                  var doc = parent.document;
-                  while ( doc && !this.isAncestor(doc.documentElement, el) ) {
-                     doc = parent.document;
+               if ( !this.inDocument(el) && parent.document != document) {// might be in a frame, need to get its scroll
+                  doc = parent.document;
+
+                  if ( !this.isAncestor(doc.documentElement, el) ) {
+                     logger.log('getXY failed: element not available', 'error', 'Dom');
+                     return false;
                   }
+
                }
 
                var scrollTop = Math.max(doc.documentElement.scrollTop, doc.body.scrollTop);
@@ -232,8 +237,10 @@ YAHOO.util.Dom = function() {
 
             while (parentNode && parentNode.tagName.toUpperCase() != 'BODY' && parentNode.tagName.toUpperCase() != 'HTML')
             { // account for any scrolled ancestors
-               pos[0] -= parentNode.scrollLeft;
-               pos[1] -= parentNode.scrollTop;
+               if (util.Dom.getStyle(parentNode, 'display') != 'inline') { // work around opera inline scrollLeft/Top bug
+                  pos[0] -= parentNode.scrollLeft;
+                  pos[1] -= parentNode.scrollTop;
+               }
 
                if (parentNode.parentNode) { parentNode = parentNode.parentNode; }
                else { parentNode = null; }
@@ -253,7 +260,11 @@ YAHOO.util.Dom = function() {
        * @return {String/Array} The X position of the element(s)
        */
       getX: function(el) {
-         return util.Dom.getXY(el)[0];
+         var f = function(el) {
+            return util.Dom.getXY(el)[0];
+         };
+
+         return util.Dom.batch(el, f, util.Dom, true);
       },
 
       /**
@@ -262,7 +273,11 @@ YAHOO.util.Dom = function() {
        * @return {String/Array} The Y position of the element(s)
        */
       getY: function(el) {
-         return util.Dom.getXY(el)[1];
+         var f = function(el) {
+            return util.Dom.getXY(el)[1];
+         };
+
+         return util.Dom.batch(el, f, util.Dom, true);
       },
 
       /**
@@ -447,10 +462,19 @@ YAHOO.util.Dom = function() {
        * @param {String} newClassName the class name that will be replacing the old class name
        */
       replaceClass: function(el, oldClassName, newClassName) {
+         if (oldClassName === newClassName) { // avoid infinite loop
+            return false;
+         };
+
          var re = new RegExp('(?:^|\\s+)' + oldClassName + '(?:\\s+|$)', 'g');
 
          var f = function(el) {
             logger.log('replaceClass replacing ' + oldClassName + ' with ' + newClassName, 'info', 'Dom');
+
+            if ( !this.hasClass(el, oldClassName) ) {
+               this.addClass(el, newClassName); // just add it if nothing to replace
+               return; // note return
+            }
 
             el['className'] = el['className'].replace(re, ' ' + newClassName + ' ');
 
@@ -519,7 +543,7 @@ YAHOO.util.Dom = function() {
                      logger.log('isAncestor returning true', 'info', 'Dom');
                      return true;
                   }
-                  else if (parent.tagName.toUpperCase() == 'HTML') {
+                  else if (!parent.tagName || parent.tagName.toUpperCase() == 'HTML') {
                      logger.log('isAncestor returning false', 'info', 'Dom');
                      return false;
                   }
@@ -661,23 +685,21 @@ YAHOO.util.Dom = function() {
                case 'CSS1Compat': // Standards mode
                   docWidth = document.documentElement.clientWidth;
                   bodyWidth = document.body.offsetWidth + marginLeft + marginRight;
-                  winWidth = self.innerWidth || -1;
                   break;
 
                default: // Quirks
                   bodyWidth = document.body.clientWidth;
-                  winWidth = document.body.scrollWidth;
+                  docWidth = document.body.scrollWidth;
                   break;
             }
          } else { // Safari
             docWidth = document.documentElement.clientWidth;
             bodyWidth = document.body.offsetWidth + marginLeft + marginRight;
-            winWidth = self.innerWidth;
          }
 
-         var w = [docWidth,bodyWidth,winWidth].sort(function(a, b){return(a-b);});
+         var w = Math.max(docWidth, bodyWidth);
          logger.log('getDocumentWidth returning ' + w[2], 'info', 'Dom');
-         return w[2];
+         return w;
       },
 
       /**
@@ -731,12 +753,6 @@ YAHOO.util.Dom = function() {
       }
    };
 }();
-
-/*
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-*/
 
 /**
  * @class A region is a representation of an object on a grid.  It is defined

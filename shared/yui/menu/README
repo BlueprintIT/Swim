@@ -1,40 +1,58 @@
 Menu Release Notes
 
-*** version 0.10.0 ***
+*** version 0.11.3 ***
 
-* Initial release
 
-* Known issues:
+Added the following features:
+-----------------------------
 
-      * Some Firefox extensions disable the ability for JavaScript to prevent  
-        the display of the browser's default context menu.  These extensions
-        can cause the YUI ContextMenu to stop working.  If you encounter this 
-        problem, you can reset the context menu preference in Firefox back to 
-        the default by making sure the "Disable or replace context menus" 
-        preference is checked:
+* Added a "target" configuration property to the MenuModuleItem object that
+  allows the user to specify the target of an item's anchor element.  Items 
+  that make use of the "target" configuration property will require the user 
+  to click exactly on the item's anchor element to navigate to the specified 
+  URL.
 
-            Mac Firefox 1.0: 
-            -------------------
-            Preferences > Web Features > 
-                Advanced... > Disable or replace context menus
+* Items without a "url" property set will automatically hide their parent 
+  menu instance(s) when clicked.
 
-            Mac Firefox 1.5
-            -------------------
-            Preferences > Context > 
-                Advanced... > Disable or replace context menus
 
-            Windows Firefox 1.0
-            -------------------
-            Tools > Options > Web Features > 
-                Advanced... > Disable or replace context menus
+Fixed the following bugs:
+-------------------------
 
-            Windows Firefox 1.5
-            -------------------
-            Tools > Options > Context > 
-                Advanced... > Disable or replace context menus
-                
+* Items in a submenu should now navigate to their specified URL when clicked.
 
+* Removed MenuBar's use of "overflow:hidden."  This fixes an issue in Firefox
+  1.5 in which submenus of a Menubar instance cannot overlay other absolutely 
+  positioned elements on the page.
+
+* Submenus of a Menubar instance will now automatically have their iframe shim
+  enabled in IE<7.
+
+* Statically positioned Menubar and Menu instances will now render with the 
+  correct position and dimensions in Safari.
+
+* MenuModuleItem's "focus" method now checks to make sure that an item's 
+  "display" style property is not "none" before trying to set focus to its
+  anchor element.
+  
+* A ContextMenu instance will now hide all other ContextMenu instances before
+  displaying itself.
+
+* Removed the dead space in front of an item's submenu indicator image in IE.  
+  This space was causing an item's submenu to flicker when the user hovered 
+  over it.
+
+
+Changes
+-------
+
+* Moved the DOM event handlers for every menu from the root DIV node of each 
+  instance to the document object.  This change reduces the number of DOM event 
+  handlers used by Menu to eight, improving the cleanup time required by the 
+  Event utility.
+  
 *** version 0.11.0 ***
+
 
 Added the following features:
 -----------------------------
@@ -80,3 +98,36 @@ Changes
 
 * Changed case of MenuModuleItem class's "subMenuIndicator" property 
   to "submenuIndicator"
+
+*** version 0.10.0 ***
+
+* Initial release
+
+* Known issues:
+
+      * Some Firefox extensions disable the ability for JavaScript to prevent  
+        the display of the browser's default context menu.  These extensions
+        can cause the YUI ContextMenu to stop working.  If you encounter this 
+        problem, you can reset the context menu preference in Firefox back to 
+        the default by making sure the "Disable or replace context menus" 
+        preference is checked:
+
+            Mac Firefox 1.0: 
+            -------------------
+            Preferences > Web Features > 
+                Advanced... > Disable or replace context menus
+
+            Mac Firefox 1.5
+            -------------------
+            Preferences > Context > 
+                Advanced... > Disable or replace context menus
+
+            Windows Firefox 1.0
+            -------------------
+            Tools > Options > Web Features > 
+                Advanced... > Disable or replace context menus
+
+            Windows Firefox 1.5
+            -------------------
+            Tools > Options > Context > 
+                Advanced... > Disable or replace context menus

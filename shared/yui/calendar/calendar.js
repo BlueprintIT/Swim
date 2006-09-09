@@ -2,11 +2,10 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-Version 0.11.0
+Version 0.11.3
 */
 
 /**
-* @class
 * <p>YAHOO.widget.DateMath is used for simple date manipulation. The class is a static utility
 * used for adding, subtracting, and comparing dates.</p>
 */
@@ -278,14 +277,8 @@ YAHOO.widget.DateMath = new function() {
 		date.setHours(0,0,0,0);
 		return date;
 	};
-}/**
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt 
-**/
-
+}
 /**
-* @class
 * <p>Calendar_Core is the base class for the Calendar widget. In its most basic
 * implementation, it has the ability to render a calendar widget on the page
 * that can be manipulated to select a single date, move back and forth between
@@ -1558,7 +1551,7 @@ YAHOO.widget.Calendar_Core.prototype.select = function(date) {
 		this.parent.sync(this);
 	}
 
-	this.onSelect();
+	this.onSelect(aToBeSelected);
 
 	return this.getSelectedDates();
 };
@@ -1591,7 +1584,7 @@ YAHOO.widget.Calendar_Core.prototype.selectCell = function(cellIndex) {
 
 	this.renderCellStyleSelected(dCellDate,cell);
 
-	this.onSelect();
+	this.onSelect([selectDate]);
 	this.doCellMouseOut.call(cell, null, this);
 
 	return this.getSelectedDates();
@@ -1626,7 +1619,7 @@ YAHOO.widget.Calendar_Core.prototype.deselect = function(date) {
 		this.parent.sync(this);
 	} 
 
-	this.onDeselect();
+	this.onDeselect(aToBeSelected);
 	return this.getSelectedDates();
 };
 
@@ -1664,7 +1657,7 @@ YAHOO.widget.Calendar_Core.prototype.deselectCell = function(i) {
 		this.parent.sync(this);
 	}
 
-	this.onDeselect();
+	this.onDeselect(selectDate);
 	return this.getSelectedDates();
 };
 
@@ -1679,6 +1672,7 @@ YAHOO.widget.Calendar_Core.prototype.deselectCell = function(i) {
 YAHOO.widget.Calendar_Core.prototype.deselectAll = function() {
 	this.onBeforeDeselect();
 	var count = this.selectedDates.length;
+	var sel = this.selectedDates.concat();
 	this.selectedDates.length = 0;
 
 	if (this.parent) {
@@ -1686,7 +1680,7 @@ YAHOO.widget.Calendar_Core.prototype.deselectAll = function() {
 	}
 	
 	if (count > 0) {
-		this.onDeselect();
+		this.onDeselect(sel);
 	}
 
 	return this.getSelectedDates();
@@ -1811,8 +1805,9 @@ YAHOO.widget.Calendar_Core.prototype.onBeforeSelect = function() {
 
 /**
 * Event executed when a date is selected in the calendar widget.
+* @param	{Array}	selected	An array of date field arrays representing which date or dates were selected. Example: [ [2006,8,6],[2006,8,7],[2006,8,8] ]
 */
-YAHOO.widget.Calendar_Core.prototype.onSelect = function() { };
+YAHOO.widget.Calendar_Core.prototype.onSelect = function(selected) { };
 
 /**
 * Event executed before a date is deselected in the calendar widget.
@@ -1821,8 +1816,9 @@ YAHOO.widget.Calendar_Core.prototype.onBeforeDeselect = function() { };
 
 /**
 * Event executed when a date is deselected in the calendar widget.
+* @param	{Array}	selected	An array of date field arrays representing which date or dates were deselected. Example: [ [2006,8,6],[2006,8,7],[2006,8,8] ]
 */
-YAHOO.widget.Calendar_Core.prototype.onDeselect = function() { };
+YAHOO.widget.Calendar_Core.prototype.onDeselect = function(deselected) { };
 
 /**
 * Event executed when the user navigates to a different calendar page.
@@ -2124,14 +2120,8 @@ YAHOO.widget.Calendar_Core.prototype.toString = function() {
 	return "Calendar_Core " + this.id;
 }
 
-YAHOO.widget.Cal_Core = YAHOO.widget.Calendar_Core;/**
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt 
-**/
-
+YAHOO.widget.Cal_Core = YAHOO.widget.Calendar_Core;
 /**
-* @class
 * Calendar is the default implementation of the YAHOO.widget.Calendar_Core base class.
 * This class is the UED-approved version of the calendar selector widget. For all documentation
 * on the implemented methods listed here, see the documentation for YAHOO.widget.Calendar_Core.
@@ -2144,6 +2134,7 @@ http://developer.yahoo.net/yui/license.txt
 								MM/DD/YYYY-MM/DD/YYYY. Month/day combinations are defined using MM/DD.
 								Any combination of these can be combined by delimiting the string with
 								commas. Example: "12/24/2005,12/25,1/18/2006-1/21/2006"
+* @extends YAHOO.widget.Calendar_Core
 */
 YAHOO.widget.Calendar = function(id, containerId, monthyear, selected) {
 	if (arguments.length > 0) {
@@ -2206,14 +2197,8 @@ YAHOO.widget.Calendar.prototype.renderHeader = function() {
 	this.headerCell.appendChild(headerContainer);
 };
 
-YAHOO.widget.Cal = YAHOO.widget.Calendar;/**
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt 
-**/
-
+YAHOO.widget.Cal = YAHOO.widget.Calendar;
 /**
-* @class
 * <p>YAHOO.widget.CalendarGroup is a special container class for YAHOO.widget.Calendar_Core. This class facilitates
 * the ability to have multi-page calendar views that share a single dataset and are
 * dependent on each other.</p>
@@ -2278,6 +2263,8 @@ YAHOO.widget.CalendarGroup.prototype.init = function(pageCount, id, containerId,
 		this.pages.push(cal);
 	}
 	
+	this.sync();
+
 	this.doNextMonth = function(e, calGroup) {
 		calGroup.nextMonth();
 	};
@@ -2635,14 +2622,8 @@ YAHOO.widget.CalendarGroup.prototype.toString = function() {
 	return "CalendarGroup " + this.id;
 }
 
-YAHOO.widget.CalGrp = YAHOO.widget.CalendarGroup;/**
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt 
-**/
-
+YAHOO.widget.CalGrp = YAHOO.widget.CalendarGroup;
 /**
-* @class
 * Calendar2up_Cal is the default implementation of the Calendar_Core base class, when used
 * in a 2-up view. This class is the UED-approved version of the calendar selector widget. For all documentation
 * on the implemented methods listed here, see the documentation for Calendar_Core. This class
@@ -2657,6 +2638,7 @@ http://developer.yahoo.net/yui/license.txt
 								MM/DD/YYYY-MM/DD/YYYY. Month/day combinations are defined using MM/DD.
 								Any combination of these can be combined by delimiting the string with
 								commas. Example: "12/24/2005,12/25,1/18/2006-1/21/2006"
+* @extends YAHOO.widget.Calendar_Core
 */
 YAHOO.widget.Calendar2up_Cal = function(id, containerId, monthyear, selected) {
 	if (arguments.length > 0)
@@ -2715,7 +2697,6 @@ YAHOO.widget.Calendar2up_Cal.prototype.renderHeader = function() {
 
 
 /**
-* @class
 * Calendar2up is the default implementation of the CalendarGroup base class, when used
 * in a 2-up view. This class is the UED-approved version of the 2-up calendar selector widget. For all documentation
 * on the implemented methods listed here, see the documentation for CalendarGroup. 
@@ -2728,6 +2709,7 @@ YAHOO.widget.Calendar2up_Cal.prototype.renderHeader = function() {
 								MM/DD/YYYY-MM/DD/YYYY. Month/day combinations are defined using MM/DD.
 								Any combination of these can be combined by delimiting the string with
 								commas. Example: "12/24/2005,12/25,1/18/2006-1/21/2006"
+* @extends YAHOO.widget.CalendarGroup
 */
 YAHOO.widget.Calendar2up = function(id, containerId, monthyear, selected) {
 	if (arguments.length > 0)
@@ -2853,7 +2835,9 @@ YAHOO.widget.Calendar2up.prototype.renderHeader = function() {
 		this.titleDiv.appendChild(linkClose);
 	}
 
-	this.innerContainer.insertBefore(this.titleDiv, this.innerContainer.firstChild);
+	if (this.titleDiv != this.innerContainer.firstChild) {
+		this.innerContainer.insertBefore(this.titleDiv, this.innerContainer.firstChild);
+	}
 }
 
 /**

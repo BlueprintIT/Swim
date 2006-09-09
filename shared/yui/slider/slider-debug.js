@@ -1,17 +1,16 @@
-
-/*                                                                                                                                                      
-Copyright (c) 2006, Yahoo! Inc. All rights reserved.                                                                                                    
-Code licensed under the BSD License:                                                                                                                    
-http://developer.yahoo.net/yui/license.txt                                                                                                              
-version: 0.11.0                                                                                                                                         
-*/ 
+/*
+Copyright (c) 2006, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+Version: 0.11.3
+*/
 
 /**
  * A DragDrop implementation that can be used as a background for a
- * slider.  It takes a reference to the thumb instance 
- * so it can delegate some of the events to it.  The goal is to make the 
- * thumb jump to the location on the background when the background is 
- * clicked.  
+ * slider.  It takes a reference to the thumb instance
+ * so it can delegate some of the events to it.  The goal is to make the
+ * thumb jump to the location on the background when the background is
+ * clicked.
  *
  * @extends YAHOO.util.DragDrop
  * @constructor
@@ -35,16 +34,16 @@ YAHOO.widget.Slider = function(sElementId, sGroup, oThumb, sType) {
 		var self = this;
 
 		/**
-		 * a YAHOO.widget.SliderThumb instance that we will use to 
+		 * a YAHOO.widget.SliderThumb instance that we will use to
 		 * reposition the thumb when the background is clicked
 		 *
-		 * @type Slider 
+		 * @type Slider
 		 */
 		this.thumb = oThumb;
 
 		// add handler for the handle onchange event
-		oThumb.onChange = function() { 
-			self.onThumbChange(); 
+		oThumb.onChange = function() {
+			self.onThumbChange();
 		};
 
 
@@ -53,7 +52,7 @@ YAHOO.widget.Slider = function(sElementId, sGroup, oThumb, sType) {
 		 * @private
 		 */
 		this.isTarget = false;
-	
+
 		/**
 		 * Flag that determines if the thumb will animate when moved
 		 * @type boolean
@@ -105,14 +104,14 @@ YAHOO.extend(YAHOO.widget.Slider, YAHOO.util.DragDrop);
  * @param {String} sHandleElId the id of the thumb element
  * @param {int} iLeft the number of pixels the element can move left
  * @param {int} iRight the number of pixels the element can move right
- * @param {int} iTickSize optional parameter for specifying that the element 
+ * @param {int} iTickSize optional parameter for specifying that the element
  * should move a certain number pixels at a time.
  * @return {Slider} a horizontal slider control
  */
-YAHOO.widget.Slider.getHorizSlider = 
+YAHOO.widget.Slider.getHorizSlider =
 	function (sBGElId, sHandleElId, iLeft, iRight, iTickSize) {
-		return new YAHOO.widget.Slider(sBGElId, sBGElId, 
-			new YAHOO.widget.SliderThumb(sHandleElId, sBGElId, 
+		return new YAHOO.widget.Slider(sBGElId, sBGElId,
+			new YAHOO.widget.SliderThumb(sHandleElId, sBGElId,
 							   iLeft, iRight, 0, 0, iTickSize), "horiz");
 };
 
@@ -123,14 +122,14 @@ YAHOO.widget.Slider.getHorizSlider =
  * @param {String} sHandleElId the id of the thumb element
  * @param {int} iUp the number of pixels the element can move up
  * @param {int} iDown the number of pixels the element can move down
- * @param {int} iTickSize optional parameter for specifying that the element 
+ * @param {int} iTickSize optional parameter for specifying that the element
  * should move a certain number pixels at a time.
  * @return {Slider} a vertical slider control
  */
-YAHOO.widget.Slider.getVertSlider = 
+YAHOO.widget.Slider.getVertSlider =
 	function (sBGElId, sHandleElId, iUp, iDown, iTickSize) {
-		return new YAHOO.widget.Slider(sBGElId, sBGElId, 
-			new YAHOO.widget.SliderThumb(sHandleElId, sBGElId, 0, 0, 
+		return new YAHOO.widget.Slider(sBGElId, sBGElId,
+			new YAHOO.widget.SliderThumb(sHandleElId, sBGElId, 0, 0,
 							   iUp, iDown, iTickSize), "vert");
 };
 
@@ -144,14 +143,14 @@ YAHOO.widget.Slider.getVertSlider =
  * @param {int} iRight the number of pixels the element can move right
  * @param {int} iUp the number of pixels the element can move up
  * @param {int} iDown the number of pixels the element can move down
- * @param {int} iTickSize optional parameter for specifying that the element 
+ * @param {int} iTickSize optional parameter for specifying that the element
  * should move a certain number pixels at a time.
  * @return {Slider} a slider region control
  */
-YAHOO.widget.Slider.getSliderRegion = 
+YAHOO.widget.Slider.getSliderRegion =
 	function (sBGElId, sHandleElId, iLeft, iRight, iUp, iDown, iTickSize) {
-		return new YAHOO.widget.Slider(sBGElId, sBGElId, 
-			new YAHOO.widget.SliderThumb(sHandleElId, sBGElId, iLeft, iRight, 
+		return new YAHOO.widget.Slider(sBGElId, sBGElId,
+			new YAHOO.widget.SliderThumb(sHandleElId, sBGElId, iLeft, iRight,
 							   iUp, iDown, iTickSize), "region");
 };
 
@@ -198,14 +197,14 @@ YAHOO.widget.Slider.prototype.setThumbCenterPoint = function() {
 
     if (el) {
         /**
-         * the center of the slider element is stored so we can position 
+         * the center of the slider element is stored so we can position
          * place it in the correct position when the background is clicked
          *
          * @type Coordinate
          */
-        this.thumbCenterPoint = { 
-                x: parseInt(el.offsetWidth/2, 10), 
-                y: parseInt(el.offsetHeight/2, 10) 
+        this.thumbCenterPoint = {
+                x: parseInt(el.offsetWidth/2, 10),
+                y: parseInt(el.offsetHeight/2, 10)
         };
     }
 
@@ -283,24 +282,24 @@ YAHOO.widget.Slider.prototype.focus = function() {
  * have the firstOffset.  Regions will have both, the first is the horizontal
  * offset, the second the vertical.
  */
-YAHOO.widget.Slider.prototype.onChange = function (firstOffset, secondOffset) { 
-	/* override me */ 
+YAHOO.widget.Slider.prototype.onChange = function (firstOffset, secondOffset) {
+	/* override me */
 	this.logger.log("onChange: " + firstOffset + ", " + secondOffset);
 };
 
 /**
  * Event that fires when the at the beginning of the slider thumb move
  */
-YAHOO.widget.Slider.prototype.onSlideStart = function () { 
-	/* override me */ 
+YAHOO.widget.Slider.prototype.onSlideStart = function () {
+	/* override me */
 	this.logger.log("onSlideStart");
 };
 
 /**
  * Event that fires at the end of a slider thumb move
  */
-YAHOO.widget.Slider.prototype.onSlideEnd = function () { 
-	/* override me */ 
+YAHOO.widget.Slider.prototype.onSlideEnd = function () {
+	/* override me */
 	this.logger.log("onSlideEnd");
 };
 
@@ -309,7 +308,7 @@ YAHOO.widget.Slider.prototype.onSlideEnd = function () {
  *
  * @return {int} the current value
  */
-YAHOO.widget.Slider.prototype.getValue = function () { 
+YAHOO.widget.Slider.prototype.getValue = function () {
 	return this.thumb.getValue();
 };
 
@@ -318,7 +317,7 @@ YAHOO.widget.Slider.prototype.getValue = function () {
  *
  * @return {int} the current horizontal offset
  */
-YAHOO.widget.Slider.prototype.getXValue = function () { 
+YAHOO.widget.Slider.prototype.getXValue = function () {
 	return this.thumb.getXValue();
 };
 
@@ -327,7 +326,7 @@ YAHOO.widget.Slider.prototype.getXValue = function () {
  *
  * @return {int} the current vertical offset
  */
-YAHOO.widget.Slider.prototype.getYValue = function () { 
+YAHOO.widget.Slider.prototype.getYValue = function () {
 	return this.thumb.getYValue();
 };
 
@@ -335,7 +334,7 @@ YAHOO.widget.Slider.prototype.getYValue = function () {
  * Internal handler for the slider thumb's onChange event
  * @private
  */
-YAHOO.widget.Slider.prototype.onThumbChange = function () { 
+YAHOO.widget.Slider.prototype.onThumbChange = function () {
 	var t = this.thumb;
 	if (t._isRegion) {
 		t.onChange(t.getXValue(), t.getYValue());
@@ -349,7 +348,7 @@ YAHOO.widget.Slider.prototype.onThumbChange = function () {
  * Provides a way to set the value of the slider in code.
  *
  * @param {int} newOffset the number of pixels the thumb should be
- * positioned away from the initial start point 
+ * positioned away from the initial start point
  * @param {boolean} skipAnim set to true to disable the animation
  * for this move action (but not others).
  * @param {boolean} force ignore the locked setting and set value anyway
@@ -396,7 +395,7 @@ YAHOO.widget.Slider.prototype.setValue = function(newOffset, skipAnim, force) {
  * Provides a way to set the value of the region slider in code.
  *
  * @param {int} newOffset the number of pixels the thumb should be
- * positioned away from the initial start point 
+ * positioned away from the initial start point
  * @param {int} newOffset2 the number of pixels the thumb should be
  * positioned away from the initial start point (y axis for region)
  * @param {boolean} skipAnim set to true to disable the animation
@@ -456,8 +455,8 @@ YAHOO.widget.Slider.prototype.verifyOffset = function() {
 };
 
 /**
- * Move the associated slider moved to a timeout to try to get around the 
- * mousedown stealing moz does when I move the slider element between the 
+ * Move the associated slider moved to a timeout to try to get around the
+ * mousedown stealing moz does when I move the slider element between the
  * cursor and the background during the mouseup event
  *
  * @param {int} x the X coordinate of the click
@@ -491,7 +490,7 @@ YAHOO.widget.Slider.prototype.moveThumb = function(x, y, skipAnim) {
 		this.logger.log("graduated");
 		// this.thumb._animating = true;
 		this.lock();
-		
+
 		setTimeout( function() { self.moveOneTick(p); }, this.tickPause );
 
 	} else if (this.animate && YAHOO.widget.Slider.ANIM_AVAIL && !skipAnim) {
@@ -500,7 +499,7 @@ YAHOO.widget.Slider.prototype.moveThumb = function(x, y, skipAnim) {
 		// this.thumb._animating = true;
 		this.lock();
 
-		var oAnim = new YAHOO.util.Motion( 
+		var oAnim = new YAHOO.util.Motion(
                 t.id, { points: { to: p } }, 0.4, YAHOO.util.Easing.easeOut );
 
 		oAnim.onComplete.subscribe( function() { self.endMove(); } );
@@ -542,7 +541,7 @@ YAHOO.widget.Slider.prototype.moveOneTick = function(finalCoord) {
         nextCoord = this._getNextY(curCoord, finalCoord);
 	}
 
-	this.logger.log("moveOneTick: " + 
+	this.logger.log("moveOneTick: " +
 			" finalCoord: " + finalCoord +
 			" curCoord: " + curCoord +
 			" nextCoord: " + nextCoord);
@@ -557,11 +556,11 @@ YAHOO.widget.Slider.prototype.moveOneTick = function(finalCoord) {
         // YAHOO.util.Dom.setStyle(el, "top",  (nextCoord[1] + this.thumb.deltaSetXY[1]) + "px");
 
         this.thumb.alignElWithMouse(t.getEl(), nextCoord[0], nextCoord[1]);
-		
+
 		// check if we are in the final position, if not make a recursive call
 		if (!(nextCoord[0] == finalCoord[0] && nextCoord[1] == finalCoord[1])) {
 			var self = this;
-			setTimeout(function() { self.moveOneTick(finalCoord); }, 
+			setTimeout(function() { self.moveOneTick(finalCoord); },
 					this.tickPause);
 		} else {
             this.endMove();
@@ -652,7 +651,7 @@ YAHOO.widget.Slider.prototype.onMouseDown = function(e) {
 		this.focus();
 		this.moveThumb(x, y);
 	}
-	
+
 };
 
 /**
@@ -678,7 +677,7 @@ YAHOO.widget.Slider.prototype.endMove = function () {
 	this.unlock();
 	this.moveComplete = true;
 	this.fireEvents();
-	
+
 };
 
 /**
@@ -730,7 +729,7 @@ YAHOO.widget.Slider.prototype.fireEvents = function () {
  * toString
  * @return {string} string representation of the instance
  */
-YAHOO.widget.Slider.prototype.toString = function () { 
+YAHOO.widget.Slider.prototype.toString = function () {
     return ("Slider (" + this.type +") " + this.id);
 };
 
@@ -745,7 +744,7 @@ YAHOO.widget.Slider.prototype.toString = function () {
  * @param {int} iRight the number of pixels the element can move right
  * @param {int} iUp the number of pixels the element can move up
  * @param {int} iDown the number of pixels the element can move down
- * @param {int} iTickSize optional parameter for specifying that the element 
+ * @param {int} iTickSize optional parameter for specifying that the element
  * should move a certain number pixels at a time.
  */
 YAHOO.widget.SliderThumb = function(id, sGroup, iLeft, iRight, iUp, iDown, iTickSize) {
@@ -804,8 +803,8 @@ YAHOO.widget.SliderThumb.prototype.getOffsetFromParent = function(parentPos) {
 };
 
 /**
- * The (X and Y) difference between the thumb location and its parent 
- * (the slider background) when the control is instantiated.  
+ * The (X and Y) difference between the thumb location and its parent
+ * (the slider background) when the control is instantiated.
  * @type int[]
  */
 YAHOO.widget.SliderThumb.prototype.startOffset = null;
@@ -859,7 +858,7 @@ YAHOO.widget.SliderThumb.prototype._graduated = false;
  * @param {int} iDown the number of pixels the element can move down
  * @param {int} iTickSize the width of the tick interval.
  */
-YAHOO.widget.SliderThumb.prototype.initSlider = function (iLeft, iRight, iUp, iDown, 
+YAHOO.widget.SliderThumb.prototype.initSlider = function (iLeft, iRight, iUp, iDown,
 		iTickSize) {
 
 	this.setXConstraint(iLeft, iRight, iTickSize);
@@ -869,9 +868,9 @@ YAHOO.widget.SliderThumb.prototype.initSlider = function (iLeft, iRight, iUp, iD
 		this._graduated = true;
 	}
 
-	this._isHoriz = (iLeft > 0 || iRight > 0); 
+	this._isHoriz = (iLeft > 0 || iRight > 0);
 	this._isVert   = (iUp > 0 ||  iDown > 0);
-	this._isRegion = (this._isHoriz && this._isVert); 
+	this._isRegion = (this._isHoriz && this._isVert);
 
 };
 
@@ -927,7 +926,7 @@ YAHOO.widget.SliderThumb.prototype.getYValue = function () {
  * toString
  * @return {string} string representation of the instance
  */
-YAHOO.widget.SliderThumb.prototype.toString = function () { 
+YAHOO.widget.SliderThumb.prototype.toString = function () {
     return "SliderThumb " + this.id;
 };
 
