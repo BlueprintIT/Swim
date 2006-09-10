@@ -34,8 +34,7 @@ ob_start();
 Options +FollowSymLinks 
 
 RewriteEngine on 
-RewriteBase <?= $_PREFS->getPref('url.base'); ?>
-
+RewriteBase <?= $_PREFS->getPref('url.base'); ?>/
 
 <?
 
