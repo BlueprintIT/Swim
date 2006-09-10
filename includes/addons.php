@@ -149,6 +149,11 @@ class Addon
   function shutdown()
   {
   }
+  
+  function getRewrites()
+  {
+  	return array();
+  }
 }
 
 class AdminManager
@@ -224,6 +229,16 @@ class AddonManager
 {
   private static $addons = array();
   private static $disabled = false;
+  
+  static function getRewrites()
+  {
+  	$rewrites = array();
+  	foreach (self::$addons as $addon)
+  	{
+  		array_merge($rewrites, $addon->getRewrites());
+  	}
+  	return $rewrites;
+  }
   
   static function disable()
   {
