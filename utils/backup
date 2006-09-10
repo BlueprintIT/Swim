@@ -1,0 +1,23 @@
+#! /bin/sh
+
+BACKUPS=../backups/
+DIR=`dirname $0`
+cd $DIR/..
+
+if [ "$1" ]; then
+	BASE=$1
+else
+	BASE=`date +backup-%Y%m%d-%H%M`
+fi
+
+TEMP_FILE=$BACKUPS$BASE.tar
+TARGET=$BACKUPS$BASE.tar.gz
+
+rm -f $TARGET
+rm -f $TEMP_FILE
+
+find containers/user \( -name temp -o -name .svn -o -name dir.lock \) -prune -o -print | tar -cf $TEMP_FILE --no-recursion -T -
+tar -rf $TEMP_FILE bootstrap/host.conf conf
+gzip $TEMP_FILE
+
+utils/purge $BACKUPS
