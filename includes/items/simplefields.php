@@ -480,6 +480,7 @@ class FileField extends TextField
   {
     if ($element->hasAttribute('filetype'))
       $this->filetype = $element->getAttribute('filetype');
+    parent::parseAttributes($element);
   }
   
   public function isIndexed()

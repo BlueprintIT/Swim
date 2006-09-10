@@ -102,6 +102,7 @@ class BaseField extends XMLSerialized
       $this->indexPriority = $element->getAttribute('priority');
     $this->id = $element->getAttribute('id');
     $this->type = $element->getAttribute('type');
+    parent::parseAttributes($element);
   }
   
   public static function getField($el)
