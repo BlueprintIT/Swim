@@ -99,8 +99,9 @@ td.name img {
 	border: 0;
 }
 </style>{/literal}
-<table id="tabpanel">
-  <tr>
+<div id="tabpanel">
+  <table>
+    <tr>
 {if $request.query.type=='link'}
     <td class="spacer"></td>
     <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/items.tpl"}">Items</a></td>
@@ -110,8 +111,9 @@ td.name img {
     <td class="spacer"></td>
     <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/files.tpl"}">Files</a></td>
     <td class="remainder"></td>
-  </tr>
-</table>
+    </tr>
+  </table>
+</div>
 
 <div id="mainpane" class="pane">
 	<div class="header">

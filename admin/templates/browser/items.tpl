@@ -43,8 +43,9 @@ function onTreeItemClick(id)
 {/literal}
 var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml'}', 'categorytree');
 </script>
-<table id="tabpanel">
-  <tr>
+<div id="tabpanel">
+  <table>
+    <tr>
     <td class="spacer"></td>
     <td class="tab selected" selected="true">Items</td>
 {if $request.query.type!='item'}
@@ -54,8 +55,9 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
     <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/files.tpl"}">Files</a></td>
 {/if}
     <td class="remainder"></td>
-  </tr>
-</table>
+    </tr>
+  </table>
+</div>
 
 <div id="leftpane" class="pane">
 	<div class="header">

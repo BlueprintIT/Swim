@@ -96,19 +96,21 @@ td.name img {
 	border: 0;
 }
 </style>{/literal}
-<table id="tabpanel">
-  <tr>
+<div id="tabpanel">
+  <table>
+    <tr>
 {if $request.query.type=='link'}
-    <td class="spacer"></td>
-    <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/items.tpl"}">Items</a></td>
+      <td class="spacer"></td>
+      <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/items.tpl"}">Items</a></td>
 {/if}
-    <td class="spacer"></td>
-    <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/attachments.tpl"}">Item Attachments</a></td>
-    <td class="spacer"></td>
-    <td class="tab selected" selected="true">Files</td>
-    <td class="remainder"></td>
-  </tr>
-</table>
+      <td class="spacer"></td>
+      <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/attachments.tpl"}">Item Attachments</a></td>
+      <td class="spacer"></td>
+      <td class="tab selected" selected="true">Files</td>
+      <td class="remainder"></td>
+    </tr>
+  </table>
+</div>
 
 <div id="mainpane" class="pane">
 	<div class="header">
