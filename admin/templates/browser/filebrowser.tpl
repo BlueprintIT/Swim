@@ -4,7 +4,7 @@
 	<head>
 		<title>Swim Resources Browser</title>
 <script type="text/javascript">
-{if $request.query.api=='fckeditor'}
+{if (($request.query.api=='fckeditor') || ($request.query.api=='filefield'))}
 {literal}
 function setUrl(url)
 {
@@ -19,6 +19,7 @@ function setUrl(url)
 	window.opener.document.forms[0].elements[field].value = url;
 }
 {/literal}
+{elsif $request.query.api=='filefield'}
 {/if}
 </script>
 	</head>

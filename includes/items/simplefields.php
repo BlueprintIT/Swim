@@ -508,6 +508,7 @@ class FileField extends TextField
     $request->setQueryVar('variant', $this->itemversion->getVariant()->getVariant());
     $request->setQueryVar('version', $this->itemversion->getVersion());
     $request->setQueryVar('type', $this->filetype);
+    $request->setQueryVar('api', 'filefield');
     
     $attrs['request'] = $request->encode();
     
@@ -523,6 +524,7 @@ class FileField extends TextField
     $request->setQueryVar('variant', $this->itemversion->getVariant()->getVariant());
     $request->setQueryVar('version', $this->itemversion->getVersion());
     $request->setQueryVar('type', $this->filetype);
+    $request->setQueryVar('api', 'filefield');
 
     $value = $this->getPassedValue($request);
     if (strlen($value)>0)
