@@ -40,20 +40,30 @@ function method_upload($request)
       $file=$_FILES['file'];
       if (($file['error']==UPLOAD_ERR_OK)&&(is_uploaded_file($file['tmp_name'])))
       {
-        if (!is_readable($path.'/'.$file['name']))
-        {
-          move_uploaded_file($file['tmp_name'],$path.'/'.$file['name']);
-          if ($request->hasQueryVar('description'))
-            $description = $request->getQueryVar('description');
-          else
-            $description = '';
-          $_STORAGE->queryExec('INSERT INTO File (itemversion,file,description) VALUES ('.$iv.',"'.$_STORAGE->escape($file['name']).'","'.$_STORAGE->escape($description).'");');
-          $message = 'Upload was successful.';
-        }
-        else
-        {
-          $message = 'Upload failed because a file of that name already exists - '.$path.'/'.$file['name'].'.';
-        }
+      	mkdir($path, 0777, true);
+      	if (is_dir($path))
+      	{
+	        if (!is_readable($path.'/'.$file['name']))
+	        {
+	          if (move_uploaded_file($file['tmp_name'],$path.'/'.$file['name']))
+	          {
+		          if ($request->hasQueryVar('description'))
+		            $description = $request->getQueryVar('description');
+		          else
+		            $description = '';
+		          $_STORAGE->queryExec('INSERT INTO File (itemversion,file,description) VALUES ('.$iv.',"'.$_STORAGE->escape($file['name']).'","'.$_STORAGE->escape($description).'");');
+		          $message = 'Upload was successful.';
+	          }
+	          else
+	          	$message = 'Error uploading, failed to save file.';
+	        }
+	        else
+	        {
+	          $message = 'Upload failed because a file of that name already exists - '.$path.'/'.$file['name'].'.';
+	        }
+      	}
+      	else
+      		$message = 'Upload failed, please notify Blueprint IT of this issue as soon as possible.';
       }
       else
       {
