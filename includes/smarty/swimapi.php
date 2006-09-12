@@ -224,37 +224,40 @@ function get_files($params, &$smarty)
       $url = $_PREFS->getPref('url.site.attachments');
     }
     $files = array();
-    $dir = opendir($path);
-    while (($file = readdir($dir)) !== false)
+    if (is_dir($path))
     {
-      if (is_file($path.'/'.$file))
-      {
-        $results = $_STORAGE->query('SELECT * FROM File WHERE itemversion='.$iv.' AND file="'.$_STORAGE->escape($file).'";');
-        if ($results->valid())
-        {
-          $fl = $results->fetch();
-          $fl['name'] = $file;
-          unset($fl['itemversion']);
-          unset($fl['file']);
-        }
-        else
-        {
-          $fl = array('name' => $file);
-          $fl['description'] = '';
-        }
-        $fl['size'] = filesize($path.'/'.$file);
-        $fl['type'] = determineContentType($path.'/'.$file);
-        if (strpos($file, '.')!==false)
-        {
-          $fl['extension'] = substr($file, strpos($file, '.')+1);
-        }
-        else
-          $fl['extension'] = 'unknown';
-        $fl['path'] = $url.'/'.$file;
-        $files[$file] = $fl;
-      }
+	    $dir = opendir($path);
+	    while (($file = readdir($dir)) !== false)
+	    {
+	      if (is_file($path.'/'.$file))
+	      {
+	        $results = $_STORAGE->query('SELECT * FROM File WHERE itemversion='.$iv.' AND file="'.$_STORAGE->escape($file).'";');
+	        if ($results->valid())
+	        {
+	          $fl = $results->fetch();
+	          $fl['name'] = $file;
+	          unset($fl['itemversion']);
+	          unset($fl['file']);
+	        }
+	        else
+	        {
+	          $fl = array('name' => $file);
+	          $fl['description'] = '';
+	        }
+	        $fl['size'] = filesize($path.'/'.$file);
+	        $fl['type'] = determineContentType($path.'/'.$file);
+	        if (strpos($file, '.')!==false)
+	        {
+	          $fl['extension'] = substr($file, strpos($file, '.')+1);
+	        }
+	        else
+	          $fl['extension'] = 'unknown';
+	        $fl['path'] = $url.'/'.$file;
+	        $files[$file] = $fl;
+	      }
+	    }
+	    closedir($dir);
     }
-    closedir($dir);
     $smarty->assign_by_ref($params['var'], $files);
   }
 }
