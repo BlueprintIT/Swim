@@ -101,12 +101,12 @@ td.name img {
     <tr>
 {if $request.query.type=='link'}
       <td class="spacer"></td>
-      <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/items.tpl"}">Items</a></td>
+      <td class="tab unselected"><div class="tableft"><div class="tabright"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/items.tpl"}">Items</a></div></div></td>
 {/if}
       <td class="spacer"></td>
-      <td class="tab unselected"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/attachments.tpl"}">Item Attachments</a></td>
+      <td class="tab unselected"><div class="tableft"><div class="tabright"><a href="{encode method="admin" type=$request.query.type item=$request.query.item variant=$request.query.variant version=$request.query.version path="browser/attachments.tpl"}">Item Attachments</a></div></div></td>
       <td class="spacer"></td>
-      <td class="tab selected" selected="true">Files</td>
+      <td class="tab selected" selected="true"><div class="tableft"><div class="tabright">Files</div></div></td>
       <td class="remainder"></td>
     </tr>
   </table>
