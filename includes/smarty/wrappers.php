@@ -24,9 +24,6 @@ class RowWrapper
 
   public function __get($name)
   {
-    if ($this->option == null)
-      return '';
-      
     switch($name)
     {
       default:
@@ -51,6 +48,9 @@ class OptionWrapper
   
   public function __get($name)
   {
+    if ($this->option === null)
+      return '';
+
     switch ($name)
     {
       case 'name':
