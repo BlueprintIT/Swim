@@ -1,0 +1,26 @@
+#! /usr/bin/perl
+use Time::Local;
+
+$dir = $ARGV[0];
+if (substr($dir,-1) ne '/')
+{
+  $dir = $dir.'/';
+}
+
+if (opendir(BACKUPS, $dir))
+{
+  $now = time();
+  $weekold = $now-(7*24*60*60);
+  while ($backup = readdir(BACKUPS))
+  {
+    if ($backup =~ m/-(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})\.tar\.gz/)
+    {
+      $time = timegm(0, $5, $4, $3, $2-1, $1);
+      if ($time<$weekold)
+      {
+        unlink($dir.$backup);
+      }
+    }
+  }
+  closedir(BACKUPS);
+}
