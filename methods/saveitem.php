@@ -45,12 +45,24 @@ function method_saveitem($request)
         }
         foreach ($query as $name => $value)
         {
-          if (($name != 'complete') && ($name != 'current'))
+          if (($name != 'complete') && ($name != 'current') && ($name != 'compounds'))
           {
             $field = $itemversion->getField($name);
             if ($field !== null)
               $field->setValue($value);
           }
+        }
+        if ((isset($query['compounds'])) && (is_array($query['compounds'])))
+        {
+        	foreach ($query['compounds'] as $compound => $count)
+        	{
+        		if (!isset($query[$compound]))
+        		{
+	            $field = $itemversion->getField($compound);
+	            if ($field !== null)
+	              $field->setValue(array());
+        		}
+        	}
         }
         if (isset($query['complete']))
           $itemversion->setComplete($query['complete']=='true');

@@ -300,7 +300,8 @@ class CompoundField extends Field
         $rowcount = count($passed);
     }
     
-    $result = "<script type=\"text/javascript\">\n<!--\n";
+    $result = "<input type=\"hidden\" name=\"compounds.".$this->getId()."\" value=\"0\">\n";
+    $result.= "<script type=\"text/javascript\">\n<!--\n";
     $result.= "var compound_".$this->getId()." = { id: '".$this->getId()."', fields: {";
     foreach ($this->fields as $field)
     {
