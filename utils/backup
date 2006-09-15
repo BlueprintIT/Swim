@@ -3,11 +3,13 @@
 BACKUPS=../backups/
 DIR=`dirname $0`
 cd $DIR/..
+BASE=`pwd`
+BASE=`basename $BASE`
 
 if [ "$1" ]; then
-	BASE=$1
+        BASE=$1
 else
-	BASE=`date +backup-%Y%m%d-%H%M`
+        BASE=`date +$BASE-%Y%m%d-%H%M`
 fi
 
 TEMP_FILE=$BACKUPS$BASE.tar
@@ -20,4 +22,4 @@ find containers/user \( -name temp -o -name .svn -o -name dir.lock \) -prune -o 
 tar -rf $TEMP_FILE bootstrap/host.conf conf
 gzip $TEMP_FILE
 
-utils/purge $BACKUPS
+#utils/purge $BACKUPS
