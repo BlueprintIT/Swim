@@ -30,7 +30,13 @@ class RowWrapper
         $field = $this->row->getField($name);
         if ($field != null)
         {
-          return $field->toString();
+          if ($field->getType() == 'optionset')
+          {
+            $option = $field->getOption();
+            return new OptionWrapper($option);
+          }
+          else
+            return $field->toString();
         }
         return '';
     }
@@ -67,10 +73,12 @@ class OptionWrapper
 class ItemWrapper
 {
   private $itemversion;
+  private $log;
   
   public function __construct($itemversion)
   {
     $this->itemversion = $itemversion;
+    $this->log = LoggerManager::getLogger('swim.itemwrapper');
   }
   
   public function __get($name)
