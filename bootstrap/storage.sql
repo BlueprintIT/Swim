@@ -90,7 +90,7 @@ CREATE TABLE OptionSet (
 );
 
 CREATE TABLE Keywords (
-	word VARCHAR(20),
+	word VARCHAR(30),
 	item INTEGER,
 	weight FLOAT,
 	UNIQUE (word, item)

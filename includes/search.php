@@ -121,7 +121,7 @@ class SearchEngine
   
   private static function addKeyword($word, $weight, &$words)
   {
-    if (strlen($word)>1)
+    if ((strlen($word)>1) && (strlen($word)<=30))
     {
       $thisweight = $weight*5;
       for ($start = 0; $start<strlen($word)-1; $start++)
