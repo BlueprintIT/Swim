@@ -219,16 +219,6 @@ class Field extends VersionField
     return $this->exists;
   }
   
-  public function isEditable()
-  {
-  	if ($this->itemversion->getItem()->getClass()->getType() == 'file')
-  	{
-  		if (($this->id == 'file') && ($this->type == 'file'))
-  			return false;
-  	}
-  	return parent::isEditable();
-  }
-  
   public function getEditor(&$request, &$smarty)
   {
   	if (!$this->isEditable())
