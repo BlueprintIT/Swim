@@ -15,6 +15,8 @@
 
 function create_item($file, $filename, $section, $variant, $sequence, $class)
 {
+  $log = Loggermanager::getLogger('swim.uploaditem');
+  
   $item = Item::createItem($section, $class);
   if ($item != null)
   {
@@ -32,12 +34,20 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
         $field = $version->getField('name');
         if ($field != null)
           $field->setValue($name);
-        $field = $version->getField('file');
-        if ($field != null)
-          $field->setValue($version->getStorageUrl().'/'.$filename);
         $path = $version->getStoragePath();
-        mkdir($path, 0777, true);
-        move_uploaded_file($file, $path.'/'.$filename);
+        if (is_dir($path) || mkdir($path, 0777, true))
+        {
+	        if (move_uploaded_file($file, $path.'/'.$filename))
+	        {
+		        $field = $version->getField('file');
+		        if ($field != null)
+		          $field->setValue($version->getStorageUrl().'/'.$filename);
+	        }
+	        else
+	        	$log->error('Unable to move uploaded file');
+        }
+        else
+        	$log->error('Unable to find or create target directory '.$path);
         $sequence->appendItem($item);
         return $version;
       }

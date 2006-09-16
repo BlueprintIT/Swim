@@ -19,7 +19,7 @@ function setUrl(url)
 	window.opener.document.forms[0].elements[field].value = url;
 }
 {/literal}
-{elsif $request.query.api=='filefield'}
+{elseif $request.query.api=='filefield'}
 {/if}
 </script>
 	</head>
