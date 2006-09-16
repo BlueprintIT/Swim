@@ -387,6 +387,18 @@ class Item
     }
     return $item;
   }
+
+  public function getStoragePath()
+  {
+    global $_PREFS;
+    return $_PREFS->getPref('storage.site.attachments').'/'.$this->getItem()->getId();
+  }
+  
+  public function getStorageUrl()
+  {
+    global $_PREFS;
+    return $_PREFS->getPref('url.site.attachments').'/'.$this->getItem()->getId();
+  }
 }
 
 class ItemVariant

@@ -488,13 +488,45 @@ class FileField extends TextField
     return false;
   }
   
-  public function copyFrom($item)
+  protected function retrieve()
   {
-    parent::copyFrom($item);
-    $this->retrieve();
-    $newvalue = str_replace($item->getStorageUrl(), $this->itemversion->getStorageUrl(), $this->value);
-    if ($newvalue != $this->value)
-      $this->setValue($newvalue);
+  	global $_PREFS;
+
+    parent::retrieve();
+    if (substr($this->value,0,7)=='global:')
+    	$this->value = $_PREFS->getPref('url.site.attachments').'/'.substr($this->value,8);
+    else if (substr($this->value,0,5)=='item:')
+    	$this->value = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,8);
+    else if (substr($this->value,0,8)=='version:')
+    	$this->value = $this->itemversion->getStorageUrl().'/'.substr($this->value,8);
+  }
+  
+  public function setValue($value)
+  {
+  	global $_PREFS;
+
+  	$path = $this->itemversion->getStorageUrl().'/'.substr($this->value,8).'/';
+  	if (substr($value,0,strlen($path))==$path)
+  	{
+  		$value = 'version:'.substr($value,strlen($path));
+  		parent::setValue($value);
+  		return;
+  	}
+  	$path = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,8).'/';
+  	if (substr($value,0,strlen($path))==$path)
+  	{
+  		$value = 'item:'.substr($value,strlen($path));
+  		parent::setValue($value);
+  		return;
+  	}
+  	$path = $_PREFS->getPref('url.site.attachments').'/';
+  	if (substr($value,0,strlen($path))==$path)
+  	{
+  		$value = 'global:'.substr($value,strlen($path));
+  		parent::setValue($value);
+  		return;
+  	}
+  	parent::setValue($value);
   }
   
   public function getClientAttributes()
@@ -513,6 +545,12 @@ class FileField extends TextField
     $attrs['request'] = $request->encode();
     
     return $attrs;
+  }
+  
+  public function output(&$request, &$smarty)
+  {
+  	$this->retrieve();
+  	return basename($this->value);
   }
   
   public function getEditor(&$request, &$smarty)
