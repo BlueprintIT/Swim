@@ -557,9 +557,13 @@ class ItemVariant
     else
       $viewid = 'NULL';
     $time = time();
-    $results = $_STORAGE->query('SELECT MAX(version)+1 FROM VariantVersion WHERE itemvariant='.$this->id.' GROUP BY itemvariant;');
+    $results = $_STORAGE->query('SELECT MAX(version)+1 FROM VariantVersion WHERE itemvariant='.$this->id.';');
     if ($results->valid())
+    {
       $version = $results->fetchSingle();
+      if ($version === null)
+        $version = 1;
+    }
     else
       $version = 1;
     if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,created,modified,owner,current,complete) ' .
