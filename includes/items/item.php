@@ -649,14 +649,12 @@ class ItemVersion
   
   public function getStoragePath()
   {
-    global $_PREFS;
-    return $_PREFS->getPref('storage.site.attachments').'/'.$this->getItem()->getId().'/'.$this->getVariant()->getVariant().'/'.$this->version;
+    return $this->getItem()->getStoragePath().'/'.$this->getVariant()->getVariant().'/'.$this->version;
   }
   
   public function getStorageUrl()
   {
-    global $_PREFS;
-    return $_PREFS->getPref('url.site.attachments').'/'.$this->getItem()->getId().'/'.$this->getVariant()->getVariant().'/'.$this->version;
+    return $this->getItem()->getStorageUrl().'/'.$this->getVariant()->getVariant().'/'.$this->version;
   }
   
   public function getId()

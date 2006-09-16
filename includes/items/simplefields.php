@@ -494,9 +494,9 @@ class FileField extends TextField
 
     parent::retrieve();
     if (substr($this->value,0,7)=='global:')
-    	$this->value = $_PREFS->getPref('url.site.attachments').'/'.substr($this->value,8);
+    	$this->value = $_PREFS->getPref('url.site.attachments').'/'.substr($this->value,7);
     else if (substr($this->value,0,5)=='item:')
-    	$this->value = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,8);
+    	$this->value = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,5);
     else if (substr($this->value,0,8)=='version:')
     	$this->value = $this->itemversion->getStorageUrl().'/'.substr($this->value,8);
   }
@@ -505,14 +505,14 @@ class FileField extends TextField
   {
   	global $_PREFS;
 
-  	$path = $this->itemversion->getStorageUrl().'/'.substr($this->value,8).'/';
+  	$path = $this->itemversion->getStorageUrl().'/';
   	if (substr($value,0,strlen($path))==$path)
   	{
   		$value = 'version:'.substr($value,strlen($path));
   		parent::setValue($value);
   		return;
   	}
-  	$path = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,8).'/';
+  	$path = $this->itemversion->getItem()->getStorageUrl().'/';
   	if (substr($value,0,strlen($path))==$path)
   	{
   		$value = 'item:'.substr($value,strlen($path));
