@@ -84,8 +84,8 @@ CREATE TABLE File (
 CREATE TABLE OptionSet (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	optionset VARCHAR(30),
-	name VARCHAR(30),
-	value VARCHAR(50),
+	name VARCHAR(100),
+	value VARCHAR(100),
 	UNIQUE (optionset,value)
 );
 
