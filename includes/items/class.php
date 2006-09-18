@@ -292,7 +292,7 @@ class ItemClass extends FieldSet
   public function load($element)
   {
   	parent::load($element);
-  	if ((!isset($this->fields['name'])) && ($this->parent !== null))
+  	if (!$this->hasField('name'))
   		$this->log->warn('Class '.$this->name.' does not have a name field defined. This could cause problems in the admin interface.');
   	if (($this->type == 'file') && ((!isset($this->fields['file'])) || ($this->fields['file']->getType()!='file')))
   		$this->log->error('Class '.$this->name.' does not have a valid file field. Uploaded files will be lost.');
