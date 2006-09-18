@@ -15,6 +15,8 @@
 
 function method_view($request)
 {
+	global $_PREFS;
+	
   $log = LoggerManager::getLogger('swim.method.view');
   checkSecurity($request, false, false);
   
@@ -25,14 +27,18 @@ function method_view($request)
     $item = $item->getCurrentVersion(Session::getCurrentVariant());
   if ($item !== null)
   {
-    $smarty = createSmarty($request, 'text/html');
     if ($request->hasQueryVar('template'))
       $template = $request->getQueryVar('template');
     else
       $template = $item->getClass()->getTemplate();
+	  $path = $_PREFS->getPref('storage.site.templates').'/'.$template;
+	  $path = findDisplayableFile($path);
+	  $type = determineContentType($path);
+    $smarty = createSmarty($request, $type);
     $smarty->assign_by_ref('item', new ItemWrapper($item));
     $log->debug('Starting display.');
-    $smarty->display($template, $item->getId());
+    setContentType($type);
+    $smarty->display($path, $item->getId());
     $log->debug('Display complete.');
   }
   else
