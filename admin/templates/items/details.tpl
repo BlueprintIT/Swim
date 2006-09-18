@@ -94,28 +94,25 @@ function moveDown(item, field, link) {
 				<table class="toolbar">
 					<tr>
 						{assign var="sequence" value=$itemversion->getMainSequence()}
+						{if $sequence !== null}
+							{assign var="choices" value=$sequence->getVisibleClasses()}
+						{else}
+							{assign var="choices" value=array()}
+						{/if}
 						<td>
-							{if $sequence !== null}
-								{assign var="choices" value=$sequence->getVisibleClasses()}
-								{assign var="found" value="false"}
-								{foreach from=$choices item="choice"}
-									{if strtolower($choice->getName())=='category'}
-										{assign var="found" value="true"}
-										<div class="toolbarbutton">
-											<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
-												<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
-												New category
-											</a>
-										</div>
-									{/if}
-								{/foreach}
-								{if $found=='false'}
-									<div class="toolbarbutton disabledtoolbarbutton">
-										<img src="{$CONTENT}/icons/add-folder-grey.gif" alt="New category">
-										New category
+							{assign var="found" value="false"}
+							{foreach from=$choices item="choice"}
+								{if strtolower($choice->getName())=='category'}
+									{assign var="found" value="true"}
+									<div class="toolbarbutton">
+										<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
+											<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
+											New category
+										</a>
 									</div>
 								{/if}
-							{else}
+							{/foreach}
+							{if $found=='false'}
 								<div class="toolbarbutton disabledtoolbarbutton">
 									<img src="{$CONTENT}/icons/add-folder-grey.gif" alt="New category">
 									New category
@@ -123,10 +120,7 @@ function moveDown(item, field, link) {
 							{/if}
 						</td>
 						<td>
-							{if $sequence !== null}
-								{assign var="choices" value=$sequence->getVisibleClasses()}
-							{/if}
-							{if $sequence!==null && count($choices)>0}
+							{if ($found=='false' && count($choices)>0) || count($choices)>1}
 								{html_form method="createitem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}
 									<p class="toolbarbutton"><a onclick="this.parentNode.parentNode.submit(); return false;" href="#">New <img src="{$CONTENT}/icons/add-page-blue.gif"></a></p>
 									<div><select name="class">
