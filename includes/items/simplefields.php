@@ -460,15 +460,16 @@ class ItemField extends IntegerField
     else
       $rlvalue = '[Nothing selected]';
 
-    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
+		$result = '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
 
-    echo '<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
-    echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
-    echo '</div> ';
-    echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
-    echo '</div> ';
+    $result.='<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    $result.='<div class="toolbarbutton">';
+    $result.='<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
+    $result.='</div> ';
+    $result.='<div class="toolbarbutton">';
+    $result.='<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
+    $result.='</div> ';
+    return $result;
   }
 }
 
@@ -575,15 +576,16 @@ class FileField extends TextField
     else
       $rlvalue = '[Nothing selected]';
 
-    echo '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
+    $result = '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
 
-    echo '<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
-    echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
-    echo '</div> ';
-    echo '<div class="toolbarbutton">';
-    echo '<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
-    echo '</div> ';
+    $result.='<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    $result.='<div class="toolbarbutton">';
+    $result.='<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
+    $result.='</div> ';
+    $result.='<div class="toolbarbutton">';
+    $result.='<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
+    $result.='</div> ';
+    return $result;
   }
 }
 
