@@ -96,8 +96,6 @@ function moveDown(item, field, link) {
 						{assign var="sequence" value=$itemversion->getMainSequence()}
 						{if $sequence !== null}
 							{assign var="choices" value=$sequence->getVisibleClasses()}
-						{else}
-							{assign var="choices" value=array()}
 						{/if}
 						<td>
 							{assign var="found" value="false"}
