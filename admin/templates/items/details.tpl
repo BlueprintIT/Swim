@@ -99,17 +99,25 @@ function moveDown(item, field, link) {
 						{/if}
 						<td>
 							{assign var="found" value="false"}
-							{foreach from=$choices item="choice"}
-								{if strtolower($choice->getName())=='category'}
-									{assign var="found" value="true"}
-									<div class="toolbarbutton">
-										<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
-											<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
-											New category
-										</a>
-									</div>
-								{/if}
-							{/foreach}
+							{assign var="classcount" value=0}
+							{assign var="filecount" value=0}
+							{if $sequence !== null}
+								{foreach from=$choices item="choice"}
+									{if strtolower($choice->getName())=='category'}
+										{assign var="found" value="true"}
+										<div class="toolbarbutton">
+											<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
+												<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
+												New category
+											</a>
+										</div>
+									{elseif $choice->getType()=='normal'}
+										{assign var="classcount" value=$classcount+1}
+									{elseif $choice->getType()=='file'}
+										{assign var="filecount" value=$classcount+1}
+									{/if}
+								{/foreach}
+							{/if}
 							{if $found=='false'}
 								<div class="toolbarbutton disabledtoolbarbutton">
 									<img src="{$CONTENT}/icons/add-folder-grey.gif" alt="New category">
@@ -118,7 +126,7 @@ function moveDown(item, field, link) {
 							{/if}
 						</td>
 						<td>
-							{if ($found=='false' && count($choices)>0) || count($choices)>1}
+							{if $classcount>0}
 								{html_form method="createitem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}
 									<p class="toolbarbutton"><a onclick="this.parentNode.parentNode.submit(); return false;" href="#">New <img src="{$CONTENT}/icons/add-page-blue.gif"></a></p>
 									<div><select name="class">
@@ -134,6 +142,13 @@ function moveDown(item, field, link) {
 								<div><select disabled="disabled" style="width: 100px"></select></div>
 							{/if}
 						</td>
+						{if ($sequence !== null) && ($filecount>0)}
+							<td>
+								{html_form tag_enctype="multipart/form-data" method="uploaditem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}
+									<p class="toolbarbutton">Upload a new item: <input type="file" name="file"> <input type="submit" value="Upload..."></p>
+								{/html_form}
+							</td>
+						{/if}
 						<td class="separator"></td>
 						<td>
 							{if $class->getVersioning()=='simple'}

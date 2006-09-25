@@ -92,6 +92,8 @@ class FieldSet extends XMLSerialized
   {
     if (isset($this->fields[$name]))
     {
+    	if ($item === null)
+    		return $this->fields[$name];
       if ($this->fields[$name] instanceof ClassField)
       {
         if (($item instanceof ItemVariant) || ($item instanceof ItemVersion))

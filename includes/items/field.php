@@ -260,7 +260,19 @@ class CompoundField extends Field
     parent::__construct($metadata);
     $this->exists = true;
   }
+  
+  public function hasField($name)
+  {
+  	return isset($fields[$name]);
+  }
 
+	public function getFieldType($name)
+	{
+		if (isset($fields[$name]))
+			return $fields[$name]->getType();
+		return null;
+	}
+	
   public function setItemVersion($item)
   {
     $this->rows = array();
