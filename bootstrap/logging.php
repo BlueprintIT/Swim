@@ -253,7 +253,10 @@ class Logger
 			{
 				$result[$pos]['function']=$trace[$tpos]['function'];
 			}
-			$result[$pos]['args']=$trace[$tpos]['args'];
+			if (isset($trace[$tpos]['args']))
+				$result[$pos]['args']=$trace[$tpos]['args'];
+			else
+				$result[$pos]['args']=array();
 			$result[$pos]['line']=$trace[$tpos-1]['line'];
 			$result[$pos]['file']=$trace[$tpos-1]['file'];
 			$pos++;

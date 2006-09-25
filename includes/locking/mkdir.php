@@ -58,7 +58,8 @@ class MkdirLocker extends Locker
       {
         $log->error('Error opening lockfile '.$lockfile);
         rmdir($lockdir);
-        return false;
+        $result = false;
+        return $result;
       }
       $count=(int)fgets($file);
       fclose($file);
@@ -78,13 +79,15 @@ class MkdirLocker extends Locker
     {
       $log->error('Error opening lockfile '.$lockfile);
       rmdir($lockdir);
-      return false;
+      $result = false;
+      return $result;
     }
     fwrite($file,$count);
     fclose($file);
   
     rmdir($lockdir);
-    return LOCK_READ;
+    $result = LOCK_READ;
+    return $result;
   }
   
   public function &getWriteLock($log,$dir)
@@ -108,7 +111,8 @@ class MkdirLocker extends Locker
       }
       unlink($lockfile);
     }
-    return true;
+    $result = true;
+    return $result;
   }
   
   public function unlock($log,$dir,&$lock,$type)

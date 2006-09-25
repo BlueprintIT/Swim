@@ -25,18 +25,21 @@ class Locker
   
   public function &getReadLock($log,$dir)
   {
-    return true;
+  	$result = true;
+    return $result;
   }
   
   public function &getWriteLock($log,$dir)
   {
-    return true;
+  	$result = true;
+    return $result;
   }
   
   public function &upgradeLock($log,$dir,&$lock)
   {
     $this->unlock($log,$dir,$lock,LOCK_READ);
-    return $this->getReadLock($log,$dir);
+    $result = $this->getReadLock($log,$dir);
+    return $result;
   }
   
   public function unlock($log,$dir,&$lock,$type)

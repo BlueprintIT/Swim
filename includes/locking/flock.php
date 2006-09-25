@@ -35,7 +35,8 @@ class FlockLocker extends Locker
     else
     {
       fclose($file);
-      return false;
+      $result = false;
+      return $result;
     }
   }
   
@@ -52,7 +53,8 @@ class FlockLocker extends Locker
     else
     {
       fclose($file);
-      return false;
+      $result = false;
+      return $result;
     }
   }
   

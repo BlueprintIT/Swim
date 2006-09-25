@@ -77,7 +77,10 @@ class CategoryManager
       if ($set->valid())
       {
         $details = $set->current();
-        $this->cache[$id] = new Category($this,$this->getCategory($details['parent']),$details['id'],$details['name']);
+        if ($details['parent'] !== null)
+	        $this->cache[$id] = new Category($this,$this->getCategory($details['parent']),$details['id'],$details['name']);
+	      else
+	        $this->cache[$id] = new Category($this,null,$details['id'],$details['name']);
       }
       else
       {
