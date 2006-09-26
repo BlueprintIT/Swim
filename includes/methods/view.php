@@ -161,7 +161,7 @@ function method_view($request)
 				{
 					$template=$resource->getReferencedTemplate();
 				}
-				setCacheInfo($modified,$resource->getETag());
+				//setCacheInfo($modified,$resource->getETag());
 				$template->display($request,$resource);
 			}
 			else
