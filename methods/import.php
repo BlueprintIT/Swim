@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-function import_items($request, $file, $section, $variant, $sequence, $dir = null)
+function import_items($request, $file, $section, $variant, $sequence, $dir = null, $temp = true)
 {
 	$doc = new DOMDocument();
 	$doc->load($file);
@@ -148,7 +148,17 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 									      			$type = $field->getFieldType($name);
 									      			if ($type == 'file')
 									      			{
-										      			if (!is_file($dir.'/'.getDOMText($subfieldloop)))
+									      				if ($dir === null)
+									      				{
+									      					displayGeneralError($request, 'Cannot specify file fields unless importing from archive or directory.');
+									      					return;
+									      				}
+									      				
+										      			if ($subfieldloop->hasAttribute('actual'))
+										      				$filename = $subfieldloop->getAttribute('actual');
+										      			else
+										      				$filename = getDOMText($subfieldloop);
+										      			if (!is_file($dir.'/'.$filename))
 										      			{
 											      			displayGeneralError($request, 'Unable to import. Item '.$pos.' contains a file field ('.$name.') with no matching file.');
 											      			return;
@@ -171,7 +181,17 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 		      		}
 		      		else if ($field->getType() == 'file')
 		      		{
-		      			if (($dir !== null) && (!is_file($dir.'/'.getDOMText($fieldloop))))
+	      				if ($dir === null)
+	      				{
+	      					displayGeneralError($request, 'Cannot specify file fields unless importing from archive or directory.');
+	      					return;
+	      				}
+	      				
+		      			if ($fieldloop->hasAttribute('actual'))
+		      				$filename = $fieldloop->getAttribute('actual');
+		      			else
+		      				$filename = getDOMText($fieldloop);
+		      			if (!is_file($dir.'/'.$filename))
 		      			{
 			      			displayGeneralError($request, 'Unable to import. Item '.$pos.' contains a file field ('.$name.') with no matching file.');
 			      			return;
@@ -255,7 +275,14 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 									      		$subfield = $row->getField($subfieldloop->getAttribute('name'));
 								      			if ($type == 'file')
 								      			{
-									      			rename($dir.'/'.getDOMText($fieldloop), $version->getStoragePath().'/'.getDOMText($fieldloop));
+									      			if ($fieldloop->hasAttribute('actual'))
+									      				$filename = $fieldloop->getAttribute('actual');
+									      			else
+									      				$filename = getDOMText($fieldloop);
+									      			if ($temp)
+										      			rename($dir.'/'.$filename, $version->getStoragePath().'/'.getDOMText($fieldloop));
+										      		else
+										      			copy($dir.'/'.$filename, $version->getStoragePath().'/'.getDOMText($fieldloop));
 									      			$subfield->setValue($version->getStorageUrl().'/'.getDOMText($fieldloop));
 								      			}
 									      		else
@@ -333,40 +360,50 @@ function method_import($request)
     		return;
     	}
     	
-      $type = determineContentType($source, $sourcename);
-      if ($type == 'application/zip')
-      {
-        $cache = $_PREFS->getPref('storage.sitecache').'/uploads';
-        if ((is_dir($cache)) || (mkdir($cache, 0777, true)))
-        {
-        	$id = 1;
-        	while (!mkdir($cache.'/'.$id, 0777, true))
-        		$id++;
-        	$command = $_PREFS->getPref('tools.unzip').' '.$source.' -d '.$cache.'/'.$id;
-        	$output = array();
-        	$return = 0;
-        	exec($command, $output, $return);
-        	if ($return == 0)
-        	{
-	        	if (is_file($cache.'/'.$id.'/swimimport.xml'))
-	        		import_items($request, $cache.'/'.$id.'/swimimport.xml', $section, $variant, $sequence, $cache.'/'.$id);
+    	if (is_dir($source))
+    	{
+      	if (is_file($source.'/swimimport.xml'))
+      		import_items($request, $source.'/swimimport.xml', $section, $variant, $sequence, $source, false);
+      	else
+      		displayGeneralError($request, 'No import file included in directory.');
+    	}
+    	else
+    	{
+	      $type = determineContentType($source, $sourcename);
+	      if ($type == 'application/zip')
+	      {
+	        $cache = $_PREFS->getPref('storage.sitecache').'/uploads';
+	        if ((is_dir($cache)) || (mkdir($cache, 0777, true)))
+	        {
+	        	$id = 1;
+	        	while (!mkdir($cache.'/'.$id, 0777, true))
+	        		$id++;
+	        	$command = $_PREFS->getPref('tools.unzip').' '.$source.' -d '.$cache.'/'.$id;
+	        	$output = array();
+	        	$return = 0;
+	        	exec($command, $output, $return);
+	        	if ($return == 0)
+	        	{
+		        	if (is_file($cache.'/'.$id.'/swimimport.xml'))
+		        		import_items($request, $cache.'/'.$id.'/swimimport.xml', $section, $variant, $sequence, $cache.'/'.$id);
+		        	else
+		        		displayGeneralError($request, 'No import file included in zip file.');
+	        	}
 	        	else
-	        		displayGeneralError($request, 'No import file included in zip file.');
-        	}
-        	else
-        		displayGeneralError($request, 'Unable to extract files from archive - error '.$return);
-
-        	recursiveDelete($cache.'/'.$id);
-        }
-        else
-        	displayGeneralError($request, 'Unable to extract files from archive.');
-      }
-      else if ($type == 'text/xml')
-      {
-      	import_items($request, $source, $section, $variant, $sequence);
-      }
-      else
-        displayGeneralError($request, 'Unknown mimetype '.$type);
+	        		displayGeneralError($request, 'Unable to extract files from archive - error '.$return);
+	
+	        	recursiveDelete($cache.'/'.$id);
+	        }
+	        else
+	        	displayGeneralError($request, 'Unable to extract files from archive.');
+	      }
+	      else if ($type == 'text/xml')
+	      {
+	      	import_items($request, $source, $section, $variant, $sequence);
+	      }
+	      else
+	        displayGeneralError($request, 'Unknown mimetype '.$type);
+    	}
     }
     else
       displayServerError($request);
