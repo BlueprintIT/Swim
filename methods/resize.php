@@ -27,12 +27,16 @@ function method_resize($request)
   {
   	setDefaultCache();
   	
+  	$mimetype = determineContentType($filename);
   	if ($request->hasQueryVar('cache'))
   	{
   		$cachefile = $_PREFS->getPref('storage.sitecache').'/'.$request->getQueryVar('cache').$filepath;
   		$cachedir = dirname($cachefile);
   		if (is_file($cachefile) && (filemtime($cachefile)>=filemtime($filename)))
   		{
+		  if ($request->hasQueryVar('type'))
+			  $mimetype = $request->getQueryVar('type');
+  			setContentType($mimetype);
   			setCacheInfo(filemtime($cachefile));
   			readfile($cachefile);
   			return;
@@ -41,7 +45,6 @@ function method_resize($request)
   	
   	setCacheInfo(filemtime($filename));
   	
-  	$mimetype = determineContentType($filename);
 		if ($mimetype=="image/jpeg")
 			$image = imagecreatefromjpeg($filename);
 		else if ($mimetype=="image/gif")
