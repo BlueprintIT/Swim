@@ -275,7 +275,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 									      		$subfield = $row->getField($subfieldloop->getAttribute('name'));
 								      			if ($type == 'file')
 								      			{
-									      			$targetdir = $version->getStorageUrl();
+									      			$targetdir = $version->getStoragePath();
 									      			if ((is_dir($targetdir)) || mkdir($targetdir, 0777, true))
 									      			{
 										      			if ($subfieldloop->hasAttribute('actual'))
@@ -290,7 +290,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 									      			}
 									      			else
 									      			{
-									      				displayGeneralError('Unable to create target directory '.$targetdir);
+									      				displayGeneralError($request, 'Unable to create target directory '.$targetdir);
 									      				return;
 									      			}
 								      			}
@@ -309,7 +309,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 		      		}
 		      		else if ($field->getType() == 'file')
 		      		{
-		      			$targetdir = $version->getStorageUrl();
+		      			$targetdir = $version->getStoragePath();
 		      			if ((is_dir($targetdir)) || mkdir($targetdir, 0777, true))
 		      			{
 			      			if ($fieldloop->hasAttribute('actual'))
@@ -325,7 +325,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 		      			}		      			
 		      			else
 		      			{
-		      				displayGeneralError('Unable to create target directory '.$targetdir);
+		      				displayGeneralError($request, 'Unable to create target directory '.$targetdir);
 		      				return;
 		      			}
 		      		}
