@@ -25,16 +25,21 @@ function method_resize($request)
   $filename = $_PREFS->getPref('storage.sitedir').$filepath;
   if (is_file($filename))
   {
+  	setDefaultCache();
+  	
   	if ($request->hasQueryVar('cache'))
   	{
   		$cachefile = $_PREFS->getPref('storage.sitecache').'/'.$request->getQueryVar('cache').$filepath;
   		$cachedir = dirname($cachefile);
   		if (is_file($cachefile) && (filemtime($cachefile)>=filemtime($filename)))
   		{
+  			setCacheInfo(filemtime($cachefile));
   			readfile($cachefile);
   			return;
   		}
   	}
+  	
+  	setCacheInfo(filemtime($filename));
   	
   	$mimetype = determineContentType($filename);
 		if ($mimetype=="image/jpeg")
@@ -120,33 +125,50 @@ function method_resize($request)
 		$newimage=imagecreatetruecolor($actualwidth,$actualheight);
 		$backg=imagecolorallocate($newimage,$br,$bg,$bb);
 		imagefill($newimage,0,0,$backg);
-		if ($transparent=true)
+		if ($transparent)
 			imagecolortransparent($newimage,$backg);
 		if (true)
 			imagecopyresampled($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
 		else
 			imagecopyresized($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
 		
-		$mimetype='image/jpeg';
-		if ($mimetype=='image/jpeg')
-			imageinterlace($image);
-		else if ($mimetype=='image/gif')
+		if ($request->hasQueryVar('type'))
+			$mimetype = $request->getQueryVar('type');
+
+		if ($mimetype=='image/gif')
+			imagetruecolortopalette($image, false, 255);
+		else if ($transparent)
+		{
 			$mimetype = 'image/png';
+			imagetruecolortopalette($image, false, 255);
+		}
+		else if ($mimetype=='image/jpeg')
+		{
+			imageinterlace($image);
+			if ($request->hasQueryVar('quality'))
+				$quality = $request->getQueryVar('quality');
+			else
+				$quality = 80;
+		}
 
 		setContentType($mimetype);
 
 		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || mkdir($cachedir, 0777, true)))
 		{
 			if ($mimetype=='image/jpeg')
-				imagejpeg($newimage, $cachefile, 80);
+				imagejpeg($newimage, $cachefile, $quality);
 			else if ($mimetype=='image/png')
 				imagepng($newimage, $cachefile);
+			else if ($mimetype=='image/gif')
+				imagegif($newimage, $cachefile);
 		}
 		
 		if ($mimetype=='image/jpeg')
-			imagejpeg($newimage,'',75);
+			imagejpeg($newimage, '', $quality);
 		else if ($mimetype=='image/png')
 			imagepng($newimage);
+		else if ($mimetype=='image/gif')
+			imagegif($newimage);
   }
   else
   {
