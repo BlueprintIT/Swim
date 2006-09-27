@@ -127,6 +127,7 @@ function method_resize($request)
 		else
 			imagecopyresized($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
 		
+		$mimetype='image/jpeg';
 		if ($mimetype=='image/jpeg')
 			imageinterlace($image);
 		else if ($mimetype=='image/gif')
@@ -137,7 +138,7 @@ function method_resize($request)
 		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || mkdir($cachedir, 0777, true)))
 		{
 			if ($mimetype=='image/jpeg')
-				imagejpeg($newimage, $cachefile, 75);
+				imagejpeg($newimage, $cachefile, 80);
 			else if ($mimetype=='image/png')
 				imagepng($newimage, $cachefile);
 		}
