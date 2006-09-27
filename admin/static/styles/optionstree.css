@@ -1,3 +1,22 @@
+#categorytree .selected div {
+  background-color: Highlight;
+}
+
+#categorytree a,
+#categorytree a:active,
+#categorytree a:hover,
+.categorytree a:visited {
+  color: WindowText;
+  text-decoration: none;
+}
+
+#categorytree .selected a,
+#categorytree .selected a:active,
+#categorytree .selected a:hover,
+.categorytree .selected a:visited {
+  color: HighlightText;
+}
+
 .iconnode_branch_users_open,
 .iconnode_branch_users_clsd {
   background-image: url('../icons/user-group2.gif');

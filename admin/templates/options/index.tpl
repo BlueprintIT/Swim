@@ -52,6 +52,18 @@ function displayTree(event)
   new BlueprintIT.widget.IconNode(details, root, false);
 {/foreach}
 {/if}
+  details = {ldelim}
+    label: "Advanced",
+    type: "advanced"
+  {rdelim};
+  root = new BlueprintIT.widget.IconNode(details, tree.getRoot(), true);
+  details = {ldelim}
+    label: "Import",
+    target: "main",
+    type: "adv-import",
+    href: "{encode method="admin" path="options/import.tpl"}"
+  {rdelim};
+  new BlueprintIT.widget.IconNode(details, root, true);
   tree.draw();
 {rdelim}
 

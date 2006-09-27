@@ -167,6 +167,8 @@ function displayGeneralError($request,$message)
 {
 	global $_PREFS;
   
+	$log = LoggerManager::getLogger('swim');
+	$log->errorTrace('General Error - '.$message);
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
   $smarty = createSmarty($request);
   $smarty->assign('message', $message);
@@ -186,6 +188,8 @@ function displayServerError($request)
 {
 	global $_PREFS;
 
+	$log = LoggerManager::getLogger('swim');
+	$log->errorTrace('Server Error');
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
   $smarty = createSmarty($request);
   $smarty->display($_PREFS->getPref('errors.server.template'));

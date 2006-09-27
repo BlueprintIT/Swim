@@ -34,25 +34,6 @@ iframe.body {
   border: none 0px;
 }
 
-#categorytree .selected div {
-  background-color: Highlight;
-}
-
-#categorytree a,
-#categorytree a:active,
-#categorytree a:hover,
-.categorytree a:visited {
-  color: WindowText;
-  text-decoration: none;
-}
-
-#categorytree .selected a,
-#categorytree .selected a:active,
-#categorytree .selected a:hover,
-.categorytree .selected a:visited {
-  color: HighlightText;
-}
-
 #tabpanel {
   background-image: url([$CONTENT]/images/tabpanel.gif);
   background-repeat: repeat-x;
