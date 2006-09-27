@@ -275,15 +275,24 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 									      		$subfield = $row->getField($subfieldloop->getAttribute('name'));
 								      			if ($type == 'file')
 								      			{
-									      			if ($fieldloop->hasAttribute('actual'))
-									      				$filename = $fieldloop->getAttribute('actual');
+									      			$targetdir = $version->getStorageUrl();
+									      			if ((is_dir($targetdir)) || mkdir($targetdir, 0777, true))
+									      			{
+										      			if ($subfieldloop->hasAttribute('actual'))
+										      				$filename = $subfieldloop->getAttribute('actual');
+										      			else
+										      				$filename = getDOMText($subfieldloop);
+										      			if ($temp)
+											      			rename($dir.'/'.$filename, $targetdir.'/'.getDOMText($subfieldloop));
+											      		else if (!link($dir.'/'.$filename, $targetdir.'/'.getDOMText($subfieldloop)))
+											      			copy($dir.'/'.$filename, $targetdir.'/'.getDOMText($subfieldloop));
+										      			$subfield->setValue($version->getStorageUrl().'/'.getDOMText($subfieldloop));
+									      			}
 									      			else
-									      				$filename = getDOMText($fieldloop);
-									      			if ($temp)
-										      			rename($dir.'/'.$filename, $version->getStoragePath().'/'.getDOMText($fieldloop));
-										      		else
-										      			copy($dir.'/'.$filename, $version->getStoragePath().'/'.getDOMText($fieldloop));
-									      			$subfield->setValue($version->getStorageUrl().'/'.getDOMText($fieldloop));
+									      			{
+									      				displayGeneralError('Unable to create target directory '.$targetdir);
+									      				return;
+									      			}
 								      			}
 									      		else
 									      		{
@@ -300,8 +309,25 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 		      		}
 		      		else if ($field->getType() == 'file')
 		      		{
-		      			rename($dir.'/'.getDOMText($fieldloop), $version->getStoragePath().'/'.getDOMText($fieldloop));
-		      			$field->setValue($version->getStorageUrl().'/'.getDOMText($fieldloop));
+		      			$targetdir = $version->getStorageUrl();
+		      			if ((is_dir($targetdir)) || mkdir($targetdir, 0777, true))
+		      			{
+			      			if ($fieldloop->hasAttribute('actual'))
+			      				$filename = $fieldloop->getAttribute('actual');
+			      			else
+			      				$filename = getDOMText($fieldloop);
+			      			if ($temp)
+				      			rename($dir.'/'.$filename, $targetdir.'/'.getDOMText($fieldloop));
+				      		else if (!link($dir.'/'.$filename, $targetdir.'/'.getDOMText($fieldloop)))
+				      			copy($dir.'/'.$filename, $targetdir.'/'.getDOMText($fieldloop));
+				      			
+			      			$field->setValue($version->getStorageUrl().'/'.getDOMText($fieldloop));
+		      			}		      			
+		      			else
+		      			{
+		      				displayGeneralError('Unable to create target directory '.$targetdir);
+		      				return;
+		      			}
 		      		}
 		      		else
 		      		{
