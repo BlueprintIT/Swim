@@ -263,13 +263,13 @@ class CompoundField extends Field
   
   public function hasField($name)
   {
-  	return isset($fields[$name]);
+  	return isset($this->fields[$name]);
   }
 
 	public function getFieldType($name)
 	{
-		if (isset($fields[$name]))
-			return $fields[$name]->getType();
+		if (isset($this->fields[$name]))
+			return $this->fields[$name]->getType();
 		return null;
 	}
 	
@@ -456,10 +456,10 @@ class CompoundField extends Field
       $fields = array();
       foreach ($this->fields as $name => $field)
       {
-        $field = clone $field;
-        $field->setItemVersion($this->itemversion);
-        $field->setPosition($index);
-        $fields[$name] = $field;
+        $newfield = clone $field;
+        $newfield->setItemVersion($this->itemversion);
+        $newfield->setPosition($index);
+        $fields[$name] = $newfield;
       }
       $this->rows[$index] = new CompoundRow($index, $fields);
     }
@@ -472,7 +472,7 @@ class CompoundField extends Field
     
     $result = $_STORAGE->query('SELECT MAX(pos)+1 FROM Field WHERE itemversion='.$this->itemversion->getId().' AND basefield="'.$_STORAGE->escape($this->getId()).'";');
     $result = $result->fetchSingle();
-    if ($result === false)
+    if ($result === null)
       return 0;
     else
       return $result;

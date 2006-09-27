@@ -124,9 +124,10 @@ function method_resize($request)
 
 		$newimage=imagecreatetruecolor($actualwidth,$actualheight);
 		$backg=imagecolorallocate($newimage,$br,$bg,$bb);
-		imagefill($newimage,0,0,$backg);
 		if ($transparent)
 			imagecolortransparent($newimage,$backg);
+//		imagerectangle($newimage, 0, 0, $actualwidth, $actualheight, $backg);
+		imagefill($newimage, 1, 1, $backg);
 		if (true)
 			imagecopyresampled($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
 		else
@@ -136,15 +137,15 @@ function method_resize($request)
 			$mimetype = $request->getQueryVar('type');
 
 		if ($mimetype=='image/gif')
-			imagetruecolortopalette($image, false, 255);
+			imagetruecolortopalette($newimage, false, 255);
 		else if ($transparent)
 		{
 			$mimetype = 'image/png';
-			imagetruecolortopalette($image, false, 255);
+			imagetruecolortopalette($newimage, false, 255);
 		}
 		else if ($mimetype=='image/jpeg')
 		{
-			imageinterlace($image);
+			imageinterlace($newimage);
 			if ($request->hasQueryVar('quality'))
 				$quality = $request->getQueryVar('quality');
 			else
@@ -153,7 +154,7 @@ function method_resize($request)
 
 		setContentType($mimetype);
 
-		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || mkdir($cachedir, 0777, true)))
+		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || @mkdir($cachedir, 0777, true)))
 		{
 			if ($mimetype=='image/jpeg')
 				imagejpeg($newimage, $cachefile, $quality);

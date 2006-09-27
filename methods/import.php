@@ -142,7 +142,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 									      			$name = $subfieldloop->getAttribute('name');
 									      			if (!$field->hasField($name))
 									      			{
-										      			displayGeneralError($request, 'Unable to import. Item '.$pos.' includes non-existant field '.$name.'.');
+										      			displayGeneralError($request, 'Unable to import. Item '.$pos.' field '.$field->getId().' includes non-existant field '.$name.'.');
 										      			return;
 									      			}
 									      			$type = $field->getFieldType($name);
