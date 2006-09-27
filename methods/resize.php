@@ -1,0 +1,157 @@
+<?
+
+/*
+ * Swim
+ *
+ * Image resizing method
+ *
+ * Copyright Blueprint IT Ltd. 2006
+ *
+ * $HeadURL$
+ * $LastChangedBy$
+ * $Date$
+ * $Revision$
+ */
+
+
+function method_resize($request)
+{
+	global $_PREFS;
+	
+	$log=LoggerManager::getLogger("swim.method.resize");
+  
+  $filepath = $request->getPath();
+  $filepath = substr($filepath, strlen($_PREFS->getPref('url.base'))-1);
+  $filename = $_PREFS->getPref('storage.sitedir').$filepath;
+  if (is_file($filename))
+  {
+  	if ($request->hasQueryVar('cache'))
+  	{
+  		$cachefile = $_PREFS->getPref('storage.sitecache').'/'.$request->getQueryVar('cache').$filepath;
+  		$cachedir = dirname($cachefile);
+  		if (is_file($cachefile) && (filemtime($cachefile)>=filemtime($filename)))
+  		{
+  			readfile($cachefile);
+  			return;
+  		}
+  	}
+  	
+  	$mimetype = determineContentType($filename);
+		if ($mimetype=="image/jpeg")
+			$image = imagecreatefromjpeg($filename);
+		else if ($mimetype=="image/gif")
+			$image = imagecreatefromgif($filename);
+		else if ($mimetype=="image/png")
+			$image = imagecreatefrompng($filename);
+		else
+		{
+			displayGeneralError($request,'Only images can be resized, this is '.$mimetype);
+			return;
+		}
+		
+		$br=255;
+		$bg=255;
+		$bb=255;
+		$transparent=false;
+
+		$width=imagesx($image);
+		$height=imagesy($image);
+		$x=0;
+		$y=0;
+		$sourceaspect=$width/$height;
+		
+		if (($request->hasQueryVar('width')) && ($request->hasQueryVar('height')))
+		{
+			$newwidth = $request->getQueryVar('width');
+			$newheight = $request->getQueryVar('height');
+			$targetaspect = $newwidth/$newheight;
+
+			if ($request->hasQueryVar('padding'))
+			{
+				$actualwidth = $newwidth;
+				$actualheight = $newheight;
+				
+        if ($request->getQueryVar('padding')=='transparent')
+          $transparent=true;
+				else
+				{
+					if (substr($request->getQueryVar('padding'),0,1)=='#')
+						$hex = substr($request->getQueryVar('padding'),1);
+					else
+						$hex = $request->getQueryVar('padding');
+					$value = hexdec($hex);
+					$br = 0xFF & ($value >> 0x10);
+					$bg = 0xFF & ($value >> 0x08);
+					$bb = 0xFF & $value;
+				}
+			}
+			
+      if ($targetaspect>$sourceaspect)
+        $newwidth = $newheight*$sourceaspect;
+      else
+        $newheight = $newwidth/$sourceaspect;
+		}
+		else if ($request->hasQueryVar('width'))
+		{
+			$newwidth = $request->getQueryVar('width');
+			$newheight = $newwidth/$sourceaspect;
+		}
+		else if ($request->hasQueryVar('height'))
+		{
+			$newheight = $request->getQueryVar('height');
+			$newwidth = $newheight*$sourceaspect;
+		}
+		else
+		{
+			$newheight = $height;
+			$newwidth = $width;
+		}
+		
+		if (!isset($actualwidth))
+			$actualwidth = $newwidth;
+		else
+			$x = ($actualwidth-$newwidth)/2;
+
+		if (!isset($actualheight))
+			$actualheight = $newheight;
+		else
+			$y = ($actualheight-$newheight)/2;
+
+		$newimage=imagecreatetruecolor($actualwidth,$actualheight);
+		$backg=imagecolorallocate($newimage,$br,$bg,$bb);
+		imagefill($newimage,0,0,$backg);
+		if ($transparent=true)
+			imagecolortransparent($newimage,$backg);
+		if (true)
+			imagecopyresampled($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
+		else
+			imagecopyresized($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
+		
+		if ($mimetype=='image/jpeg')
+			imageinterlace($image);
+		else if ($mimetype=='image/gif')
+			$mimetype = 'image/png';
+
+		setContentType($mimetype);
+
+		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || mkdir($cachedir, 0777, true)))
+		{
+			if ($mimetype=='image/jpeg')
+				imagejpeg($newimage, $cachefile, 75);
+			else if ($mimetype=='image/png')
+				imagepng($newimage, $cachefile);
+		}
+		
+		if ($mimetype=='image/jpeg')
+			imagejpeg($newimage,'',75);
+		else if ($mimetype=='image/png')
+			imagepng($newimage);
+  }
+  else
+  {
+  	displayNotFound($request);
+  }
+}
+
+
+?>
