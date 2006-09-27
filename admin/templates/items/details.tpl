@@ -131,7 +131,7 @@ function moveDown(item, field, link) {
 									<p class="toolbarbutton"><a onclick="this.parentNode.parentNode.submit(); return false;" href="#">New <img src="{$CONTENT}/icons/add-page-blue.gif"></a></p>
 									<div><select name="class">
 									{foreach from=$choices item="choice"}
-										{if strtolower($choice->getName())!='category'}
+										{if (strtolower($choice->getName())!='category') && ($choice->getType()=='normal')}
 											<option value="{$choice->getId()}">{$choice->getName()}</option>
 										{/if}
 									{/foreach}
