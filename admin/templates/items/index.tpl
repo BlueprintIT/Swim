@@ -2,6 +2,7 @@
 {include file='includes/adminheader.tpl' title="Content management"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
+{stylesheet href="$SITECONTENT/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
