@@ -25,3 +25,7 @@
 .iconnode_leaf_user {
   background-image: url('../icons/user.gif');
 }
+
+.iconnode_leaf_adv-import {
+  background-image: url('../icons/up-blue.gif');
+}
