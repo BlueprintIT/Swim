@@ -589,7 +589,7 @@ class Resource
 
 			if ($type=='file')
 			{
-				$path=implode('/',array_slice($parts,1));
+				$path=rawurldecode(implode('/',array_slice($parts,1)));
 				return $this->getFile($path,$version);
 			}
 			else
