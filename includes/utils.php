@@ -13,6 +13,23 @@
  * $Revision$
  */
 
+function linkorcopy($source, $target)
+{
+	if (is_dir($source))
+	{
+		if ((function_exists("symlink")) && (symlink($source,$target)))
+			return true;
+		mkdir($target);
+		recursiveCopy($source, $target, true);
+	}
+	else
+	{
+		if ((function_exists("link")) && (link($source,$target)))
+			return true;
+		return copy($source, $target);
+	}
+}
+
 function getReadableFileSize($path)
 {
 	$units = array('bytes','KB','MB','GB','TB');
@@ -89,12 +106,16 @@ function recursiveCopy($dir, $target, $uselinks = false)
           $target = $dir.'/'.$file;
           while (is_link($target))
             $target = readlink($target);
-          if ((!$uselinks) || (!symlink($target, $target.'/'.$file)))
+          if ($uselinks) 
+          	linkorcopy($dir.'/'.$file, $target.'/'.$file);
+          else
             copy($dir.'/'.$file, $target.'/'.$file);
         }
         else if (is_file($dir.'/'.$file))
         {
-          if ((!$uselinks) || (!link($dir.'/'.$file, $target.'/'.$file)))
+          if ($uselinks)
+          	linkorcopy($dir.'/'.$file, $target.'/'.$file);
+          else
             copy($dir.'/'.$file, $target.'/'.$file);
         }
 				else if (is_dir($dir.'/'.$file))

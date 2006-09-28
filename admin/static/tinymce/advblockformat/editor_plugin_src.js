@@ -314,7 +314,13 @@ var TinyMCE_AdvBlockFormatPlugin = {
 			if (this.formats[i].tag == tag) {
 				var match = true;
 				for (var attr in this.formats[i].attributes) {
-					if (element.getAttribute(attr)!=this.formats[i].attributes[attr]) {
+					if (attr == "class") {
+						if (element.className!=this.formats[i].attributes[attr]) {
+							match = false;
+							break;
+						}
+					}
+					else if (element.getAttribute(attr)!=this.formats[i].attributes[attr]) {
 						match = false;
 						break;
 					}
@@ -375,7 +381,7 @@ var TinyMCE_AdvBlockFormatPlugin = {
 	getSelectionStart: function(doc, selection)
 	{
 		if (selection.getRangeAt)
-			return selection.getRangeAt(0).endContainer;
+			return selection.getRangeAt(0).startContainer;
 		
 		var range = selection.createRange();
 		var seeker = range.duplicate();
