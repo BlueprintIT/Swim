@@ -53,8 +53,8 @@ if ($_USER->canWrite($page))
 <div class="body">
 <table>
 <tr>
-    <td style="vertical-align: top"><label for="title">Version:</label></td>
-    <td style="vertical-align: top"><?
+    <td style="vertical-align: top; width: 10%"><label for="title">Version:</label></td>
+    <td style="vertical-align: top; width: 90%"><?
 
 $versions=$page->getVersions();
 $verlist = array_keys($versions);
@@ -132,9 +132,11 @@ if ($page->isCurrentVersion())
 <tr>
     <td style="vertical-align: top">Content:</td>
     <td style="vertical-align: top">
+      <div style="width: 100%">
 <?
 $block=$page->getReferencedBlock('content');
 ?><block id="content" src="version/<?= $page->version ?>/<?= $block->getPath() ?>"/>
+      </div>
     </td>
 </tr>
 </table>
