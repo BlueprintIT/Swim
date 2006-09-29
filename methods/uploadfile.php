@@ -14,11 +14,11 @@
  */
 
 
-function method_upload($request)
+function method_uploadfile($request)
 {
   global $_USER,$_PREFS,$_STORAGE;
   
-  $log = Loggermanager::getLogger('swim.upload');
+  $log = Loggermanager::getLogger('swim.uploadfile');
   
   checkSecurity($request, true, true);
   

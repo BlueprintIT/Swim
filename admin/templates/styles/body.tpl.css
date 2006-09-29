@@ -64,7 +64,7 @@ a:hover, a:visited:hover {
 
 .header .toolbar .separator {
   width: 1px;
-  background-color: black;
+  background-color: #808080;
 }
 
 .header h2 {

@@ -245,6 +245,7 @@ function get_files($params, &$smarty)
 	          $fl['description'] = '';
 	        }
 	        $fl['size'] = filesize($path.'/'.$file);
+	        $fl['readablesize'] = getReadableFileSize($path.'/'.$file);
 	        $fl['type'] = determineContentType($path.'/'.$file);
 	        if (strpos($file, '.')!==false)
 	        {

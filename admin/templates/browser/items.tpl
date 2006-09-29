@@ -1,7 +1,7 @@
 {secure documents="read"}
 {include file="includes/singletabbedheader.tpl" title="Item Browser"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
-{stylesheet href="$SHARED/treeview/sitetree.css"}
+{stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
@@ -38,8 +38,9 @@ function onTreeItemClick(id)
 	document.getElementById('main').src = request.encode();
 	SiteTree.selectItem(id);
 	var btn = document.getElementById("okbtn");
-	if (btn.hasAttribute("disabled"))
-		btn.removeAttribute("disabled");
+	btn.style.display = null;
+	btn = document.getElementById("okbtn-disabled");
+	btn.style.display = 'none';
 }
 {/literal}
 var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml'}', 'categorytree');
@@ -70,8 +71,23 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
 
 <div id="leftpane" class="pane">
 	<div class="header">
-		<button id="okbtn" onclick="selectUrl()" type="button" disabled="true">OK</button>
-		<button onclick="cancel()" type="button">Cancel</button>
+		<table class="toolbar">
+			<tr>
+				<td>
+					<div id="okbtn-disabled" class="toolbarbutton disabledtoolbarbutton" style="width: auto">
+						<img src="{$CONTENT}/icons/check-grey.gif"/> Save
+					</div>
+					<div id="okbtn" class="toolbarbutton" style="width: auto; display: none">
+						<a href="javascript:selectUrl()"><img src="{$CONTENT}/icons/check-grey.gif"/> Save</a>
+					</div>
+				</td>
+				<td>
+					<div class="toolbarbutton" style="width: auto">
+						<a href="javascript:cancel()"><img src="{$CONTENT}/icons/delete-page-blue.gif"/> Cancel</a>
+					</div>
+				</td>
+			</tr>
+		</table>
 		<h2>Structure</h2>
 	</div>
 	<div class="body">

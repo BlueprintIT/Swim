@@ -51,7 +51,7 @@ function submitForm(form)
 					</td>
 					<td>
 						<div class="toolbarbutton">
-							<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/check-grey.gif"/> Cancel</a>
+							<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/delete-page-blue.gif"/> Cancel</a>
 						</div>
 					</td>
 				</tr>
