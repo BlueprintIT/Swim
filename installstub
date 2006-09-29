@@ -1,6 +1,6 @@
 #! /bin/bash
 
-SWIM=/home/blueprin/shared/Swim
+SWIM=`dirname $0`
 
 FCKeditor=$SWIM/../FCKeditor
 TinyMCE=$SWIM/../tinymce
