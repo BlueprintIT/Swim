@@ -177,11 +177,11 @@ class Sequence extends ClassField
     global $_STORAGE;
     
     $items = array();
-    $results = $_STORAGE->query('SELECT position,item FROM Sequence WHERE parent='.$this->item->getId().' AND field="'.$_STORAGE->escape($this->id).'" ORDER BY position;');
+    $results = $_STORAGE->query('SELECT position,Item.* FROM Sequence JOIN Item ON Sequence.item=Item.id WHERE parent='.$this->item->getId().' AND field="'.$_STORAGE->escape($this->id).'" ORDER BY position;');
     while ($results->valid())
     {
       $details = $results->fetch();
-      $items[$details['position']] = Item::getItem($details['item']);
+      $items[$details['position']] = Item::getItem($details['id'], $details);
     }
     return $items;
   }

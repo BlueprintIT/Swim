@@ -371,18 +371,23 @@ class Item
     return $v->getVersion($version);
   }
   
-  public static function getItem($id)
+  public static function getItem($id, $details = null)
   {
     global $_STORAGE;
     
     $item = ObjectCache::getItem('dbitem', $id);
     if ($item === null)
     {
-      $result = $_STORAGE->query('SELECT * FROM Item WHERE id='.$id.';');
-      if (($result !== false) && ($result->valid()))
-        $item = new Item($result->fetch());
-      else
-        $item = null;
+    	if ($details === null)
+    	{
+	      $result = $_STORAGE->query('SELECT * FROM Item WHERE id='.$id.';');
+	      if (($result !== false) && ($result->valid()))
+	        $item = new Item($result->fetch());
+	      else
+	        $item = null;
+    	}
+    	else
+    		$item = new Item($details);
       ObjectCache::setItem('dbitem', $id, $item);
     }
     return $item;
