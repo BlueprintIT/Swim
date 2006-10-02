@@ -122,6 +122,16 @@ BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 
 YAHOO.extend(BlueprintIT.widget.DraggableTreeNodeProxy, YAHOO.util.DDProxy);
 
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.applyConfig = function() {
+  this.padding           = [0, 0, 0, 0];
+  this.isTarget          = false;
+  this.maintainOffset    = false;
+  this.primaryButtonOnly = true;
+  this.resizeFrame       = false;
+  this.centerFrame       = false;
+  this.setDragElId(YAHOO.util.DDProxy.dragElId);
+}
+
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.node = null;
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.indicatorDiv = null;
@@ -347,8 +357,10 @@ BlueprintIT.widget.DraggableTreeView.prototype.createIndicator = function() {
 
 BlueprintIT.widget.DraggableTreeView.prototype.draw = function() {
 	BlueprintIT.widget.DraggableTreeView.superclass.draw.call(this);
+	SiteTree.log("basic draw");
 	if (this.dragDropManager) {
 		this.setupDD(this.getRoot());
+		SiteTree.log("dd proxy setup");
 		new YAHOO.util.DDTarget(this.getRoot().getChildrenElId());
 	}
 }

@@ -58,6 +58,10 @@ BlueprintIT.widget.SiteTree.prototype = {
 	collapseAnim: null,
 	dragMode: null,
 	
+	log: function(message) {
+		YAHOO.log("[SiteTree] "+message);
+	},
+	
 	onDragStart: function() {
 		this.dragging = true;
 	},
@@ -141,6 +145,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	init: function(event, obj) {
+		this.log("init");
 		this.loadTree();
 	},
 	
@@ -233,6 +238,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 		else
 			this.tree = new YAHOO.widget.TreeView(this.element);
 		this.loadCategory(doc.documentElement, this.tree.getRoot());
+		this.log("data parsed");
 		if (this.dragMode)
 			this.tree.setDefaultDragMode(this.dragMode);
 		if (this.expandAnim)
@@ -240,6 +246,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 		if (this.collapseAnim)
 			this.tree.setCollapseAnim(this.collapseAnim);
 		this.tree.draw();
+		this.log("tree drawn");
 		this.loading = false;
 		if (this.selected) {
 			var selected = this.selected;
@@ -249,14 +256,18 @@ BlueprintIT.widget.SiteTree.prototype = {
 	},
 	
 	loadTree: function() {
+		this.log("loadTree");
 		BlueprintIT.dialog.Wait.show("Updating Site Structure...");
 		this.loading = true;
 		var callback = {
 			success: function(obj) {
+				this.log("load complete");
 				this.loadFromDocument(obj.responseXML);
+				this.log("finished");
 				BlueprintIT.dialog.Wait.hide();
 			},
 			failure: function(obj) {
+				this.log("load failed");
 				BlueprintIT.dialog.Wait.hide();
 				this.loading = false;
 				BlueprintIT.dialog.Alert.show("Error", "There was a problem retrieving the site structure.<br>Please try logging out and in again.");
