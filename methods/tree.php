@@ -15,19 +15,20 @@
 
 function displayTreeItem($item, $variant)
 {
-	$iv = $item->getCurrentVersion($variant);
-	if ($iv === null)
+	global $_STORAGE;
+	
+	$results = $_STORAGE->query('SELECT VariantVersion.current AS published,Field.textValue AS name FROM (ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant) LEFT JOIN Field ON VariantVersion.id=Field.itemversion WHERE ItemVariant.item='.$item->getId().' AND ItemVariant.variant="default" AND Field.field="name" ORDER BY VariantVersion.current DESC, VariantVersion.version DESC;');
+	if ($results->valid())
 	{
-		$published = 'false';
-		$iv = $item->getNewestVersion($variant);
-	}
-	else
-		$published = 'true';
-	if ($iv !== null)
-	{
-		$name = $iv->getField('name');
-		print "<item id=\"".$item->getId()."\" class=\"".$item->getClass()->getId()."\" published=\"".$published."\" name=\"".htmlspecialchars($name->toString())."\"";
-		$sequence = $iv->getMainSequence();
+		$details = $results->fetch();
+		if ($details['published']==1)
+			$published = 'true';
+		else
+			$published = 'false';
+		$name = $details['name'];
+
+		print "<item id=\"".$item->getId()."\" class=\"".$item->getClass()->getId()."\" published=\"".$published."\" name=\"".htmlspecialchars($name)."\"";
+		$sequence = $item->getMainSequence();
 		if ($sequence !== null)
 		{
 			$contents = " contains=\"";
