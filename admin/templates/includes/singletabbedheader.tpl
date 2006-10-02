@@ -10,16 +10,5 @@
   {stylesheet href="$SHARED/yui/fonts/fonts-min.css"}
   {stylesheet method="admin" path="styles/header.css"}
   {stylesheet method="admin" path="styles/body.css"}
-<style type="text/css">{literal}
-body {
-	padding: 50px 0px 10px 0px !important;
-}
-
-#tabpanel {
-  position: absolute;
-  top: 10px;
-  left: 0;
-}
-{/literal}</style>
 </head>
 <body>

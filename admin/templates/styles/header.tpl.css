@@ -11,6 +11,7 @@ body {
 	margin: 0;
 	overflow: hidden;
 	font-family: Arial, Helvetica, sans-serif;
+	padding: 50px 0 10px 0;
 }
 
 #leftpane {
@@ -35,6 +36,9 @@ iframe.body {
 }
 
 #tabpanel {
+  position: absolute;
+  left: 0;
+  top: 10px;
   background-image: url([$CONTENT]/images/tabpanel.gif);
   background-repeat: repeat-x;
   background-position: bottom;

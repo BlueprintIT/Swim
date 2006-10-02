@@ -10,25 +10,6 @@
   {stylesheet href="$SHARED/yui/fonts/fonts-min.css"}
   {stylesheet method="admin" path="styles/header.css"}
   {stylesheet method="admin" path="styles/body.css"}
-<style type="text/css">{literal}
-body {
-	padding: 140px 0px 10px 0px !important;
-}
-
-#banner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-}
-
-#tabpanel {
-  position: absolute;
-  top: 100px;
-  left: 0;
-}
-{/literal}</style>
 </head>
 <body>
 
