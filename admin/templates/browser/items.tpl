@@ -43,7 +43,7 @@ function onTreeItemClick(id)
 	btn.style.display = 'none';
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='items/tree.xml'}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree'}', 'categorytree');
 </script>
 <div id="tabpanel">
   <table>
