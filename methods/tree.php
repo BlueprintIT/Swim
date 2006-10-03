@@ -27,23 +27,30 @@ function displayTreeItem($item, $variant)
 			$published = 'false';
 		$name = $details['name'];
 
-		print "<item id=\"".$item->getId()."\" class=\"".$item->getClass()->getId()."\" published=\"".$published."\" name=\"".htmlspecialchars($name)."\"";
+		print "{ \"id\": \"".$item->getId()."\", \"class\": \"".$item->getClass()->getId()."\", \"published\": \"".$published."\", \"name\": \"".addslashes($name)."\"";
 		$sequence = $item->getMainSequence();
 		if ($sequence !== null)
 		{
-			$contents = " contains=\"";
+			$contents = ", \"contains\": \"";
 			foreach ($sequence->getVisibleClasses() as $class)
 			{
 				$contents .= $class->getId().",";
 			}
 			$contents = substr($contents,0,-1);
-			print $contents."\">\n";
-			foreach ($sequence->getItems() as $subitem)
+			print $contents."\", \"subitems\": [";
+			$i = 0;
+			$items = $sequence->getItems();
+			foreach ($items as $subitem)
+			{
+				$i++;
 				displayTreeItem($subitem,$variant);
+				if ($i<count($items))
+					print ", ";
+			}
+			print "]}";
 		}
 		else
-			print ">\n";
-		print "</item>\n";
+			print ", \"contains\": \"\", \"subitems\": []}";
 	}
 }
 
@@ -51,11 +58,10 @@ function displayUncategorised($section, $variant)
 {
 	global $_STORAGE;
 	
-	print "<item id=\"uncat\" class=\"uncategorised\" name=\"Uncategorised Items\" contains=\"";
+	print "{ \"id\": \"uncat\", \"class\": \"uncategorised\", \"name\": \"Uncategorised Items\", \"contains\": \"";
 	foreach ($section->getVisibleClasses() as $class)
 		print $class->getId().",";
-
-	print "\">\n";
+	print "\", \"subitems\": [";
 	$root = $section->getRootItem();
 	$results = $_STORAGE->query('SELECT Item.* FROM Item LEFT JOIN Sequence ON Item.id=Sequence.item WHERE ISNULL(Sequence.Item) AND section="'.$_STORAGE->escape($section->getId()).'" AND id!='.$root->getId().' AND (ISNULL(archived) OR archived<>1);');
 	while ($results->valid())
@@ -63,19 +69,75 @@ function displayUncategorised($section, $variant)
 		$details = $results->fetch();
 		$item = Item::getItem($details['id'], $results->fetch());
 		displayTreeItem($item, $variant);
+		if ($results->valid())
+			print ", ";
 	}
-	print "</item>\n";
+	print "]}";
+}
+
+function displaySection($section, $variant)
+{
+	print "[";
+	$item = $section->getRootItem();
+	displayTreeItem($item, Session::getCurrentVariant());
+	print ",";
+	displayUncategorised($section, Session::getCurrentVariant());
+	print "]";
+}
+
+function displayArchive($variant)
+{
+	global $_STORAGE;
+	
+	print "[";
+	$i = 0;
+	$sections = SectionManager::getSections();
+	foreach ($sections as $section)
+	{
+		$i++;
+		print "{ \"class\": \"section\", \"name\": \"".addslashes($section->getName())."\", \"subitems\": [";
+		$results = $_STORAGE->query('SELECT Item.* FROM Item LEFT JOIN Sequence ON Item.id=Sequence.item WHERE ISNULL(Sequence.Item) AND section="'.$_STORAGE->escape($section->getId()).'" AND archived=1;');
+		if ($results->valid())
+		{
+			while ($results->valid())
+			{
+				$details = $results->fetch();
+			  $item = Item::getItem($details['id'], $details);
+			  displayTreeItem($item, $variant);
+			  if ($results->valid())
+			  	print ", ";
+			}
+		}
+		print "]}";
+		if ($i<count($sections))
+			print ", ";
+	}
+	print "]";
+}
+
+function displayAllSections($variant)
+{
+	print "[";
+	$sections = SectionManager::getSections();
+	$i = 0;
+	foreach ($sections as $section)
+	{
+		$i++;
+		print "{ \"class\": \"section\", \"name\": \"".addslashes($section->getName())."\", \"subitems\": ";
+		displaySection($section, $variant);
+		print "}";
+		if ($i<count($sections))
+			print ",";
+	}
+	print "]";
 }
 
 function method_tree($request)
 {
-  global $_USER, $_STORAGE, $_PREFS;
-  
   $log = LoggerManager::getLogger('swim.method.tree');
   checkSecurity($request, true, true);
   
-  setContentType("text/xml");
-	print "<?xml version=\"1.0\"?>\n\n<tree>\n";
+  setContentType("text/plain");
 	if ($request->hasQueryVar('root'))
 	{
 		$item = Item::getItem($request->getQueryVar('root'));
@@ -84,38 +146,16 @@ function method_tree($request)
 	else if ($request->hasQueryVar('section'))
 	{
 		$section = SectionManager::getSection($request->getQueryVar('section'));
-		$item = $section->getRootItem();
-		displayTreeItem($item, Session::getCurrentVariant());
-		displayUncategorised($section, Session::getCurrentVariant());
+		displaySection($section, Session::getCurrentVariant());
 	}
 	else if ($request->hasQueryVar('archive'))
 	{
-		$sections = SectionManager::getSections();
-		foreach ($sections as $section)
-		{
-			print "<item class=\"section\" name=\"".htmlspecialchars($section->getName())."\">\n";
-			$results = $_STORAGE->query('SELECT Item.* FROM Item LEFT JOIN Sequence ON Item.id=Sequence.item WHERE ISNULL(Sequence.Item) AND section="'.$_STORAGE->escape($section->getId()).'" AND archived=1;');
-			while ($results->valid())
-			{
-				$details = $results->fetch();
-			  $item = Item::getItem($details['id'], $details);
-			  displayTreeItem($item, Session::getCurrentVariant());
-			}
-		}
+		displayArchive(Session::getCurrentVariant());
 	}
 	else
 	{
-		$sections = SectionManager::getSections();
-		foreach ($sections as $section)
-		{
-			print "<item class=\"section\" name=\"".htmlspecialchars($section->getName())."\">\n";
-			$item = $section->getRootItem();
-			displayTreeItem($item, Session::getCurrentVariant());
-			displayUncategorised($section, Session::getCurrentVariant());
-			print "</item>\n";
-		}
+		displayAllSections(Session::getCurrentVariant());
 	}
-	print "</tree>\n";
 }
 
 ?>

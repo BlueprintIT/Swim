@@ -37,10 +37,11 @@ BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
 	return style;
 }
 
-BlueprintIT.widget.SiteTree = function(url, div) {
+BlueprintIT.widget.SiteTree = function(url, div, data) {
 	this.location=url;
 	this.element=div;
 	this.loading=true;
+	this.siteData = data;
 	
 	YAHOO.util.Event.addListener(window, "load", this.init, this, true);
 }
@@ -57,9 +58,10 @@ BlueprintIT.widget.SiteTree.prototype = {
 	expandAnim: null,
 	collapseAnim: null,
 	dragMode: null,
+	siteData: null,
 	
-	log: function(message) {
-		YAHOO.log("[SiteTree] "+message);
+	log: function(message, obj) {
+		YAHOO.log("[SiteTree] "+message, "info", obj);
 	},
 	
 	onDragStart: function() {
@@ -189,25 +191,24 @@ BlueprintIT.widget.SiteTree.prototype = {
 		}
 	},
 	
-	loadItem: function(node, parentnode) {
-		var label = node.getAttribute("name");
-		var type = node.getAttribute("class");
-		var published = node.getAttribute("published")=="true";
+	loadItem: function(item, parentnode) {
+		var label = item["name"];
+		var type = item["class"];
+		var published = item["published"] == "true";
 		var contents = null;
 		
 		if (!label)
 			label = '[Unnamed]';
 		
-		var id = node.getAttribute("id");
+		var id = item["id"];
 		if (id) {
-			if (!this.items[id]) {
+			if (!this.items[id])
 				this.items[id] = [];
-			}
 		}
 		
-		if (node.getAttribute("contains")) {
+		if (item["contains"]) {
 			contents = {};
-			var content = node.getAttribute("contains").split(",");
+			var content = item["contains"].split(",");
 			for (var i = 0; i<content.length; i++)
 				contents[content[i]] = true;
 		}
@@ -216,28 +217,25 @@ BlueprintIT.widget.SiteTree.prototype = {
 		if (id)
 			this.items[id].push(treenode);
 		
-		this.loadCategory(node, treenode);
+		this.loadCategory(item["subitems"], treenode);
 	},
 	
-	loadCategory: function(element, treenode) {
-		var node = element.firstChild;
-		while (node) {
-			if (node.nodeType == 1) {
-				treenode.expanded=true;
-				this.loadItem(node, treenode);
-			}
-			node = node.nextSibling;
+	loadCategory: function(root, treenode) {
+		if (root && root.length>0) {
+			treenode.expanded = true;
+			for (var i=0; i<root.length; i++)
+				this.loadItem(root[i], treenode);
 		}
 	},
 
-	loadFromDocument: function(doc) {
+	loadFromDocument: function(root) {
 		this.items = [];
 		this.tree = null;
 		if (this.draggable)
 			this.tree = new BlueprintIT.widget.DraggableTreeView(this.element, this);
 		else
 			this.tree = new YAHOO.widget.TreeView(this.element);
-		this.loadCategory(doc.documentElement, this.tree.getRoot());
+		this.loadCategory(root, this.tree.getRoot());
 		this.log("data parsed");
 		if (this.dragMode)
 			this.tree.setDefaultDragMode(this.dragMode);
@@ -259,23 +257,31 @@ BlueprintIT.widget.SiteTree.prototype = {
 		this.log("loadTree");
 		BlueprintIT.dialog.Wait.show("Updating Site Structure...");
 		this.loading = true;
-		var callback = {
-			success: function(obj) {
-				this.log("load complete");
-				this.loadFromDocument(obj.responseXML);
-				this.log("finished");
-				BlueprintIT.dialog.Wait.hide();
-			},
-			failure: function(obj) {
-				this.log("load failed");
-				BlueprintIT.dialog.Wait.hide();
-				this.loading = false;
-				BlueprintIT.dialog.Alert.show("Error", "There was a problem retrieving the site structure.<br>Please try logging out and in again.");
-			},
-			argument: null,
-			scope: null
-		};
-		callback.scope = this;
-		YAHOO.util.Connect.asyncRequest("GET", this.location, callback, null);
+		if (this.siteData) {
+			this.loadFromDocument(this.siteData);
+			this.siteData = null;
+			BlueprintIT.dialog.Wait.hide();
+		}
+		else {
+			var callback = {
+				success: function(obj) {
+					var root = obj.responseText.parseJSON();
+					this.log("load complete", root);
+					this.loadFromDocument(root);
+					this.log("finished");
+					BlueprintIT.dialog.Wait.hide();
+				},
+				failure: function(obj) {
+					this.log("load failed");
+					BlueprintIT.dialog.Wait.hide();
+					this.loading = false;
+					BlueprintIT.dialog.Alert.show("Error", "There was a problem retrieving the site structure.<br>Please try logging out and in again.");
+				},
+				argument: null,
+				scope: null
+			};
+			callback.scope = this;
+			YAHOO.util.Connect.asyncRequest("GET", this.location, callback, null);
+		}
 	}
 }

@@ -104,6 +104,30 @@ BlueprintIT.widget.StyledTextNode.prototype.getHoverStyle = function() {
 	return style;
 }
 
+YAHOO.util.DDM.refreshCache = function(groups) {
+    for (var sGroup in groups) {
+        if ("string" != typeof sGroup) {
+            continue;
+        }
+        for (var i in this.ids[sGroup]) {
+            var oDD = this.ids[sGroup][i];
+
+            // if (this.isTypeOfDD(oDD)) {
+            if (this.isTypeOfDD(oDD) && oDD.isTarget) {
+                var loc = this.getLocation(oDD);
+                if (loc) {
+                    this.locationCache[oDD.id] = loc;
+                } else {
+                    delete this.locationCache[oDD.id];
+                    // this will unregister the drag and drop object if
+                    // the element is not in a usable state
+                    // oDD.unreg();
+                }
+            }
+        }
+    }
+};
+
 BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 	if (node) {
 		this.node = node;
@@ -114,6 +138,7 @@ BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 			el = el.id;
 		else
 			el = BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);
+			
 		this.init(el, sGroup);
 		delete this.invalidHandleTypes["A"];
 		this.initFrame();
@@ -121,6 +146,9 @@ BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 }
 
 YAHOO.extend(BlueprintIT.widget.DraggableTreeNodeProxy, YAHOO.util.DDProxy);
+
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.resetConstraints = function() {
+}
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.applyConfig = function() {
   this.padding           = [0, 0, 0, 0];

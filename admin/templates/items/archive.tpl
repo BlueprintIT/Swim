@@ -3,6 +3,7 @@
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
+{script href="$SHARED/json/json`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
@@ -17,6 +18,15 @@
 {script href="$SHARED/scripts/dialogs.js"}
 {script href="$SHARED/scripts/sitetree.js"}
 <script>
+{if $smarty.config.inlinetree}
+var sitedata = {php}
+global $_PREFS;
+$request = $this->get_template_vars('REQUEST');
+include_once $_PREFS->getPref('storage.methods').'/tree.php';
+displayArchive(Session::getCurrentVariant());{/php};
+{else}
+var sitedata = null;
+{/if}
 {literal}
 function onTreeItemClick(id)
 {
@@ -27,7 +37,7 @@ function onTreeItemClick(id)
 	document.getElementById('main').src = request.encode();
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' archive='true'}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' archive='true'}', 'categorytree', sitedata);
 </script>
 <div id="leftpane" class="pane">
 	<div class="header">

@@ -3,6 +3,7 @@
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
+{script href="$SHARED/json/json`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
@@ -18,7 +19,17 @@
 {script href="$SHARED/scripts/sitetree.js"}
 <script>
 var section = '{$request.query.section}';
+{if $smarty.config.inlinetree}
+var sitedata = {php}
+global $_PREFS;
+$request = $this->get_template_vars('REQUEST');
+include_once $_PREFS->getPref('storage.methods').'/tree.php';
+displaySection(SectionManager::getSection($request->getQueryVar('section')), Session::getCurrentVariant());{/php};
+{else}
+var sitedata = null;
+{/if}
 {literal}
+
 YAHOO.widget.Logger.enableBrowserConsole();
 function onTreeItemClick(id)
 {
@@ -43,10 +54,10 @@ function updateDragMode(input)
 }
 {/literal}
 {if isset($request.query.root)}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' root=$request.query.root}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' root=$request.query.root}', 'categorytree', sitedata);
 {apiget var="root" type="item" id=$request.query.root}
 {else}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' section=$request.query.section}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' section=$request.query.section}', 'categorytree', sitedata);
 {apiget var="section" type="section" id=$request.query.section}
 {assign var="root" value=$section->getRootItem()}
 {/if}

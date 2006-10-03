@@ -3,6 +3,7 @@
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
+{script href="$SHARED/json/json`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT.js"}
 {script method="admin" path="scripts/request.js"}
@@ -15,7 +16,17 @@
 {script href="$SHARED/scripts/treeview.js"}
 {script href="$SHARED/scripts/dom.js"}
 {script href="$SHARED/scripts/sitetree.js"}
-<script>{literal}
+<script>
+{if $smarty.config.inlinetree}
+var sitedata = {php}
+global $_PREFS;
+$request = $this->get_template_vars('REQUEST');
+include_once $_PREFS->getPref('storage.methods').'/tree.php';
+displayAllSections(Session::getCurrentVariant());{/php};
+{else}
+var sitedata = null;
+{/if}
+{literal}
 function selectUrl(url)
 {
 	var request = new Request();
@@ -43,7 +54,7 @@ function onTreeItemClick(id)
 	btn.style.display = 'none';
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree'}', 'categorytree');
+var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree'}', 'categorytree', sitedata);
 </script>
 <div id="tabpanel">
   <table>
