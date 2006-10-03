@@ -1,11 +1,17 @@
 Drag and Drop Release Notes
 
+0.11.4
+
+   * YAHOO.util.DragDropMgr.swapNode now handles adjacent nodes properly
+
+   * Fixed missing variable declarations
+
 0.11.3
- 
+
    * Fixed a JavaScript error that would be generated when trying to implement
      DDProxy using the default settings and a tiny element.
 
-   * Fixed an error that resulted when constraints were applied to DragDrop 
+   * Fixed an error that resulted when constraints were applied to DragDrop
      instances.
 
 0.11.2
@@ -13,8 +19,8 @@ Drag and Drop Release Notes
    * Drag and drop will no longer interfere with selecting text on elements
      that are not involved in drag and drop.
 
-   * The shared drag and drop proxy element now resizes correctly when autoResize
-     is enabled.
+   * The shared drag and drop proxy element now resizes correctly when
+     autoResize is enabled.
 
 0.11.1
 
@@ -53,17 +59,19 @@ Drag and Drop Release Notes
 
 0.10.0
 
-   * Improved the performance in intersect mode
+   * Improved the performance when in intersect mode
 
    * It was possible for the drag and drop initialization to be skipped
      for very slow loading pages.  This was fixed.
 
-   * New methods to exclude regions within your drag and drop element: 
+   * New methods to exclude regions within your drag and drop element:
      addInvalidHandleId(), addInvalidHandleClass()
 
-   * Added an onAvailable handler that is executed after the initial state is set.
+   * Added an onAvailable handler that is executed after the initial state is
+   set.
 
    * Drag and drop is more forgiving when the implementer attempts to create the
      instance prior to the element being in the document, but after the window
      load event has fired.
+
 

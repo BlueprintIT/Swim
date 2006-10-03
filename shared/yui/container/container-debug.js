@@ -2,7 +2,7 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-Version 0.11.3
+Version 0.11.4
 */
 
 /**
@@ -2804,12 +2804,28 @@ YAHOO.widget.Panel.prototype.configModal = function(type, args, obj) {
 		if (! YAHOO.util.Config.alreadySubscribed( YAHOO.widget.Overlay.windowResizeEvent, this.sizeMask, this ) ) {
 			YAHOO.widget.Overlay.windowResizeEvent.subscribe(this.sizeMask, this, true);
 		}
+		if (! YAHOO.util.Config.alreadySubscribed( this.destroyEvent, this.removeMask, this) ) {
+			this.destroyEvent.subscribe(this.removeMask, this, true);
+		}
 	} else {
 		this.beforeShowEvent.unsubscribe(this.showMask, this);
 		this.hideEvent.unsubscribe(this.hideMask, this);
-		YAHOO.widget.Overlay.windowResizeEvent.unsubscribe(this.sizeMask);
+		YAHOO.widget.Overlay.windowResizeEvent.unsubscribe(this.sizeMask, this);
+		this.destroyEvent.unsubscribe(this.removeMask, this);
 	}
 };
+
+/**
+* Removes the modality mask.
+*/
+YAHOO.widget.Panel.prototype.removeMask = function() {
+	if (this.mask) {
+		if (this.mask.parentNode) {
+			this.mask.parentNode.removeChild(this.mask);
+		}
+		this.mask = null;
+	}
+}
 
 /**
 * The default event handler fired when the "keylisteners" property is changed. 
