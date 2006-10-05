@@ -67,7 +67,7 @@ function displayUncategorised($section, $variant)
 	while ($results->valid())
 	{
 		$details = $results->fetch();
-		$item = Item::getItem($details['id'], $results->fetch());
+		$item = Item::getItem($details['id'], $details);
 		displayTreeItem($item, $variant);
 		if ($results->valid())
 			print ", ";
