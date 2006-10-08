@@ -31,12 +31,13 @@ array_push($rewrites, array('pattern' => '^$', 'target' => 'swim/startup/swim.ph
 
 ob_start();
 
+?>
+RewriteEngine on 
+
+<?
 if (is_file($_PREFS->getPref('storage.config').'/htaccess'))
 	readfile($_PREFS->getPref('storage.config').'/htaccess');
 ?>
-Options +FollowSymLinks 
-
-RewriteEngine on 
 RewriteBase <?= $_PREFS->getPref('url.base'); ?>/
 
 <?
