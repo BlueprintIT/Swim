@@ -201,9 +201,30 @@ class ItemClass extends FieldSet
     return true;
   }
   
-  public function getTemplate()
+  public function getTemplate($extra = null)
   {
-    return 'classes/'.$this->id.'.tpl';
+  	global $_PREFS;
+  	
+  	$dir = $_PREFS->getPref('storage.site.templates').'/classes/';
+
+  	if (is_dir($dir.$this->id))
+  	{
+  		if ($extra !== null)
+	  		$file = findDisplayableFile($dir.$this->id.'/'.$extra);
+	  	else
+	  		$file = findDisplayableFile($dir.$this->id);
+	  	
+  		if ($file !== null)
+  			return $file;
+  	}
+
+  	if (is_file($dir.$this->id.'.tpl'))
+  		return $dir.$this->id.'.tpl';
+
+  	if ($this->parent !== null)
+  		return $this->parent->getTemplate($extra);
+
+    return null;
   }
   
   public function getDefaultView()

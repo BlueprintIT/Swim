@@ -20,7 +20,19 @@ function method_view($request)
   $log = LoggerManager::getLogger('swim.method.view');
   checkSecurity($request, false, false);
   
-  $item = Item::getItem($request->getPath());
+  $pos = strpos($request->getPath(), '/');
+  if ($pos === false)
+  {
+	  $id = $request->getPath();
+	  $extra = null;
+  }
+	else
+	{
+		$id = substr($request->getPath(), 0, $pos);
+		$extra = substr($request->getPath(), $pos+1);
+	}
+	$item = Item::getItem($id);
+	
   if ($item !== null && $item->isArchived())
     $item = null;
   if ($item !== null)
@@ -28,18 +40,26 @@ function method_view($request)
   if ($item !== null)
   {
     if ($request->hasQueryVar('template'))
+    {
       $template = $request->getQueryVar('template');
+		  $template = $_PREFS->getPref('storage.site.templates').'/'.$template;
+		  $template = findDisplayableFile($template);
+    }
     else
-      $template = $item->getClass()->getTemplate();
-	  $path = $_PREFS->getPref('storage.site.templates').'/'.$template;
-	  $path = findDisplayableFile($path);
-	  $type = determineContentType($path);
-    $smarty = createSmarty($request, $type);
-    $smarty->assign_by_ref('item', new ItemWrapper($item));
-    $log->debug('Starting display.');
-    setContentType($type);
-    $smarty->display($path, $item->getId());
-    $log->debug('Display complete.');
+      $template = $item->getClass()->getTemplate($extra);
+
+    if ($template !== null)
+    {
+		  $type = determineContentType($template);
+	    $smarty = createSmarty($request, $type);
+	    $smarty->assign_by_ref('item', new ItemWrapper($item));
+	    $log->debug('Starting display.');
+	    setContentType($type);
+	    $smarty->display($template, $item->getId());
+	    $log->debug('Display complete.');
+    }
+	  else
+	  	displayNotFound($request);
   }
   else
     displayNotFound($request);
