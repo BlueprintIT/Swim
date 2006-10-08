@@ -33,12 +33,12 @@ ob_start();
 
 ?>
 RewriteEngine on 
+RewriteBase <?= $_PREFS->getPref('url.base'); ?>/
 
 <?
 if (is_file($_PREFS->getPref('storage.config').'/htaccess'))
 	readfile($_PREFS->getPref('storage.config').'/htaccess');
 ?>
-RewriteBase <?= $_PREFS->getPref('url.base'); ?>/
 
 <?
 
