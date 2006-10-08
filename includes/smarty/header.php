@@ -113,7 +113,10 @@ function encode_link($params, &$smarty)
     }
   }
   $request = get_params_request($params, $smarty);
-  $tparams['href'] = $request->encode();
+  if ($request instanceof Request)
+    $tparams['href'] = $request->encode();
+  else
+    $tparams['href'] = $request;
   $head = $smarty->get_registered_object('HEAD');
   $head->addLink($tparams);
 }

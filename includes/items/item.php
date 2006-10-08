@@ -19,6 +19,7 @@ class Item
   private $id;
   private $section;
   private $itemclass;
+  private $path;
   private $archived;
   private $complete;
   private $variants = array();
@@ -31,6 +32,10 @@ class Item
     $this->id = $details['id'];
     $this->section = $details['section'];
     $this->itemclass = FieldSetManager::getClass($details['class']);
+    if (($details['path']===false)||($details['path']==''))
+    	$this->path = null;
+    else
+    	$this->path = $details['path'];
     if (isset($details['archived']) && $details['archived']==1)
       $this->archived = true;
     else
@@ -93,6 +98,11 @@ class Item
   public function getClass()
   {
     return $this->itemclass;
+  }
+  
+  public function getPath()
+  {
+  	return $this->path;
   }
   
   public function getParents()

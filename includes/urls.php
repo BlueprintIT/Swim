@@ -499,49 +499,63 @@ class Request
 		return $url;
 	}
 	
+	static function getCurrentPath()
+	{
+		global $_PREFS;
+		
+		$log=LoggerManager::getLogger('swim.request');
+
+  	$pathvar=$_PREFS->getPref('url.pathenvvar');
+		if (isset($_SERVER[$pathvar]))
+		{
+			$path=$_SERVER[$pathvar];
+      $log->debug('Decoding path '.$path);
+      if (strpos($path,'?'))
+      {
+        $path=substr($path,0,strpos($path,'?'));
+        $log->debug('Removed query '.$path);
+      }
+			$pathstart=$_PREFS->getPref('url.pathstart','');
+			if (substr($path,0,strlen($pathstart))==$pathstart)
+			{
+				$path=substr($path,strlen($pathstart));
+        if ($path=='/index.php')
+        {
+          $path='';
+        }
+        $log->debug('Reduced to path '.$path);
+        return $path;
+			}
+			else
+			{
+				return '';
+			}
+		}
+		return '';
+	}
+	
 	static function decodeCurrentRequest()
 	{
 		global $_PREFS;
 		
 		$log=LoggerManager::getLogger('swim.request');
-    $path='';
-		$query=decodeQuery($_SERVER['QUERY_STRING']);
+
 	  if ($_PREFS->getPref('url.encoding')=='path')
-	  {
-	  	$pathvar=$_PREFS->getPref('url.pathenvvar');
-			if (isset($_SERVER[$pathvar]))
-			{
-				$path=$_SERVER[$pathvar];
-        $log->debug('Decoding path '.$path);
-        if (strpos($path,'?'))
-        {
-          $path=substr($path,0,strpos($path,'?'));
-          $log->debug('Removed query '.$path);
-        }
-				$pathstart=$_PREFS->getPref('url.pathstart','');
-				if (substr($path,0,strlen($pathstart))==$pathstart)
-				{
-					$path=substr($path,strlen($pathstart));
-          if ($path=='/index.php')
-          {
-            $path='';
-          }
-          $log->debug('Reduced to path '.$path);
-				}
-				else
-				{
-					$path='';
-				}
-			}
-	  }
+	  	$path = self::getCurrentPath();
+	  else
+	  	$path = '';
+
+		$query=decodeQuery($_SERVER['QUERY_STRING']);
 		if ($_SERVER['REQUEST_METHOD']=='POST')
 		{
 			$postvars = decodePostQuery();
 			$query=array_merge($query,$postvars);
 		}
+
     $protocol='http';
     if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
       $protocol='https';
+
 		return Request::decode($path,$query,$protocol);
 	}
 	

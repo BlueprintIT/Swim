@@ -81,6 +81,32 @@ class ItemWrapper
     $this->log = LoggerManager::getLogger('swim.itemwrapper');
   }
   
+  public function getUrl($extra = '')
+  {
+  	global $_PREFS;
+  	
+    $target = $this->itemversion->getLinkTarget();
+    if ($target == null)
+      $target = $this->itemversion;
+    $path = $target->getItem()->getPath();
+  	if ($extra !== '')
+  	{
+  		if (substr($extra,0,1)!='/')
+  			$extra = '/'.$extra;
+  	}
+    if ($path !== null)
+    {
+    	return $_PREFS->getPref('url.pagegen').$path.$extra;
+    }
+    else
+    {
+      $req = new Request();
+      $req->setMethod('view');
+      $req->setPath($target->getItem()->getId().$extra);
+      return $req->encode();
+    }
+  }
+  
   public function __get($name)
   {
     switch($name)
@@ -129,13 +155,7 @@ class ItemWrapper
         return null;
         break;
       case 'url':
-        $target = $this->itemversion->getLinkTarget();
-        if ($target == null)
-          $target = $this->itemversion;
-        $req = new Request();
-        $req->setMethod('view');
-        $req->setPath($target->getItem()->getId());
-        return $req->encode();
+      	return $this->getUrl();
         break;
       default:
         $field = $this->itemversion->getField($name);

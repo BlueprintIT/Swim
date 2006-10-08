@@ -63,6 +63,13 @@ class SwimEngine
     return self::$requests[count(self::$requests)-1];
   }
   
+  static function isMethod($method)
+  {
+  	global $_PREFS;
+  	
+  	return is_readable($_PREFS->getPref('storage.methods').'/'.$method.'.php');
+  }
+  
   static function processRequest($request)
   {
     global $_STATE, $_PREFS;
@@ -84,7 +91,7 @@ class SwimEngine
     $prevstate=$_STATE;
     $_STATE=STATE_PROCESSING;
     
-    $methodfile=$request->getMethod().".php";
+    $methodfile=$request->getMethod().'.php';
     $methodfunc='method_'.$request->getMethod();
     if (is_readable($_PREFS->getPref('storage.methods').'/'.$methodfile))
     {
@@ -98,7 +105,7 @@ class SwimEngine
         displayServerError($request);
       }
     }
-    else
+    else //TODO parse special paths.
     {
       displayNotFound($request);
     }
@@ -111,12 +118,36 @@ class SwimEngine
   
   static function processCurrentRequest()
   {
-    global $_STATE;
+    global $_STATE, $_STORAGE;
     
     if ($_STATE<STATE_STARTED)
       self::ensureStarted();
     
-    self::processRequest(Request::decodeCurrentRequest());
+    $request = Request::decodeCurrentRequest();
+    if (self::isMethod($request->getMethod()))
+	    self::processRequest(Request::decodeCurrentRequest());
+	  else
+	  {
+	  	$log=LoggerManager::getLogger('swim.engine');
+	  	$path = Request::getCurrentPath();
+	  	if (strlen($path)>0)
+	  	{
+		  	$log->debug('Seeking equivalent item for '.$path);
+		  	$results = $_STORAGE->query('SELECT * FROM Item WHERE "'.$_STORAGE->escape($path).'" LIKE CONCAT(path,"%");');
+		  	if ($results->valid())
+		  	{
+		  		$details = $results->fetch();
+		  		$item = Item::getItem($details['id'], $details);
+			  	$log->debug('Found item '.$item->getId());
+		  		$request->setMethod('view');
+		  		$request->setPath($item->getId().substr($path,strlen($item->getPath())));
+			  	$log->debug('New path is '.$request->getPath());
+		  		self::processRequest($request);
+		  		return;
+		  	}
+	  	}
+	  	displayNotFound($request);
+    }
   }
   
   static function shutdown()
