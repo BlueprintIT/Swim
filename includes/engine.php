@@ -133,7 +133,7 @@ class SwimEngine
 	  	if (strlen($path)>0)
 	  	{
 		  	$log->debug('Seeking equivalent item for '.$path);
-		  	$results = $_STORAGE->query('SELECT * FROM Item WHERE "'.$_STORAGE->escape($path).'" LIKE CONCAT(path,"%");');
+		  	$results = $_STORAGE->query('SELECT * FROM Item WHERE "'.$_STORAGE->escape($path).'" LIKE CONCAT(path,"%") ORDER BY LENGTH(path) DESC;');
 		  	if ($results->valid())
 		  	{
 		  		$details = $results->fetch();
