@@ -20,11 +20,19 @@ function method_admin($request)
   $log = LoggerManager::getLogger('swim.method.admin');
   checkSecurity($request, true, true);
   
-  $path = $_PREFS->getPref('storage.admin.templates').'/'.$request->getPath();
+	$path = $_PREFS->getPref('storage.admin.templates').'/'.$request->getPath();
   $path = findDisplayableFile($path);
   if ($path != null)
   {
     $type = determineContentType($path);
+    if (($_PREFS->isPrefSet('admin.offline')) && ($type == 'text/html') && ($request->getPath() != 'offline.tpl'))
+    {
+    	$offline = new Request();
+    	$offline->setMethod('admin');
+    	$offline->setPath('offline.tpl');
+    	redirect($offline);
+    	return;
+    }
     setContentType($type);
     if (isTemplateFile($path))
     {
