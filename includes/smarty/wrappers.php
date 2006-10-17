@@ -118,6 +118,9 @@ class ItemWrapper
       case 'modified':
         return $this->itemversion->getModified();
         break;
+      case 'published':
+        return $this->itemversion->getPublished();
+        break;
       case 'item':
         return $this->itemversion;
         break;

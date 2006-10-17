@@ -638,6 +638,7 @@ class ItemVersion
   private $itemview;
   private $owner;
   private $modified;
+  private $published;
   private $complete;
   private $current;
   private $fields = array();
@@ -655,6 +656,7 @@ class ItemVersion
     if ($this->itemview === null)
       $this->itemview = $this->getClass()->getDefaultView();
     $this->modified = $details['modified'];
+    $this->published = $details['published'];
     $this->owner = $details['owner'];
     if ($details['complete']==1)
       $this->complete = true;
@@ -711,6 +713,11 @@ class ItemVersion
   public function getModified()
   {
     return $this->modified;
+  }
+  
+  public function getPublished()
+  {
+    return $this->published;
   }
   
   public function getOwner()

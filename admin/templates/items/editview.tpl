@@ -5,7 +5,7 @@
 {script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/calendar/calendar`$smarty.config.YUI`.js"}
-{script href="$CONTENT/scripts/fields.js"}
+{script href="$CONTENT/scripts/fields.js`$smarty.config.YUI`"}
 {stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="itemvariant" value=$item->getVariant($session.variant)}
