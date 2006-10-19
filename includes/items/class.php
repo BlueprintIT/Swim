@@ -548,7 +548,7 @@ class FieldSetManager
     
     $cache = $_PREFS->getPref('storage.sitecache');
     if (!is_dir($cache))
-    	mkdir($cache, 0777, true);
+    	recursiveMkDir($cache);
     	
     $cache = $cache.'/fieldsets.ser';
     $files = array($_PREFS->getPref('storage.config').'/optionsets.xml', $_PREFS->getPref('storage.config').'/views.xml', $_PREFS->getPref('storage.config').'/classes.xml');

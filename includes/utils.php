@@ -48,13 +48,15 @@ function getReadableFileSize($path)
 function recursiveMkDir($dir)
 {
 	if ((strlen($dir)==0)||($dir=='.'))
-		return;
+		return true;
 		
 	if (!is_dir($dir))
 	{
-		recursiveMkDir(dirname($dir));
-		mkdir($dir);
+		if (recursiveMkDir(dirname($dir)))
+			return mkdir($dir);
+		return false;
 	}
+	return true;
 }
 
 function recursiveDelete($dir)

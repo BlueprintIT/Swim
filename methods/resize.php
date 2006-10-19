@@ -157,7 +157,7 @@ function method_resize($request)
 
 		setContentType($mimetype);
 
-		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || @mkdir($cachedir, 0777, true)))
+		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || @recursiveMkDir($cachedir)))
 		{
 			if ($mimetype=='image/jpeg')
 				imagejpeg($newimage, $cachefile, $quality);

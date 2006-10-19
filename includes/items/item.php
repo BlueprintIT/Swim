@@ -350,7 +350,7 @@ class Item
     if ($_STORAGE->queryExec('INSERT INTO Item (section,class,created) VALUES ("'.$_STORAGE->escape($section->getId()).'","'.$_STORAGE->escape($class->getId()).'",'.time().');'))
     {
       $id = $_STORAGE->lastInsertRowid();
-      $details = array('id' => $id, 'section' => $section->getId(), 'class' => $class->getId());
+      $details = array('id' => $id, 'section' => $section->getId(), 'class' => $class->getId(), 'path' => '');
       $item = new Item($details);
       ObjectCache::setItem('dbitem', $id, $item);
       return $item;
@@ -767,13 +767,8 @@ class ItemVersion
     else
       $bit = 'NULL';
 
-    $newtime = time();
-    $this->modified = time();
-    if ($_STORAGE->queryExec('UPDATE VariantVersion SET complete='.$bit.', modified='.$newtime.' WHERE id='.$this->getId().';'))
-    {
-      $this->modified = $newtime;
+    if ($_STORAGE->queryExec('UPDATE VariantVersion SET complete='.$bit.' WHERE id='.$this->getId().';'))
       $this->complete = $value;
-    }
   }
   
   public function isCurrent()
@@ -909,14 +904,15 @@ class ItemVersion
     return $field;
   }
   
-  public function updateModified()
+  public function updateModified($newtime = null)
   {
     global $_STORAGE;
     
     if ($this->complete)
       return;
-      
-    $newtime = time();
+     
+    if ($newtime == null)
+	    $newtime = time();
     if ($_STORAGE->queryExec('UPDATE VariantVersion SET modified='.$newtime.' WHERE id='.$this->getId().';'))
       $this->modified = $newtime;
   }

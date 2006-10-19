@@ -35,7 +35,7 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
         if ($field != null)
           $field->setValue($name);
         $path = $version->getStoragePath();
-        if (is_dir($path) || mkdir($path, 0777, true))
+        if (is_dir($path) || recursiveMkDir($path))
         {
 	        if (move_uploaded_file($file, $path.'/'.$filename))
 	        {
@@ -99,10 +99,10 @@ function method_uploaditem($request)
           if ($type == 'application/zip')
           {
             $cache = $_PREFS->getPref('storage.sitecache').'/uploads';
-            if ((is_dir($cache)) || (mkdir($cache, 0777, true)))
+            if ((is_dir($cache)) || (recursiveMkDir($cache)))
             {
             	$id = 1;
-            	while (!mkdir($cache.'/'.$id, 0777, true))
+            	while (!recursiveMkDir($cache.'/'.$id))
             		$id++;
             	$command = $_PREFS->getPref('tools.unzip').' '.$_FILES['file']['tmp_name'].' -d '.$cache.'/'.$id;
             	$output = array();

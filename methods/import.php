@@ -276,7 +276,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 								      			if ($type == 'file')
 								      			{
 									      			$targetdir = $version->getStoragePath();
-									      			if ((is_dir($targetdir)) || mkdir($targetdir, 0777, true))
+									      			if ((is_dir($targetdir)) || recursiveMkDir($targetdir))
 									      			{
 										      			if ($subfieldloop->hasAttribute('actual'))
 										      				$filename = $subfieldloop->getAttribute('actual');
@@ -310,7 +310,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 		      		else if ($field->getType() == 'file')
 		      		{
 		      			$targetdir = $version->getStoragePath();
-		      			if ((is_dir($targetdir)) || mkdir($targetdir, 0777, true))
+		      			if ((is_dir($targetdir)) || recursiveMkDir($targetdir))
 		      			{
 			      			if ($fieldloop->hasAttribute('actual'))
 			      				$filename = $fieldloop->getAttribute('actual');
@@ -399,10 +399,10 @@ function method_import($request)
 	      if ($type == 'application/zip')
 	      {
 	        $cache = $_PREFS->getPref('storage.sitecache').'/uploads';
-	        if ((is_dir($cache)) || (mkdir($cache, 0777, true)))
+	        if ((is_dir($cache)) || (recursiveMkDir($cache)))
 	        {
 	        	$id = 1;
-	        	while (!mkdir($cache.'/'.$id, 0777, true))
+	        	while (!recursiveMkDir($cache.'/'.$id))
 	        		$id++;
 	        	$command = $_PREFS->getPref('tools.unzip').' '.$source.' -d '.$cache.'/'.$id;
 	        	$output = array();

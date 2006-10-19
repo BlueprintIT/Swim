@@ -40,7 +40,7 @@ function method_uploadfile($request)
       $file=$_FILES['file'];
       if (($file['error']==UPLOAD_ERR_OK)&&(is_uploaded_file($file['tmp_name'])))
       {
-      	mkdir($path, 0777, true);
+      	recursiveMkDir($path);
       	if (is_dir($path))
       	{
 	        if (!is_readable($path.'/'.$file['name']))
