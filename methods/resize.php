@@ -126,28 +126,42 @@ function method_resize($request)
 		else
 			$y = ($actualheight-$newheight)/2;
 
-		$newimage=imagecreatetruecolor($actualwidth,$actualheight);
-		$backg=imagecolorallocate($newimage,$br,$bg,$bb);
-		if ($transparent)
-			imagecolortransparent($newimage,$backg);
-//		imagerectangle($newimage, 0, 0, $actualwidth, $actualheight, $backg);
-		imagefill($newimage, 1, 1, $backg);
-		if (true)
-			imagecopyresampled($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
-		else
-			imagecopyresized($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
-		
 		if ($request->hasQueryVar('type'))
 			$mimetype = $request->getQueryVar('type');
 
-		if ($mimetype=='image/gif')
-			imagetruecolortopalette($newimage, false, 255);
-		else if ($transparent)
+		if (($mimetype=='image/gif') || $transparent)
 		{
-			$mimetype = 'image/png';
-			imagetruecolortopalette($newimage, false, 255);
+			if ($mimetype != 'image/gif')
+				$mimetype = 'image/png';
+				
+			$tempimage=imagecreatetruecolor($newwidth, $newheight);
+			if ($_PREFS->getPref('method.resize.resample'))
+				imagecopyresampled($tempimage, $image, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+			else
+				imagecopyresized($tempimage, $image, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+			imagetruecolortopalette($tempimage, false, 255);
+			
+			$newimage=imagecreate($actualwidth,$actualheight);
+			$backg=imagecolorallocate($newimage,$br,$bg,$bb);
+			imagefill($newimage, 0, 0, $backg);
+			if ($transparent)
+				imagecolortransparent($newimage,$backg);
+			
+			imagecopy($newimage, $tempimage, $x, $y, 0, 0, $newwidth, $newheight);
 		}
-		else if ($mimetype=='image/jpeg')
+		else
+		{
+			$newimage=imagecreatetruecolor($actualwidth,$actualheight);
+			$backg=imagecolorallocate($newimage,$br,$bg,$bb);
+			imagefill($newimage, 0, 0, $backg);
+
+			if ($_PREFS->getPref('method.resize.resample'))
+				imagecopyresampled($newimage, $image, $x, $y, 0, 0, $newwidth, $newheight, $width, $height);
+			else
+				imagecopyresized($newimage, $image, $x, $y, 0, 0, $newwidth, $newheight, $width, $height);
+		}
+		
+		if ($mimetype=='image/jpeg')
 		{
 			imageinterlace($newimage);
 			if ($request->hasQueryVar('quality'))
