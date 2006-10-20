@@ -1,0 +1,63 @@
+[$CONTEXT] .level1 .menuitem span {
+  white-space: nowrap;
+}
+
+[$CONTEXT] a,
+[$CONTEXT] a:visited,
+[$CONTEXT] a:hover,
+[$CONTEXT] a:active {
+  text-decoration: none;
+  display: block;
+}
+
+[$CONTEXT] .menupopup {
+  display: none;
+  position: absolute;
+  z-index: 999;
+}
+
+[$CONTEXT] .opened {
+  cursor: pointer;
+}
+
+[$CONTEXT],
+[$CONTEXT] ul,
+[$CONTEXT] ol,
+[$CONTEXT] li,
+[$CONTEXT] td {
+  padding: 0;
+  margin: 0;
+}
+
+[$CONTEXT] li {
+  list-style-type: none;
+  text-align: left;
+  display: block;
+}
+
+[$CONTEXT] td {
+  text-align: left;
+}
+
+[$CONTEXT],
+[$CONTEXT] table {
+  border-collapse: collapse;
+}
+
+[$CONTEXT] img.icon, [$CONTEXT] img.hoverIcon {
+  vertical-align: middle;
+  border: 0px none;
+  margin-right: 5px;
+}
+
+[$CONTEXT] img.hoverIcon {
+  display: none;
+}
+
+[$CONTEXT] a.opened img.icon {
+  display: none;
+}
+
+[$CONTEXT] a.opened img.hoverIcon {
+  display: inline;
+}

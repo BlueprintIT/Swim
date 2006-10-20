@@ -70,6 +70,48 @@ class OptionWrapper
   }
 }
 
+class SectionWrapper
+{
+	private $section;
+	
+	public function __construct($section)
+	{
+		$this->section = $section;
+	}
+
+	public function __get($name)
+	{
+    switch($name)
+    {
+      case 'root':
+      	$iv = $this->section->getRootItem()->getCurrentVersion(Session::getCurrentVariant());
+      	if ($iv !== null)
+	        return new ItemWrapper($iv);
+        break;
+      case 'name':
+      	return $this->section->getName();
+      	break;
+    }
+    return null;
+	}
+}
+
+class SectionManagerWrapper
+{
+	public function __get($name)
+	{
+    switch($name)
+    {
+      default:
+      	$section = SectionManager::getSection($name);
+      	if ($section !== null)
+      		return new SectionWrapper($section);
+      	break;
+    }
+    return null;
+	}
+}
+
 class ItemWrapper
 {
   private $itemversion;
@@ -164,6 +206,26 @@ class ItemWrapper
       case 'url':
       	return $this->getUrl();
         break;
+      case 'mainsequence':
+      	$field = $this->itemversion->getMainSequence();
+      	if ($field !== null)
+      	{
+      		$result = array();
+          $items = $field->getItems();
+          foreach ($items as $item)
+          {
+            $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
+            if ($itemv != null)
+            {
+              $wrapped = new ItemWrapper($itemv);
+              array_push($result, $wrapped);
+            }
+          }
+          return $result;
+      	}
+      	else
+      		return array();
+      	break;
       default:
         $field = $this->itemversion->getField($name);
         if ($field != null)

@@ -167,6 +167,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->assign_by_ref('request', $req);
   $smarty->assign_by_ref('NESTED', $request->getNested());
   $smarty->assign_by_ref('PREFS', $_PREFS);
+  $smarty->assign_by_ref('SECTIONS', new SectionManagerWrapper());
   $smarty->assign_by_ref('LOG', $log);
   $smarty->assign_by_ref('SMARTY', $smarty);
   $smarty->register_resource('brand', array(
@@ -174,6 +175,11 @@ function configureSmarty($smarty, $request, $type)
                              'brand_get_timestamp',
                              'brand_get_secure',
                              'brand_get_trusted'));
+  $smarty->register_resource('shared', array(
+                             'shared_get_template',
+                             'shared_get_timestamp',
+                             'shared_get_secure',
+                             'shared_get_trusted'));
   $smarty->register_function('wrap', 'item_wrap');
   $smarty->register_function('getfiles', 'get_files');
   $smarty->register_function('meta', 'encode_meta');
