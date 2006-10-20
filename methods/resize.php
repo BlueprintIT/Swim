@@ -20,8 +20,9 @@ function method_resize($request)
 	
 	$log=LoggerManager::getLogger("swim.method.resize");
   
-  $filepath = $request->getPath();
-  $filepath = substr($filepath, strlen($_PREFS->getPref('url.base'))-1);
+  $filepath = '/'.$request->getPath();
+  $base = $_PREFS->getPref('url.base');
+  $filepath = substr($filepath, strlen($base));
   $filename = $_PREFS->getPref('storage.sitedir').$filepath;
   if (is_file($filename))
   {
