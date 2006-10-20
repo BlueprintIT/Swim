@@ -38,6 +38,9 @@ function importStructure($section, $old, $category)
 		$version = $variant->createNewVersion();
 		$field = $version->getField('name');
 		$field->setValue($details['name']);
+		$version->setComplete(true);
+		$version->makeCurrent();
+		importStructure($section, $details['id'], $item);
 		$items[$details['sortkey']] = $item;
 	}
 
@@ -45,11 +48,28 @@ function importStructure($section, $old, $category)
 	while ($results->valid())
 	{
 		$details = $results->fetch();
-		$id = substr($details['page'], 12);
+		$id = basename($details['page']);
 		if (isset($pagemap[$id]))
 			$items[$details['sortkey']] = $pagemap[$id];
 		else
 			$log->warn('Missing page '.$id);
+	}
+	
+	$results = $OLDSTORAGE->query('SELECT * FROM LinkCategory WHERE category='.$old.';');
+	while ($results->valid())
+	{
+		$details = $results->fetch();
+		$item = Item::createItem($section, FieldSetManager::getClass('link'));
+		$variant = $item->createVariant('default');
+		$version = $variant->createNewVersion();
+		$field = $version->getField('name');
+		$field->setValue($details['name']);
+		$field = $version->getField('link');
+		$field->setValue($details['link']);
+		$version->updateModified();
+		$version->setComplete(true);
+		$version->makeCurrent();
+		$items[$details['sortkey']] = $item;
 	}
 	
 	ksort($items);

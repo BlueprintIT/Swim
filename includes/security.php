@@ -465,46 +465,6 @@ class User
 		$this->log->debug('Permission for '.$permission.' is '.$perm);
 		return $perm;
 	}
-	
-	function canRead($resource)
-	{
-    global $_USER;
-    
-    if ($this === $_USER)
-    {
-      $perm = ObjectCache::getItem('canRead',$resource->getPath());
-      if ($perm !== null)
-        return $perm;
-    }
-		$this->log->debug('Checking canRead');
-  	$perm = $this->getPermission(PERMISSION_READ,$resource)==PERMISSION_ALLOWED;
-
-    if ($this === $_USER)
-      ObjectCache::setItem('canRead', $resource->getPath(), $perm);
-
-    return $perm;
-	}
-	
-	function canWrite($resource)
-	{
-    global $_USER;
-    
-    if ($this === $_USER)
-    {
-      $perm = ObjectCache::getItem('canWrite',$resource->getPath());
-      if ($perm !== null)
-        return $perm;
-    }
-		$this->log->debug('Checking canWrite');
-    $perm = false;
-    if (($resource->isWritable())&&($this->hasPermission('documents',PERMISSION_WRITE)))
-  		$perm = $this->getPermission(PERMISSION_WRITE,$resource)==PERMISSION_ALLOWED;
-
-    if ($this === $_USER)
-      ObjectCache::setItem('canWrite', $resource->getPath(), $perm);
-
-    return $perm;
-	}
 }
 
 class Group

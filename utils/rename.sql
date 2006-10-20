@@ -1,0 +1,12 @@
+RENAME TABLE user TO User;
+RENAME TABLE access TO Access;
+RENAME TABLE useraccess TO UserAccess;
+RENAME TABLE permission TO Permission;
+RENAME TABLE item TO Item;
+RENAME TABLE itemvariant TO ItemVariant;
+RENAME TABLE variantversion TO VariantVersion;
+RENAME TABLE field TO Field;
+RENAME TABLE sequence TO Sequence;
+RENAME TABLE file TO File;
+RENAME TABLE optionset TO OptionSet;
+RENAME TABLE keywords TO Keywords;
