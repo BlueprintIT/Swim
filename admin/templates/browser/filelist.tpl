@@ -44,7 +44,7 @@ function selectRow(row)
 		document.getElementById("preview").src = request.encode();*/
 		document.getElementById("preview").src = row.getAttribute("path");
 		var btn = document.getElementById("okbtn");
-		btn.style.display = null;
+		btn.style.display = 'block';
 		btn = document.getElementById("okbtn-disabled");
 		btn.style.display = 'none';
 	}
