@@ -31,11 +31,31 @@ function method_postback($request)
         $subject = $field->toString();
       }
       $message = '';
-      foreach ($request->getQuery() as $name => $value)
+
+			if ($request->hasQueryVar('mail_subject'))
+			{
+				$subject = $request->getQueryVar('mail_subject');
+				$request->clearQueryVar('mail_subject');
+			}
+			
+      if ($request->hasQueryVar('from_email'))
       {
-        $message .= $name.': '.$value."\n\n";
+      	if ($request->hasQueryVar('from_name'))
+      		$from = $request->getQueryVar('from_name');
+      	else
+      		$from = 'Anonymous';
+      	$from.=' <'.$request->getQueryVar('from_email').'>';
+      	$request->clearQueryVar('from_email');
+      	$request->clearQueryVar('from_name');
+      	$from = str_replace("\n", " ", $from);
+      	$from = str_replace("\r", " ", $from);
       }
-      $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+      else
+	      $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+
+      foreach ($request->getQuery() as $name => $value)
+        $message .= $name.': '.$value."\n\n";
+
       $field = $itemversion->getField('email');
       $email = $field->toString();
       mail($email, $subject, $message, 'From: '.$from."\r\n");
