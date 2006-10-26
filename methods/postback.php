@@ -15,6 +15,8 @@
 
 function method_postback($request)
 {
+	global $_PREFS;
+	
   $log = LoggerManager::getLogger('swim.postback');
   checkSecurity($request, true, true);
   
@@ -53,12 +55,15 @@ function method_postback($request)
       else
 	      $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
 
+			if ($_PREFS->getPref('method.postback.headernewline'))
+				$from.="\r\n";
+				
       foreach ($request->getQuery() as $name => $value)
         $message .= $name.': '.$value."\n\n";
 
       $field = $itemversion->getField('email');
       $email = $field->toString();
-      mail($email, $subject, $message, 'From: '.$from."\r\n");
+      mail($email, $subject, $message, 'From: '.$from);
       
       $request = new Request();
       $request->setMethod('view');
