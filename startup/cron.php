@@ -15,12 +15,58 @@
 
 require('startup.php');
 
+function checkConsistency()
+{
+  global $_STORAGE,$_PREFS;
+  
+  $log = LoggerManager::getLogger('swim.consistency');
+  
+  $sections = SectionManager::getSections();
+  foreach ($sections as $section)
+  {
+    $log->info('Scanning '.$section->getName());
+    $items = $section->getItems();
+    foreach ($items as $item)
+    {
+      $variants = $item->getVariants();
+      foreach ($variants as $variant)
+      {
+        $versions = $variant->getVersions();
+        foreach ($versions as $version)
+        {
+        	$path = $version->getStoragePath();
+          $results = $_STORAGE->query('SELECT * FROM File WHERE itemversion='.$version->getId().';');
+          while ($results->valid())
+          {
+          	$details = $results->fetch();
+          	if (!is_file($path.'/'.$details['file']))
+          		$log->warn('Missing file in '.$item->getId().'/'.$variant->getName().'/'.$version->getVersion());
+          }
+        }
+      }
+    }
+  }
+  
+  $results = $_STORAGE->query('SELECT ItemVariant.id FROM ItemVariant LEFT JOIN Item ON Item.id=ItemVariant.item WHERE ISNULL(Item.id);');
+  while ($results->valid())
+  {
+  	$log->warn('Disconnected variant '.$results->fetchSingle());
+  }
+  
+  $results = $_STORAGE->query('SELECT VariantVersion.id FROM VariantVersion LEFT JOIN ItemVariant ON VariantVersion.itemvariant = ItemVariant.id WHERE ISNULL(ItemVariant.id);');
+  while ($results->valid())
+  {
+  	$log->warn('Disconnected version '.$results->fetchSingle());
+  }
+}
+
 LoggerManager::setLogOutput('',new StdOutLogOutput());
 
 SwimEngine::ensureStarted();
 
 setContentType('text/plain');
 
+checkConsistency();
 SearchEngine::buildIndex();
 
 $hosts = $_PREFS->getPrefBranch('url.host');
