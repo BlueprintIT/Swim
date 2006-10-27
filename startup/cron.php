@@ -40,7 +40,7 @@ function checkConsistency()
           {
           	$details = $results->fetch();
           	if (!is_file($path.'/'.$details['file']))
-          		$log->warn('Missing file in '.$item->getId().'/'.$variant->getName().'/'.$version->getVersion());
+          		$log->warn('Missing file in '.$item->getId().'/'.$variant->getVariant().'/'.$version->getVersion().'/'.$details['file']);
           }
         }
       }
