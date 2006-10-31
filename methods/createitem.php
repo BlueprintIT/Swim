@@ -57,7 +57,7 @@ function method_createitem($request)
             else
             {
               $log->warn('Unable to create version');
-              displayServerError($version);
+              displayServerError($request);
             }
           }
           else

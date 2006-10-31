@@ -47,12 +47,18 @@ function encodeQuery($query)
   return substr($result,1);
 }
 
+function cleanTag($text,$tag)
+{
+  $text = preg_replace("/<".$tag.".*?".$tag.">/si", "", "$text");
+  $text = preg_replace("/<".$tag.".*?>/si", "", "$text");
+  return $text;
+}
+
 function cleanVariable($text)
 {
-  return $text;
-  $text = preg_replace("/<script.*?script>/si", "", "$text");
-  $text = preg_replace("/<script.*>/si", "", "$text");
-  $text = preg_replace("/<\/script>/si", "", "$text");
+	$text = cleanTag($text, 'script');
+	$text = cleanTag($text, 'style');
+	$text = cleanTag($text, 'link');
   return $text;
 }
 
@@ -62,9 +68,9 @@ function buildArray(&$current, $parts, $pos, $value)
   if ($pos == count($parts)-1)
   {
     if (strlen($part) == 0)
-      $current[] = cleanVariable($value);
+      $current[] = $value; //cleanVariable($value);
     else
-      $current[$part] = cleanVariable($value);
+      $current[$part] = $value; //cleanVariable($value);
   }
   else
   {

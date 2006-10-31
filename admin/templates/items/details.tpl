@@ -204,6 +204,23 @@ function moveDown(item, field, link) {
 								</div>
 							{/if}
 						</td>
+						{if $class->getVersioning()=='simple'}
+							<td>
+								{if $itemversion->isCurrent()}
+									<div class="toolbarbutton">
+										<img src="{$CONTENT}/icons/publish-done.gif"/>
+										Published
+									</div>
+								{else}
+									<div class="toolbarbutton">
+										<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true" current="true" nestcurrent="true"}">
+											<img src="{$CONTENT}/icons/complete-grey.gif"/>
+											Publish
+										</a>
+									</div>
+								{/if}
+							</td>
+						{/if}
 						<td class="separator"></td>
 						<td>
 							{if $item !== $section->getRootItem()}

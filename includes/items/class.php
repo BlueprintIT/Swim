@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-define('SWIM_FIELDSET_CACHE_VERSION',2);
+define('SWIM_FIELDSET_CACHE_VERSION',3);
 
 class FieldSet extends XMLSerialized
 {

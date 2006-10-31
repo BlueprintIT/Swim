@@ -37,10 +37,6 @@ function submitForm(form)
 {/literal}</script>
 <div id="mainpane">
 	{html_form tag_name="mainform" method="saveitem" itemversion=$itemversion->getId()}
-		{if $class->getVersioning()=='simple'}
-			<input type="hidden" name="complete" value="true">
-			<input type="hidden" name="current" value="true">
-		{/if}
 		<div class="header">
 			<table class="toolbar">
 				<tr>

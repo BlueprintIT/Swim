@@ -72,6 +72,8 @@ class Sequence extends ClassField
   protected $classes;  
   protected $sortfield;
   protected $relationship = 'aggregation';
+  protected $allowposts = false;
+  protected $postpublished = true;
   
   public function __construct($metadata)
   {
@@ -107,6 +109,19 @@ class Sequence extends ClassField
         default:
           $this->relationship = 'aggregation';
       }
+    }
+    if ($element->hasAttribute('allowpost'))
+    {
+    	switch ($element->getAttribute('allowpost'))
+    	{
+    		case 'true':
+    			$this->allowposts = true;
+    			break;
+    		case 'moderated':
+    			$this->allowposts = true;
+    			$this->postpublished = false;
+    			break;
+    	}
     }
     parent::parseAttributes($element);
   }
@@ -165,6 +180,16 @@ class Sequence extends ClassField
     }
     
     return $this->classes;
+  }
+  
+  public function allowPosts()
+  {
+  	return $this->allowposts;
+  }
+  
+  public function postPublished()
+  {
+  	return $this->postpublished;
   }
   
   public function isSorted()
