@@ -776,16 +776,24 @@ class ItemVersion
     return $this->current;
   }
   
-  public function makeCurrent()
+  public function setCurrent($value)
   {
     global $_STORAGE;
     
-    if ($this->current)
+    if ($this->current == $value)
       return;
       
-    if (($_STORAGE->queryExec('UPDATE VariantVersion SET current=0 WHERE current=1 AND itemvariant="'.$this->variantid.'";'))
-      && ($_STORAGE->queryExec('UPDATE VariantVersion SET current=1, published='.time().' WHERE id='.$this->getId().';')))
-      $this->current = true;
+    if ($value)
+    {
+	    if (($_STORAGE->queryExec('UPDATE VariantVersion SET current=0 WHERE current=1 AND itemvariant="'.$this->variantid.'";'))
+	      && ($_STORAGE->queryExec('UPDATE VariantVersion SET current=1, published='.time().' WHERE id='.$this->getId().';')))
+	      $this->current = true;
+    }
+    else
+    {
+	    if ($_STORAGE->queryExec('UPDATE VariantVersion SET current=0 WHERE id='.$this->getId().';'))
+	    	$this->current = false;
+    }
   }
   
   public function getView()

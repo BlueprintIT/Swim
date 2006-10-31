@@ -343,7 +343,7 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
       		$items[$itemloop->getAttribute('id')] = $version;
       	}
       	$version->setComplete(true);
-      	$version->makeCurrent();
+      	$version->setCurrent(true);
       }
     }
     $itemloop = $itemloop->nextSibling;

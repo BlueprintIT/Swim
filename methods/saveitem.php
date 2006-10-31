@@ -67,7 +67,7 @@ function method_saveitem($request)
         if (isset($query['complete']))
           $itemversion->setComplete($query['complete']=='true');
         if (isset($query['current']))
-          $itemversion->makeCurrent();
+          $itemversion->setCurrent(true);
         redirect($req);
       }
       else

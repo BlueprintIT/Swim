@@ -39,7 +39,7 @@ function importStructure($section, $old, $category)
 		$field = $version->getField('name');
 		$field->setValue($details['name']);
 		$version->setComplete(true);
-		$version->makeCurrent();
+		$version->setCurrent(true);
 		importStructure($section, $details['id'], $item);
 		$items[$details['sortkey']] = $item;
 	}
@@ -68,7 +68,7 @@ function importStructure($section, $old, $category)
 		$field->setValue($details['link']);
 		$version->updateModified();
 		$version->setComplete(true);
-		$version->makeCurrent();
+		$version->setCurrent(true);
 		$items[$details['sortkey']] = $item;
 	}
 	
@@ -225,7 +225,7 @@ function importNamespace($namespace, $section, $basedir)
 			importPage($file, $item, $basedir.'/pages/'.$file);
 			$version = file_get_contents($basedir.'/pages/'.$file.'/version');
 			$current = $item->getVariant("default")->getVersion($version);
-			$current->makeCurrent();
+			$current->setCurrent(true);
 		}
 	}
 	closedir($dir);
