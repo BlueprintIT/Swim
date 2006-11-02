@@ -86,7 +86,7 @@ class SectionWrapper
       case 'root':
       	$iv = $this->section->getRootItem()->getCurrentVersion(Session::getCurrentVariant());
       	if ($iv !== null)
-	        return new ItemWrapper($iv);
+	        return ItemWrapper::getWrapper($iv);
         break;
       case 'name':
       	return $this->section->getName();
@@ -121,6 +121,17 @@ class ItemWrapper
   {
     $this->itemversion = $itemversion;
     $this->log = LoggerManager::getLogger('swim.itemwrapper');
+  }
+  
+  public static function getWrapper($itemversion)
+  {
+    $wrapper = ObjectCache::getItem('itemwrapper', $itemversion->getId());
+    if ($wrapper === null)
+    {
+    	$wrapper = new ItemWrapper($itemversion);
+    	ObjectCache::setItem('itemwrapper', $itemversion->getId(), $wrapper);
+    }
+    return $wrapper;
   }
   
   public function getUrl($extra = '')
@@ -184,7 +195,7 @@ class ItemWrapper
       case 'parent':
         $parents = $this->itemversion->getItem()->getMainParents();
         if (count($parents)>0)
-          return new ItemWrapper($parents[0]);
+          return ItemWrapper::getWrapper($parents[0]);
         return null;
         break;
       case 'parentPath':
@@ -195,7 +206,7 @@ class ItemWrapper
           {
             $itemv = $parents[$i]->getCurrentVersion(Session::getCurrentVariant());
             if ($itemv != null)
-              $parents[$i] = new ItemWrapper($itemv);
+              $parents[$i] = ItemWrapper::getWrapper($itemv);
             else
               $parents[$i] = null;
           }
@@ -217,7 +228,7 @@ class ItemWrapper
             $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
             if ($itemv != null)
             {
-              $wrapped = new ItemWrapper($itemv);
+              $wrapped = ItemWrapper::getWrapper($itemv);
               array_push($result, $wrapped);
             }
           }
@@ -239,7 +250,7 @@ class ItemWrapper
               $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
               if ($itemv != null)
               {
-                $wrapped = new ItemWrapper($itemv);
+                $wrapped = ItemWrapper::getWrapper($itemv);
                 array_push($result, $wrapped);
               }
             }
@@ -284,7 +295,7 @@ function item_wrap($params, &$smarty)
       $item = $item->getCurrentVersion();
     else if (!($item instanceof ItemVersion))
       return "Invalid item specified";
-    $smarty->assign_by_ref($params['var'], new ItemWrapper($item));
+    $smarty->assign_by_ref($params['var'], ItemWrapper::getWrapper($item));
   }
   else
   {

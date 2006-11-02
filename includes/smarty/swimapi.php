@@ -197,7 +197,7 @@ function search_items($params, &$smarty)
     {
       $item = $item->getCurrentVersion(Session::getCurrentVariant());
       if ($item !== null)
-        $rlitems[] = new ItemWrapper($item);
+        $rlitems[] = ItemWrapper::getWrapper($item);
     }
 
     $smarty->assign_by_ref($params['var'], $rlitems);
@@ -276,7 +276,7 @@ function getSubitems($item, $depth, $types, &$items)
         {
           $iv = $subitem->getCurrentVersion(Session::getCurrentVariant());
           if ($iv !== null)
-            $items[$subitem->getId()] = new ItemWrapper($iv);
+            $items[$subitem->getId()] = ItemWrapper::getWrapper($iv);
         }
         if ($depth>0)
           getSubitems($subitem, $depth-1, $types, $items);

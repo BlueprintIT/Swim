@@ -52,7 +52,7 @@ function method_view($request)
     {
 		  $type = determineContentType($template);
 	    $smarty = createSmarty($request, $type);
-	    $smarty->assign_by_ref('item', new ItemWrapper($item));
+	    $smarty->assign_by_ref('item', ItemWrapper::getWrapper($item));
 	    $log->debug('Starting display.');
 	    setContentType($type);
 	    $smarty->display($template, $item->getId());
