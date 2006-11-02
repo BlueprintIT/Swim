@@ -1,6 +1,8 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
 {script method="admin" path="scripts/request.js"}
+{script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
@@ -26,12 +28,7 @@
 {if isset($request.query.reloadtree)}
   window.top.SiteTree.loadTree();
 {/if}
-{literal}
-function submitForm(form)
-{
-  document.forms[form].submit();
-}
-{/literal}</script>
+</script>
 <div id="mainpane">
 	{html_form tag_name="mainform" method="saveitem" item=$item->getId() version=$itemversion->getVersion() itemversion=$itemversion->getId()}
 		<div class="header">
@@ -39,9 +36,16 @@ function submitForm(form)
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
 						</div>
 					</td>
+					{if $class->getVersioning()=='simple'}
+						<td>
+							<div class="toolbarbutton">
+								<a href="javascript:BlueprintIT.forms.submitForm('mainform', 'current', 'true')"><img src="{$CONTENT}/icons/complete-grey.gif"/> Save and Publish</a>
+							</div>
+						</td>
+					{/if}
 					<td>
 						<div class="toolbarbutton">
 							<a href="{encode method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}"><img src="{$CONTENT}/icons/check-grey.gif"/> Cancel</a>

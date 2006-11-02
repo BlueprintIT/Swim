@@ -1,26 +1,17 @@
 {secure users="write" login="true"}
 {include file='includes/frameheader.tpl' title="User management"}
+{script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/validators`$smarty.config.YUI`.js"}
 <div id="mainpane">
 <script>{literal}
-function checkForm(form)
-{
-  if (form.elements['username'].value.length==0)
-  {
-    alert('You must enter a username.');
-    return false;
-  }
-  if (form.elements['password'].value.length==0)
-  {
-    alert('You must enter a password.');
-    return false;
-  }
-  return true;
-}
-
-function submitForm(form)
-{
-  if (checkForm(document.forms[form]))
-    document.forms[form].submit();
+var listener = {
+	onValidationComplete: function(form, result)
+	{
+		if (!result)
+			alert('Please make sure that all mandatory fields are filled out.');
+		return result;
+	}
 }
 {/literal}</script>
 	{html_form tag_name="mainform" method="saveuser" nestcurrent="true"}
@@ -29,7 +20,7 @@ function submitForm(form)
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('mainform')">Create</a>
+							<a href="javascript:BlueprintIT.validation.validateForm('mainform', {ldelim}'username':{ldelim}'allowempty':false{rdelim}, 'password':{ldelim}'allowempty':false{rdelim}{rdelim}, listener)">Create</a>
 						</div>
 					</td>
 					<td>

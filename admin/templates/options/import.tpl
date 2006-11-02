@@ -4,6 +4,7 @@
 {stylesheet href="$SITECONTENT/sitetree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
@@ -16,11 +17,6 @@
 {script href="$SHARED/scripts/sitetree`$smarty.config.YUI`.js"}
 <script>
 {literal}
-function submitForm(form)
-{
-	document.forms[form].submit();
-}
-
 function onTreeItemClick(id)
 {
   var input = document.getElementById("parentitem");
@@ -39,7 +35,7 @@ SiteTree.draggable = false;
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('mainform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Import</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('mainform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Import</a>
 						</div>
 					</td>
 				</tr>

@@ -1,5 +1,7 @@
 {secure documents="read"}
 {include file="includes/singletabbedheader.tpl" title=$title}
+{script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {literal}<script>
 function selectUrl()
 {
@@ -48,11 +50,6 @@ function selectRow(row)
 		btn = document.getElementById("okbtn-disabled");
 		btn.style.display = 'none';
 	}
-}
-
-function submitForm(form)
-{
-  document.forms[form].submit();
 }
 </script>
 <style>
@@ -180,7 +177,7 @@ td.name img {
 					</td>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('uploadform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Upload</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('uploadform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Upload</a>
 						</div>
 					</td>
 					{/html_form}
@@ -192,7 +189,7 @@ td.name img {
 					</td>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('uploadform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Upload</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('uploadform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Upload</a>
 						</div>
 					</td>
 					{/html_form}

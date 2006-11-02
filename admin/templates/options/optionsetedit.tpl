@@ -1,4 +1,6 @@
 {include file='includes/frameheader.tpl' title="Option Set Details"}
+{script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {apiget var="selected" type="optionset" id=$request.query.optionset}
 {assign var="options" value=$selected->getOptions()}
 <script>
@@ -10,11 +12,6 @@ var usename = false;
 {/if}
 var content = "{$CONTENT}";
 {literal}
-function submitForm(form)
-{
-	document.forms[form].submit();
-}
-
 function deleteRow(row)
 {
 	row.parentNode.removeChild(row);
@@ -53,7 +50,7 @@ function createRow()
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
 						</div>
 					</td>
 					<td>

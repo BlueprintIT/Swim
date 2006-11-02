@@ -1,12 +1,8 @@
 {secure users="write" login="true"}
 {include file='includes/frameheader.tpl' title="User management"}
+{script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 <div id="mainpane">
-<script>{literal}
-function submitForm(form)
-{
-  document.forms[form].submit();
-}
-{/literal}</script>
 	{apiget var='selected' type='user' id=$request.query.user}
 	{html_form tag_name="mainform" method="saveuser" username=$selected->getUsername() nestcurrent="true"}
 		<div class="header">
@@ -14,7 +10,7 @@ function submitForm(form)
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:submitForm('mainform')">Save</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('mainform')">Save</a>
 						</div>
 					</td>
 					<td>

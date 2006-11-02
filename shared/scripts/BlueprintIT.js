@@ -3,6 +3,7 @@ var BlueprintIT = {
 	dialog: {},
 	widget: {},
 	timing: {},
+	forms: {},
 	validation: {}
 }
 
