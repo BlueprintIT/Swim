@@ -71,7 +71,9 @@ function create_items($request, $dir, $section, $variant, $sequence)
 			$class = $sequence->getClassForMimetype($type);
 			if ($class !== null)
 			{
-				create_item($dir.'/'.$file, $file, $section, $variant, $sequence, $class);
+				$version = create_item($dir.'/'.$file, $file, $section, $variant, $sequence, $class);
+				$version->setComplete(true);
+				$version->setCurrent(true);
 			}
 		}
 	}
