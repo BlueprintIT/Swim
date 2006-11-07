@@ -37,14 +37,19 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
         $path = $version->getStoragePath();
         if (is_dir($path) || recursiveMkDir($path))
         {
-	        if (move_uploaded_file($file, $path.'/'.$filename))
+        	if (is_uploaded_file($file))
+        		$result = move_uploaded_file($file, $path.'/'.$filename);
+        	else
+        		$result = rename($file, $path.'/'.$filename);
+
+	        if ($result)
 	        {
 		        $field = $version->getField('file');
 		        if ($field != null)
 		          $field->setValue($version->getStorageUrl().'/'.$filename);
 	        }
 	        else
-	        	$log->error('Unable to move uploaded file '.$file.' '.$path.'/'.$filename);
+	        	$log->error('Unable to move file '.$file.' '.$path.'/'.$filename);
         }
         else
         	$log->error('Unable to find or create target directory '.$path);
