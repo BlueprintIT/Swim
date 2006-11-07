@@ -132,7 +132,7 @@ class Section extends AdminSection
   
   public function isSelected($request)
   {
-    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,6)=='items/') && ($request->getQueryVar('section')==$this->id))
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,6)=='items/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->id))
       return true;
     return false;
   }
