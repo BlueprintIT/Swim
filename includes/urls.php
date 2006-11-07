@@ -350,6 +350,12 @@ class Request
   
   public function getQueryVar($var)
   {
+  	if (!isset($this->query[$var]))
+  	{
+  		$this->log->warntrace('Attempt to access unset query var '.$var);
+  		return null;
+  	}
+  
     return $this->query[$var];
   }
   
