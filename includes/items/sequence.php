@@ -158,7 +158,11 @@ class Sequence extends ClassField
           if ($type == '*')
             return $class;
             
-          list($maj,$min) = explode('/', $type);
+          $type = explode('/', $type);
+          $maj = $type[0];
+          if (count($type)>1)
+          	$min = $type[1];
+          	
           if (($maj == $major) && ((!isset($min)) || ($min == $minor)))
             return $class;
         }

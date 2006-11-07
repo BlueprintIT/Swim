@@ -75,7 +75,7 @@ function create_items($request, $dir, $section, $variant, $sequence)
 
 function method_uploaditem($request)
 {
-  global $_USER;
+  global $_USER,$_PREFS;
   
   $log = Loggermanager::getLogger('swim.uploaditem');
   
