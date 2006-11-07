@@ -44,7 +44,7 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
 		          $field->setValue($version->getStorageUrl().'/'.$filename);
 	        }
 	        else
-	        	$log->error('Unable to move uploaded file');
+	        	$log->error('Unable to move uploaded file '.$file.' '.$path.'/'.$filename);
         }
         else
         	$log->error('Unable to find or create target directory '.$path);
