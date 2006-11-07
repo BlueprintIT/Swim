@@ -119,7 +119,7 @@ function method_uploaditem($request)
             }
             else
             {
-            	displayGeneralError($request, 'Unable to extract files from archive.');
+            	displayGeneralError($request, 'Unable to create extraction folder.');
             }
           }
           else if (($type == 'text/xml') && ($_FILES['file']['name'] == 'swimimport.xml'))
