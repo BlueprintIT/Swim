@@ -103,6 +103,11 @@ function method_uploaditem($request)
         $class = $sequence->getClassForMimetype($type);
         if ($class == null)
         {
+          $req = new Request();
+          $req->setMethod('admin');
+          $req->setPath('items/details.tpl');
+          $req->setQueryVar('item', $parent->getId());
+          $req->setQueryVar('reloadtree', 'true');
           if ($type == 'application/zip')
           {
             $cache = $_PREFS->getPref('storage.sitecache').'/uploads';
@@ -123,6 +128,8 @@ function method_uploaditem($request)
             	{
             		displayGeneralError($request, 'Unable to extract files from archive - error '.$return);
             	}
+            	else
+			          redirect($req);
             }
             else
             {
@@ -132,6 +139,7 @@ function method_uploaditem($request)
           else if (($type == 'text/xml') && ($_FILES['file']['name'] == 'swimimport.xml'))
           {
           	import_items($request, $_FILES['file']['tmp_name'], $section, $request->getQueryVar('targetvariant'), $sequence);
+	          redirect($req);
           }
           else
           {
