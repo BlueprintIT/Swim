@@ -151,6 +151,9 @@ class IntegerField extends SimpleField
   {
     if ($b instanceof IntegerField)
       return $this->toString()-$b->toString();
+    if (is_numeric($b))
+    	return $this->toString()-$b;
+    $this->log->errortrace('Unable to compare to value: '.$b);
     return 0;
   }
   
@@ -198,6 +201,9 @@ class TextField extends SimpleField
   {
     if ($b instanceof TextField)
       return strcmp($this->toString(), $b->toString());
+    if (is_string($b))
+    	return strcmp($this->toString(), $b);
+    $this->log->errortrace('Unable to compare to value: '.$b);
     return 0;
   }
   
@@ -274,13 +280,6 @@ class BaseHTMLField extends TextField
 
 class DateField extends IntegerField
 {
-  public function compareTo($b)
-  {
-    if ($b instanceof DateField)
-      return $this->toString()-$b->toString();
-    return 0;
-  }
-  
   public function getEditor(&$request, &$smarty)
   {
     $text = '';

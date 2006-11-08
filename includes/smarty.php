@@ -18,6 +18,68 @@ require $_PREFS->getPref('storage.includes').'/smarty/resources.php';
 require $_PREFS->getPref('storage.includes').'/smarty/swimapi.php';
 require $_PREFS->getPref('storage.includes').'/smarty/wrappers.php';
 
+function array_select($params, &$smarty)
+{
+  if ((!empty($params['var'])) && (!empty($params['from'])) && (!empty($params['field'])))
+  {
+    $source = $params['from'];
+    
+    if (count($source)==0)
+    {
+    	$source = array();
+    	$smarty->assign_by_ref($params['var'], $source);
+    	return;
+    }
+    
+    $order = true;
+    if ((!empty($params['order'])) && ($params['order'] == 'descending'))
+      $order = false;
+      
+    $field = $params['field'];
+      
+    $source = ItemSorter::sortItems($source, $field);
+    
+    $start = 0;
+    $end = count($source);
+    if (!empty($params['min']))
+    {
+    	while ($start<$end)
+    	{
+    		if ($source[$start]->item->getField($field)->compareTo($params['min'])>=0)
+    			break;
+    		$start++;
+    	}
+    }
+    
+    if (!empty($params['max']))
+    {
+    	while ($end>$start)
+    	{
+    		if ($source[$end-1]->item->getField($field)->compareTo($params['max'])<=0)
+    			break;
+    		$end--;
+    	}
+    }
+    
+    if ($end == $start)
+    {
+    	$source = array();
+    	$smarty->assign_by_ref($params['var'], $source);
+    	return;
+    }
+    
+    $source = array_slice($source, $start, $end-$start);
+    
+    if (!$order)
+    	$source = array_reverse($source);
+    	
+   	if (!empty($params['maxcount']))
+   		$source = array_slice($source, 0, $params['maxcount']);
+  
+    $smarty->assign_by_ref($params['var'], $source);
+  }
+}
+
 function sort_array($params, &$smarty)
 {
   if ((!empty($params['var'])) && (!empty($params['from'])))
@@ -190,6 +252,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('encode', 'encode_url');
   $smarty->register_function('apiget', 'api_get');
   $smarty->register_function('sort', 'sort_array');
+  $smarty->register_function('select', 'array_select');
   $smarty->register_function('search', 'search_items');
   $smarty->register_function('subitems', 'fetch_subitems');
   $smarty->register_function('dynamic', 'dynamic_section', false);
