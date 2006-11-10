@@ -29,6 +29,7 @@ class SwimEngine
       $_STATE=STATE_STARTUP;
       // Include various utils
       require_once $_PREFS->getPref('storage.bootstrap').'/includes.php';
+      date_default_timezone_set($_PREFS->getPref('system.timezone'));
     }
   }
   
