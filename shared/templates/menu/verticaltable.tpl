@@ -2,7 +2,7 @@
 	<table class="vertmenu menupopup">
 		{foreach name="itemlist" from=$items item="subitem"}
 			<tr>
-				{if $subitem == $item}
+				{if $subitem === $item}
 					<td class="selected menuitem">
 				{else}
 					<td class="menuitem">
