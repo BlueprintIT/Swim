@@ -358,7 +358,8 @@ function moveDown(item, field, link) {
 								<select name="version" onchange="this.form.submit();">
 									{sort var="versions" order="descending" from=$itemvariant->getVersions()}
 									{foreach from=$versions item="version"}
-										{if $version == $itemversion}
+										{if $version 
+=== $itemversion}
 												<option value="{$version->getVersion()}" selected="true">
 										{else}
 												<option value="{$version->getVersion()}">
@@ -423,7 +424,8 @@ function moveDown(item, field, link) {
 			</div>
 		</div>
 		{foreach name="fieldlist" from=$itemversion->getClassFields() item="field"}
-			{if $field->getType()=='sequence' && $field != $itemversion->getMainSequence()}
+			{if $field->getType()=='sequence' && $field !== 
+$itemversion->getMainSequence()}
 				<div class="section">
 					<div class="sectionheader">
 						<h3>{$field->getName()|escape}</h3>
@@ -433,7 +435,7 @@ function moveDown(item, field, link) {
 							<table class="sequencelist">
 								{foreach name="itemlist" from=$field->getItems() item="subitem"}
 									{assign var="rlitem" value=$subitem->getCurrentVersion($session.variant)}
-									{if $rlitem==null}
+									{if $rlitem===null}
 										{assign var="rlitem" value=$subitem->getNewestVersion($session.variant)}
 									{/if}
 									{assign var="itemclass" value=$rlitem->getClass()}
