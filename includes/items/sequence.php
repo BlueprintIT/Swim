@@ -41,15 +41,15 @@ class ItemSorter
       
     $a = $this->getItemVersion($a);
     $b = $this->getItemVersion($b);
-    if ($a != null)
+    if ($a !== null)
       $a = $a->getField($this->field);
-    if ($b != null)
+    if ($b !== null)
       $b = $b->getField($this->field);
-    if (($b == null) && ($a == null))
+    if (($b === null) && ($a === null))
       $result = 0;
-    else if ($b == null)
+    else if ($b === null)
       $result = -1;
-    else if ($a == null)
+    else if ($a === null)
       $result = 1;
     else
       $result = $a->compareTo($b);

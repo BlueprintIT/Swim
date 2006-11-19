@@ -28,7 +28,7 @@ function method_copyversion($request)
       && ($request->hasQueryVar('targetitem') || $request->hasQueryVar('targetsection')))
     {
       $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
-      if ($itemversion != null)
+      if ($itemversion !== null)
       {
         $item = null;
         if ($request->hasQueryVar('targetitem'))
@@ -36,18 +36,18 @@ function method_copyversion($request)
         else
         {
           $section = Section::getSection($request->getQueryVar('targetsection'));
-          if ($section != null)
+          if ($section !== null)
             $item = Item::createItem($section);
         }
-        if ($item != null)
+        if ($item !== null)
         {
           $variant = $item->createVariant($request->getQueryVar('targetvariant'));
-          if ($variant != null)
+          if ($variant !== null)
           {
             $newversion = $variant->getDraftVersion();
             if ($newversion === null)
               $newversion = $variant->createNewVersion($itemversion);
-            if ($newversion != null)
+            if ($newversion !== null)
             {
               $req = new Request();
               $req->setMethod('admin');

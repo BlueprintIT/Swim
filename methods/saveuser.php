@@ -44,7 +44,7 @@ function method_saveuser($request)
         {
           $user->clearGroups();
           $group = UserManager::getGroup($request->getQueryVar('group'));
-          if ($group != null)
+          if ($group !== null)
             $user->addGroup($group);
         }
         $req = new Request();

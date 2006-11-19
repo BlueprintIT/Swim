@@ -28,7 +28,7 @@ class RowWrapper
     {
       default:
         $field = $this->row->getField($name);
-        if ($field != null)
+        if ($field !== null)
         {
           if ($field->getType() == 'optionset')
           {
@@ -139,7 +139,7 @@ class ItemWrapper
   	global $_PREFS;
   	
     $target = $this->itemversion->getLinkTarget();
-    if ($target == null)
+    if ($target === null)
       $target = $this->itemversion;
     $path = $target->getItem()->getPath();
   	if ($extra !== '')
@@ -205,7 +205,7 @@ class ItemWrapper
           for ($i=0; $i<count($parents); $i++)
           {
             $itemv = $parents[$i]->getCurrentVersion(Session::getCurrentVariant());
-            if ($itemv != null)
+            if ($itemv !== null)
               $parents[$i] = ItemWrapper::getWrapper($itemv);
             else
               $parents[$i] = null;
@@ -226,7 +226,7 @@ class ItemWrapper
           foreach ($items as $item)
           {
             $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
-            if ($itemv != null)
+            if ($itemv !== null)
             {
               $wrapped = ItemWrapper::getWrapper($itemv);
               array_push($result, $wrapped);
@@ -239,7 +239,7 @@ class ItemWrapper
       	break;
       default:
         $field = $this->itemversion->getField($name);
-        if ($field != null)
+        if ($field !== null)
         {
           if ($field->getType() == 'sequence')
           {
@@ -248,7 +248,7 @@ class ItemWrapper
             foreach ($items as $item)
             {
               $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
-              if ($itemv != null)
+              if ($itemv !== null)
               {
                 $wrapped = ItemWrapper::getWrapper($itemv);
                 array_push($result, $wrapped);
@@ -282,7 +282,7 @@ function item_wrap($params, &$smarty)
 {
   if (isset($params['var']))
   {
-    if ((!isset($params['item'])) || ($params['item'] == null))
+    if ((!isset($params['item'])) || ($params['item'] === null))
     {
       $smarty->assign($params['var'], null);
       return;

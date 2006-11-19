@@ -26,7 +26,7 @@ function method_saveitem($request)
     if ($request->hasQueryVar('itemversion'))
     {
       $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
-      if ($itemversion != null)
+      if ($itemversion !== null)
       {
         $req = new Request();
         $req->setMethod('admin');

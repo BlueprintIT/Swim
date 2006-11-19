@@ -107,7 +107,7 @@ class BaseField extends XMLSerialized
   
   public static function getField($el)
   {
-    if (($el != null) && ($el->hasAttribute('type')))
+    if (($el !== null) && ($el->hasAttribute('type')))
     {
       $type = $el->getAttribute('type');
       if ($type == 'text')

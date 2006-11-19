@@ -364,7 +364,7 @@ class OptionField extends IntegerField
     if ($value != -1)
       $option = $optionset->getOption($value);
 
-    if ($option == null)
+    if ($option === null)
     {
       $options = $optionset->getOptions();
       if (count($options)>0)
@@ -385,7 +385,7 @@ class OptionField extends IntegerField
     $optionset = FieldSetManager::getOptionSet($this->id);
     if ($this->value != -1)
       $this->option = $optionset->getOption($this->value);
-    if ($this->option == null)
+    if ($this->option === null)
       $this->setValue($this->value);
   }
   

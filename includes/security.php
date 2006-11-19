@@ -255,7 +255,7 @@ class User
   		$nwgroups=array();
   		foreach ($this->groups as $grp)
   		{
-  			if ($grp!=$group)
+  			if ($grp !== $group)
   			{
   				$newgroups[]=$grp;
   			}
@@ -541,7 +541,7 @@ class UserManager
   public static function getUser($name)
   {
     $user = ObjectCache::getItem('user', $name);
-    if ($user == null)
+    if ($user === null)
     {
       $user = new User($name);
       ObjectCache::setItem('user', $name, $user);
@@ -552,7 +552,7 @@ class UserManager
   public static function getGroup($name)
   {
     $group = ObjectCache::getItem('group', $name);
-    if ($group == null)
+    if ($group === null)
     {
       $group = new Group($name);
       if (!$group->groupExists())

@@ -29,22 +29,22 @@ function method_createitem($request)
     {
       $class = FieldSetManager::getClass($request->getQueryVar('class'));
       $section = SectionManager::getSection($request->getQueryVar('targetsection'));
-      if (($section != null) && ($class != null))
+      if (($section !== null) && ($class !== null))
       {
         $item = Item::createItem($section, $class);
-        if ($item != null)
+        if ($item !== null)
         {
           $variant = $item->createVariant($request->getQueryVar('targetvariant'));
-          if ($variant != null)
+          if ($variant !== null)
           {
             $version = $variant->createNewVersion();
-            if ($version != null)
+            if ($version !== null)
             {
               if ($request->hasQueryVar('parentitem') && $request->hasQueryVar('parentsequence'))
               {
                 $parent = Item::getItem($request->getQueryVar('parentitem'));
                 $sequence = $parent->getSequence($request->getQueryVar('parentsequence'));
-                if ($sequence != null)
+                if ($sequence !== null)
                   $sequence->appendItem($item);
               }
               $req = new Request();

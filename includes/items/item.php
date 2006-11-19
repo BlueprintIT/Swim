@@ -362,7 +362,7 @@ class Item
   {
     global $_STORAGE;
 
-    if (($variant == null) && ($version == null))
+    if (($variant === null) && ($version === null))
     {
       $results = $_STORAGE->query('SELECT item,variant,version FROM ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant WHERE VariantVersion.id='.$id.';');
       if (!$results->valid())
@@ -373,10 +373,10 @@ class Item
       $version = $details['version'];
     }
     $item = Item::getItem($id);
-    if ($item == null)
+    if ($item === null)
       return null;
     $v = $item->getVariant($variant);
-    if ($v == null)
+    if ($v === null)
       return null;
     return $v->getVersion($version);
   }
@@ -590,7 +590,7 @@ class ItemVariant
       $iv = new ItemVersion($details, $this);
       $this->versions[$iv->getVersion()] = $iv;
       
-      if ($clone != null)
+      if ($clone !== null)
       {
         $_STORAGE->queryExec('INSERT INTO Field (itemversion,basefield,pos,field,textValue,intValue,dateValue) ' .
           'SELECT '.$id.',basefield,pos,field,textValue,intValue,dateValue FROM Field WHERE itemversion='.$clone->getId().';');
@@ -608,7 +608,7 @@ class ItemVariant
       $fields = $iv->getFields();
       foreach ($fields as $name => $field)
       {
-        if ($clone == null)
+        if ($clone === null)
           $field->initialise();
         else
         {
@@ -648,7 +648,7 @@ class ItemVersion
     $this->log = LoggerManager::getLogger('swim.itemversion');
     
     $this->id = $details['id'];
-    if ($variant != null)
+    if ($variant !== null)
       $this->variant = $variant;
     $this->variantid = $details['itemvariant'];
     $this->version = $details['version'];
@@ -692,14 +692,14 @@ class ItemVersion
   {
     global $_STORAGE;
     
-    if ($this->variant != null)
+    if ($this->variant !== null)
       return $this->variant;
     $results = $_STORAGE->query('SELECT item,variant FROM ItemVariant WHERE id='.$this->variantid.';');
     if ($results->valid())
     {
       $details = $result->fetch();
       $item = Item::getItem($details['item']);
-      if ($item != null)
+      if ($item !== null)
         $this->variant = $item->getVariant($details['variant']);
     }
     return $this->variant;
@@ -808,7 +808,7 @@ class ItemVersion
     if ($this->complete)
       return;
       
-    if ($this->itemview->getId() == $value->getId())
+    if ($this->itemview === $value)
       return;
       
     if (!$this->getClass()->isValidView($value))
@@ -865,7 +865,7 @@ class ItemVersion
   
   public function getClassFields()
   {
-    if ($this->getClass() == null)
+    if ($this->getClass() === null)
       return array();
     
     $fields = array();
@@ -877,7 +877,7 @@ class ItemVersion
   
   public function getViewFields()
   {
-    if ($this->itemview == null)
+    if ($this->itemview === null)
       return array();
     
     $fields = array();
@@ -919,7 +919,7 @@ class ItemVersion
     if ($this->complete)
       return;
      
-    if ($newtime == null)
+    if ($newtime === null)
 	    $newtime = time();
     if ($_STORAGE->queryExec('UPDATE VariantVersion SET modified='.$newtime.' WHERE id='.$this->getId().';'))
       $this->modified = $newtime;

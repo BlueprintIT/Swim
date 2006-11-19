@@ -23,7 +23,7 @@ function method_postback($request)
   if ($request->hasQueryVar('itemversion'))
   {
     $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
-    if (($itemversion != null) && ($itemversion->hasField('email')))
+    if (($itemversion !== null) && ($itemversion->hasField('email')))
     {
       $request->clearQueryVar('itemversion');
       $subject = 'Email from '.$_SERVER['HTTP_HOST'];

@@ -89,7 +89,7 @@ class Section extends AdminSection
           foreach ($items as $name)
           {
             $class = FieldSetManager::getClass($name);
-            if ($class != null)
+            if ($class !== null)
               $this->classes[$name] = $class; 
           }
         }

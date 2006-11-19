@@ -22,7 +22,7 @@ function method_login($request)
 	$user=UserManager::login($request->getQueryVar('username'),$request->getQueryVar('password'));
 	if ($user!==null)
 	{
-    if ($request->getNested() != null)
+    if ($request->getNested() !== null)
     {
   		redirect($request->getNested());
     }

@@ -18,13 +18,13 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
   $log = Loggermanager::getLogger('swim.uploaditem');
   
   $item = Item::createItem($section, $class);
-  if ($item != null)
+  if ($item !== null)
   {
     $variant = $item->createVariant($variant);
-    if ($variant != null)
+    if ($variant !== null)
     {
       $version = $variant->createNewVersion();
-      if ($version != null)
+      if ($version !== null)
       {
         $pos = strrpos($filename, '.');
         if ($pos === FALSE)
@@ -32,7 +32,7 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
         else
           $name = substr($filename, 0, $pos);
         $field = $version->getField('name');
-        if ($field != null)
+        if ($field !== null)
           $field->setValue($name);
         $path = $version->getStoragePath();
         if (is_dir($path) || recursiveMkDir($path))
@@ -45,7 +45,7 @@ function create_item($file, $filename, $section, $variant, $sequence, $class)
 	        if ($result)
 	        {
 		        $field = $version->getField('file');
-		        if ($field != null)
+		        if ($field !== null)
 		          $field->setValue($version->getStorageUrl().'/'.$filename);
 	        }
 	        else
@@ -97,7 +97,7 @@ function method_uploaditem($request)
       $parent = Item::getItem($request->getQueryVar('parentitem'));
       $sequence = $parent->getSequence($request->getQueryVar('parentsequence'));
       $section = SectionManager::getSection($request->getQueryVar('targetsection'));
-      if ($sequence != null && $section != null)
+      if ($sequence !== null && $section !== null)
       {
         $type = determineContentType($_FILES['file']['tmp_name'], $_FILES['file']['name']);
         $class = $sequence->getClassForMimetype($type);
