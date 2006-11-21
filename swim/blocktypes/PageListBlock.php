@@ -50,7 +50,7 @@ class PageListBlock extends Block
   		if ($item instanceof Category)
   			$this->findPages($item, $depth-1, $pages, $seen);
   			
-  		if (($item instanceof Page) && (!in_array($item,$seen)))
+  		if (($item instanceof Page) && (!in_array($item,$seen,true)))
   		{
   			array_push($seen,$item);
   			if (isset($this->sort))
