@@ -263,7 +263,7 @@ class ItemClass extends FieldSet
       return ((!isset($this->views)) || (count($this->views)==0));
     
     if (isset($this->views))
-      return in_array($view, $this->views);
+      return in_array($view, $this->views, true);
     return false;
   }
   
