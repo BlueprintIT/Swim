@@ -214,8 +214,9 @@ function displayCalendar(id, value)
 {
 	var date = new Date(value*1000);
 	var datestr = (date.getMonth()+1)+"/"+date.getDate()+"/"+date.getFullYear();
-	var calendar = new YAHOO.widget.Calendar("cal_"+id, "calendar_"+id, "", datestr);
-	calendar.onSelect = function() { selectDate(calendar, id) };
+	var monthstr = (date.getMonth()+1)+"/"+date.getFullYear();
+	var calendar = new YAHOO.widget.Calendar("cal_"+id, "calendar_"+id, { pagedate: monthstr, selected: datestr } );
+	calendar.selectEvent.subscribe(function() { selectDate(calendar, id) }, calendar, true);
 	calendar.render();
 	return calendar;
 }
