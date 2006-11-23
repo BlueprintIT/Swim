@@ -19,39 +19,40 @@ function displayTreeItem($item, $variant)
 	
 	$results = $_STORAGE->query('SELECT VariantVersion.current AS published,Field.textValue AS name FROM (ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant) LEFT JOIN Field ON VariantVersion.id=Field.itemversion WHERE ItemVariant.item='.$item->getId().' AND ItemVariant.variant="default" AND Field.field="name" ORDER BY VariantVersion.current DESC, VariantVersion.version DESC;');
 	if ($results->valid())
-	{
 		$details = $results->fetch();
-		if ($details['published']==1)
-			$published = 'true';
-		else
-			$published = 'false';
-		$name = $details['name'];
+	else
+		$details = array('name' => '', 'published' => '0');
+		
+	if ($details['published']==1)
+		$published = 'true';
+	else
+		$published = 'false';
+	$name = $details['name'];
 
-		print "{ \"id\": \"".$item->getId()."\", \"class\": \"".$item->getClass()->getId()."\", \"published\": \"".$published."\", \"name\": \"".addslashes($name)."\"";
-		$sequence = $item->getMainSequence();
-		if ($sequence !== null)
+	print "{ \"id\": \"".$item->getId()."\", \"class\": \"".$item->getClass()->getId()."\", \"published\": \"".$published."\", \"name\": \"".addslashes($name)."\"";
+	$sequence = $item->getMainSequence();
+	if ($sequence !== null)
+	{
+		$contents = ", \"contains\": \"";
+		foreach ($sequence->getVisibleClasses() as $class)
 		{
-			$contents = ", \"contains\": \"";
-			foreach ($sequence->getVisibleClasses() as $class)
-			{
-				$contents .= $class->getId().",";
-			}
-			$contents = substr($contents,0,-1);
-			print $contents."\", \"subitems\": [";
-			$i = 0;
-			$items = $sequence->getItems();
-			foreach ($items as $subitem)
-			{
-				$i++;
-				displayTreeItem($subitem,$variant);
-				if ($i<count($items))
-					print ", ";
-			}
-			print "]}";
+			$contents .= $class->getId().",";
 		}
-		else
-			print ", \"contains\": \"\", \"subitems\": []}";
+		$contents = substr($contents,0,-1);
+		print $contents."\", \"subitems\": [";
+		$i = 0;
+		$items = $sequence->getItems();
+		foreach ($items as $subitem)
+		{
+			$i++;
+			displayTreeItem($subitem,$variant);
+			if ($i<count($items))
+				print ", ";
+		}
+		print "]}";
 	}
+	else
+		print ", \"contains\": \"\", \"subitems\": []}";
 }
 
 function displayUncategorised($section, $variant)
