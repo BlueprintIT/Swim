@@ -128,10 +128,14 @@ if ($output !== FALSE)
 	fclose($output);
 }
 
-$backupfile = $_PREFS->getPref('storage.backup').'/'.$_PREFS->getPref('url.host.1.hostname').'-';
-$backupfile .= date('Ymd-Hi');
-$backupfile .= '.tar.bz';
-system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.site').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));
-system($_PREFS->getPref('tools.tar').' -cjf '.$backupfile.' -C '.$_PREFS->getPref('storage.site').' database.sql files');
-unlink($_PREFS->getPref('storage.site').'/database.sql');
+if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))
+{
+	$backupfile = $_PREFS->getPref('storage.backup').'/'.$_PREFS->getPref('url.host.1.hostname').'-';
+	$backupfile .= date('Ymd-Hi');
+	$backupfile .= '.tar.bz';
+	system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.site').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));
+	system($_PREFS->getPref('tools.tar').' -cjf '.$backupfile.' -C '.$_PREFS->getPref('storage.site').' database.sql files');
+	unlink($_PREFS->getPref('storage.site').'/database.sql');
+}
+
 ?>
