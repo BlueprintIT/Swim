@@ -137,5 +137,10 @@ if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->ge
 	system($_PREFS->getPref('tools.tar').' -cjf '.$backupfile.' -C '.$_PREFS->getPref('storage.site').' database.sql files');
 	unlink($_PREFS->getPref('storage.site').'/database.sql');
 }
+else
+{
+	$log = Loggermanager::getLogger('swim.backup');
+	$log->error('Unable to backup since tools are unavailable.');
+}
 
 ?>
