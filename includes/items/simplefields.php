@@ -475,6 +475,7 @@ class ItemField extends IntegerField
 class FileField extends TextField
 {
   private $filetype;
+  private $filename;
   
   protected function parseAttributes($element)
   {
@@ -492,13 +493,31 @@ class FileField extends TextField
   {
   	global $_PREFS;
 
+    if ($this->retrieved)
+      return;
+      
     parent::retrieve();
     if (substr($this->value,0,7)=='global:')
+    {
     	$this->value = $_PREFS->getPref('url.site.attachments').'/'.substr($this->value,7);
+    	$this->filename = $_PREFS->getPref('storage.site.attachments').'/'.substr($this->value,7);
+    }
     else if (substr($this->value,0,5)=='item:')
+    {
     	$this->value = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,5);
+    	$this->filename = $this->itemversion->getItem()->getStoragePath().'/'.substr($this->value,5);
+    }
     else if (substr($this->value,0,8)=='version:')
+   	{
     	$this->value = $this->itemversion->getStorageUrl().'/'.substr($this->value,8);
+    	$this->filename = $this->itemversion->getStoragePath().'/'.substr($this->value,8);
+   	}
+  }
+  
+  public function getFilename()
+  {
+  	$this->retrieve();
+  	return $this->filename;
   }
   
   public function setValue($value)

@@ -112,6 +112,47 @@ class SectionManagerWrapper
 	}
 }
 
+class FileWrapper
+{
+	private $field;
+	
+	public function __construct($field)
+	{
+		$this->field = $field;
+	}
+	
+	public function __get($name)
+	{
+    switch($name)
+    {
+    	case 'url':
+    		return $this->field->toString();
+    		break;
+    	case 'file':
+    		return $this->field->getFilename();
+    		break;
+    	case 'width':
+    		$size = @getimagesize($this->field->getFilename());
+    		if ($size !== FALSE)
+    			return $size[0];
+    		return 0;
+    		break;
+    	case 'height':
+    		$size = @getimagesize($this->field->getFilename());
+    		if ($size !== FALSE)
+    			return $size[1];
+    		return 0;
+    		break;
+    }
+    return null;
+	}
+	
+	public function __toString()
+	{
+		return $this->field->toString();
+	}
+}
+
 class ItemWrapper
 {
   private $itemversion;
@@ -269,6 +310,10 @@ class ItemWrapper
           {
             $option = $field->getOption();
             return new OptionWrapper($option);
+          }
+          else if ($field->getType() == 'file')
+          {
+          	return new FileWrapper($field);
           }
           else
             return $field->toString();
