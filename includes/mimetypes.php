@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * COde for handling mime types
+ * Code for handling mime types
  *
  * Copyright Blueprint IT Ltd. 2006
  *
