@@ -32,6 +32,8 @@ class Item
     $this->id = $details['id'];
     $this->section = $details['section'];
     $this->itemclass = FieldSetManager::getClass($details['class']);
+    if ($this->itemclass === null)
+    	$this->log->warn('Item '.$this->id.' has an invalid class - '.$details['class']);
     if (($details['path']===false)||($details['path']==''))
     	$this->path = null;
     else
@@ -654,7 +656,10 @@ class ItemVersion
     $this->version = $details['version'];
     $this->itemview = FieldSetManager::getView($details['view']);
     if ($this->itemview === null)
+    {
+    	$this->log->warn('Unknown view for itemversion '.$this->id.' - '.$details['view']);
       $this->itemview = $this->getClass()->getDefaultView();
+    }
     $this->modified = $details['modified'];
     $this->published = $details['published'];
     $this->owner = $details['owner'];
