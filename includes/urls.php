@@ -96,7 +96,7 @@ function extractVariable(&$array,$name,$value)
 {
   $name = str_replace('].', '.', $name);
   $name = str_replace('][', '.', $name);
-  $name = str_replace(']', '.', $name);
+  $name = str_replace(']', '', $name);
   $name = str_replace('[', '.', $name);
   
   $parts = explode('.', $name);
