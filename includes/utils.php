@@ -192,6 +192,7 @@ function displayGeneralError($request,$message)
   
 	$log = LoggerManager::getLogger('swim');
 	$log->errorTrace('General Error - '.$message);
+	setNoCache();
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
   $smarty = createSmarty($request);
   $smarty->assign('message', $message);
@@ -202,6 +203,7 @@ function displayNotFound($request)
 {
 	global $_PREFS;
 
+	setNoCache();
  	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
   $smarty = createSmarty($request);
   $smarty->display($_PREFS->getPref('errors.notfound.template'));
@@ -213,18 +215,20 @@ function displayServerError($request)
 
 	$log = LoggerManager::getLogger('swim');
 	$log->errorTrace('Server Error');
+	setNoCache();
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
   $smarty = createSmarty($request);
   $smarty->display($_PREFS->getPref('errors.server.template'));
 }
 
-function setDefaultCache()
+function setNoCache()
 {
-	header('Cache-Control: must-revalidate');
-	header('Pragma:');
+	header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+	header('Pragma: no-cache');
+	header('Expires: '.httpdate(time()-3600));
 }
 
-function setValidTime($minutes)
+function setCacheTime($minutes)
 {
 	header('Cache-Control: max-age='.($minutes*60).', public');
 	header('Pragma: cache');
@@ -235,6 +239,7 @@ function setCacheInfo($date,$etag=false)
 {
 	$log=LoggerManager::getLogger('swim.cache');
 
+	header('Cache-Control: must-revalidate');
 	if ($date!=false)
 		header('Last-Modified: '.httpdate($date));
 	if ($etag!==false)

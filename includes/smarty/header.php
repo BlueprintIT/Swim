@@ -53,18 +53,28 @@ class HtmlHeader
   public function getHtml()
   {
     $result = '';
-    if (count($this->stylesheets)>0)
+    if (false)
     {
-    	$stylereq = new Request();
-    	$stylereq->setMethod('combine');
-    	$paths = array();
+	    if (count($this->stylesheets)>0)
+	    {
+	    	$stylereq = new Request();
+	    	$stylereq->setMethod('combine');
+	    	$paths = array();
+		    foreach ($this->stylesheets as $path => $val)
+		    {
+		    	array_push($paths, $path);
+		    }
+		    $stylereq->setQueryVar('type', 'text/css');
+		    $stylereq->setQueryVar('paths', $paths);
+	      $result.='<link rel="stylesheet" href="'.$stylereq->encode().'" type="text/css">'."\n";
+	    }
+    }
+    else
+    {
 	    foreach ($this->stylesheets as $path => $val)
 	    {
-	    	array_push($paths, $path);
+	      $result.='<link rel="stylesheet" href="'.$path.'" type="text/css">'."\n";
 	    }
-	    $stylereq->setQueryVar('type', 'text/css');
-	    $stylereq->setQueryVar('paths', $paths);
-      $result.='<link rel="stylesheet" href="'.$stylereq->encode().'" type="text/css">'."\n";
     }
     foreach ($this->scripts as $path => $val)
     {

@@ -138,6 +138,8 @@ function method_tree($request)
   $log = LoggerManager::getLogger('swim.method.tree');
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   setContentType("text/plain");
 	if ($request->hasQueryVar('root'))
 	{

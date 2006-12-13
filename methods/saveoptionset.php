@@ -20,6 +20,8 @@ function method_saveoptionset($request)
   
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if ($_USER->isLoggedIn())
   {
     if ($request->hasQueryVar('optionset'))

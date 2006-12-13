@@ -34,6 +34,15 @@ function method_admin($request)
     	return;
     }
     setContentType($type);
+		switch ($type)
+		{
+			case 'text/css':
+			case 'text/javascript':
+	  		setCacheInfo(filemtime($path));
+				break;
+			default:
+				setNoCache();
+		}
     if (isTemplateFile($path))
     {
       $smarty = createAdminSmarty($request, $type);

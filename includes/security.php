@@ -620,6 +620,7 @@ class UserManager
 
 // Start up the session
 session_name('SwimSession');
+session_cache_limiter('none');
 @session_start();
 
 

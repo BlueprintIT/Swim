@@ -27,6 +27,40 @@ function method_combine($request)
   	{
   		$type = $request->getQueryVar('type');
 	    setContentType($type);
+	    $newest = 0;
+  		foreach ($paths as $path)
+  		{
+  			if (is_file($_PREFS->getPref('storage.sitedir').$path))
+  			{
+		    	$newest = max($newest, filemtime($_PREFS->getPref('storage.sitedir').$path));
+  			}
+  			else
+  			{
+	  			if (strpos($path, '?') !== false)
+	  			{
+	  				$query = decodeQuery(substr($path, strpos($path, '?')+1));
+	  				$path = substr($path, 0, strpos($path, '?'));
+	  			}
+	  			else
+	  				$query = array();
+	
+	  			$subreq = Request::decode($path, $query, $request->getProtocol());
+				  
+				  $path = $_PREFS->getPref('storage.site.templates').'/'.$subreq->getPath();
+				  $path = findDisplayableFile($path);
+				  if ($path != null)
+			    	$newest = max($newest, filemtime($path));
+  			}
+  		}
+			switch ($type)
+			{
+				case 'text/css':
+				case 'text/javascript':
+		  		setCacheInfo($newest);
+					break;
+				default:
+					setNoCache();
+			}
   		foreach ($paths as $path)
   		{
   			switch ($type)
@@ -50,7 +84,15 @@ function method_combine($request)
 	
 	  			$subreq = Request::decode($path, $query, $request->getProtocol());
 				  
-				  $path = $_PREFS->getPref('storage.site.templates').'/'.$subreq->getPath();
+				  switch ($subreq->getMethod())
+				  {
+				  	case 'admin':
+				  		$base = $_PREFS->getPref('storage.admin.templates');
+				  		break;
+				  	default:
+				  		$base = $_PREFS->getPref('storage.site.templates');
+				  }
+				  $path = $base.'/'.$subreq->getPath();
 				  $path = findDisplayableFile($path);
 				  if ($path != null)
 				  {

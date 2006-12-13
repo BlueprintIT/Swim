@@ -20,6 +20,8 @@ function method_view($request)
   $log = LoggerManager::getLogger('swim.method.view');
   checkSecurity($request, false, false);
   
+  setNoCache();
+  
   $pos = strpos($request->getPath(), '/');
   if ($pos === false)
   {

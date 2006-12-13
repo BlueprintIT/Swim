@@ -26,11 +26,15 @@ function method_layout($request)
   {
     $type = determineContentType($path);
     setContentType($type);
-		/*if (($type == 'text/css') || ($type == 'text/javascript'))
+		switch ($type)
 		{
-			setValidTime(60);
-			setCacheInfo(filemtime($path));
-		}*/
+			case 'text/css':
+			case 'text/javascript':
+	  		setCacheInfo(filemtime($path));
+				break;
+			default:
+				setNoCache();
+		}
     if (isTemplateFile($path))
     {
       $smarty = createSmarty($request, $type);

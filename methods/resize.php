@@ -26,8 +26,6 @@ function method_resize($request)
   $filename = $_PREFS->getPref('storage.sitedir').$filepath;
   if (is_file($filename))
   {
-  	setDefaultCache();
-  	
   	$mimetype = determineContentType($filename);
   	if ($request->hasQueryVar('cache'))
   	{

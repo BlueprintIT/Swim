@@ -20,6 +20,8 @@ function method_postback($request)
   $log = LoggerManager::getLogger('swim.postback');
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if ($request->hasQueryVar('itemversion'))
   {
     $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));

@@ -22,6 +22,8 @@ function method_deletefile($request)
   
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('itemversion'))

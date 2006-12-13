@@ -21,6 +21,8 @@ function method_saveitem($request)
   $log = LoggerManager::getLogger('swim.saveitem');
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('itemversion'))

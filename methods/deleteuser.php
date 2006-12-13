@@ -20,6 +20,8 @@ function method_deleteuser($request)
   
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_DELETE)))
   {
     $user = UserManager::getUser($request->getQueryVar('user'));

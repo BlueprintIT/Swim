@@ -22,6 +22,8 @@ function method_copyversion($request)
   
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('itemversion') && $request->hasQueryVar('targetvariant') 

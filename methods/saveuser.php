@@ -20,6 +20,8 @@ function method_saveuser($request)
   
   checkSecurity($request, true, true);
   
+  setNoCache();
+  
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_WRITE)))
   {
     if (!$request->hasQueryVar('cancel'))
