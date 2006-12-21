@@ -40,7 +40,7 @@ tinyMCEparams = {
 	                                 + "cut,copy,paste,pastetext,pasteword,separator,"
 	                                 + "print,separator,"
 	                                 + "link,unlink,separator,"
-	                                 + "image,table,charmap,endtoolbar",
+	                                 + "image,charmap,separator,tablecontrols,endtoolbar",
 	theme_advanced_container_toolbar2: "bold,italic,underline,strikethrough,separator,"
 	                                 + "sub,sup,separator,"
 	                                 + "bullist,numlist,separator,"
