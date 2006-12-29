@@ -116,6 +116,24 @@ function sort_array($params, &$smarty)
   }
 }
 
+function paginate($params, &$smarty)
+{
+	if ((!empty($params['items'])) && (!empty($params['max'])))
+	{
+		$pages = ceil(count($params['items'])/$params['max']);
+		if (!empty($params['selected']))
+			$page = min($pages,$params['selected']);
+		else
+			$page = 1;
+		if (!empty($params['pages']))
+			$smarty->assign($params['pages'], $pages);
+		if (!empty($params['start']))
+			$smarty->assign($params['start'], ($page-1)*$params['max']);
+		if (!empty($params['page']))
+			$smarty->assign($params['page'], $page);
+	}
+}
+
 function dynamic_section($params, $content, &$smarty, &$repeat)
 {
   if (!$repeat)
@@ -256,6 +274,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('search', 'search_items');
   $smarty->register_function('subitems', 'fetch_subitems');
   $smarty->register_function('dynamic', 'dynamic_section', false);
+  $smarty->register_function('paginate', 'paginate');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_object('HEAD', new HtmlHeader());

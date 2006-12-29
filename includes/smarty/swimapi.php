@@ -278,7 +278,7 @@ function getSubitems($item, $depth, $types, &$items)
           if ($iv !== null)
             $items[$subitem->getId()] = ItemWrapper::getWrapper($iv);
         }
-        if ($depth>0)
+        if ($depth!=0)
           getSubitems($subitem, $depth-1, $types, $items);
       }
     }

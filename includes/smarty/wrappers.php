@@ -316,7 +316,10 @@ class ItemWrapper
           }
           else if ($field->getType() == 'file')
           {
-          	return new FileWrapper($field);
+          	if ($field->toString())
+	          	return new FileWrapper($field);
+	          else
+	          	return null;
           }
           else
             return $field->toString();
