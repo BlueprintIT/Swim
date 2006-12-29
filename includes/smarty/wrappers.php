@@ -215,6 +215,9 @@ class ItemWrapper
       case 'published':
         return $this->itemversion->getPublished();
         break;
+      case 'id':
+        return $this->itemversion->getItem()->getId();
+        break;
       case 'item':
         return $this->itemversion;
         break;

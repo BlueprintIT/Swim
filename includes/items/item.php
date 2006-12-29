@@ -832,6 +832,38 @@ class ItemVersion
     return $this->getItem()->getClass();
   }
   
+  public function getTemplate($extra = null)
+  {
+  	global $_PREFS;
+  	
+  	$dir = $_PREFS->getPref('storage.site.templates').'/classes/';
+		$view = $this->itemview->getId();
+
+		$cls = $this->getItem()->getClass();
+		while ($cls !== null)
+		{
+			$class = $cls->getId();
+
+			$paths = array();
+			if ($extra !== null)
+				array_push($paths, $dir.$class.'/'.$view.'/'.$extra);
+			array_push($paths, $dir.$class.'/'.$view);
+			if ($extra !== null)
+				array_push($paths, $dir.$class.'/'.$extra);
+			array_push($paths, $dir.$class);
+			
+			foreach ($paths as $path)
+			{
+				$file = findDisplayableFile($path);
+				if ($file !== null)
+					return $file;
+			}
+			
+			$cls = $cls->getParent();
+		}
+    return null;
+  }
+  
   public function getLinkTarget()
   {
     if ($this->getClass() === null)

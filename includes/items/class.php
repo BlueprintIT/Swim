@@ -58,6 +58,11 @@ class FieldSet extends XMLSerialized
     return $this->description;
   }
   
+  public function getParent()
+  {
+    return $this->parent;
+  }
+  
   public function getFieldType($name)
   {
     if (isset($this->fields[$name]))
@@ -199,32 +204,6 @@ class ItemClass extends FieldSet
       return $this->parent->allowsLink();
     
     return true;
-  }
-  
-  public function getTemplate($extra = null)
-  {
-  	global $_PREFS;
-  	
-  	$dir = $_PREFS->getPref('storage.site.templates').'/classes/';
-
-  	if (is_dir($dir.$this->id))
-  	{
-  		if ($extra !== null)
-	  		$file = findDisplayableFile($dir.$this->id.'/'.$extra);
-	  	else
-	  		$file = findDisplayableFile($dir.$this->id);
-	  	
-  		if ($file !== null)
-  			return $file;
-  	}
-
-  	if (is_file($dir.$this->id.'.tpl'))
-  		return $dir.$this->id.'.tpl';
-
-  	if ($this->parent !== null)
-  		return $this->parent->getTemplate($extra);
-
-    return null;
   }
   
   public function getDefaultView()
