@@ -304,7 +304,7 @@ function fetch_subitems($params, &$smarty)
 
     $items = array();
     getSubitems($item, $depth, $types, $items);
-    $smarty->assign_by_ref($params['var'], $items);
+    $smarty->assign_by_ref($params['var'], array_values($items));
   }
 }
 
