@@ -321,6 +321,15 @@ class ItemWrapper
 	          else
 	          	return null;
           }
+          else if ($field->getType() == 'item')
+          {
+          	$item = $field->getItem();
+          	if ($item)
+          		$item = $item->getCurrentVersion(Session::getCurrentVariant());
+          	if ($item)
+          		return new ItemWrapper($item);
+          	return null;
+          }
           else
             return $field->toString();
         }

@@ -27,12 +27,12 @@ displayAllSections(Session::getCurrentVariant());{/php};
 var sitedata = null;
 {/if}
 {literal}
-function selectUrl(url)
+function selectItem()
 {
 	var request = new Request();
 	request.setMethod("view");
 	request.setPath(SiteTree.selected);
-	window.parent.setUrl(request.encode());
+	window.parent.setItem(request.encode(), SiteTree.selected, SiteTree.items[SiteTree.selected][0].data.label);
 	window.parent.close();
 }
 
@@ -89,7 +89,7 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree'}', 'catego
 						<img src="{$CONTENT}/icons/check-grey.gif"/> Save
 					</div>
 					<div id="okbtn" class="toolbarbutton" style="width: auto; display: none">
-						<a href="javascript:selectUrl()"><img src="{$CONTENT}/icons/check-grey.gif"/> Save</a>
+						<a href="javascript:selectItem()"><img src="{$CONTENT}/icons/check-grey.gif"/> Save</a>
 					</div>
 				</td>
 				<td>

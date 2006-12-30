@@ -221,6 +221,29 @@ function displayCalendar(id, value)
 	return calendar;
 }
 
+// Itembrowser specific code
+
+function showItemBrowser(id, url) {
+	window.SetItem = function(item, name) { itemBrowserSetItem(id, item, name); };
+  window.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0');
+}
+
+function itemBrowserSetItem(id, item, name) {
+	var field = document.getElementById(id);
+	field.value = item;
+	
+	var fake = document.getElementById("ibfake-"+id);
+	fake.value = name;
+}
+
+function clearItemBrowser(id) {
+	var field = document.getElementById(id);
+	field.value = "-1";
+	
+	var fake = document.getElementById("ibfake-"+id);
+	fake.value = "[Nothing selected]";
+}
+
 // Filebrowser specific code
 
 function showFileBrowser(id, url) {

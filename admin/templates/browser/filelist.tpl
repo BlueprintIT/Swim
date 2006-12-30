@@ -3,7 +3,7 @@
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {literal}<script>
-function selectUrl()
+function selectItem()
 {
 	var table = document.getElementById("files");
 	var node = table.firstChild;
@@ -11,7 +11,7 @@ function selectUrl()
 	{
 		if ((node.nodeType == 1) && (node.className == "selected"))
 		{
-			window.parent.setUrl(node.getAttribute("path"));
+			window.parent.setItem(node.getAttribute("path"), node.getAttribute("path"), node.getAttribute("name"));
 			window.parent.close();
 			break;
 		}
@@ -216,7 +216,7 @@ td.name img {
 				</thead>
 				<tbody id="files">
 					{foreach from=$files item="file"}
-						<tr path="{$file.path}" onclick="selectRow(this)">
+						<tr path="{$file.path}" name="{$file.name}" description="{$file.description}" onclick="selectRow(this)">
 							<td class="name">{$file.name}</td>
 							<td class="description">{$file.description}</td>
 							<td class="type">{$file.type}</td>

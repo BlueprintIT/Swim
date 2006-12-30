@@ -430,7 +430,7 @@ class ItemField extends IntegerField
   {
     $this->retrieve();
     
-    return $this->item();
+    return $this->item;
   }
   
   public function toString()
@@ -442,6 +442,21 @@ class ItemField extends IntegerField
       return -1;
   }
   
+  public function output(&$request, &$smarty)
+  {
+  	$this->retrieve();
+    if ($this->item !== null)
+    {
+    	$item = $this->item->getCurrentVersion(Session::getCurrentVariant());
+    	if ($item !== null)
+    		return $item->getField('name')->toString();
+    	else
+    		return 'Unpublished item';
+    }
+    else
+      return '';
+  }
+  
   public function getEditor(&$request, &$smarty)
   {
     $this->retrieve();
@@ -450,23 +465,29 @@ class ItemField extends IntegerField
     $request->setMethod('admin');
     $request->setPath('browser/filebrowser.tpl');
     $request->setQueryVar('type', 'item');
+    $request->setQueryVar('api', 'itemfield');
 
     $value = $this->getPassedValue($request);
     if ($value>=0)
     {
-      $rlvalue = $value;
+      $rlvalue = 'Unpublished item';
+    	$item = Item::getItem($value);
+    	if ($item !== null)
+	    	$item = $this->item->getCurrentVersion(Session::getCurrentVariant());
+    	if ($item !== null)
+    		$rlvalue = $item->getField('name')->toString();
     }
     else
       $rlvalue = '[Nothing selected]';
 
 		$result = '<input id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" type="hidden" value="'.$value.'"> ';
 
-    $result.='<input id="fbfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
+    $result.='<input id="ibfake-'.$this->getFieldId().'" disabled="true" type="text" value="'.$rlvalue.'"> ';
     $result.='<div class="toolbarbutton">';
-    $result.='<a href="javascript:showFileBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
+    $result.='<a href="javascript:showItemBrowser(\''.$this->getFieldId().'\',\''.$request->encode().'\')">Select...</a>';
     $result.='</div> ';
     $result.='<div class="toolbarbutton">';
-    $result.='<a href="javascript:clearFileBrowser(\''.$this->getFieldId().'\')">Clear</a>';
+    $result.='<a href="javascript:clearItemBrowser(\''.$this->getFieldId().'\')">Clear</a>';
     $result.='</div> ';
     return $result;
   }

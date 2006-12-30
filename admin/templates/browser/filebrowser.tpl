@@ -6,7 +6,7 @@
 <script type="text/javascript">
 {if (($request.query.api=='fckeditor') || ($request.query.api=='filefield'))}
 {literal}
-function setUrl(url)
+function setItem(url, path, name)
 {
 	window.opener.SetUrl(url);
 }
@@ -14,12 +14,18 @@ function setUrl(url)
 {elseif $request.query.api=='tinymce'}
 var field = "{$request.query.field}";
 {literal}
-function setUrl(url)
+function setItem(url, path, name)
 {
 	window.opener.document.forms[0].elements[field].value = url;
 }
 {/literal}
-{elseif $request.query.api=='filefield'}
+{elseif $request.query.api=='itemfield'}
+{literal}
+function setItem(url, path, name)
+{
+	window.opener.SetItem(path, name);
+}
+{/literal}
 {/if}
 </script>
 	</head>
