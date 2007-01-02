@@ -160,7 +160,7 @@ td.name img {
 						<img src="{$CONTENT}/icons/check-grey.gif"/> Save
 					</div>
 					<div id="okbtn" class="toolbarbutton" style="display: none">
-						<a href="javascript:selectUrl()"><img src="{$CONTENT}/icons/check-grey.gif"/> Save</a>
+						<a href="javascript:selectItem()"><img src="{$CONTENT}/icons/check-grey.gif"/> Save</a>
 					</div>
 				</td>
 				<td>
