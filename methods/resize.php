@@ -5,7 +5,7 @@
  *
  * Image resizing method
  *
- * Copyright Blueprint IT Ltd. 2006
+ * Copyright Blueprint IT Ltd. 2007
  *
  * $HeadURL$
  * $LastChangedBy$

@@ -5,7 +5,7 @@
  *
  * Allows non-admin users to post items (such as comments).
  *
- * Copyright Blueprint IT Ltd. 2006
+ * Copyright Blueprint IT Ltd. 2007
  *
  * $HeadURL$
  * $LastChangedBy$

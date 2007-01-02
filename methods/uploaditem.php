@@ -5,7 +5,7 @@
  *
  * Uploads a new item(s), optionally inserting into a sequence.
  *
- * Copyright Blueprint IT Ltd. 2006
+ * Copyright Blueprint IT Ltd. 2007
  *
  * $HeadURL$
  * $LastChangedBy$

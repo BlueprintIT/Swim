@@ -5,7 +5,7 @@
  *
  * Attempts to log in
  *
- * Copyright Blueprint IT Ltd. 2006
+ * Copyright Blueprint IT Ltd. 2007
  *
  * $HeadURL$
  * $LastChangedBy$

@@ -5,7 +5,7 @@
  *
  * Object cache. Holds previously retrieved objects so they don't need to be built again.
  *
- * Copyright Blueprint IT Ltd. 2006
+ * Copyright Blueprint IT Ltd. 2007
  *
  * $HeadURL$
  * $LastChangedBy$

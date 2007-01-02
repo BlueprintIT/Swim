@@ -5,7 +5,7 @@
  *
  * Creates a new version of a given itemversion, optionally in a different item/variant.
  *
- * Copyright Blueprint IT Ltd. 2006
+ * Copyright Blueprint IT Ltd. 2007
  *
  * $HeadURL$
  * $LastChangedBy$
