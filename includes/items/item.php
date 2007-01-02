@@ -846,10 +846,11 @@ class ItemVersion
 
 			$paths = array();
 			if ($extra !== null)
-				array_push($paths, $dir.$class.'/'.$view.'/'.$extra);
-			array_push($paths, $dir.$class.'/'.$view);
-			if ($extra !== null)
+			{
 				array_push($paths, $dir.$class.'/'.$extra);
+				array_push($paths, $dir.$class.'/'.$view.'/'.$extra);
+			}
+			array_push($paths, $dir.$class.'/'.$view);
 			array_push($paths, $dir.$class);
 			
 			foreach ($paths as $path)

@@ -47,7 +47,7 @@ function method_preview($request)
 		  $template = findDisplayableFile($template);
     }
     else
-      $template = $item->getClass()->getTemplate($extra);
+      $template = $item->getTemplate($extra);
 
     if ($template !== null)
     {
