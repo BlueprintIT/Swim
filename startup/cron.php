@@ -75,7 +75,7 @@ SearchEngine::buildIndex();
 $hosts = $_PREFS->getPrefBranch('url.host');
 
 $rewrites = AddonManager::getRewrites();
-array_push($rewrites, array('pattern' => '^tinymce/jscripts/tiny_mce/plugins/advblockformat/(.*)', 'target' => 'swim/admin/static/tinymce/advblockformat/$1'));
+array_push($rewrites, array('pattern' => 'tinymce/jscripts/tiny_mce/plugins/advblockformat/(.*)', 'target' => 'swim/admin/static/tinymce/advblockformat/$1'));
 array_push($rewrites, array('pattern' => '^$', 'target' => 'swim/startup/swim.php [L]'));
 
 ob_start();

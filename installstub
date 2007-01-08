@@ -2,6 +2,8 @@
 
 SWIM=`dirname $0`
 
+TinyMCE=$SWIM/../tinymce
+
 mkdir swim
 mkdir swim/admin
 ln -s $SWIM/admin/static swim/admin/static
@@ -10,3 +12,5 @@ ln -s $SWIM/startup swim/startup
 
 mkdir swim/branding
 ln -s $SWIM/branding/static swim/branding/static
+
+ln -s $TinyMCE swim/tinymce
