@@ -1,8 +1,8 @@
 Index: container/assets/container.css
 ===================================================================
---- container/assets/container.css	(revision 861)
-+++ container/assets/container.css	(revision 862)
-@@ -147,11 +147,11 @@
+--- container/assets/container.css	(revision 1223)
++++ container/assets/container.css	(working copy)
+@@ -148,11 +148,11 @@
  }
  
  .panel .close.nonsecure {
