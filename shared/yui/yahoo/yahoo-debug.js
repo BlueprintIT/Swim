@@ -2,7 +2,7 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 0.12.0
+version: 0.12.2
 */
 
 /**
@@ -14,12 +14,12 @@ version: 0.12.0
  * @title  YAHOO Global
  */
 
-/**
- * The YAHOO global namespace object
- * @class YAHOO
- * @static
- */
 if (typeof YAHOO == "undefined") {
+    /**
+     * The YAHOO global namespace object
+     * @class YAHOO
+     * @static
+     */
     var YAHOO = {};
 }
 
@@ -41,7 +41,7 @@ if (typeof YAHOO == "undefined") {
  *
  * @method namespace
  * @static
- * @param  {String*} arguments 1-n namespaces to create
+ * @param  {String*} arguments 1-n namespaces to create 
  * @return {Object}  A reference to the last namespace object created
  */
 YAHOO.namespace = function() {
@@ -89,9 +89,9 @@ YAHOO.log = function(msg, cat, src) {
  * @static
  * @param {Function} subc   the object to modify
  * @param {Function} superc the object to inherit
- * @param {String[]} overrides  additional properties/methods to add to the
+ * @param {Object} overrides  additional properties/methods to add to the
  *                              subclass prototype.  These will override the
- *                              matching items obtained from the superclass
+ *                              matching items obtained from the superclass 
  *                              if present.
  */
 YAHOO.extend = function(subc, superc, overrides) {
@@ -133,7 +133,7 @@ YAHOO.augment = function(r, s) {
             rp[a[i]] = sp[a[i]];
         }
     } else {
-        for (p in sp) {
+        for (p in sp) { 
             if (!rp[p]) {
                 rp[p] = sp[p];
             }
@@ -142,4 +142,3 @@ YAHOO.augment = function(r, s) {
 };
 
 YAHOO.namespace("util", "widget", "example");
-

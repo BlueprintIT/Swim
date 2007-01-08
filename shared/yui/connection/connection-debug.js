@@ -2,20 +2,26 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 0.12.0
+version: 0.12.2
 */
-
 /**
- * @description
  * The Connection Manager provides a simplified interface to the XMLHttpRequest
  * object.  It handles cross-browser instantiantion of XMLHttpRequest, negotiates the
  * interactive states and server response, returning the results to a pre-defined
  * callback you create.
  *
  * @namespace YAHOO.util
- * @module Connection
- * @Class Connect
+ * @module connection
+ * @requires yahoo
  */
+
+/**
+ * The Connection Manager singleton provides methods for creating and managing
+ * asynchronous transactions.
+ *
+ * @class Connect
+ */
+
 YAHOO.util.Connect =
 {
   /**
@@ -319,9 +325,9 @@ YAHOO.util.Connect =
 			if(this._isFormSubmit || (postData && this._use_default_post_header)){
 				this.initHeader('Content-Type', this._default_post_header);
 				YAHOO.log('Initialize default header Content-Type to application/x-www-form-urlencoded.', 'info', 'Connection');
-			}
-			else if(this._isFormSubmit){
-				this.resetFormState();
+				if(this._isFormSubmit){
+					this.resetFormState();
+				}
 			}
 
 			if(this._has_http_headers){
@@ -612,15 +618,17 @@ YAHOO.util.Connect =
    */
 	setForm:function(formId, isUpload, secureUri)
 	{
+		this.resetFormState();
+		var oForm;
 		if(typeof formId == 'string'){
 			// Determine if the argument is a form id or a form name.
 			// Note form name usage is deprecated by supported
 			// here for legacy reasons.
-			var oForm = (document.getElementById(formId) || document.forms[formId]);
+			oForm = (document.getElementById(formId) || document.forms[formId]);
 		}
 		else if(typeof formId == 'object'){
 			// Treat argument as an HTML form object.
-			var oForm = formId;
+			oForm = formId;
 		}
 		else{
 			YAHOO.log('Unable to create form object ' + formId, 'warn', 'Connection');
@@ -719,16 +727,13 @@ YAHOO.util.Connect =
    * @method resetFormState
    * @private
    * @static
-   * @param {boolean} isUpload Indicates if file upload properties should be reset.
    * @return {void}
    */
-	resetFormState:function(isUpload){
+	resetFormState:function(){
 		this._isFormSubmit = false;
-		this._sFormData = null;
-		if(isUpload){
-			this._isFileUpload = false;
-			this._formNode = null;
-		}
+		this._isFileUpload = false;
+		this._formNode = null;
+		this._sFormData = "";
 	},
 
   /**
@@ -784,7 +789,7 @@ YAHOO.util.Connect =
    */
 	appendPostData:function(postData)
 	{
-		var formElements = new Array();
+		var formElements = [];
 		var postMessage = postData.split('&');
 		for(var i=0; i < postMessage.length; i++){
 			var delimitPos = postMessage[i].indexOf('=');

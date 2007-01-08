@@ -1,5 +1,20 @@
 utilities.js Release Notes
 
+*** NOTE ***
+
+This document is not updated with each release.  Changes to
+the utilities.js source are noted in the README
+file for each component that comprises this aggregate:
+
+yahoo/README
+dom/README
+event/README
+connection/README
+animation/README
+dragdrop/README
+
+************
+
 *** version 0.12.0 ***
 
 The utilities.js file rolls up all of the YUI utility components into a single
