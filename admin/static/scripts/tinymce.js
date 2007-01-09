@@ -6,6 +6,7 @@ tinyMCEparams = {
 	editor_selector: "HTMLEditor",
 	button_tile_map: true,
 	dialog_type: "modal",
+	gecko_spellcheck: true,
 	
 	// Cleanup/Output
 	cleanup_on_startup: true,
