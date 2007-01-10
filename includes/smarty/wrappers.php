@@ -153,15 +153,85 @@ class FileWrapper
 	}
 }
 
+class ItemFieldWrapper
+{
+	private $itemversion;
+	private $log;
+
+  public function __construct($itemversion)
+  {
+    $this->itemversion = $itemversion;
+    $this->log = LoggerManager::getLogger('swim.itemfieldwrapper');
+  }
+  
+  public function __get($name)
+  {
+    $field = $this->itemversion->getField($name);
+    if ($field !== null)
+    {
+      if ($field->getType() == 'sequence')
+      {
+        $result = array();
+        $items = $field->getItems();
+        foreach ($items as $item)
+        {
+          $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
+          if ($itemv !== null)
+          {
+            $wrapped = ItemWrapper::getWrapper($itemv);
+            array_push($result, $wrapped);
+          }
+        }
+        return $result;
+      }
+      else if ($field->getType() == 'compound')
+      {
+        $rows = $field->getRows();
+        foreach ($rows as $key => $row)
+        {
+          $rows[$key] = new RowWrapper($row);
+        }
+        return $rows;
+      }
+      else if ($field->getType() == 'optionset')
+      {
+        $option = $field->getOption();
+        return new OptionWrapper($option);
+      }
+      else if ($field->getType() == 'file')
+      {
+      	if ($field->toString())
+        	return new FileWrapper($field);
+        else
+        	return null;
+      }
+      else if ($field->getType() == 'item')
+      {
+      	$item = $field->getItem();
+      	if ($item)
+      		$item = $item->getCurrentVersion(Session::getCurrentVariant());
+      	if ($item)
+      		return ItemWrapper::getWrapper($item);
+      	return null;
+      }
+      else
+        return $field->toString();
+    }
+    return '';
+  }
+}
+
 class ItemWrapper
 {
   private $itemversion;
+  private $fieldwrapper;
   private $log;
   
   public function __construct($itemversion)
   {
     $this->itemversion = $itemversion;
     $this->log = LoggerManager::getLogger('swim.itemwrapper');
+    $this->fieldwrapper = new ItemFieldWrapper($itemversion);
   }
   
   public static function getWrapper($itemversion)
@@ -281,59 +351,10 @@ class ItemWrapper
       	else
       		return array();
       	break;
+      case 'fields':
+      	return $this->fieldwrapper;
       default:
-        $field = $this->itemversion->getField($name);
-        if ($field !== null)
-        {
-          if ($field->getType() == 'sequence')
-          {
-            $result = array();
-            $items = $field->getItems();
-            foreach ($items as $item)
-            {
-              $itemv = $item->getCurrentVersion(Session::getCurrentVariant());
-              if ($itemv !== null)
-              {
-                $wrapped = ItemWrapper::getWrapper($itemv);
-                array_push($result, $wrapped);
-              }
-            }
-            return $result;
-          }
-          else if ($field->getType() == 'compound')
-          {
-            $rows = $field->getRows();
-            foreach ($rows as $key => $row)
-            {
-              $rows[$key] = new RowWrapper($row);
-            }
-            return $rows;
-          }
-          else if ($field->getType() == 'optionset')
-          {
-            $option = $field->getOption();
-            return new OptionWrapper($option);
-          }
-          else if ($field->getType() == 'file')
-          {
-          	if ($field->toString())
-	          	return new FileWrapper($field);
-	          else
-	          	return null;
-          }
-          else if ($field->getType() == 'item')
-          {
-          	$item = $field->getItem();
-          	if ($item)
-          		$item = $item->getCurrentVersion(Session::getCurrentVariant());
-          	if ($item)
-          		return new ItemWrapper($item);
-          	return null;
-          }
-          else
-            return $field->toString();
-        }
-        return '';
+      	return $this->fieldwrapper->__get($name);
     }
   }
 }
