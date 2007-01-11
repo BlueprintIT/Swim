@@ -24,10 +24,10 @@ class Block extends Resource
     if ((isset($this->parent))&&($this->parent instanceof Page))
     {
       $layout = $this->parent->getLayout();
-      if ($layout != null)
+      if ($layout !== null)
       {
 	      $blk = $layout->getBlockLayout($this->id);
-	      if ($blk!=null)
+	      if ($blk!==null)
 	      {
 	        $layprefs = new Preferences($blk->prefs);
 	        $layprefs->setParent($this->prefs->getParent());
@@ -191,10 +191,10 @@ function loadBlock($blockdir,$container,$id,$version=false)
     if ($container instanceof Page)
     {
       $layout=$container->getLayout();
-      if ($layout != null)
+      if ($layout !== null)
       {
 	      $blk=$layout->getBlockLayout($id);
-	      if ($blk!=null)
+	      if ($blk!==null)
 	      {
 	        $blockprefs->addPreferences($blk->prefs,false);
 	      }
