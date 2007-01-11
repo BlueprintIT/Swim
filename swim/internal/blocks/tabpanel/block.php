@@ -11,7 +11,7 @@ function display_tab($title,$url,$selected)
   else
   {
 ?>
-  <td><a href="<?= $url ?>"><?= $title; ?></a></td>
+  <td><a href="<?= $url ?>"><?= $title ?></a></td>
 <?
   }
 }
@@ -26,7 +26,8 @@ foreach (AdminManager::$sections as $section)
 ?>
   <td class="spacer"></td>
 <?
-    display_tab($section->getName(), $section->getUrl(), $section->isSelected($request));
+    $url = $section->getURL();
+    display_tab($section->getName(), $url, $section->isSelected($request));
   }
 }
 ?>
