@@ -27,7 +27,9 @@ BlueprintIT.menus.FadeAnimator=function()
 BlueprintIT.menus.FadeAnimator.prototype={step:0.05,delay:10,startAnimateIn:function(item)
 {YAHOO.util.Dom.setStyle(item.element,'opacity',0);item.setVisible(true);YAHOO.util.Dom.removeClass(item.element,'hidden');item.state=2;item.opacpos=0;item.timer=BlueprintIT.timing.startTimer(item,this.delay);},animateIn:function(item)
 {var next=item.opacpos;next+=this.step;if(next>=1)
-{YAHOO.util.Dom.setStyle(item.element,'opacity',1);item.opacpos=1;item.state=3;}
+{if(item.element.style.filter)
+item.element.style.filter='';else
+YAHOO.util.Dom.setStyle(item.element,'opacity',1);item.opacpos=1;item.state=3;}
 else
 {YAHOO.util.Dom.setStyle(item.element,'opacity',next);item.opacpos=next;BlueprintIT.timing.startTimer(item,this.delay);}},startAnimateOut:function(item)
 {YAHOO.util.Dom.setStyle(item.element,'opacity',1);item.state=5;item.opacpos=1;item.timer=BlueprintIT.timing.startTimer(item,this.delay);},animateOut:function(item)

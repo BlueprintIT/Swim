@@ -140,7 +140,10 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 
 		if (next>=1)
 		{
-			YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
+			if (item.element.style.filter)
+				item.element.style.filter = '';
+			else
+				YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
 			item.opacpos = 1;
 			item.state=3;
 		}
