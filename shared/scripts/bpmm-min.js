@@ -38,7 +38,7 @@ else
 {YAHOO.util.Dom.addClass(item.element,'hidden');BlueprintIT.timing.startTimer(item,5);}}
 else
 {YAHOO.util.Dom.setStyle(item.element,'opacity',next);item.opacpos=next;BlueprintIT.timing.startTimer(item,this.delay);}}}
-BlueprintIT.menus.HORIZONTAL=0;BlueprintIT.menus.VERTICAL=1;BlueprintIT.menus.MenuManager=function()
+BlueprintIT.menus.HORIZONTAL=1;BlueprintIT.menus.VERTICAL=2;BlueprintIT.menus.MenuManager=function()
 {this.instantAnimator=new BlueprintIT.menus.InstantAnimator();this.slideAnimator=new BlueprintIT.menus.SlideAnimator();this.fadeAnimator=new BlueprintIT.menus.FadeAnimator();this.animator=this.instantAnimator;YAHOO.util.Event.addListener(document,'keydown',this.keyPressEvent,this,true);var ua=navigator.userAgent.toLowerCase();if(ua.indexOf('opera')!=-1)
 this.browser='opera';else if(ua.indexOf('msie 7')!=-1)
 this.browser='ie7';else if(ua.indexOf('msie')!=-1)
@@ -64,9 +64,9 @@ return element.menu.parentItem;element=element.parentNode;}}
 catch(e)
 {this.log(e);}
 return null;},mouseOut:function(items)
-{items.reverse();for(var k in items)
+{items.reverse();for(var k=0;k<items.length;k++)
 items[k].mouseOut();},mouseOver:function(items)
-{for(var k in items)
+{for(var k=0;k<items.length;k++)
 items[k].mouseOver();},makeItemList:function(bottom)
 {var list=[];if(bottom)
 {list.push(bottom);while((bottom.parentMenu!=null)&&(bottom.parentMenu.parentItem!=null))
@@ -160,7 +160,7 @@ else if((code==40)&&(this.submenu))
 {newitem=this.submenu.menuItems[0];}}
 else if(this.parentMenu.orientation==BlueprintIT.menus.VERTICAL)
 {var parentOrient=null;if(this.parentMenu.parentItem)
-{parientOrient=this.parentMenu.parentItem.parentMenu.orientation;}
+{parentOrient=this.parentMenu.parentItem.parentMenu.orientation;}
 if(code==38)
 {if(this.pos==0)
 {if(parentOrient==BlueprintIT.menus.HORIZONTAL)
@@ -171,18 +171,22 @@ else
 else if(code==40)
 {var newpos=(this.pos+1)%this.parentMenu.menuItems.length;newitem=this.parentMenu.menuItems[newpos];}
 else if(code==37)
-{if(parientOrient==BlueprintIT.menus.HORIZONTAL)
+{if(parentOrient==BlueprintIT.menus.HORIZONTAL)
 {var newpos=this.parentMenu.parentItem.pos-1;if(newpos<0)
 newpos=this.parentMenu.parentItem.parentMenu.menuItems.length-1;newitem=this.parentMenu.parentItem.parentMenu.menuItems[newpos];}
 else
 {newitem=this.parentMenu.parentItem;}}
 else if(code==39)
-{if(parientOrient==BlueprintIT.menus.HORIZONTAL)
-{var newpos=this.parentMenu.parentItem.pos+1;newpos=newpos%this.parentMenu.parentItem.parentMenu.menuItems.length;newitem=this.parentMenu.parentItem.parentMenu.menuItems[newpos];}}}
+{if(this.submenu)
+{newitem=this.submenu.menuItems[0];}
+else
+{var parent=this.parentMenu.parentItem;while(parent&&parent.parentMenu.orientation!=BlueprintIT.menus.HORIZONTAL)
+parent=parent.parentMenu.parentItem;if(parent)
+{var newpos=parent.pos+1;newpos=newpos%parent.parentMenu.menuItems.length;newitem=parent.parentMenu.menuItems[newpos];}}}}
 if(newitem)
 {if(newitem.focusElement)
 newitem.focusElement.focus();else
-this.changeSelection(newitem);return true;}
+this.manager.changeSelection(newitem);return true;}
 return false;},mouseOver:function()
 {this.manager.log('mouseOver '+this.element.id);YAHOO.util.Dom.addClass(this.element,'opened');if(this.focusElement)
 YAHOO.util.Dom.addClass(this.focusElement,'opened');if(this.submenu)

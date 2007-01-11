@@ -190,8 +190,8 @@ BlueprintIT.menus.FadeAnimator.prototype = {
 	}		
 }
 
-BlueprintIT.menus.HORIZONTAL = 0;
-BlueprintIT.menus.VERTICAL = 1;
+BlueprintIT.menus.HORIZONTAL = 1;
+BlueprintIT.menus.VERTICAL = 2;
 
 BlueprintIT.menus.MenuManager = function()
 {
@@ -292,13 +292,13 @@ BlueprintIT.menus.MenuManager.prototype = {
 	mouseOut: function(items)
 	{
 		items.reverse();
-		for (var k in items)
+		for (var k=0; k<items.length; k++)
 			items[k].mouseOut();
 	},
 	
 	mouseOver: function(items)
 	{
-		for (var k in items)
+		for (var k=0; k<items.length; k++)
 			items[k].mouseOver();
 	},
 	
@@ -707,24 +707,24 @@ MenuItem.prototype = {
 		var newitem = null;
 		if (this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 		{
-			if (code==39)
+			if (code==39) // Right
 			{
 				var npos=(this.pos+1)%this.parentMenu.menuItems.length;
 				newitem=this.parentMenu.menuItems[npos];
 			}
-			else if (code==37)
+			else if (code==37) // Left
 			{
 				var npos=(this.pos+(this.parentMenu.menuItems.length-1))%this.parentMenu.menuItems.length;
 				newitem=this.parentMenu.menuItems[npos];
 			}
-			else if (code==38)
+			else if (code==38) // Up
 			{
 				if (this.parentMenu.parentItem)
 				{
 					newitem=this.parentMenu.parentItem;
 				}
 			}
-			else if ((code==40)&&(this.submenu))
+			else if ((code==40)&&(this.submenu)) // Down
 			{
 				newitem=this.submenu.menuItems[0];
 			}
@@ -734,9 +734,9 @@ MenuItem.prototype = {
 			var parentOrient = null;
 			if (this.parentMenu.parentItem)
 			{
-				parientOrient=this.parentMenu.parentItem.parentMenu.orientation;
+				parentOrient=this.parentMenu.parentItem.parentMenu.orientation;
 			}
-			if (code==38)
+			if (code==38) // Up
 			{
 				if (this.pos==0)
 				{
@@ -750,32 +750,46 @@ MenuItem.prototype = {
 					newitem=this.parentMenu.menuItems[this.pos-1];
 				}
 			}
-			else if (code==40)
+			else if (code==40) // Down
 			{
 				var newpos=(this.pos+1)%this.parentMenu.menuItems.length;
 				newitem=this.parentMenu.menuItems[newpos];
 			}
-			else if (code==37)
+			else if (code==37) // Left
 			{
-				if (parientOrient==BlueprintIT.menus.HORIZONTAL)
+				if (parentOrient==BlueprintIT.menus.HORIZONTAL)
 				{
 					var newpos=this.parentMenu.parentItem.pos-1;
 					if (newpos<0)
 						newpos=this.parentMenu.parentItem.parentMenu.menuItems.length-1;
 					newitem=this.parentMenu.parentItem.parentMenu.menuItems[newpos];
+					/*if (newitem.submenu)
+						newitem = newitem.submenu.menuItems[0];*/
 				}
 				else
 				{
 					newitem=this.parentMenu.parentItem;
 				}
 			}
-			else if (code==39)
+			else if (code==39) // Right
 			{
-				if (parientOrient==BlueprintIT.menus.HORIZONTAL)
+				if (this.submenu)
 				{
-					var newpos=this.parentMenu.parentItem.pos+1;
-					newpos=newpos%this.parentMenu.parentItem.parentMenu.menuItems.length;
-					newitem=this.parentMenu.parentItem.parentMenu.menuItems[newpos];
+					newitem=this.submenu.menuItems[0];
+				}
+				else
+				{
+					var parent = this.parentMenu.parentItem;
+					while (parent && parent.parentMenu.orientation != BlueprintIT.menus.HORIZONTAL)
+						parent = parent.parentMenu.parentItem;
+					if (parent)
+					{
+						var newpos=parent.pos+1;
+						newpos=newpos%parent.parentMenu.menuItems.length;
+						newitem=parent.parentMenu.menuItems[newpos];
+						/*if (newitem.submenu)
+							newitem = newitem.submenu.menuItems[0];*/
+					}
 				}
 			}
 		}
@@ -784,7 +798,7 @@ MenuItem.prototype = {
 			if (newitem.focusElement)
 				newitem.focusElement.focus();
 			else
-				this.changeSelection(newitem);
+				this.manager.changeSelection(newitem);
 			return true;
 		}
 		return false;
