@@ -157,15 +157,22 @@ class ItemFieldWrapper
 {
 	private $itemversion;
 	private $log;
+	private $results;
 
   public function __construct($itemversion)
   {
     $this->itemversion = $itemversion;
     $this->log = LoggerManager::getLogger('swim.itemfieldwrapper');
+    $this->results = array();
   }
   
   public function __get($name)
   {
+  	if (isset($this->results[$name]))
+  		return $this->results[$name];
+  	
+  	$result = null;
+  	
     $field = $this->itemversion->getField($name);
     if ($field !== null)
     {
@@ -182,28 +189,24 @@ class ItemFieldWrapper
             array_push($result, $wrapped);
           }
         }
-        return $result;
       }
       else if ($field->getType() == 'compound')
       {
-        $rows = $field->getRows();
-        foreach ($rows as $key => $row)
+        $result = $field->getRows();
+        foreach ($result as $key => $row)
         {
-          $rows[$key] = new RowWrapper($row);
+          $result[$key] = new RowWrapper($row);
         }
-        return $rows;
       }
       else if ($field->getType() == 'optionset')
       {
         $option = $field->getOption();
-        return new OptionWrapper($option);
+        $result = new OptionWrapper($option);
       }
       else if ($field->getType() == 'file')
       {
       	if ($field->toString())
-        	return new FileWrapper($field);
-        else
-        	return null;
+        	$result = new FileWrapper($field);
       }
       else if ($field->getType() == 'item')
       {
@@ -211,13 +214,17 @@ class ItemFieldWrapper
       	if ($item)
       		$item = $item->getCurrentVersion(Session::getCurrentVariant());
       	if ($item)
-      		return ItemWrapper::getWrapper($item);
-      	return null;
+      		$result = ItemWrapper::getWrapper($item);
       }
       else
-        return $field->toString();
+        $result = $field->toString();
     }
-    return '';
+    
+    if ($result === null)
+    	$result = '';
+    $this->results[$name] = $result;
+    
+    return $result;
   }
 }
 
