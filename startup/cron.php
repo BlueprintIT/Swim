@@ -63,7 +63,8 @@ function checkConsistency()
   }
 }
 
-LoggerManager::setLogOutput('',new StdOutLogOutput());
+$host = $_PREFS->getPref('url.host.1.hostname');
+LoggerManager::setLogOutput('',new StdOutLogOutput($host.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $host.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
 
 SwimEngine::ensureStarted();
 
@@ -72,45 +73,47 @@ setContentType('text/plain');
 checkConsistency();
 SearchEngine::buildIndex();
 
-$hosts = $_PREFS->getPrefBranch('url.host');
-
-$rewrites = AddonManager::getRewrites();
-array_push($rewrites, array('pattern' => 'tinymce/jscripts/tiny_mce/plugins/advblockformat/(.*)', 'target' => 'swim/admin/static/tinymce/advblockformat/$1'));
-array_push($rewrites, array('pattern' => '^$', 'target' => 'swim/startup/swim.php [L]'));
-
-ob_start();
-
+if (is_writable($_PREFS->getPref('storage.sitedir').'/.htaccess'))
+{
+	$hosts = $_PREFS->getPrefBranch('url.host');
+	
+	$rewrites = AddonManager::getRewrites();
+	array_push($rewrites, array('pattern' => 'tinymce/jscripts/tiny_mce/plugins/advblockformat/(.*)', 'target' => 'swim/admin/static/tinymce/advblockformat/$1'));
+	array_push($rewrites, array('pattern' => '^$', 'target' => 'swim/startup/swim.php [L]'));
+	
+	ob_start();
+	
 ?>
 RewriteEngine on 
 RewriteBase <?= $_PREFS->getPref('url.base'); ?>/
 
 <?
-if (is_file($_PREFS->getPref('storage.config').'/htaccess'))
-	readfile($_PREFS->getPref('storage.config').'/htaccess');
+	if (is_file($_PREFS->getPref('storage.config').'/htaccess'))
+		readfile($_PREFS->getPref('storage.config').'/htaccess');
 ?>
 
 <?
-
-foreach ($rewrites as $rewrite)
-{
+	
+	foreach ($rewrites as $rewrite)
+	{
+		foreach ($hosts as $host)
+		{
+			print("RewriteCond %{HTTP_HOST} ^".$host."$\n");
+			print("RewriteRule ".$rewrite['pattern']." ".$rewrite['target']."\n");
+		}
+		print("\n");
+	}
+	
 	foreach ($hosts as $host)
 	{
-		print("RewriteCond %{HTTP_HOST} ^".$host."$\n");
-		print("RewriteRule ".$rewrite['pattern']." ".$rewrite['target']."\n");
-	}
-	print("\n");
-}
-
-foreach ($hosts as $host)
-{
 ?>
 RewriteCond %{HTTP_HOST} ^<?= $host ?>$
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* swim/startup/swim.php [L]
 <?
-}
-
+	}
+	
 ?>
 
 <Files access>
@@ -121,21 +124,28 @@ RewriteRule .* swim/startup/swim.php [L]
 	Deny from all
 </Files>
 <?
-
-$htaccess = ob_get_contents();
-ob_end_clean();
-$output = fopen($_PREFS->getPref('storage.sitedir').'/.htaccess','w');
-if ($output !== FALSE)
+	
+	$htaccess = ob_get_contents();
+	ob_end_clean();
+	$output = fopen($_PREFS->getPref('storage.sitedir').'/.htaccess','w');
+	if ($output !== FALSE)
+	{
+		fwrite($output, $htaccess);
+		fclose($output);
+	}
+	else
+		$log->error('Unable to write configuration. Attempt to open htaccess failed');
+}
+else
 {
-	fwrite($output, $htaccess);
-	fclose($output);
+	$log->error('Unable to write configuration. htaccess in unwritable');
 }
 
 if (isset($_GET['backup']))
 {
 	if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))
 	{
-		$backupfile = $_PREFS->getPref('storage.backup').'/'.$_PREFS->getPref('url.host.1.hostname').'-';
+		$backupfile = $_PREFS->getPref('storage.backup').'/'.$host.'-';
 		$backupfile .= date('Ymd-Hi');
 		$backupfile .= '.tar.bz';
 		system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.site').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));

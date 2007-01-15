@@ -29,10 +29,16 @@ class LogOutput
 	protected $tracePattern;
 	private $level = LOG_LEVEL_ALL;
 	
-	function __construct()
+	function __construct($pattern = null, $tracePattern = null)
 	{
-		$this->pattern='';
-		$this->tracePattern='';
+		if ($pattern === null)
+			$this->pattern = '';
+		else
+			$this->pattern = $pattern;
+		if ($tracePattern === null)
+			$this->tracePattern = '';
+		else
+			$this->tracePattern = $tracePattern;
 	}
 	
 	function setLevel($level)
@@ -161,11 +167,13 @@ class LogOutput
 
 class StdOutLogOutput extends LogOutput
 {
-  function __construct()
+  function __construct($pattern = null, $tracePattern = null)
   {
-    parent::__construct();
-    $this->pattern='[$[txtlevel]] $[logger]: $[text] ($[file]:$[line])';
-    $this->tracePattern='$[logger]: $[function]$[arglist] ($[file]:$[line])';
+    if ($pattern === null)
+	    $pattern = '[$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])';
+	  if ($tracePattern === null)
+	    $tracePattern='      $[logger+30]: $[function]$[arglist] ($[file]:$[line])';
+    parent::__construct($pattern, $tracePattern);
   }
   
   function internalOutput($text)
@@ -178,12 +186,15 @@ class FileLogOutput extends LogOutput
 {
   private $filename;
   
-	function __construct($filename)
+	function __construct($filename, $pattern = null, $tracePattern = null)
 	{
 		parent::__construct();
 		$this->filename=$filename;
-		$this->pattern="[$[time+5] $[txtlevel+5] $[uid-4]] $[logger+30]: $[text] ($[file]:$[line])\n";
-		$this->tracePattern="                   $[logger+30]: $[function]$[arglist] ($[file]:$[line])\n";
+    if ($pattern === null)
+			$pattern="[$[time+5] $[txtlevel+5] $[uid-4]] $[logger+30]: $[text] ($[file]:$[line])\n";
+	  if ($tracePattern === null)
+			$tracePattern="                   $[logger+30]: $[function]$[arglist] ($[file]:$[line])\n";
+    parent::__construct($pattern, $tracePattern);
 	}
 	
 	function internalOutput($text)
@@ -198,11 +209,13 @@ class FileLogOutput extends LogOutput
 
 class PageLogOutput extends LogOutput
 {
-	function __construct()
+	function __construct($pattern = null, $tracePattern = null)
 	{
-		parent::__construct();
-		$this->pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
-		$this->tracePattern='$[logger]: $[function]$[arglist] ($[file]:$[line])<br />';
+    if ($pattern === null)
+			$pattern='<b>[$[txtlevel]]</b> $[logger]: $[text] ($[file]:$[line])<br />';
+	  if ($tracePattern === null)
+			$tracePattern='$[logger]: $[function]$[arglist] ($[file]:$[line])<br />';
+    parent::__construct($pattern, $tracePattern);
 	}
 	
 	function internalOutput($text)
