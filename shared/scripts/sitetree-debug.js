@@ -50,6 +50,9 @@ BlueprintIT.widget.ItemNode.prototype.setSelected = function(oValue) {
 }
 
 BlueprintIT.widget.ItemNode.prototype.setLabel = function(oLabel) {
+	if (!oLabel)
+		oLabel = "[Unnamed]";
+		
 	this.data.label = oLabel;
 	this.initContent(this.data, true);
 	this.getContentEl().innerHTML = this.html;
@@ -60,11 +63,13 @@ BlueprintIT.widget.ItemNode.prototype.setPublished = function(oPublished) {
 	this.getContentEl().className = this.getContentStyle();
 }
 
-BlueprintIT.widget.SiteTree = function(url, div, data) {
+BlueprintIT.widget.SiteTree = function(id, url, div, data) {
+	this.id = id;
 	this.location=url;
 	this.element=div;
 	this.loading=true;
 	this.siteData = data;
+	this.items = [];
 	
 	YAHOO.util.Event.addListener(window, "load", this.init, this, true);
 }
@@ -82,6 +87,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	collapseAnim: null,
 	dragMode: null,
 	siteData: null,
+	id: null,
 	
 	log: function(message, obj) {
 		YAHOO.log("[SiteTree] "+message, "info", obj);
@@ -216,20 +222,52 @@ BlueprintIT.widget.SiteTree.prototype = {
 		}
 	},
 	
+	createNode: function(id, label, type, published, contents, parentnode) {
+		if (!label)
+			label = '[Unnamed]';
+
+		var treenode = new BlueprintIT.widget.ItemNode(id, label, type, published, contents, parentnode);
+
+		if (id) {
+			if (!this.items[id])
+				this.items[id] = [];
+			this.items[id].push(treenode);
+		}
+		
+		return treenode;
+	},
+	
+	removeAllNodes: function(id) {
+		var items = this.items[id];
+		for (var i=0; i<items.length; i++) {
+			var parent = items[i].parent;
+			parent.removeChild(items[i]);
+			parent.redrawChildren();
+		}
+		delete this.items[id];
+		if (this.selected == id)
+			this.selected = null;
+	},
+	
+	removeNode: function(node) {
+		var parent = node.parent;
+		parent.removeChild(node);
+		parent.redrawChildren();
+		var bucket = this.items[node.id];
+		var pos = bucket.indexOf(node);
+		bucket.splice(pos,1);
+		if (bucket.length == 0) {
+			delete this.items[node.id];
+			if (this.selected == id)
+				this.selected = null;
+		}
+	},
+	
 	loadItem: function(item, parentnode) {
 		var label = item["name"];
 		var type = item["class"];
 		var published = item["published"] == "true";
 		var contents = null;
-		
-		if (!label)
-			label = '[Unnamed]';
-		
-		var id = item["id"];
-		if (id) {
-			if (!this.items[id])
-				this.items[id] = [];
-		}
 		
 		if (item["contains"]) {
 			contents = {};
@@ -238,9 +276,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 				contents[content[i]] = true;
 		}
 			
-		var treenode = new BlueprintIT.widget.ItemNode(id, label, type, published, contents, parentnode);
-		if (id)
-			this.items[id].push(treenode);
+		var treenode = this.createNode(item["id"], label, type, published, contents, parentnode);
 		
 		this.loadCategory(item["subitems"], treenode);
 	},

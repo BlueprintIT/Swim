@@ -10,10 +10,11 @@ if(this.data.selected)
 style+=" selected";return style;}
 BlueprintIT.widget.ItemNode.prototype.setSelected=function(oValue){if(oValue){YAHOO.util.Dom.addClass(this.getContentEl(),"selected");}else{YAHOO.util.Dom.removeClass(this.getContentEl(),"selected");}
 this.data.selected=oValue;}
-BlueprintIT.widget.ItemNode.prototype.setLabel=function(oLabel){this.data.label=oLabel;this.initContent(this.data,true);this.getContentEl().innerHTML=this.html;}
+BlueprintIT.widget.ItemNode.prototype.setLabel=function(oLabel){if(!oLabel)
+oLabel="[Unnamed]";this.data.label=oLabel;this.initContent(this.data,true);this.getContentEl().innerHTML=this.html;}
 BlueprintIT.widget.ItemNode.prototype.setPublished=function(oPublished){this.data.published=oPublished;this.getContentEl().className=this.getContentStyle();}
-BlueprintIT.widget.SiteTree=function(url,div,data){this.location=url;this.element=div;this.loading=true;this.siteData=data;YAHOO.util.Event.addListener(window,"load",this.init,this,true);}
-BlueprintIT.widget.SiteTree.prototype={element:null,location:null,items:null,selected:null,loading:null,draggable:false,dragging:false,tree:null,expandAnim:null,collapseAnim:null,dragMode:null,siteData:null,log:function(message,obj){YAHOO.log("[SiteTree] "+message,"info",obj);},onDragStart:function(){this.dragging=true;},onDragEnd:function(){var self=this;window.setTimeout(function(){self.dragging=false},100);},canHold:function(parent,child,mode){if(parent.tree.getRoot()==parent)
+BlueprintIT.widget.SiteTree=function(id,url,div,data){this.id=id;this.location=url;this.element=div;this.loading=true;this.siteData=data;this.items=[];YAHOO.util.Event.addListener(window,"load",this.init,this,true);}
+BlueprintIT.widget.SiteTree.prototype={element:null,location:null,items:null,selected:null,loading:null,draggable:false,dragging:false,tree:null,expandAnim:null,collapseAnim:null,dragMode:null,siteData:null,id:null,log:function(message,obj){YAHOO.log("[SiteTree] "+message,"info",obj);},onDragStart:function(){this.dragging=true;},onDragEnd:function(){var self=this;window.setTimeout(function(){self.dragging=false},100);},canHold:function(parent,child,mode){if(parent.tree.getRoot()==parent)
 return false;if(parent.data.id=='uncat'){if(mode==BlueprintIT.widget.DraggableTreeView.DRAG_COPY)
 return false;if(child.parent==parent)
 return false;}
@@ -31,13 +32,15 @@ return this.items[id];return null;},selectItem:function(id){if(this.loading){thi
 if(this.selected){for(var i=0;i<this.items[this.selected].length;i++)
 this.items[this.selected][i].setSelected(false);this.selected=null;}
 if(id&&this.items[id]){for(var i=0;i<this.items[id].length;i++)
-this.items[id][i].setSelected(true);this.selected=id;}},loadItem:function(item,parentnode){var label=item["name"];var type=item["class"];var published=item["published"]=="true";var contents=null;if(!label)
-label='[Unnamed]';var id=item["id"];if(id){if(!this.items[id])
-this.items[id]=[];}
-if(item["contains"]){contents={};var content=item["contains"].split(",");for(var i=0;i<content.length;i++)
+this.items[id][i].setSelected(true);this.selected=id;}},createNode:function(id,label,type,published,contents,parentnode){if(!label)
+label='[Unnamed]';var treenode=new BlueprintIT.widget.ItemNode(id,label,type,published,contents,parentnode);if(id){if(!this.items[id])
+this.items[id]=[];this.items[id].push(treenode);}
+return treenode;},removeAllNodes:function(id){var items=this.items[id];for(var i=0;i<items.length;i++){var parent=items[i].parent;parent.removeChild(items[i]);parent.redrawChildren();}
+delete this.items[id];if(this.selected==id)
+this.selected=null;},removeNode:function(node){var parent=node.parent;parent.removeChild(node);parent.redrawChildren();var bucket=this.items[node.id];var pos=bucket.indexOf(node);bucket.splice(pos,1);if(bucket.length==0){delete this.items[node.id];if(this.selected==id)
+this.selected=null;}},loadItem:function(item,parentnode){var label=item["name"];var type=item["class"];var published=item["published"]=="true";var contents=null;if(item["contains"]){contents={};var content=item["contains"].split(",");for(var i=0;i<content.length;i++)
 contents[content[i]]=true;}
-var treenode=new BlueprintIT.widget.ItemNode(id,label,type,published,contents,parentnode);if(id)
-this.items[id].push(treenode);this.loadCategory(item["subitems"],treenode);},loadCategory:function(root,treenode){if(root&&root.length>0){treenode.expanded=true;for(var i=0;i<root.length;i++)
+var treenode=this.createNode(item["id"],label,type,published,contents,parentnode);this.loadCategory(item["subitems"],treenode);},loadCategory:function(root,treenode){if(root&&root.length>0){treenode.expanded=true;for(var i=0;i<root.length;i++)
 this.loadItem(root[i],treenode);}},loadFromDocument:function(root){this.items=[];this.tree=null;if(this.draggable)
 this.tree=new BlueprintIT.widget.DraggableTreeView(this.element,this);else
 this.tree=new YAHOO.widget.TreeView(this.element);this.loadCategory(root,this.tree.getRoot());this.log("data parsed");if(this.dragMode)

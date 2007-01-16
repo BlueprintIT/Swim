@@ -510,3 +510,18 @@ BlueprintIT.widget.TreeViewLoader.prototype.loadFromList = function(treeid, list
 	}
 	return tree;
 }
+
+YAHOO.widget.Node.prototype.removeChild = function(childNode) {
+	if (childNode.parent != this)
+		return;
+
+	var prev = childNode.previousSibling;
+	var next = childNode.nextSibling;
+	if (next)
+		next.previousSibling = prev;
+	if (prev)
+		prev.nextSibling = next;
+		
+	var pos = this.children.indexOf(childNode);
+	this.children.splice(pos, 1);
+}
