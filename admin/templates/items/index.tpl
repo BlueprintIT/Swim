@@ -54,10 +54,10 @@ function updateDragMode(input)
 }
 {/literal}
 {if isset($request.query.root)}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' root=$request.query.root}', 'categorytree', sitedata);
+var SiteTree = new BlueprintIT.widget.SiteTree('null', '{encode method='tree' root=$request.query.root}', 'categorytree', sitedata);
 {apiget var="root" type="item" id=$request.query.root}
 {else}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree' section=$request.query.section}', 'categorytree', sitedata);
+var SiteTree = new BlueprintIT.widget.SiteTree('{$request.query.section}', '{encode method='tree' section=$request.query.section}', 'categorytree', sitedata);
 {apiget var="section" type="section" id=$request.query.section}
 {assign var="root" value=$section->getRootItem()}
 {/if}

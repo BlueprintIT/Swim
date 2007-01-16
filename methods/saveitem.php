@@ -35,7 +35,6 @@ function method_saveitem($request)
         $req->setPath('items/details.tpl');
         $req->setQueryVar('item', $itemversion->getItem()->getId());
         $req->setQueryVar('version', $itemversion->getVersion());
-        $req->setQueryVar('reloadtree', 'true');
         $query = $request->getQuery();
         unset($query['itemversion']);
         if (isset($query['view']))

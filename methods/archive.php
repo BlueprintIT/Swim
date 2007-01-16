@@ -36,7 +36,6 @@ function method_archive($request)
           $item->setArchived(false);
         
         $req = $request->getNested();
-        $req->setQueryVar('reloadtree', 'true');
         redirect($req);
       }
       else

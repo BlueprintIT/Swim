@@ -54,7 +54,7 @@ function onTreeItemClick(id)
 	btn.style.display = 'none';
 }
 {/literal}
-var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='tree'}', 'categorytree', sitedata);
+var SiteTree = new BlueprintIT.widget.SiteTree('all', '{encode method='tree'}', 'categorytree', sitedata);
 </script>
 <div id="tabpanel">
   <table>

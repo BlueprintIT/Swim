@@ -18,11 +18,51 @@
 {/if}
 {assign var="class" value=$itemversion->getClass()}
 {assign var="view" value=$itemversion->getView()}
+{if $itemvariant->getCurrentVersion()}
+	{assign var="bestversion" value=$itemvariant->getCurrentVersion()}
+{else}
+	{assign var="bestversion" value=$itemvariant->getNewestVersion()}
+{/if}
+{assign var="bestname" value=$bestversion->getField("name")}
 <script>
 {if isset($request.query.reloadtree)}
   window.top.SiteTree.loadTree();
+{else}
+  {if $item->isArchived()}
+  var righttree =  window.top.SiteTree.id == 'archive';
+  {else}
+  var righttree =  window.top.SiteTree.id != 'archive';
+  {/if}
+  if (righttree) {ldelim}
+    var items = window.top.SiteTree.getItems({$item->getId()});
+    if (items) {ldelim}
+      for (var i=0; i<items.length; i++) {ldelim}
+        items[i].setPublished({if $bestversion->isCurrent()}true{else}false{/if});
+        items[i].setLabel("{$bestname->toString()}");
+      {rdelim}
+    {rdelim} else {ldelim}
+      var parent;
+      {assign var="sequence" value=$item->getMainSequence()}
+      {if $sequence}
+      var contents = "{foreach name="contentlist" item="subclass" from=$sequence->getVisibleClasses()}{$subclass->getId()}{if !$smarty.foreach.contentlist.last},{/if}{/foreach}";
+      {else}
+      var contents = "";
+      {/if}
+      {foreach from=$item->getParents() item="parent"}
+      parent = {$parent.item->getId()};
+      items = window.top.SiteTree.getItems(parent);
+      if (items) {ldelim}
+        for (var i=0; i<items.length; i++) {ldelim}
+          window.top.SiteTree.createNode({$item->getId()}, "{$bestname->toString()}", "{$class->getId()}", {if $bestversion->isCurrent()}true{else}false{/if}, contents, items[i]);
+          items[i].redrawChildren();
+        {rdelim}
+      {rdelim}
+      {/foreach}
+    {rdelim}
+    window.top.SiteTree.selectItem({$item->getId()});
+  {rdelim} else
+    window.top.SiteTree.removeAllNodes({$item->getId()});
 {/if}
-  window.top.SiteTree.selectItem({$item->getId()});
 {literal}
 function getRow(element)
 {

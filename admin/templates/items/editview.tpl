@@ -24,11 +24,6 @@
 {else}
 	{assign var="view" value=$itemversion->getView()}
 {/if}
-<script>
-{if isset($request.query.reloadtree)}
-  window.top.SiteTree.loadTree();
-{/if}
-</script>
 <div id="mainpane">
 	{html_form tag_name="mainform" method="saveitem" item=$item->getId() version=$itemversion->getVersion() itemversion=$itemversion->getId()}
 		<div class="header">

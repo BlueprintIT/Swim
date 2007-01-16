@@ -109,7 +109,6 @@ function method_uploaditem($request)
           $req->setMethod('admin');
           $req->setPath('items/details.tpl');
           $req->setQueryVar('item', $parent->getId());
-          $req->setQueryVar('reloadtree', 'true');
           if ($type == 'application/zip')
           {
             $cache = $_PREFS->getPref('storage.sitecache').'/uploads';
