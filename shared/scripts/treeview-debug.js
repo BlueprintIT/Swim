@@ -10,22 +10,32 @@ BlueprintIT.widget.IconNode.prototype.getLabelEl = function() {
 }
 
 BlueprintIT.widget.IconNode.prototype.init = function(oData, oParent, expanded) {
-	var html;
-	if (oData.href) {
-		html = '<a href="' + oData.href + '"';
-		if (oData.target)
-			html += ' target="' + oData.target + '"';
-		html += '>' + oData.label + '</a>';
-	}
-	else
-		html = oData.label;
-	oData.html = html;
-
 	BlueprintIT.widget.IconNode.superclass.init.call(this, oData, oParent, expanded);
 
   this.labelElId = "ygtvlabelel" + this.index;
-	oData.html = '<div id="'+this.labelElId+'">' + html + '</div>';
-	this.initContent(oData, true);
+	this.initContent(this.data, true);
+}
+
+BlueprintIT.widget.IconNode.prototype.initContent = function(oData, hasIcon) { 
+	if (typeof oData == "string") {
+		oData = { html: oData };
+	}
+	else {
+		var html;
+		if (oData.href) {
+			html = '<a href="' + oData.href + '"';
+			if (oData.target)
+				html += ' target="' + oData.target + '"';
+			html += '>' + oData.label + '</a>';
+		}
+		else
+			html = oData.label;
+		oData.html = '<div id="'+this.labelElId+'">' + html + '</div>';
+	}
+	
+	this.html = oData.html;
+	this.contentElId = "ygtvcontentel" + this.index;
+	this.hasIcon = hasIcon;
 }
 
 BlueprintIT.widget.IconNode.prototype.getContentStyle = function() {
@@ -60,6 +70,22 @@ BlueprintIT.widget.IconNode.prototype.getNodeHtml = function() {
 	this.contentStyle = this.getContentStyle();
 	
 	return BlueprintIT.widget.IconNode.superclass.getNodeHtml.call(this);
+}
+
+BlueprintIT.widget.IconNode.prototype.redraw = function() {
+	this.initContent(this.data, true);
+	this.getContentEl().className = this.getContentStyle();
+	this.getEl().innerHTML = this.getNodeHTML() + this.getChildrenHTML();
+}
+
+BlueprintIT.widget.IconNode.prototype.redrawNode = function() {
+	this.initContent(this.data, true);
+	this.getContentEl().className = this.getContentStyle();
+	this.getContentEl().innerHTML = this.html;
+}
+
+BlueprintIT.widget.IconNode.prototype.redrawChildren = function() {
+	this.getChildrenEl().innerHTML = this.completeRender();
 }
 
 BlueprintIT.widget.StyledTextNode = function(oData, oParent, expanded) {

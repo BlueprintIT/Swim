@@ -4,7 +4,8 @@ BlueprintIT.widget.ItemNode = function(oId, oLabel, oType, oPublished, oContents
 		label: oLabel,
 		published: oPublished,
 		type: oType,
-		contains: oContents
+		contains: oContents,
+		selected: false
 	};
 	if (oId) {
 		oData.href = 'javascript:onTreeItemClick(\''+oId+'\')'
@@ -33,8 +34,30 @@ BlueprintIT.widget.ItemNode.prototype.getContentStyle = function() {
 		style+= " site_item"+parg;
 		style+= " site_icon_"+this.data.type+parg;
 	}
+	if (this.data.selected)
+		style+= " selected";
 	
 	return style;
+}
+
+BlueprintIT.widget.ItemNode.prototype.setSelected = function(oValue) {
+	if (oValue) {
+		YAHOO.util.Dom.addClass(this.getContentEl(), "selected");
+	} else {
+		YAHOO.util.Dom.removeClass(this.getContentEl(), "selected");
+	}
+	this.data.selected = oValue;
+}
+
+BlueprintIT.widget.ItemNode.prototype.setLabel = function(oLabel) {
+	this.data.label = oLabel;
+	this.initContent(this.data, true);
+	this.getContentEl().innerHTML = this.html;
+}
+
+BlueprintIT.widget.ItemNode.prototype.setPublished = function(oPublished) {
+	this.data.published = oPublished;
+	this.getContentEl().className = this.getContentStyle();
 }
 
 BlueprintIT.widget.SiteTree = function(url, div, data) {
@@ -169,6 +192,12 @@ BlueprintIT.widget.SiteTree.prototype = {
 		this.collapseAnim = anim;
 	},
 	
+	getItems: function(id) {
+		if (this.items[id])
+			return this.items[id];
+		return null;
+	},
+	
 	selectItem: function(id) {
 		if (this.loading) {
 			this.selected = id;
@@ -176,17 +205,13 @@ BlueprintIT.widget.SiteTree.prototype = {
 		}
 		
 		if (this.selected) {
-			for (var i = 0; i<this.items[this.selected].length; i++) {
-				var label = this.items[this.selected][i].getContentEl();
-				YAHOO.util.Dom.removeClass(label, "selected");
-			}
+			for (var i = 0; i<this.items[this.selected].length; i++)
+				this.items[this.selected][i].setSelected(false);
 			this.selected = null;
 		}
 		if (id && this.items[id]) {
-			for (var i = 0; i<this.items[id].length; i++) {
-				var label = this.items[id][i].getContentEl();
-				YAHOO.util.Dom.addClass(label, "selected");
-			}
+			for (var i = 0; i<this.items[id].length; i++)
+				this.items[id][i].setSelected(true);
 			this.selected = id;
 		}
 	},

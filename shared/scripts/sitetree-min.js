@@ -1,12 +1,17 @@
 
-BlueprintIT.widget.ItemNode=function(oId,oLabel,oType,oPublished,oContents,oParent){var oData={id:oId,label:oLabel,published:oPublished,type:oType,contains:oContents};if(oId){oData.href='javascript:onTreeItemClick(\''+oId+'\')'}
+BlueprintIT.widget.ItemNode=function(oId,oLabel,oType,oPublished,oContents,oParent){var oData={id:oId,label:oLabel,published:oPublished,type:oType,contains:oContents,selected:false};if(oId){oData.href='javascript:onTreeItemClick(\''+oId+'\')'}
 this.init(oData,oParent,false);};YAHOO.extend(BlueprintIT.widget.ItemNode,BlueprintIT.widget.IconNode);BlueprintIT.widget.ItemNode.prototype.getContentStyle=function(){var style="site_itemcontent";var parg="";if(this.data.published)
 parg="_published";if(this.data.contains)
 {var state="clsd";if(this.expanded)
 state="open";style+=" site_container_"+state+parg;style+=" site_icon_"+this.data.type+parg+" site_icon_"+this.data.type+"_"+state+parg;}
 else
 {style+=" site_item"+parg;style+=" site_icon_"+this.data.type+parg;}
-return style;}
+if(this.data.selected)
+style+=" selected";return style;}
+BlueprintIT.widget.ItemNode.prototype.setSelected=function(oValue){if(oValue){YAHOO.util.Dom.addClass(this.getContentEl(),"selected");}else{YAHOO.util.Dom.removeClass(this.getContentEl(),"selected");}
+this.data.selected=oValue;}
+BlueprintIT.widget.ItemNode.prototype.setLabel=function(oLabel){this.data.label=oLabel;this.initContent(this.data,true);this.getContentEl().innerHTML=this.html;}
+BlueprintIT.widget.ItemNode.prototype.setPublished=function(oPublished){this.data.published=oPublished;this.getContentEl().className=this.getContentStyle();}
 BlueprintIT.widget.SiteTree=function(url,div,data){this.location=url;this.element=div;this.loading=true;this.siteData=data;YAHOO.util.Event.addListener(window,"load",this.init,this,true);}
 BlueprintIT.widget.SiteTree.prototype={element:null,location:null,items:null,selected:null,loading:null,draggable:false,dragging:false,tree:null,expandAnim:null,collapseAnim:null,dragMode:null,siteData:null,log:function(message,obj){YAHOO.log("[SiteTree] "+message,"info",obj);},onDragStart:function(){this.dragging=true;},onDragEnd:function(){var self=this;window.setTimeout(function(){self.dragging=false},100);},canHold:function(parent,child,mode){if(parent.tree.getRoot()==parent)
 return false;if(parent.data.id=='uncat'){if(mode==BlueprintIT.widget.DraggableTreeView.DRAG_COPY)
@@ -21,11 +26,12 @@ if(parent.data.id!='uncat'){request.setQueryVar("insertitem",parent.data.id);req
 if(valid){var callback={success:function(obj){this.loadTree();},failure:function(obj){alert("Operation failed");this.loadTree();},argument:null,scope:null};callback.scope=this;YAHOO.util.Connect.asyncRequest("GET",request.encode(),callback,null);}},init:function(event,obj){this.log("init");this.loadTree();},setDragMode:function(mode){if(this.tree)
 this.tree.setDefaultDragMode(mode);this.dragMode=mode;},setExpandAnim:function(anim){if(this.tree)
 this.tree.setExpandAnim(anim);this.expandAnim=anim;},setCollapseAnim:function(anim){if(this.tree)
-this.tree.setCollapseAnim(anim);this.collapseAnim=anim;},selectItem:function(id){if(this.loading){this.selected=id;return;}
-if(this.selected){for(var i=0;i<this.items[this.selected].length;i++){var label=this.items[this.selected][i].getContentEl();YAHOO.util.Dom.removeClass(label,"selected");}
-this.selected=null;}
-if(id&&this.items[id]){for(var i=0;i<this.items[id].length;i++){var label=this.items[id][i].getContentEl();YAHOO.util.Dom.addClass(label,"selected");}
-this.selected=id;}},loadItem:function(item,parentnode){var label=item["name"];var type=item["class"];var published=item["published"]=="true";var contents=null;if(!label)
+this.tree.setCollapseAnim(anim);this.collapseAnim=anim;},getItems:function(id){if(this.items[id])
+return this.items[id];return null;},selectItem:function(id){if(this.loading){this.selected=id;return;}
+if(this.selected){for(var i=0;i<this.items[this.selected].length;i++)
+this.items[this.selected][i].setSelected(false);this.selected=null;}
+if(id&&this.items[id]){for(var i=0;i<this.items[id].length;i++)
+this.items[id][i].setSelected(true);this.selected=id;}},loadItem:function(item,parentnode){var label=item["name"];var type=item["class"];var published=item["published"]=="true";var contents=null;if(!label)
 label='[Unnamed]';var id=item["id"];if(id){if(!this.items[id])
 this.items[id]=[];}
 if(item["contains"]){contents={};var content=item["contains"].split(",");for(var i=0;i<content.length;i++)

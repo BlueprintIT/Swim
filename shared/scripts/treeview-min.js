@@ -1,9 +1,12 @@
 
 BlueprintIT.widget.IconNode=function(oData,oParent,expanded){this.init(oData,oParent,expanded);};YAHOO.extend(BlueprintIT.widget.IconNode,YAHOO.widget.HTMLNode);BlueprintIT.widget.IconNode.prototype.labelElId=null;BlueprintIT.widget.IconNode.prototype.getLabelEl=function(){return document.getElementById(this.labelElId);}
-BlueprintIT.widget.IconNode.prototype.init=function(oData,oParent,expanded){var html;if(oData.href){html='<a href="'+oData.href+'"';if(oData.target)
+BlueprintIT.widget.IconNode.prototype.init=function(oData,oParent,expanded){BlueprintIT.widget.IconNode.superclass.init.call(this,oData,oParent,expanded);this.labelElId="ygtvlabelel"+this.index;this.initContent(this.data,true);}
+BlueprintIT.widget.IconNode.prototype.initContent=function(oData,hasIcon){if(typeof oData=="string"){oData={html:oData};}
+else{var html;if(oData.href){html='<a href="'+oData.href+'"';if(oData.target)
 html+=' target="'+oData.target+'"';html+='>'+oData.label+'</a>';}
 else
-html=oData.label;oData.html=html;BlueprintIT.widget.IconNode.superclass.init.call(this,oData,oParent,expanded);this.labelElId="ygtvlabelel"+this.index;oData.html='<div id="'+this.labelElId+'">'+html+'</div>';this.initContent(oData,true);}
+html=oData.label;oData.html='<div id="'+this.labelElId+'">'+html+'</div>';}
+this.html=oData.html;this.contentElId="ygtvcontentel"+this.index;this.hasIcon=hasIcon;}
 BlueprintIT.widget.IconNode.prototype.getContentStyle=function(){var style="iconnode_content";if(this.hasChildren(false))
 {var state="clsd";if(this.expanded)
 state="open";style+=" iconnode_branch_"+state;if(this.data.type)
@@ -14,6 +17,9 @@ style+=" iconnode_leaf_"+this.data.type;}
 return style;}
 BlueprintIT.widget.IconNode.prototype.toggle=function(){BlueprintIT.widget.IconNode.superclass.toggle.call(this);this.getContentEl().className=this.getContentStyle();}
 BlueprintIT.widget.IconNode.prototype.getNodeHtml=function(){this.contentStyle=this.getContentStyle();return BlueprintIT.widget.IconNode.superclass.getNodeHtml.call(this);}
+BlueprintIT.widget.IconNode.prototype.redraw=function(){this.initContent(this.data,true);this.getContentEl().className=this.getContentStyle();this.getEl().innerHTML=this.getNodeHTML()+this.getChildrenHTML();}
+BlueprintIT.widget.IconNode.prototype.redrawNode=function(){this.initContent(this.data,true);this.getContentEl().className=this.getContentStyle();this.getContentEl().innerHTML=this.html;}
+BlueprintIT.widget.IconNode.prototype.redrawChildren=function(){this.getChildrenEl().innerHTML=this.completeRender();}
 BlueprintIT.widget.StyledTextNode=function(oData,oParent,expanded){if(oParent){this.init(oData,oParent,expanded);this.setUpLabel(oData);this.setUpStyles(oData);}}
 BlueprintIT.widget.StyledTextNode.prototype=new YAHOO.widget.TextNode();BlueprintIT.widget.StyledTextNode.prototype.iconClass=null;BlueprintIT.widget.StyledTextNode.prototype.labelClass="";BlueprintIT.widget.StyledTextNode.prototype.setUpStyles=function(oData){if(oData.labelClass){this.labelStyle=' '+oData.labelClass;}
 if(oData.iconClass){this.iconClass=oData.iconClass;}}
