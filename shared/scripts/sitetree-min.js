@@ -36,7 +36,7 @@ return this.items[id];return null;},selectItem:function(id){if(this.loading){thi
 if(this.selected){for(var i=0;i<this.items[this.selected].length;i++)
 this.items[this.selected][i].setSelected(false);this.selected=null;}
 if(id&&this.items[id]){for(var i=0;i<this.items[id].length;i++)
-this.items[id][i].setSelected(true);this.selected=id;}},cloneNode:function(node,newparent){var newnode=this.createNode(node.data.id,node.data.label,node.data.type,node.data.published,node.data.contains,newparent);newnode.expanded=node.expanded;for(var i=0;i<node.children.length;i++)
+this.items[id][i].setSelected(true);this.selected=id;}},cloneNode:function(node,newparent){var newnode=this.createNode(node.data.id,node.data.label,node.data.type,node.data.published,node.data.contains,newparent);newnode.expanded=node.expanded;newnode.data.selected=node.data.selected;for(var i=0;i<node.children.length;i++)
 this.cloneNode(node.children[i],newnode);return newnode;},createNode:function(id,label,type,published,contents,parentnode){if(!label)
 label='[Unnamed]';var treenode=new BlueprintIT.widget.ItemNode(id,label,type,published,contents,parentnode);if(id){if(!this.items[id])
 this.items[id]=[];this.items[id].push(treenode);}

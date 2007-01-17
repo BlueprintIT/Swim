@@ -245,6 +245,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	cloneNode: function(node, newparent) {
 		var newnode = this.createNode(node.data.id, node.data.label, node.data.type, node.data.published, node.data.contains, newparent);
 		newnode.expanded = node.expanded;
+		newnode.data.selected = node.data.selected;
 		for (var i=0; i<node.children.length; i++)
 			this.cloneNode(node.children[i], newnode);
 		return newnode;
