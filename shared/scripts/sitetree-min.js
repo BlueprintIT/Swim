@@ -18,6 +18,7 @@ BlueprintIT.widget.SiteTree.prototype={element:null,location:null,items:null,sel
 return false;if(parent.data.id=='uncat'){if(mode==BlueprintIT.widget.DraggableTreeView.DRAG_COPY)
 return false;if(child.parent==parent)
 return false;}
+if((child.parent.data.id=='uncat')&&(mode==BlueprintIT.widget.DraggableTreeView.DRAG_COPY)){return false;}
 if(parent.data.contains&&child.data.type&&parent.data.contains[child.data.type])
 return true;return false;},canDrag:function(node){if(node.parent==node.tree.getRoot())
 return false;return true;},onDragDrop:function(node,parent,position,mode){var valid=false;var request=new Request();request.setMethod("mutatesequence");request.setQueryVar("item",node.data.id);request.setQueryVar("action","move");if((mode==BlueprintIT.widget.DraggableTreeView.DRAG_MOVE)&&(node.parent.data.id!='uncat')){var findpos=node;var pos=0;while(findpos.previousSibling){pos++;findpos=findpos.previousSibling;}
@@ -25,8 +26,8 @@ request.setQueryVar("removeitem",node.parent.data.id);request.setQueryVar("remov
 position--;}
 if(parent.data.id!='uncat'){request.setQueryVar("insertitem",parent.data.id);request.setQueryVar("insertpos",position);valid=true;}
 if(mode==BlueprintIT.widget.DraggableTreeView.DRAG_MOVE){var oldparent=node.parent;oldparent.removeChild(node);if(oldparent.children.length==0)
-oldparent.expanded=false;parent.insertChild(node,position);if(parent.children.length==1)
-parent.expanded=true;oldparent.redraw();parent.redraw();this.tree.setupDD(oldparent);this.tree.setupDD(parent);}else{var newnode=this.cloneNode(node,parent);if(parent.children.length==1)
+oldparent.expanded=false;oldparent.redraw();this.tree.setupDD(oldparent);if((parent.data.id=='uncat')&&(this.items[node.data.id].length>1)){this.removeNode(node);}else{parent.insertChild(node,position);if(parent.children.length==1)
+parent.expanded=true;parent.redraw();this.tree.setupDD(parent);}}else{var newnode=this.cloneNode(node,parent);if(parent.children.length==1)
 parent.expanded=true;parent.insertChild(newnode,position);parent.redraw();this.tree.setupDD(parent);}
 if(valid){var callback={success:function(obj){},failure:function(obj){alert("There was an error updating the site structure. Reloading current structure.");this.loadTree();},argument:null,scope:null};callback.scope=this;YAHOO.util.Connect.asyncRequest("GET",request.encode(),callback,null);}},init:function(event,obj){this.log("init");this.loadTree();},setDragMode:function(mode){if(this.tree)
 this.tree.setDefaultDragMode(mode);this.dragMode=mode;},setExpandAnim:function(anim){if(this.tree)
@@ -42,7 +43,8 @@ label='[Unnamed]';var treenode=new BlueprintIT.widget.ItemNode(id,label,type,pub
 this.items[id]=[];this.items[id].push(treenode);}
 return treenode;},removeAllNodes:function(id){var items=this.items[id];for(var i=0;i<items.length;i++){var parent=items[i].parent;parent.removeChild(items[i]);parent.redrawChildren();}
 delete this.items[id];if(this.selected==id)
-this.selected=null;},removeNode:function(node){var parent=node.parent;parent.removeChild(node);parent.redrawChildren();var bucket=this.items[node.id];var pos=bucket.indexOf(node);bucket.splice(pos,1);if(bucket.length==0){delete this.items[node.id];if(this.selected==id)
+this.selected=null;},removeNode:function(node){var parent=node.parent;if(parent){parent.removeChild(node);parent.redrawChildren();}
+var bucket=this.items[node.data.id];var pos=bucket.indexOf(node);bucket.splice(pos,1);if(bucket.length==0){delete this.items[node.data.id];if(this.selected==id)
 this.selected=null;}},loadItem:function(item,parentnode){var label=item["name"];var type=item["class"];var published=item["published"]=="true";var contents=null;if(item["contains"]){contents={};var content=item["contains"].split(",");for(var i=0;i<content.length;i++)
 contents[content[i]]=true;}
 var treenode=this.createNode(item["id"],label,type,published,contents,parentnode);this.loadCategory(item["subitems"],treenode);},loadCategory:function(root,treenode){if(root&&root.length>0){treenode.expanded=true;for(var i=0;i<root.length;i++)

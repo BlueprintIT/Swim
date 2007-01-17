@@ -208,6 +208,8 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.node = null;
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.indicatorDiv = null;
 
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.dragDropManager = null;
+
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.showFrame = function(iPageX, iPageY) {
 	var el = this.getEl();
 	var dragEl = this.getDragEl();
@@ -224,7 +226,7 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode = 
 	while (subnode) {
 		var elregion = YAHOO.util.Dom.getRegion(subnode.getEl());
 		if (ypos<elregion.top) {
-			if (this.node.tree.dragDropManager.canHold(node, this.node, mode))
+			if (this.dragDropManager.canHold(node, this.node, mode))
 				return { parent: node, position: pos };
 			else
 				return null;
@@ -233,14 +235,14 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode = 
 			var chregion = YAHOO.util.Dom.getRegion(subnode.getChildrenEl());
 			if (ypos<chregion.top) {
 				if (ypos>((chregion.top+elregion.top)/2)) {
-					if (this.node.tree.dragDropManager.canHold(subnode, this.node, mode))
+					if (this.dragDropManager.canHold(subnode, this.node, mode))
 						return { parent: subnode, position: 0 };
-					else if (this.node.tree.dragDropManager.canHold(node, this.node, mode))
+					else if (this.dragDropManager.canHold(node, this.node, mode))
 						return { parent: node, position: pos+1 };
 					else
 						return null;
 				}
-				else if (this.node.tree.dragDropManager.canHold(node, this.node, mode))
+				else if (this.dragDropManager.canHold(node, this.node, mode))
 					return { parent: node, position: pos };
 				else
 					return null;
@@ -251,14 +253,14 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode = 
 		}
 		if (ypos<elregion.bottom) {
 			if (ypos>((elregion.top+elregion.bottom)/2)) {
-				if ((subnode != this.node) && this.node.tree.dragDropManager.canHold(subnode, this.node, mode))
+				if ((subnode != this.node) && this.dragDropManager.canHold(subnode, this.node, mode))
 					return { parent: subnode, position: 0 };
-				else if (this.node.tree.dragDropManager.canHold(node, this.node, mode))
+				else if (this.dragDropManager.canHold(node, this.node, mode))
 					return { parent: node, position: pos+1 };
 				else
 					return null;
 			}
-			else if (this.node.tree.dragDropManager.canHold(node, this.node, mode))
+			else if (this.dragDropManager.canHold(node, this.node, mode))
 				return { parent: node, position: pos };
 			else
 				return null;
@@ -266,7 +268,7 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode = 
 		pos++;
 		subnode = subnode.nextSibling;
 	}
-	if (this.node.tree.dragDropManager.canHold(node, this.node, mode))
+	if (this.dragDropManager.canHold(node, this.node, mode))
 		return { parent: node, position: pos };
 	else
 		return null;
@@ -284,19 +286,21 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPosition = function
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.startDrag = function(x, y) {
-	this.node.tree.dragDropManager.onDragStart();
+	this.indicatorDiv = this.node.tree.indicatorDiv;
+	this.dragDropManager = this.node.tree.dragDropManager;
+	this.dragDropManager.onDragStart();
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragDrop = function(e, id) {
 	if (id != this.node.tree.getRoot().getChildrenElId())
 		return;
 		
-	this.node.tree.indicatorDiv.style.visibility = "hidden";
+	this.indicatorDiv.style.visibility = "hidden";
 
 	var point = this.getInsertPosition(e);
 
 	if (point)
-		this.node.tree.dragDropManager.onDragDrop(this.node, point.parent, point.position, this.node.tree.getDragMode(e));
+		this.dragDropManager.onDragDrop(this.node, point.parent, point.position, this.node.tree.getDragMode(e));
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOver = function(e, id) {
@@ -337,22 +341,22 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOver = function(e, id)
 		region = YAHOO.util.Dom.getRegion(BlueprintIT.widget.DraggableTreeView.getNodeLabel(this.node));
 		width = region.right-region.left;
 		
-		var s = this.node.tree.indicatorDiv.style;
+		var s = this.indicatorDiv.style;
 		s.width = width + "px";
 		s.visibility = "";
-		YAHOO.util.Dom.setXY(this.node.tree.indicatorDiv, [x, y]);
+		YAHOO.util.Dom.setXY(this.indicatorDiv, [x, y]);
 	}
 	else
-		this.node.tree.indicatorDiv.style.visibility = "hidden";
+		this.indicatorDiv.style.visibility = "hidden";
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOut = function(e, id) {
-	this.node.tree.indicatorDiv.style.visibility = "hidden";
+	this.indicatorDiv.style.visibility = "hidden";
 }
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.endDrag = function(e) {
-	this.node.tree.indicatorDiv.style.visibility = "hidden";
-	this.node.tree.dragDropManager.onDragEnd();
+	this.indicatorDiv.style.visibility = "hidden";
+	this.dragDropManager.onDragEnd();
 }
 
 BlueprintIT.widget.DraggableTreeView = function(id, dd) {

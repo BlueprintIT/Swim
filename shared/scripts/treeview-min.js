@@ -38,46 +38,46 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.initFrame=function(){Bluepri
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.nodeParentChange=function(){YAHOO.log('nodeParentChange');this.unreg();this.init(this.node,null);}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.resetConstraints=function(){}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.applyConfig=function(){this.padding=[0,0,0,0];this.isTarget=false;this.maintainOffset=false;this.primaryButtonOnly=true;this.resizeFrame=false;this.centerFrame=false;this.setDragElId(YAHOO.util.DDProxy.dragElId);}
-BlueprintIT.widget.DraggableTreeNodeProxy.prototype.node=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.indicatorDiv=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.showFrame=function(iPageX,iPageY){var el=this.getEl();var dragEl=this.getDragEl();dragEl.className="dragframe "+el.className;dragEl.innerHTML=YAHOO.util.Dom.allTextContent(el);BlueprintIT.widget.DraggableTreeNodeProxy.superclass.showFrame.call(this,iPageX,iPageY);}
-BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode=function(node,e){var ypos=YAHOO.util.Event.getPageY(e);var mode=this.node.tree.getDragMode(e);var pos=0;var subnode=node.children[0];while(subnode){var elregion=YAHOO.util.Dom.getRegion(subnode.getEl());if(ypos<elregion.top){if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.node=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.indicatorDiv=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.dragDropManager=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.showFrame=function(iPageX,iPageY){var el=this.getEl();var dragEl=this.getDragEl();dragEl.className="dragframe "+el.className;dragEl.innerHTML=YAHOO.util.Dom.allTextContent(el);BlueprintIT.widget.DraggableTreeNodeProxy.superclass.showFrame.call(this,iPageX,iPageY);}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode=function(node,e){var ypos=YAHOO.util.Event.getPageY(e);var mode=this.node.tree.getDragMode(e);var pos=0;var subnode=node.children[0];while(subnode){var elregion=YAHOO.util.Dom.getRegion(subnode.getEl());if(ypos<elregion.top){if(this.dragDropManager.canHold(node,this.node,mode))
 return{parent:node,position:pos};else
 return null;}
-if(subnode!=this.node){var chregion=YAHOO.util.Dom.getRegion(subnode.getChildrenEl());if(ypos<chregion.top){if(ypos>((chregion.top+elregion.top)/2)){if(this.node.tree.dragDropManager.canHold(subnode,this.node,mode))
-return{parent:subnode,position:0};else if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
+if(subnode!=this.node){var chregion=YAHOO.util.Dom.getRegion(subnode.getChildrenEl());if(ypos<chregion.top){if(ypos>((chregion.top+elregion.top)/2)){if(this.dragDropManager.canHold(subnode,this.node,mode))
+return{parent:subnode,position:0};else if(this.dragDropManager.canHold(node,this.node,mode))
 return{parent:node,position:pos+1};else
 return null;}
-else if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
+else if(this.dragDropManager.canHold(node,this.node,mode))
 return{parent:node,position:pos};else
 return null;}
 else if(ypos<chregion.bottom){return this.getInsertPositionFromNode(subnode,e);}}
-if(ypos<elregion.bottom){if(ypos>((elregion.top+elregion.bottom)/2)){if((subnode!=this.node)&&this.node.tree.dragDropManager.canHold(subnode,this.node,mode))
-return{parent:subnode,position:0};else if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
+if(ypos<elregion.bottom){if(ypos>((elregion.top+elregion.bottom)/2)){if((subnode!=this.node)&&this.dragDropManager.canHold(subnode,this.node,mode))
+return{parent:subnode,position:0};else if(this.dragDropManager.canHold(node,this.node,mode))
 return{parent:node,position:pos+1};else
 return null;}
-else if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
+else if(this.dragDropManager.canHold(node,this.node,mode))
 return{parent:node,position:pos};else
 return null;}
 pos++;subnode=subnode.nextSibling;}
-if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
+if(this.dragDropManager.canHold(node,this.node,mode))
 return{parent:node,position:pos};else
 return null;}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPosition=function(e){var point=this.getInsertPositionFromNode(this.node.tree.getRoot(),e);if(point&&this.node.tree.getDragMode(e)==BlueprintIT.widget.DraggableTreeView.DRAG_MOVE){if(point.parent.children[point.position]==this.node)
 return null;if((point.position>0)&&(point.parent.children[point.position-1]==this.node))
 return null;}
 return point;}
-BlueprintIT.widget.DraggableTreeNodeProxy.prototype.startDrag=function(x,y){this.node.tree.dragDropManager.onDragStart();}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.startDrag=function(x,y){this.indicatorDiv=this.node.tree.indicatorDiv;this.dragDropManager=this.node.tree.dragDropManager;this.dragDropManager.onDragStart();}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragDrop=function(e,id){if(id!=this.node.tree.getRoot().getChildrenElId())
-return;this.node.tree.indicatorDiv.style.visibility="hidden";var point=this.getInsertPosition(e);if(point)
-this.node.tree.dragDropManager.onDragDrop(this.node,point.parent,point.position,this.node.tree.getDragMode(e));}
+return;this.indicatorDiv.style.visibility="hidden";var point=this.getInsertPosition(e);if(point)
+this.dragDropManager.onDragDrop(this.node,point.parent,point.position,this.node.tree.getDragMode(e));}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOver=function(e,id){if(id!=this.node.tree.getRoot().getChildrenElId())
 return;var point=this.getInsertPosition(e);if(point){var x;var y;var width;var node;var region;if(point.parent.children.length==0){node=point.parent;region=YAHOO.util.Dom.getRegion(node.getEl());y=region.bottom;}
 else{if(point.position<point.parent.children.length){node=point.parent.children[point.position];region=YAHOO.util.Dom.getRegion(node.getEl());y=region.top;}
 else if(point.parent.children.length>0){node=point.parent.children[point.parent.children.length-1];region=YAHOO.util.Dom.getRegion(node.getEl());y=region.bottom;}}
-var label=BlueprintIT.widget.DraggableTreeView.getNodeLabel(point.parent);region=YAHOO.util.Dom.getRegion(label);x=region.left;region=YAHOO.util.Dom.getRegion(BlueprintIT.widget.DraggableTreeView.getNodeLabel(this.node));width=region.right-region.left;var s=this.node.tree.indicatorDiv.style;s.width=width+"px";s.visibility="";YAHOO.util.Dom.setXY(this.node.tree.indicatorDiv,[x,y]);}
+var label=BlueprintIT.widget.DraggableTreeView.getNodeLabel(point.parent);region=YAHOO.util.Dom.getRegion(label);x=region.left;region=YAHOO.util.Dom.getRegion(BlueprintIT.widget.DraggableTreeView.getNodeLabel(this.node));width=region.right-region.left;var s=this.indicatorDiv.style;s.width=width+"px";s.visibility="";YAHOO.util.Dom.setXY(this.indicatorDiv,[x,y]);}
 else
-this.node.tree.indicatorDiv.style.visibility="hidden";}
-BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOut=function(e,id){this.node.tree.indicatorDiv.style.visibility="hidden";}
-BlueprintIT.widget.DraggableTreeNodeProxy.prototype.endDrag=function(e){this.node.tree.indicatorDiv.style.visibility="hidden";this.node.tree.dragDropManager.onDragEnd();}
+this.indicatorDiv.style.visibility="hidden";}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.onDragOut=function(e,id){this.indicatorDiv.style.visibility="hidden";}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.endDrag=function(e){this.indicatorDiv.style.visibility="hidden";this.dragDropManager.onDragEnd();}
 BlueprintIT.widget.DraggableTreeView=function(id,dd){if(id){this.init(id);this.dragDropManager=dd;this.createIndicator();}}
 YAHOO.extend(BlueprintIT.widget.DraggableTreeView,YAHOO.widget.TreeView);BlueprintIT.widget.DraggableTreeView.DRAG_MOVE=0;BlueprintIT.widget.DraggableTreeView.DRAG_COPY=1;BlueprintIT.widget.DraggableTreeView.prototype.dragType=BlueprintIT.widget.DraggableTreeView.DRAG_MOVE;BlueprintIT.widget.DraggableTreeView.prototype.getDragMode=function(e){return this.dragType;}
 BlueprintIT.widget.DraggableTreeView.prototype.setDefaultDragMode=function(mode){this.dragType=mode;}

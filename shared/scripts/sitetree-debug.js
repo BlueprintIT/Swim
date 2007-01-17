@@ -117,6 +117,11 @@ BlueprintIT.widget.SiteTree.prototype = {
 				return false;
 		}
 		
+		if ((child.parent.data.id == 'uncat') && (mode == BlueprintIT.widget.DraggableTreeView.DRAG_COPY)) {
+			// Cannot copy from uncategorised
+			return false;
+		}
+		
 		//console.log("Checking drop of "+child.data.id+" on "+parent.data.id);
 		if (parent.data.contains && child.data.type && parent.data.contains[child.data.type])
 			return true;
@@ -163,13 +168,17 @@ BlueprintIT.widget.SiteTree.prototype = {
 			oldparent.removeChild(node);
 			if (oldparent.children.length == 0)
 				oldparent.expanded = false;
-			parent.insertChild(node, position);
-			if (parent.children.length == 1)
-				parent.expanded = true;
 			oldparent.redraw();
-			parent.redraw();
 			this.tree.setupDD(oldparent);
-			this.tree.setupDD(parent);
+			if ((parent.data.id == 'uncat') && (this.items[node.data.id].length>1)) {
+				this.removeNode(node);
+			} else {
+				parent.insertChild(node, position);
+				if (parent.children.length == 1)
+					parent.expanded = true;
+				parent.redraw();
+				this.tree.setupDD(parent);
+			}
 		} else {
 			var newnode = this.cloneNode(node, parent);
 			if (parent.children.length == 1)
@@ -280,13 +289,15 @@ BlueprintIT.widget.SiteTree.prototype = {
 	
 	removeNode: function(node) {
 		var parent = node.parent;
-		parent.removeChild(node);
-		parent.redrawChildren();
-		var bucket = this.items[node.id];
+		if (parent) {
+			parent.removeChild(node);
+			parent.redrawChildren();
+		}
+		var bucket = this.items[node.data.id];
 		var pos = bucket.indexOf(node);
 		bucket.splice(pos,1);
 		if (bucket.length == 0) {
-			delete this.items[node.id];
+			delete this.items[node.data.id];
 			if (this.selected == id)
 				this.selected = null;
 		}
