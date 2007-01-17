@@ -201,6 +201,7 @@ BlueprintIT.widget.DraggableTreeNodeProxy.prototype.applyConfig = function() {
   this.primaryButtonOnly = true;
   this.resizeFrame       = false;
   this.centerFrame       = false;
+  this.scroll            = false;
   this.setDragElId(YAHOO.util.DDProxy.dragElId);
 }
 
