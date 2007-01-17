@@ -158,13 +158,33 @@ BlueprintIT.widget.SiteTree.prototype = {
 			valid = true;
 		}
 		
+		if (mode == BlueprintIT.widget.DraggableTreeView.DRAG_MOVE) {
+			var oldparent = node.parent;
+			oldparent.removeChild(node);
+			if (oldparent.children.length == 0)
+				oldparent.expanded = false;
+			parent.insertChild(node, position);
+			if (parent.children.length == 1)
+				parent.expanded = true;
+			oldparent.redraw();
+			parent.redraw();
+			this.tree.setupDD(oldparent);
+			this.tree.setupDD(parent);
+		} else {
+			var newnode = this.cloneNode(node, parent);
+			if (parent.children.length == 1)
+				parent.expanded = true;
+			parent.insertChild(newnode, position);
+			parent.redraw();
+			this.tree.setupDD(parent);
+		}
+		
 		if (valid) {
 			var callback = {
 				success: function(obj) {
-					this.loadTree();
 				},
 				failure: function(obj) {
-					alert("Operation failed");
+					alert("There was an error updating the site structure. Reloading current structure.");
 					this.loadTree();
 				},
 				argument: null,
@@ -220,6 +240,14 @@ BlueprintIT.widget.SiteTree.prototype = {
 				this.items[id][i].setSelected(true);
 			this.selected = id;
 		}
+	},
+	
+	cloneNode: function(node, newparent) {
+		var newnode = this.createNode(node.data.id, node.data.label, node.data.type, node.data.published, node.data.contains, newparent);
+		newnode.expanded = node.expanded;
+		for (var i=0; i<node.children.length; i++)
+			this.cloneNode(node.children[i], newnode);
+		return newnode;
 	},
 	
 	createNode: function(id, label, type, published, contents, parentnode) {

@@ -17,7 +17,7 @@ style+=" iconnode_leaf_"+this.data.type;}
 return style;}
 BlueprintIT.widget.IconNode.prototype.toggle=function(){BlueprintIT.widget.IconNode.superclass.toggle.call(this);this.getContentEl().className=this.getContentStyle();}
 BlueprintIT.widget.IconNode.prototype.getNodeHtml=function(){this.contentStyle=this.getContentStyle();return BlueprintIT.widget.IconNode.superclass.getNodeHtml.call(this);}
-BlueprintIT.widget.IconNode.prototype.redraw=function(){this.initContent(this.data,true);this.getContentEl().className=this.getContentStyle();this.getEl().innerHTML=this.getNodeHTML()+this.getChildrenHTML();}
+BlueprintIT.widget.IconNode.prototype.redraw=function(){this.initContent(this.data,true);this.getContentEl().className=this.getContentStyle();this.getEl().innerHTML=this.getNodeHtml()+this.getChildrenHtml();}
 BlueprintIT.widget.IconNode.prototype.redrawNode=function(){this.initContent(this.data,true);this.getContentEl().className=this.getContentStyle();this.getContentEl().innerHTML=this.html;}
 BlueprintIT.widget.IconNode.prototype.redrawChildren=function(){this.getChildrenEl().innerHTML=this.completeRender();}
 BlueprintIT.widget.StyledTextNode=function(oData,oParent,expanded){if(oParent){this.init(oData,oParent,expanded);this.setUpLabel(oData);this.setUpStyles(oData);}}
@@ -28,11 +28,15 @@ style+=' '+this.iconClass+' '+this.iconClass+loc+type;}
 return style;}
 BlueprintIT.widget.StyledTextNode.prototype.getHoverStyle=function(){var style=YAHOO.widget.TextNode.prototype.getHoverStyle.call(this);style+=this.iconClass;return style;}
 YAHOO.util.DDM.refreshCache=function(groups){for(var sGroup in groups){if("string"!=typeof sGroup){continue;}
-for(var i in this.ids[sGroup]){var oDD=this.ids[sGroup][i];if(this.isTypeOfDD(oDD)&&oDD.isTarget){var loc=this.getLocation(oDD);if(loc){this.locationCache[oDD.id]=loc;}else{delete this.locationCache[oDD.id];}}}}};BlueprintIT.widget.DraggableTreeNodeProxy=function(node,sGroup){if(node){this.node=node;var el=BlueprintIT.widget.DraggableTreeView.getNodeLabel(node);while(el&&el.tagName!='TD')
+for(var i in this.ids[sGroup]){var oDD=this.ids[sGroup][i];if(this.isTypeOfDD(oDD)&&oDD.isTarget){var loc=this.getLocation(oDD);if(loc){this.locationCache[oDD.id]=loc;}else{delete this.locationCache[oDD.id];}}else
+delete this.locationCache[oDD.id];}}};BlueprintIT.widget.DraggableTreeNodeProxy=function(node,sGroup){if(node){this.node=node;this.init(node,sGroup);this.initFrame();}}
+YAHOO.extend(BlueprintIT.widget.DraggableTreeNodeProxy,YAHOO.util.DDProxy);BlueprintIT.widget.DraggableTreeNodeProxy.prototype.init=function(node,sGroup,config){var el=BlueprintIT.widget.DraggableTreeView.getNodeLabel(node);while(el&&el.tagName!='TD')
 el=el.parentNode;if(el&&el.id)
 el=el.id;else
-el=BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);this.init(el,sGroup);delete this.invalidHandleTypes["A"];this.initFrame();}}
-YAHOO.extend(BlueprintIT.widget.DraggableTreeNodeProxy,YAHOO.util.DDProxy);BlueprintIT.widget.DraggableTreeNodeProxy.prototype.resetConstraints=function(){}
+el=BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);BlueprintIT.widget.DraggableTreeNodeProxy.superclass.init.call(this,el,sGroup,config);delete this.invalidHandleTypes["A"];this._domRef=null;}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.initFrame=function(){BlueprintIT.widget.DraggableTreeNodeProxy.superclass.initFrame.call(this);var dragEl=this.getDragEl();YAHOO.util.Dom.setStyle(dragEl,'opacity',0.4);}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.nodeParentChange=function(){YAHOO.log('nodeParentChange');this.unreg();this.init(this.node,null);}
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.resetConstraints=function(){}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.applyConfig=function(){this.padding=[0,0,0,0];this.isTarget=false;this.maintainOffset=false;this.primaryButtonOnly=true;this.resizeFrame=false;this.centerFrame=false;this.setDragElId(YAHOO.util.DDProxy.dragElId);}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.node=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.indicatorDiv=null;BlueprintIT.widget.DraggableTreeNodeProxy.prototype.showFrame=function(iPageX,iPageY){var el=this.getEl();var dragEl=this.getDragEl();dragEl.className="dragframe "+el.className;dragEl.innerHTML=YAHOO.util.Dom.allTextContent(el);BlueprintIT.widget.DraggableTreeNodeProxy.superclass.showFrame.call(this,iPageX,iPageY);}
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.getInsertPositionFromNode=function(node,e){var ypos=YAHOO.util.Event.getPageY(e);var mode=this.node.tree.getDragMode(e);var pos=0;var subnode=node.children[0];while(subnode){var elregion=YAHOO.util.Dom.getRegion(subnode.getEl());if(ypos<elregion.top){if(this.node.tree.dragDropManager.canHold(node,this.node,mode))
@@ -86,10 +90,16 @@ return node.getLabelEl();if(node.getContentEl)
 return node.getContentEl();if(node.getEl)
 return node.getEl();var id=BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);if(id)
 return document.getElementById(id);return null;}
-BlueprintIT.widget.DraggableTreeView.prototype.dragDropManager=null;BlueprintIT.widget.DraggableTreeView.prototype.setupDD=function(node){if(node!=this.getRoot()&&this.dragDropManager.canDrag(node))
-new BlueprintIT.widget.DraggableTreeNodeProxy(node);var pos=0;for(pos=0;pos<node.children.length;pos++)
+BlueprintIT.widget.DraggableTreeView.prototype.dragDropManager=null;BlueprintIT.widget.DraggableTreeView.prototype.setupDD=function(node){if(node!=this.getRoot()&&this.dragDropManager.canDrag(node)){if(!node.dtnProxy)
+node.dtnProxy=new BlueprintIT.widget.DraggableTreeNodeProxy(node);else
+node.dtnProxy.init(node);}
+var pos=0;for(pos=0;pos<node.children.length;pos++)
 this.setupDD(node.children[pos]);}
 BlueprintIT.widget.DraggableTreeView.prototype.createIndicator=function(){if(!this.indicatorDiv){this.indicatorDiv=document.createElement("div");var s=this.indicatorDiv.style;s.position="absolute";s.visibility="hidden";s.border="1px solid black";s.height="0px";s.lineHeight="0px";s.zIndex=999;document.body.appendChild(this.indicatorDiv);}};BlueprintIT.widget.DraggableTreeView.prototype.draw=function(){BlueprintIT.widget.DraggableTreeView.superclass.draw.call(this);SiteTree.log("basic draw");if(this.dragDropManager){this.setupDD(this.getRoot());SiteTree.log("dd proxy setup");new YAHOO.util.DDTarget(this.getRoot().getChildrenElId());}}
+BlueprintIT.widget.DraggableTreeView.prototype.unregDD=function(node){for(var i=0;i<node.children.length;i++)
+this.unregDD(node.children[i]);if(node.dtnProxy)
+node.dtnProxy.unreg();}
+BlueprintIT.widget.DraggableTreeView.prototype.popNode=function(node){this.unregDD(node);BlueprintIT.widget.DraggableTreeView.superclass.popNode.call(this,node);}
 BlueprintIT.widget.TreeViewLoader=function(){}
 BlueprintIT.widget.TreeViewLoader.prototype={}
 BlueprintIT.widget.TreeViewLoader.prototype.loadNode=function(treenode,item){var nodes=[];var node=item.firstChild;while(node){if((node.nodeType==1)&&(node.tagName.toLowerCase()!="ul")&&(node.tagName.toLowerCase()!="ol")){nodes.push(node);}
@@ -110,7 +120,8 @@ BlueprintIT.widget.TreeViewLoader.prototype.loadNodeContents=function(treenode,l
 node=node.nextSibling;}}
 BlueprintIT.widget.TreeViewLoader.prototype.loadFromList=function(treeid,listid){var tree=new BlueprintIT.widget.TreeView(treeid);var list=document.getElementById(listid);if(list&&(list.tagName.toLowerCase()=="ul"||list.tagName.toLowerCase()=="ol")){this.loadNodeContents(tree.getRoot(),list);}
 return tree;}
+YAHOO.widget.Node.prototype.insertChild=function(childNode,pos){if(this.children.length<pos)
+return null;if(childNode.tree)
+childNode.tree.popNode(childNode);if(this.children.length==0){this.appendChild(childNode);}else if(pos>0){childNode.insertAfter(this.children[pos-1]);}else{childNode.insertBefore(this.children[pos]);}}
 YAHOO.widget.Node.prototype.removeChild=function(childNode){if(childNode.parent!=this)
-return;var prev=childNode.previousSibling;var next=childNode.nextSibling;if(next)
-next.previousSibling=prev;if(prev)
-prev.nextSibling=next;var pos=this.children.indexOf(childNode);this.children.splice(pos,1);}
+return;childNode.tree.popNode(childNode);}

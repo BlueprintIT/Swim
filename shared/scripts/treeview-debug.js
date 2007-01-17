@@ -75,7 +75,7 @@ BlueprintIT.widget.IconNode.prototype.getNodeHtml = function() {
 BlueprintIT.widget.IconNode.prototype.redraw = function() {
 	this.initContent(this.data, true);
 	this.getContentEl().className = this.getContentStyle();
-	this.getEl().innerHTML = this.getNodeHTML() + this.getChildrenHTML();
+	this.getEl().innerHTML = this.getNodeHtml() + this.getChildrenHtml();
 }
 
 BlueprintIT.widget.IconNode.prototype.redrawNode = function() {
@@ -149,7 +149,8 @@ YAHOO.util.DDM.refreshCache = function(groups) {
                     // the element is not in a usable state
                     // oDD.unreg();
                 }
-            }
+            } else
+            	delete this.locationCache[oDD.id];
         }
     }
 };
@@ -157,21 +158,38 @@ YAHOO.util.DDM.refreshCache = function(groups) {
 BlueprintIT.widget.DraggableTreeNodeProxy = function(node, sGroup) {
 	if (node) {
 		this.node = node;
-		var el = BlueprintIT.widget.DraggableTreeView.getNodeLabel(node);
-		while (el && el.tagName != 'TD')
-			el = el.parentNode;
-		if (el && el.id)
-			el = el.id;
-		else
-			el = BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);
-			
-		this.init(el, sGroup);
-		delete this.invalidHandleTypes["A"];
+		this.init(node, sGroup);
+		//node.subscribe('parentChange', this.nodeParentChange, this, true);
 		this.initFrame();
 	}
 }
 
 YAHOO.extend(BlueprintIT.widget.DraggableTreeNodeProxy, YAHOO.util.DDProxy);
+
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.init = function(node, sGroup, config) {
+	var el = BlueprintIT.widget.DraggableTreeView.getNodeLabel(node);
+	while (el && el.tagName != 'TD')
+		el = el.parentNode;
+	if (el && el.id)
+		el = el.id;
+	else
+		el = BlueprintIT.widget.DraggableTreeView.getNodeLabelId(node);
+	BlueprintIT.widget.DraggableTreeNodeProxy.superclass.init.call(this, el, sGroup, config);
+	delete this.invalidHandleTypes["A"];
+	this._domRef = null;
+}
+
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.initFrame = function() {
+	BlueprintIT.widget.DraggableTreeNodeProxy.superclass.initFrame.call(this);
+	var dragEl = this.getDragEl();
+	YAHOO.util.Dom.setStyle(dragEl, 'opacity', 0.4);
+}
+
+BlueprintIT.widget.DraggableTreeNodeProxy.prototype.nodeParentChange = function() {
+	YAHOO.log('nodeParentChange');
+	this.unreg();
+	this.init(this.node, null);
+}
 
 BlueprintIT.widget.DraggableTreeNodeProxy.prototype.resetConstraints = function() {
 }
@@ -386,8 +404,12 @@ BlueprintIT.widget.DraggableTreeView.getNodeLabel = function(node) {
 BlueprintIT.widget.DraggableTreeView.prototype.dragDropManager = null;
 
 BlueprintIT.widget.DraggableTreeView.prototype.setupDD = function(node) {
-	if (node != this.getRoot() && this.dragDropManager.canDrag(node))
-		new BlueprintIT.widget.DraggableTreeNodeProxy(node);
+	if (node != this.getRoot() && this.dragDropManager.canDrag(node)) {
+		if (!node.dtnProxy)
+			node.dtnProxy = new BlueprintIT.widget.DraggableTreeNodeProxy(node);
+		else
+			node.dtnProxy.init(node);
+	}
 	
 	var pos = 0;
 	for (pos = 0; pos<node.children.length; pos++)
@@ -417,6 +439,19 @@ BlueprintIT.widget.DraggableTreeView.prototype.draw = function() {
 		SiteTree.log("dd proxy setup");
 		new YAHOO.util.DDTarget(this.getRoot().getChildrenElId());
 	}
+}
+
+BlueprintIT.widget.DraggableTreeView.prototype.unregDD = function(node) {
+	for (var i=0; i<node.children.length; i++)
+		this.unregDD(node.children[i]);
+		
+	if (node.dtnProxy)
+		node.dtnProxy.unreg();
+}
+
+BlueprintIT.widget.DraggableTreeView.prototype.popNode = function(node) {
+	this.unregDD(node);
+	BlueprintIT.widget.DraggableTreeView.superclass.popNode.call(this, node);
 }
 
 BlueprintIT.widget.TreeViewLoader = function() {
@@ -511,17 +546,25 @@ BlueprintIT.widget.TreeViewLoader.prototype.loadFromList = function(treeid, list
 	return tree;
 }
 
+YAHOO.widget.Node.prototype.insertChild = function(childNode, pos) {
+	if (this.children.length < pos)
+		return null;
+	
+	if (childNode.tree)
+		childNode.tree.popNode(childNode);
+
+	if (this.children.length==0) {
+		this.appendChild(childNode);
+	} else if (pos > 0) {
+		childNode.insertAfter(this.children[pos-1]);
+	} else {
+		childNode.insertBefore(this.children[pos]);
+	}
+}
+
 YAHOO.widget.Node.prototype.removeChild = function(childNode) {
 	if (childNode.parent != this)
 		return;
 
-	var prev = childNode.previousSibling;
-	var next = childNode.nextSibling;
-	if (next)
-		next.previousSibling = prev;
-	if (prev)
-		prev.nextSibling = next;
-		
-	var pos = this.children.indexOf(childNode);
-	this.children.splice(pos, 1);
+	childNode.tree.popNode(childNode);
 }
