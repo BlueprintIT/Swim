@@ -18,7 +18,7 @@ tinyMCEparams = {
 	
 	// Cleanup/Output
 	cleanup_on_startup: true,
-	invalid_elements: "font,div,applet,iframe,object",
+	invalid_elements: "font,applet,iframe,object",
 	remove_linebreaks: false,
 	fix_list_elements: true,
 	fix_table_elements: true,

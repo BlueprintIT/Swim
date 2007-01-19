@@ -25,8 +25,8 @@ class HTMLField extends BaseHTMLField
     {
       $head = $smarty->get_registered_object('HEAD');
       //$head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce.js');
-      $head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce_src.js');
-      //$head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce_gzip.js');
+      //$head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce_src.js');
+      $head->addScript($_PREFS->getPref('url.tinymce').'/jscripts/tiny_mce/tiny_mce_gzip.js');
       $head->addScript($_PREFS->getPref('url.admin.static').'/scripts/tinymce.js');
       $result = '<textarea class="HTMLEditor" style="width: 100%; height: 400px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.$this->getPassedValue($request).'</textarea>';
       $result.= "\n".'<script type="text/javascript">'."\n";
