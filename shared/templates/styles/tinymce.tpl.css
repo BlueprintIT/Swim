@@ -1,0 +1,26 @@
+/* Indent uses this */
+[$CONTEXT] blockquote {
+	margin-left: 20px;
+}
+
+/* Align text properly */
+[$CONTEXT] *[ldelim]align="center"[rdelim] {
+  text-align: center;
+}
+
+[$CONTEXT] *[ldelim]align="left"[rdelim] {
+  text-align: left;
+}
+
+[$CONTEXT] *[ldelim]align="right"[rdelim] {
+  text-align: right;
+}
+
+/* float images */
+[$CONTEXT img[ldelim]align="left"[rdelim] {
+	float: left;
+}
+
+[$CONTEXT img[ldelim]align="right"[rdelim] {
+	float: right;
+}

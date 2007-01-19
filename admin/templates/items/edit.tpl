@@ -123,6 +123,7 @@ var item = {ldelim}
 					<div id="outer_field_{$field->getId()}">{$field->getEditor($REQUEST,$SMARTY)}</div>
 				{/if}
 			{/foreach}
+<script type="text/javascript">if (initialiseTinyMCE) initialiseTinyMCE_GZ();</script>
 <script type="text/javascript">if (initialiseTinyMCE) initialiseTinyMCE();</script>
 		</div>
 	</div>

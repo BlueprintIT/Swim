@@ -470,6 +470,8 @@ var TinyMCE_AdvBlockFormatPlugin = {
 					if (context == end)
 						return nodes;
 					context = context.parentNode;
+					if (!context)
+						return nodes;
 				}
 				context = context.nextSibling;
 			}

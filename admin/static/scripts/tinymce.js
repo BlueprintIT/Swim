@@ -1,3 +1,11 @@
+tinyMCE_GZparams = {
+	plugins : "print,spellchecker,paste,searchreplace,table,advblockformat",
+	themes : 'advanced',
+	languages : 'en',
+	disk_cache : true,
+	debug : false
+}
+
 tinyMCEparams = {
 	// General
 	mode: "textareas",
@@ -74,6 +82,11 @@ function tinyMCEEditorInit(inst)
 {
 	// Applies a unique style to the editor body for styling
 	inst.getBody().className+=" "+inst.formTargetElementId;
+}
+
+function initialiseTinyMCE_GZ()
+{
+	tinyMCE_GZ.init(tinyMCE_GZparams);
 }
 
 function initialiseTinyMCE()
