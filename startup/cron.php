@@ -63,8 +63,8 @@ function checkConsistency()
   }
 }
 
-$host = $_PREFS->getPref('url.host.1.hostname');
-LoggerManager::setLogOutput('',new StdOutLogOutput($host.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $host.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
+$mainhost = $_PREFS->getPref('url.host.1.hostname');
+LoggerManager::setLogOutput('',new StdOutLogOutput($mainhost.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $host.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
 
 SwimEngine::ensureStarted();
 
@@ -145,12 +145,20 @@ if (isset($_GET['backup']))
 {
 	if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))
 	{
-		$backupfile = $_PREFS->getPref('storage.backup').'/'.$host.'-';
+		$backupfile = $_PREFS->getPref('storage.backup').'/'.$mainhost.'-';
 		$backupfile .= date('Ymd-Hi');
 		$backupfile .= '.tar.bz';
-		system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.site').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));
-		system($_PREFS->getPref('tools.tar').' -cjhf '.$backupfile.' -C '.$_PREFS->getPref('storage.site').' database.sql files');
-		unlink($_PREFS->getPref('storage.site').'/database.sql');
+		if (is_writable($backupfile))
+		{
+			system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.site').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));
+			system($_PREFS->getPref('tools.tar').' -cjhf '.$backupfile.' -C '.$_PREFS->getPref('storage.site').' database.sql files');
+			unlink($_PREFS->getPref('storage.site').'/database.sql');
+		}
+		else
+		{
+			$log = Loggermanager::getLogger('swim.backup');
+			$log->error('Unable to backup since backup file is not writable.');
+		}
 	}
 	else
 	{
