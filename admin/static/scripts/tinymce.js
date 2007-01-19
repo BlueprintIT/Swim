@@ -1,12 +1,4 @@
-tinyMCE_GZparams = {
-	plugins : "print,spellchecker,paste,searchreplace,table,advblockformat",
-	themes : 'advanced',
-	languages : 'en',
-	disk_cache : true,
-	debug : false
-}
-
-tinyMCEparams = {
+var tinyMCEparams = {
 	// General
 	mode: "textareas",
 	theme: "advanced",
@@ -59,6 +51,14 @@ tinyMCEparams = {
 	
 	// Plugins
 	advblockformat_stylesurl: ""
+};
+
+var tinyMCE_GZparams = {
+	plugins : tinyMCEparams.plugins,
+	themes : tinyMCEparams.theme,
+	languages : 'en',
+	disk_cache : true,
+	debug : false
 };
 
 function tinyMCEFileBrowser(field, url, type, win)
