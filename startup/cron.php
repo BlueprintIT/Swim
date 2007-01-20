@@ -64,7 +64,7 @@ function checkConsistency()
 }
 
 $mainhost = $_PREFS->getPref('url.host.1.hostname');
-LoggerManager::setLogOutput('',new StdOutLogOutput($mainhost.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $host.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
+LoggerManager::setLogOutput('',new StdOutLogOutput($mainhost.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $mainhost.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
 
 SwimEngine::ensureStarted();
 
