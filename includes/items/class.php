@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-define('SWIM_FIELDSET_CACHE_VERSION',3);
+define('SWIM_FIELDSET_CACHE_VERSION',4);
 
 class FieldSet extends XMLSerialized
 {
@@ -542,6 +542,7 @@ class FieldSetManager
   
   public static function loadFieldSets($files)
   {
+  	$loads = array();
     $doc = new DOMDocument();
     foreach ($files as $file)
     {
@@ -566,7 +567,7 @@ class FieldSetManager
                 $class = new ItemClass($id);
               }
               self::$classes[$id]=$class;
-              $class->load($el);
+              array_push($loads, array('item' => $class, 'data' => $el));
             }
             else if ($el->tagName=='view')
             {
@@ -582,7 +583,7 @@ class FieldSetManager
                 $view = new ItemView($id);
               }
               self::$views[$id]=$view;
-              $view->load($el);
+              array_push($loads, array('item' => $view, 'data' => $el));
             }
             else if ($el->tagName=='optionset')
             {
@@ -600,6 +601,8 @@ class FieldSetManager
         self::$log->debug('No fieldsets defined at '.$file);
       }
     }
+    foreach ($loads as $item)
+    	$item['item']->load($item['data']);
   }
   
   public static function getOptionSets()

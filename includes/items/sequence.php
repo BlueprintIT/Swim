@@ -137,6 +137,8 @@ class Sequence extends ClassField
         $class = FieldSetManager::getClass($name);
         if ($class !== null)
           $this->classes[$name] = $class;
+        else
+        	$this->log->warn('Unknown class '.$name.' specified in definition.');
       }
     }
     else
