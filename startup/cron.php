@@ -65,6 +65,7 @@ function checkConsistency()
 
 $mainhost = $_PREFS->getPref('url.host.1.hostname');
 LoggerManager::setLogOutput('',new StdOutLogOutput($mainhost.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $mainhost.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
+$log = Loggermanager::getLogger('swim.cron');
 
 SwimEngine::ensureStarted();
 
@@ -73,7 +74,7 @@ setContentType('text/plain');
 checkConsistency();
 SearchEngine::buildIndex();
 
-if (is_writable($_PREFS->getPref('storage.sitedir').'/.htaccess'))
+if (is_writable($_PREFS->getPref('storage.sitedir')))
 {
 	$hosts = $_PREFS->getPrefBranch('url.host');
 	
@@ -137,9 +138,7 @@ RewriteRule .* swim/startup/swim.php [L]
 		$log->error('Unable to write configuration. Attempt to open htaccess failed');
 }
 else
-{
 	$log->error('Unable to write configuration. htaccess in unwritable');
-}
 
 if (isset($_GET['backup']))
 {
@@ -156,16 +155,10 @@ if (isset($_GET['backup']))
 			unlink($_PREFS->getPref('storage.site').'/database.sql');
 		}
 		else
-		{
-			$log = Loggermanager::getLogger('swim.backup');
 			$log->error('Unable to backup since backup file is not writable.');
-		}
 	}
 	else
-	{
-		$log = Loggermanager::getLogger('swim.backup');
 		$log->error('Unable to backup since tools are unavailable.');
-	}
 }
 
 ?>
