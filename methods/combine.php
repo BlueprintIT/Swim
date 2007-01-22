@@ -56,10 +56,10 @@ function method_combine($request)
 			{
 				case 'text/css':
 				case 'text/javascript':
-		  		setCacheInfo($newest);
+		  		RequestCache::setCacheInfo($newest);
 					break;
 				default:
-					setNoCache();
+					RequestCache::setNoCache();
 			}
   		foreach ($paths as $path)
   		{

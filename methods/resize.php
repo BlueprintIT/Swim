@@ -36,13 +36,11 @@ function method_resize($request)
 		  if ($request->hasQueryVar('type'))
 			  $mimetype = $request->getQueryVar('type');
   			setContentType($mimetype);
-  			setCacheInfo(filemtime($cachefile));
+  			RequestCache::setCacheInfo(filemtime($cachefile));
   			readfile($cachefile);
   			return;
   		}
   	}
-  	
-  	setCacheInfo(filemtime($filename));
   	
 		if ($mimetype=="image/jpeg")
 			$image = imagecreatefromjpeg($filename);
@@ -170,7 +168,7 @@ function method_resize($request)
 
 		setContentType($mimetype);
 
-		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || @recursiveMkDir($cachedir)))
+		if (($request->hasQueryVar('cache')) && (is_dir($cachedir) || @recursiveMkDir($cachedir)) && (is_writable($cachedir)))
 		{
 			if ($mimetype=='image/jpeg')
 				imagejpeg($newimage, $cachefile, $quality);
@@ -178,7 +176,10 @@ function method_resize($request)
 				imagepng($newimage, $cachefile);
 			else if ($mimetype=='image/gif')
 				imagegif($newimage, $cachefile);
+	  	RequestCache::setCacheInfo(filemtime($cachefile));  	
 		}
+		else
+	  	RequestCache::setCacheInfo(filemtime($filename));  	
 		
 		if ($mimetype=='image/jpeg')
 			imagejpeg($newimage, '', $quality);

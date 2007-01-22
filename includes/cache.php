@@ -48,4 +48,79 @@ class ObjectCache
   }
 }
 
+class RequestCache
+{
+	private static $defined = false;
+	
+	public static function isCacheDefined()
+	{
+		return self::$defined;
+	}
+	
+	public static function setNoCache()
+	{
+		if (self::$defined)
+			return;
+		self::$defined = true;
+		
+		header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: no-cache');
+		header('Expires: '.httpdate(time()-3600));
+	}
+	
+	public static function setCacheTime($minutes)
+	{
+		if (self::$defined)
+			return;
+		self::$defined = true;
+		
+		header('Cache-Control: max-age='.($minutes*60).', public');
+		header('Pragma: cache');
+		header('Expires: '.httpdate(time()+($minutes*60)));
+	}
+	
+	public static function setCacheInfo($date,$etag=false)
+	{
+		if (self::$defined)
+			return;
+		self::$defined = true;
+		
+		$log=LoggerManager::getLogger('swim.requestcache');
+	
+		header('Cache-Control: must-revalidate');
+		if ($date!=false)
+			header('Last-Modified: '.httpdate($date));
+		if ($etag!==false)
+			header('ETag: '.$etag);
+	
+		if (((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))&&($date!==false))
+			||((isset($_SERVER['HTTP_IF_NONE_MATCH'])))&&($etag!==false))
+		{
+			$log->debug('Found a cache check header');
+			if ((isset($_SERVER['HTTP_IF_NONE_MATCH']))&&($etag!==false))
+			{
+				$log->debug('Checking etag');
+				if ($etag!=$_SERVER['HTTP_IF_NONE_MATCH'])
+				{
+					$log->debug('ETag differs');
+					return;
+				}
+			}
+			if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))&&($date!==false))
+			{
+				$log->debug('Checking modification date');
+				$checkdate=strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+				if ($checkdate!=$date)
+				{
+					$log->debug('Date differs');
+					return;
+				}
+			}
+			$log->debug('Resource is cached');
+			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
+			SwimEngine::shutdown();
+		}
+	}
+}
+
 ?>

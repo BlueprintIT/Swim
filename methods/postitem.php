@@ -26,7 +26,7 @@ function method_postitem($request)
   
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if (!$request->hasQueryVar('itemversion'))
   {

@@ -192,7 +192,7 @@ function displayGeneralError($request,$message)
   
 	$log = LoggerManager::getLogger('swim');
 	$log->errorTrace('General Error - '.$message);
-	setNoCache();
+	RequestCache::setNoCache();
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
   $smarty = createSmarty($request);
   $smarty->assign('message', $message);
@@ -203,7 +203,7 @@ function displayNotFound($request)
 {
 	global $_PREFS;
 
-	setNoCache();
+	RequestCache::setNoCache();
  	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
   $smarty = createSmarty($request);
   $smarty->display($_PREFS->getPref('errors.notfound.template'));
@@ -215,63 +215,10 @@ function displayServerError($request)
 
 	$log = LoggerManager::getLogger('swim');
 	$log->errorTrace('Server Error');
-	setNoCache();
+	RequestCache::setNoCache();
 	header($_SERVER["SERVER_PROTOCOL"]." 500 Internal Server Error");
   $smarty = createSmarty($request);
   $smarty->display($_PREFS->getPref('errors.server.template'));
-}
-
-function setNoCache()
-{
-	header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-	header('Pragma: no-cache');
-	header('Expires: '.httpdate(time()-3600));
-}
-
-function setCacheTime($minutes)
-{
-	header('Cache-Control: max-age='.($minutes*60).', public');
-	header('Pragma: cache');
-	header('Expires: '.httpdate(time()+($minutes*60)));
-}
-
-function setCacheInfo($date,$etag=false)
-{
-	$log=LoggerManager::getLogger('swim.cache');
-
-	header('Cache-Control: must-revalidate');
-	if ($date!=false)
-		header('Last-Modified: '.httpdate($date));
-	if ($etag!==false)
-		header('ETag: '.$etag);
-
-	if (((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))&&($date!==false))
-		||((isset($_SERVER['HTTP_IF_NONE_MATCH'])))&&($etag!==false))
-	{
-		$log->debug('Found a cache check header');
-		if ((isset($_SERVER['HTTP_IF_NONE_MATCH']))&&($etag!==false))
-		{
-			$log->debug('Checking etag');
-			if ($etag!=$_SERVER['HTTP_IF_NONE_MATCH'])
-			{
-				$log->debug('ETag differs');
-				return;
-			}
-		}
-		if ((isset($_SERVER['HTTP_IF_MODIFIED_SINCE']))&&($date!==false))
-		{
-			$log->debug('Checking modification date');
-			$checkdate=strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
-			if ($checkdate!=$date)
-			{
-				$log->debug('Date differs');
-				return;
-			}
-		}
-		$log->debug('Resource is cached');
-		header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
-		SwimEngine::shutdown();
-	}
 }
 
 function saveSitePreferences()

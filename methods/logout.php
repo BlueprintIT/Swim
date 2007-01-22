@@ -19,7 +19,7 @@ function method_logout($request)
   
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   UserManager::logout();
   redirect($request->getNested());

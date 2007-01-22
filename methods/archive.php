@@ -21,7 +21,7 @@ function method_archive($request)
   $log = LoggerManager::getLogger('swim.archive');
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
   {

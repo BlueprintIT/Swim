@@ -22,7 +22,7 @@ function method_createitem($request)
   
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
   {

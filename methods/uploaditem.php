@@ -88,7 +88,7 @@ function method_uploaditem($request)
   
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
   {

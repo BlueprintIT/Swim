@@ -20,7 +20,7 @@ function method_saveoptionset($request)
   
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if ($_USER->isLoggedIn())
   {

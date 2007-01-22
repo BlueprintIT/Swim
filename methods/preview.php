@@ -20,7 +20,7 @@ function method_preview($request)
   $log = LoggerManager::getLogger('swim.method.preview');
   checkSecurity($request, false, false);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   $parts = explode('/', $request->getPath(), 4);
   if (count($parts)>=3)

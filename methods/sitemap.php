@@ -20,7 +20,7 @@ function method_sitemap($request)
   $log = LoggerManager::getLogger('swim.method.admin');
   checkSecurity($request, false, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   $path = $_PREFS->getPref('storage.admin.templates').'/sitemap.tpl.xml';
   if ($path != null)

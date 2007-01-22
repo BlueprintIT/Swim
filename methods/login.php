@@ -19,7 +19,7 @@ function method_login($request)
 	
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
 	$user=UserManager::login($request->getQueryVar('username'),$request->getQueryVar('password'));
 	if ($user!==null)

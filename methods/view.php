@@ -20,8 +20,6 @@ function method_view($request)
   $log = LoggerManager::getLogger('swim.method.view');
   checkSecurity($request, false, false);
   
-  setNoCache();
-  
   $pos = strpos($request->getPath(), '/');
   if ($pos === false)
   {
@@ -56,8 +54,11 @@ function method_view($request)
 	    $smarty = createSmarty($request, $type);
 	    $smarty->assign_by_ref('item', ItemWrapper::getWrapper($item));
 	    $log->debug('Starting display.');
-	    setContentType($type);
-	    $smarty->display($template, $item->getId());
+	    $result = $smarty->fetch($template, $item->getId());
+	    if (!RequestCache::isCacheDefined())
+	    	RequestCache::setNoCache();
+	   	setContentType($type);
+	    print($result);
 	    $log->debug('Display complete.');
     }
 	  else

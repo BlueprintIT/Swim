@@ -20,7 +20,7 @@ function method_postback($request)
   $log = LoggerManager::getLogger('swim.postback');
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if ($request->hasQueryVar('itemversion'))
   {

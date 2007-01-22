@@ -30,10 +30,10 @@ function method_layout($request)
 		{
 			case 'text/css':
 			case 'text/javascript':
-	  		setCacheInfo(filemtime($path));
+	  		RequestCache::setCacheInfo(filemtime($path));
 				break;
 			default:
-				setNoCache();
+				RequestCache::setNoCache();
 		}
     if (isTemplateFile($path))
     {

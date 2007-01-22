@@ -20,7 +20,7 @@ function method_saveuser($request)
   
   checkSecurity($request, true, true);
   
-  setNoCache();
+  RequestCache::setNoCache();
   
   if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_WRITE)))
   {
