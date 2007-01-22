@@ -8,7 +8,7 @@
         {if ($wrapped !== null)}
           <url>
             <loc>http://{$SERVER.HTTP_HOST}{$wrapped->url|escape}</loc>
-            <lastmod>{$wrapped->published|date_format:"%Y-%m-%dT%H:%M:%S+00:00"}</lastmod>
+            <lastmod>{$wrapped->published|date_format:"%Y-%m-%dT%H:%M:%S+00:00"|default:"2006-01-01T00:00:00+00:00"}</lastmod>
           </url>
         {/if}
       {/if}
