@@ -1,4 +1,4 @@
-{secure documents="read"}
+{secure documents="read" login="true"}
 {include file="includes/singletabbedheader.tpl" title=$title}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}

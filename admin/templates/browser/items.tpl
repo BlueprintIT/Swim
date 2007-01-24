@@ -1,4 +1,4 @@
-{secure documents="read"}
+{secure documents="read" login="true"}
 {include file="includes/singletabbedheader.tpl" title="Item Browser"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
