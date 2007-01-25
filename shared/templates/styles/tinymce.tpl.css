@@ -1,3 +1,12 @@
+/* Standard styles */
+[$CONTEXT] em {
+  font-style: italic;
+}
+
+[$CONTEXT] strong {
+	font-weight: bold;
+}
+
 /* Indent uses this */
 [$CONTEXT] blockquote {
 	margin-left: 20px;
