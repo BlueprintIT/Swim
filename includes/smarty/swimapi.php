@@ -82,21 +82,23 @@ function encode_url($params, &$smarty)
 {
   $request = get_params_request($params, $smarty);
   if ($request instanceof Request)
-    return $request->encode();
+    return htmlspecialchars($request->encode());
   else
-    return $request;
+    return htmlspecialchars($request);
 }
 
 function encode_form($params, $content, &$smarty, &$repeat)
 {
   if ($repeat)
   {
-    $method = "POST";
+    $method = 'method="POST" ';
     $attrs = '';
     foreach(array_keys($params) as $key)
     {
       if (substr($key,0,4) == 'tag_')
       {
+      	if ($key == 'tag_method')
+      		$method = '';
         $attrs.=substr($key,4).'="'.$params[$key].'" ';
         unset($params[$key]);
       }
@@ -115,7 +117,7 @@ function encode_form($params, $content, &$smarty, &$repeat)
       $path = $request;
       $vars = '';
     }
-    print('<form '.$attrs.'method="'.$method.'" action="'.$path.'">');
+    print('<form '.$attrs.$method.'action="'.htmlspecialchars($path).'">');
     print($vars);
   }
   else
