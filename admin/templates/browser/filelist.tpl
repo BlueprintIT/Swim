@@ -2,7 +2,7 @@
 {include file="includes/singletabbedheader.tpl" title=$title}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
-{literal}<script>
+<script>{literal}
 function selectItem()
 {
 	var table = document.getElementById("files");
@@ -51,8 +51,8 @@ function selectRow(row)
 		btn.style.display = 'none';
 	}
 }
-</script>
-<style>
+{/literal}</script>
+{style}{literal}
 table#filelist {
 	border: 0 none;
 	border-collapse: collapse;
@@ -114,7 +114,7 @@ td.name img {
 	vertical-align: middle;
 	border: 0;
 }
-</style>{/literal}
+{/literal}{/style}
 <div id="tabpanel">
   <table>
     <tr>
