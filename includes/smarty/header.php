@@ -18,6 +18,7 @@ class HtmlHeader
   private $stylesheets = array();
   private $scripts = array();
   private $headers = array();
+  private $styles = array();
   
   public function addStyleSheet($path)
   {
@@ -48,6 +49,11 @@ class HtmlHeader
       $line.='>';
       array_push($this->headers, $line);
     }
+  }
+  
+  public function addStyle($content)
+  {
+  	array_push($this->styles, $content);
   }
   
   public function getHtml()
@@ -85,6 +91,13 @@ class HtmlHeader
       $result.=$line."\n";
     }
     $result.='<meta name="generator" content="SWIM 3.0">'."\n";
+    if (count($this->styles)>0)
+    {
+    	$result.="<style type=\"text/css\">\n";
+	    foreach ($this->styles as $style)
+	    	$result.=$style;
+	    $result.="</style>\n";
+    }
     return $result;
   }
 }
@@ -138,6 +151,15 @@ function encode_link($params, &$smarty)
     $tparams['href'] = $request;
   $head = $smarty->get_registered_object('HEAD');
   $head->addLink($tparams);
+}
+
+function encode_style($params, $content, &$smarty, &$repeat)
+{
+	if (!$repeat)
+	{
+	  $head = $smarty->get_registered_object('HEAD');
+	  $head->addStyle($content);
+	}
 }
 
 function header_outputfilter($tpl_output, &$smarty)

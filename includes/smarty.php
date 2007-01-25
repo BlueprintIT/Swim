@@ -275,6 +275,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('subitems', 'fetch_subitems');
   $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_function('paginate', 'paginate');
+  $smarty->register_block('style', 'encode_style');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_object('HEAD', new HtmlHeader());
