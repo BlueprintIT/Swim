@@ -30,9 +30,9 @@ function method_combine($request)
 	    $newest = 0;
   		foreach ($paths as $path)
   		{
-  			if (is_file($_PREFS->getPref('storage.sitedir').$path))
+  			if (is_file($_PREFS->getPref('storage.rootdir').$path))
   			{
-		    	$newest = max($newest, filemtime($_PREFS->getPref('storage.sitedir').$path));
+		    	$newest = max($newest, filemtime($_PREFS->getPref('storage.rootdir').$path));
   			}
   			else
   			{
@@ -70,8 +70,8 @@ function method_combine($request)
   					break;
   			}
   			
-  			if (is_file($_PREFS->getPref('storage.sitedir').$path))
-  				include $_PREFS->getPref('storage.sitedir').$path;
+  			if (is_file($_PREFS->getPref('storage.rootdir').$path))
+  				include $_PREFS->getPref('storage.rootdir').$path;
   			else
   			{
 	  			if (strpos($path, '?') !== false)

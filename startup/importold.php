@@ -237,8 +237,8 @@ function importNamespace($namespace, $section, $basedir)
 $OLDSTORAGE = new SqliteStorage($_PREFS->getPref('storage.config').'/storage.db');
 $pagemap = array();
 
-initialImportNamespace("website", "content", $_PREFS->getPref('storage.site').'/content');
-importNamespace("website", "content", $_PREFS->getPref('storage.site').'/content');
+initialImportNamespace("website", "content", $_PREFS->getPref('storage.sitedir').'/content');
+importNamespace("website", "content", $_PREFS->getPref('storage.sitedir').'/content');
 
 
 ?>

@@ -15,16 +15,18 @@
 
 // Include all the support routines
 
-require $_PREFS->getPref('storage.includes').'/cache.php';
-require $_PREFS->getPref('storage.includes').'/xml.php';
-require $_PREFS->getPref('storage.includes').'/addons.php';
-require $_PREFS->getPref('storage.includes').'/security.php';
-require $_PREFS->getPref('storage.includes').'/utils.php';
-require $_PREFS->getPref('storage.includes').'/urls.php';
-require $_PREFS->getPref('storage.includes').'/mimetypes.php';
-require $_PREFS->getPref('storage.includes').'/smarty.php';
-require $_PREFS->getPref('storage.includes').'/session.php';
-require $_PREFS->getPref('storage.includes').'/items/items.php';
-require $_PREFS->getPref('storage.includes').'/search.php';
+$includesdir = $_PREFS->getPref('storage.includes');
+require $includesdir.'/cache.php';
+require $includesdir.'/xml.php';
+require $includesdir.'/addons.php';
+require $includesdir.'/security.php';
+require $includesdir.'/utils.php';
+require $includesdir.'/urls.php';
+require $includesdir.'/mimetypes.php';
+require $includesdir.'/smarty.php';
+require $includesdir.'/session.php';
+require $includesdir.'/items/items.php';
+require $includesdir.'/search.php';
+unset($includesdir);
 
 ?>

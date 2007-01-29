@@ -23,20 +23,20 @@ define('STATE_COMPLETE', STATE_SHUTDOWN+1);
 
 function loadBasePreferences()
 {
-  global $swimbase, $sitebase, $_PREFS, $_PREFSCOPES;
+  global $swimdir, $rootdir, $_PREFS, $_PREFSCOPES;
   
   $_PREFSCOPES = array();
   $_PREFSCOPES['default'] = new Preferences();
-  $file=fopen($swimbase.'/bootstrap/default.conf','r');
+  $file=fopen($swimdir.'/bootstrap/default.conf','r');
   $_PREFSCOPES['default']->loadPreferences($file);
   fclose($file);
-  $_PREFSCOPES['default']->setPref('storage.basedir', $swimbase);
-  $_PREFSCOPES['default']->setPref('storage.sitedir', $sitebase);
+  $_PREFSCOPES['default']->setPref('storage.swimdir', $swimdir);
+  $_PREFSCOPES['default']->setPref('storage.rootdir', $rootdir);
   
   $_PREFSCOPES['host'] = new Preferences();
-  if (is_readable($swimbase.'/bootstrap/host.conf'))
+  if (is_readable($swimdir.'/bootstrap/host.conf'))
   {
-    $file=fopen($swimbase.'/bootstrap/host.conf','r');
+    $file=fopen($swimdir.'/bootstrap/host.conf','r');
     $_PREFSCOPES['host']->loadPreferences($file);
     fclose($file);
   }
@@ -76,7 +76,7 @@ function loadSitePreferences()
 $_STATE=STATE_BOOTSTRAP;
 
 // Load the logging engine
-require_once $swimbase.'/bootstrap/logging.php';
+require_once $swimdir.'/bootstrap/logging.php';
 error_reporting(E_ALL);
 
 LoggerManager::setLogLevel('',LOG_LEVEL_WARN);
@@ -85,14 +85,14 @@ LoggerManager::setLogLevel('swim.storage',LOG_LEVEL_WARN);
 LoggerManager::setLogLevel('swim.utils.shutdown',LOG_LEVEL_WARN);
 
 // Load the preferences engine
-require_once $swimbase.'/bootstrap/prefs.php';
+require_once $swimdir.'/bootstrap/prefs.php';
 
 loadBasePreferences();
 loadSitePreferences();
 
 LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
-LoggerManager::setBaseDir($_PREFS->getPref('storage.basedir'));
+LoggerManager::setBaseDir($_PREFS->getPref('storage.swimdir'));
 
-require_once $swimbase.'/bootstrap/baseincludes.php';
+require_once $swimdir.'/bootstrap/baseincludes.php';
 
 ?>

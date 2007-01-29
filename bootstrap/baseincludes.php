@@ -15,8 +15,10 @@
 
 // Include all the support routines
 
-require $_PREFS->getPref('storage.includes').'/storage/storage.php';
-require $_PREFS->getPref('storage.includes').'/locking/locking.php';
-require $_PREFS->getPref('storage.includes').'/engine.php';
+$includesdir = $_PREFS->getPref('storage.includes');
+require $includesdir.'/storage/storage.php';
+require $includesdir.'/locking/locking.php';
+require $includesdir.'/engine.php';
+unset($includesdir);
 
 ?>

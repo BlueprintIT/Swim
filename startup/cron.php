@@ -74,7 +74,7 @@ setContentType('text/plain');
 checkConsistency();
 SearchEngine::buildIndex();
 
-if (is_writable($_PREFS->getPref('storage.sitedir')))
+if (is_writable($_PREFS->getPref('storage.rootdir')))
 {
 	$hosts = $_PREFS->getPrefBranch('url.host');
 	
@@ -128,7 +128,7 @@ RewriteRule .* swim/startup/swim.php [L]
 	
 	$htaccess = ob_get_contents();
 	ob_end_clean();
-	$output = fopen($_PREFS->getPref('storage.sitedir').'/.htaccess','w');
+	$output = fopen($_PREFS->getPref('storage.rootdir').'/.htaccess','w');
 	if ($output !== FALSE)
 	{
 		fwrite($output, $htaccess);
@@ -150,9 +150,9 @@ if (isset($_GET['backup']))
 			$backupfile .= '/'.$mainhost.'-';
 			$backupfile .= date('Ymd-Hi');
 			$backupfile .= '.tar.bz';
-			system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.site').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));
-			system($_PREFS->getPref('tools.tar').' -cjhf '.$backupfile.' -C '.$_PREFS->getPref('storage.site').' database.sql files');
-			unlink($_PREFS->getPref('storage.site').'/database.sql');
+			system($_PREFS->getPref('tools.mysqldump').' --result-file='.$_PREFS->getPref('storage.sitedir').'/database.sql --add-drop-table --ignore-table='.$_PREFS->getPref('storage.mysql.database').'.Keywords -u '.$_PREFS->getPref('storage.mysql.user').' -p'.$_PREFS->getPref('storage.mysql.pass').' -e '.$_PREFS->getPref('storage.mysql.database'));
+			system($_PREFS->getPref('tools.tar').' -cjhf '.$backupfile.' -C '.$_PREFS->getPref('storage.sitedir').' database.sql files');
+			unlink($_PREFS->getPref('storage.sitedir').'/database.sql');
 		}
 		else
 			$log->error('Unable to backup since backup file is not writable.');

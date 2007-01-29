@@ -23,7 +23,7 @@ function method_resize($request)
   $filepath = '/'.$request->getPath();
   $base = $_PREFS->getPref('url.base');
   $filepath = substr($filepath, strlen($base));
-  $filename = $_PREFS->getPref('storage.sitedir').$filepath;
+  $filename = $_PREFS->getPref('storage.rootdir').$filepath;
   if (is_file($filename))
   {
   	$mimetype = determineContentType($filename);

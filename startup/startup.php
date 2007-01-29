@@ -13,12 +13,12 @@
  * $Revision$
  */
 
-$sitebase = dirname(dirname(dirname($_SERVER["SCRIPT_FILENAME"])));
-$swimbase = dirname(dirname(__FILE__));
+$rootdir = dirname(dirname(dirname($_SERVER["SCRIPT_FILENAME"])));
+$swimdir = dirname(dirname(__FILE__));
 
 unset($source);
-require_once $swimbase.'/bootstrap/bootstrap.php';
-unset($swimbase);
-unset($sitebase);
+require_once $swimdir.'/bootstrap/bootstrap.php';
+unset($swimdir);
+unset($rootdir);
 
 ?>
