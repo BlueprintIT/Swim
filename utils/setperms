@@ -1,8 +1,0 @@
-#! /bin/sh
-
-PERMS=apache:apache
-
-chown $PERMS -R containers/user
-chown $PERMS -R conf
-touch logfile.txt
-chown $PERMS logfile.txt

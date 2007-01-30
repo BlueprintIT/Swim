@@ -117,10 +117,6 @@ RewriteRule .* swim/startup/swim.php [L]
 	
 ?>
 
-<Files access>
-	Deny from all
-</Files>
-
 <Files .*>
 	Deny from all
 </Files>
