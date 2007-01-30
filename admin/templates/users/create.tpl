@@ -20,7 +20,7 @@ var listener = {
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:BlueprintIT.validation.validateForm('mainform', {ldelim}'username':{ldelim}'allowempty':false{rdelim}, 'password':{ldelim}'allowempty':false{rdelim}{rdelim}, listener)">Create</a>
+							<a href="javascript:BlueprintIT.forms.validateAndSubmit('mainform', {ldelim}'username':{ldelim}'allowempty':false{rdelim}, 'password':{ldelim}'allowempty':false{rdelim}{rdelim}, listener)">Create</a>
 						</div>
 					</td>
 					<td>
