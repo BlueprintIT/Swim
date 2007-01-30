@@ -20,10 +20,10 @@ class HtmlHeader
   private $headers = array();
   private $styles = array();
   
-  public function addStyleSheet($path)
+  public function addStyleSheet($path, $media = null)
   {
     if (!isset($this->stylesheets[$path]))
-      $this->stylesheets[$path]=true;
+      $this->stylesheets[$path]=$media;
   }
   
   public function addScript($path)
@@ -59,7 +59,7 @@ class HtmlHeader
   public function getHtml()
   {
     $result = '';
-    if (false)
+    if (false)   // Need to fix media handling
     {
 	    if (count($this->stylesheets)>0)
 	    {
@@ -79,7 +79,11 @@ class HtmlHeader
     {
 	    foreach ($this->stylesheets as $path => $val)
 	    {
-	      $result.='<link rel="stylesheet" href="'.$path.'" type="text/css">'."\n";
+        if ($val !== null)
+          $media = ' media="'.$val.'"';
+        else
+          $media = '';
+	      $result.='<link rel="stylesheet" href="'.$path.'"'.$media.' type="text/css">'."\n";
 	    }
     }
     foreach ($this->scripts as $path => $val)
@@ -104,13 +108,18 @@ class HtmlHeader
 
 function encode_stylesheet($params, &$smarty)
 {
+  if (isset($params['tag_media']))
+    $media = $params['tag_media'];
+  else
+    $media = null;
+  unset($params['tag_media']);
   $request = get_params_request($params, $smarty);
   if ($request instanceof Request)
     $path = $request->encode();
   else
     $path = $request;
   $head = $smarty->get_registered_object('HEAD');
-  $head->addStyleSheet($path);
+  $head->addStyleSheet($path,$media);
 }
 
 function encode_script($params, &$smarty)
