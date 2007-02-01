@@ -1,4 +1,4 @@
-{include file='includes/adminheader.tpl' title="Login"}
+{include file='includes/adminheader.tpl' title="Admin Area Offline"}
 {assign var="message" value=""}
 <div id="mainpane" class="pane">
 	<div class="header">
