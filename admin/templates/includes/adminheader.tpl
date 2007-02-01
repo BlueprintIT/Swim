@@ -23,7 +23,8 @@
       </div>
   </div>
 
-{php}$this->assign_by_ref('sections', AdminManager::$sections);{/php}
+{php}$this->assign_by_ref('sections', AdminManager::getAvailableSections());{/php}
+{if count($sections)>0}
   <div id="tabpanel">
 	  <table>
 	    <tr>
@@ -54,4 +55,5 @@
 	    </tr>
 	  </table>
   </div>
-  
+{/if}
+

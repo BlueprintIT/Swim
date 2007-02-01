@@ -6,19 +6,19 @@
 	</div>
 	<div class="body" style="text-align: center">
 		{if $message ne ""}
-			<h3>{$message}</h3>
+			<h3 style="margin-bottom: 0.5em">{$message}</h3>
 		{/if}
 		{if $USER->isLoggedIn()}
-			<p>The user you are currently logged in as does not have permission for this. You may log in
+			<p style="margin-bottom: 0.5em">The user you are currently logged in as does not have permission for this. You may log in
 			 as a different user.</p> 
 		{else}
-			<p>If you were logged in then you may have been automatically logged out for being inactive.</p>
+			<p style="margin-bottom: 0.5em">If you were logged in then you may have been automatically logged out for being inactive.</p>
 		{/if}
 		{html_form method="login" nestcurrent="true"}
 			{if $message ne ""}
 				<input type="hidden" name="message" value="{$message}">
 			{/if}
-			<table align="center">
+			<table align="center" style="border-collapse: separate; border-spacing: 1em">
 				<tr>
 					<td>Username:</td><td><input type='text' name='username' value=''></td>
 				</tr>

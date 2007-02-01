@@ -40,7 +40,9 @@ class AdminSection
   
   public function isAvailable()
   {
-    return true;
+    global $_USER;
+    
+    return $_USER->isLoggedIn();
   }
   
   public function isSelected($request)
@@ -161,6 +163,17 @@ class AdminManager
   public static $log;
   public static $sections = array();
   
+  public static function getAvailableSections()
+  {
+    $sections = array();
+    foreach (self::$sections as $section)
+    {
+      if ($section->isAvailable())
+        array_push($sections, $section);
+    }
+    return $sections;
+  }
+  
   public static function addSection($section)
   {
     if (!isset(self::$log))
@@ -213,7 +226,7 @@ class OptionsAdminSection extends AdminSection
   {
     global $_USER;
     
-    return true;
+    return $_USER->isLoggedIn();
   }
   
   public function isSelected($request)
