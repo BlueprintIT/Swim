@@ -27,10 +27,7 @@ function method_admin($request)
     $type = determineContentType($path);
     if (($_PREFS->isPrefSet('admin.offline')) && ($type == 'text/html') && ($request->getPath() != 'offline.tpl'))
     {
-    	$offline = new Request();
-    	$offline->setMethod('admin');
-    	$offline->setPath('offline.tpl');
-    	redirect($offline);
+      displayAdminFile($request, $_PREFS->getPref('storage.admin.templates').'/offline');
     	return;
     }
     setContentType($type);

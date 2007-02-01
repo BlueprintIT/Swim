@@ -146,19 +146,6 @@ function formatdate($date)
 	return date('g:ia d/m/Y',$date);
 }
 
-function displayLocked($request,$details,$resource)
-{
-	header($_SERVER["SERVER_PROTOCOL"]." 409 Conflict");
-	$request->data['details']=$details;
-	$request->data['resource']=$resource;
-	$container = getContainer('internal');
-	$page=$container->getPage('locked');
-	if ($page!==null)
-	{
-		$page->display($request);
-	}
-}
-
 function displayAdminLogin($request)
 {
 	displayLogin($request,'You must log in to administer this website.');
@@ -170,18 +157,20 @@ function displayLogin($request,$message)
   displayAdminFile($request, $_PREFS->getPref('storage.admin.templates').'/login', array('message' => $message));
 }
 
-function displayAdminFile($request, $path, $vars)
+function displayAdminFile($request, $path, $vars = array())
 {
-  if (is_file($path.'.tpl'))
+  $file = findDisplayableFile($path);
+  if ($file !== null)
   {
-    $smarty = createAdminSmarty($request);
-    $smarty->assign($vars);
-    $smarty->display($path.'.tpl');
+    if (isTemplateFile($file))
+    {
+      $smarty = createAdminSmarty($request);
+      $smarty->assign($vars);
+      $smarty->display($file);
+    }
+    else
+      include($file);
   }
-  else if (is_file($path.'.php'))
-    include($path.'.php');
-  else if (is_file($path.'.html'))
-    include($path.'.html');
   else
     displayNotFound($request);
 }
