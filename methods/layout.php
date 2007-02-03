@@ -25,7 +25,6 @@ function method_layout($request)
   if ($path != null)
   {
     $type = determineContentType($path);
-    setContentType($type);
 		switch ($type)
 		{
 			case 'text/css':
@@ -33,17 +32,24 @@ function method_layout($request)
 	  		RequestCache::setCacheInfo(filemtime($path));
 				break;
 			default:
-				RequestCache::setNoCache();
 		}
     if (isTemplateFile($path))
     {
       $smarty = createSmarty($request, $type);
       $log->debug('Starting display.');
       $smarty->display($path);
+      $result = $smarty->fetch($path);
+      if (!RequestCache::isCacheDefined())
+        RequestCache::setCacheInfo($_STORAGE->singleQuery('SELECT MAX(published) FROM VariantVersion;'));
+      setContentType($type);
+      print($result);
       $log->debug('Display complete.');
     }
     else
+    {
+      RequestCache::setNoCache();
       include($path);
+    }
   }
   else
     displayNotFound($request);

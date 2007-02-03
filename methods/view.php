@@ -50,13 +50,12 @@ function method_view($request)
 
     if ($template !== null)
     {
+      RequestCache::setCacheInfo($_STORAGE->singleQuery('SELECT MAX(published) FROM VariantVersion;'));
 		  $type = determineContentType($template);
 	    $smarty = createSmarty($request, $type);
 	    $smarty->assign_by_ref('item', ItemWrapper::getWrapper($item));
 	    $log->debug('Starting display.');
 	    $result = $smarty->fetch($template, $item->getId());
-	    if (!RequestCache::isCacheDefined())
-	    	RequestCache::setCacheInfo($_STORAGE->singleQuery('SELECT MAX(published) FROM VariantVersion;'));
 	   	setContentType($type);
 	    print($result);
 	    $log->debug('Display complete.');
