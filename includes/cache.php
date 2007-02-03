@@ -86,8 +86,11 @@ class RequestCache
 		self::$defined = true;
 		
 		$log=LoggerManager::getLogger('swim.requestcache');
-	
-		header('Cache-Control: must-revalidate');
+    
+    $log->debug('Checking cache info for '.$_SERVER['REQUEST_URI']);
+    
+    header('Cache-Control: max-age=0, pre-check=0, post-check=0');
+    
 		if ($date!=false)
 			header('Last-Modified: '.httpdate($date));
 		if ($etag!==false)
@@ -120,6 +123,10 @@ class RequestCache
 			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
 			SwimEngine::shutdown();
 		}
+    else
+    {
+      $log->debug('No cache information in request');
+    }
 	}
 }
 

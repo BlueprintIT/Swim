@@ -15,7 +15,7 @@
 
 function method_view($request)
 {
-	global $_PREFS;
+	global $_PREFS,$_STORAGE;
 	
   $log = LoggerManager::getLogger('swim.method.view');
   checkSecurity($request, false, false);
@@ -56,7 +56,7 @@ function method_view($request)
 	    $log->debug('Starting display.');
 	    $result = $smarty->fetch($template, $item->getId());
 	    if (!RequestCache::isCacheDefined())
-	    	RequestCache::setNoCache();
+	    	RequestCache::setCacheInfo($_STORAGE->singleQuery('SELECT MAX(published) FROM VariantVersion;'));
 	   	setContentType($type);
 	    print($result);
 	    $log->debug('Display complete.');
