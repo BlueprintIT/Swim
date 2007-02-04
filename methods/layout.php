@@ -31,13 +31,11 @@ function method_layout($request)
 			case 'text/javascript':
 	  		RequestCache::setCacheInfo(filemtime($path));
 				break;
-			default:
 		}
     if (isTemplateFile($path))
     {
       $smarty = createSmarty($request, $type);
       $log->debug('Starting display.');
-      $smarty->display($path);
       $result = $smarty->fetch($path);
       if (!RequestCache::isCacheDefined())
         RequestCache::setCacheInfo($_STORAGE->singleQuery('SELECT MAX(published) FROM VariantVersion;'));
