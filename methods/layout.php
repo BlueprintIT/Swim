@@ -47,6 +47,7 @@ function method_layout($request)
     }
     else
     {
+      setContentType($type);
       RequestCache::setNoCache();
       include($path);
     }
