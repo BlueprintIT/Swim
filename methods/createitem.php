@@ -16,15 +16,14 @@
 
 function method_createitem($request)
 {
-  global $_USER;
-  
   $log = Loggermanager::getLogger('swim.createitem');
+  $user = Session::getUser();
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('targetvariant') && $request->hasQueryVar('targetsection')
        && $request->hasQueryVar('class'))

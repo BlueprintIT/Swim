@@ -16,14 +16,13 @@
 
 function method_archive($request)
 {
-  global $_USER;
-  
   $log = LoggerManager::getLogger('swim.archive');
   checkSecurity($request, true, true);
+  $user = Session::getUser();
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('item') && $request->hasQueryVar('archive'))
     {

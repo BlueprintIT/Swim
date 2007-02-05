@@ -352,15 +352,14 @@ function import_items($request, $file, $section, $variant, $sequence, $dir = nul
 
 function method_import($request)
 {
-  global $_USER;
-  
   $log = Loggermanager::getLogger('swim.importitem');
+  $user = Session::getUser();
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('targetvariant') && $request->hasQueryVar('parentitem'))
     {

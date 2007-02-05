@@ -52,10 +52,9 @@ function get_params_request(&$params, $smarty)
 
 function check_security($params, $content, &$smarty, &$repeat)
 {
-  global $_USER;
-  
+  $user = Session::getUser();
   $valid = false;
-  if ($_USER->isLoggedIn())
+  if ($user->isLoggedIn())
   {
     $valid = true;
     foreach ($params as $section => $types)
@@ -65,7 +64,7 @@ function check_security($params, $content, &$smarty, &$repeat)
         $list = explode(',', $types);
         foreach ($list as $type)
         {
-          if (!$_USER->hasPermission($section, $type))
+          if (!$user->hasPermission($section, $type))
             $valid=false;
         }
       }

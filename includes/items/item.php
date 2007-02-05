@@ -557,8 +557,10 @@ class ItemVariant
   
   public function createNewVersion($clone = null)
   {
-    global $_PREFS,$_STORAGE,$_USER;
+    global $_PREFS,$_STORAGE;
 
+    $user = Session::getUser();
+    
     $class = $this->getItem()->getClass();
     if ($clone !== null)
     {
@@ -584,7 +586,7 @@ class ItemVariant
     else
       $version = 1;
     if ($_STORAGE->queryExec('INSERT INTO VariantVersion (itemvariant,version,view,created,modified,owner,current,complete) ' .
-      'VALUES ('.$this->id.','.$version.','.$viewid.','.$time.','.$time.',"'.$_USER->getUsername().'",0,0);'))
+      'VALUES ('.$this->id.','.$version.','.$viewid.','.$time.','.$time.',"'.$user->getUsername().'",0,0);'))
     {
       $id = $_STORAGE->lastInsertRowid();
       $results = $_STORAGE->query('SELECT * FROM VariantVersion WHERE id='.$id.';');

@@ -16,15 +16,14 @@
 
 function method_mutatesequence($request)
 {
-  global $_USER;
-  
   $log = Loggermanager::getLogger('swim.mutatesequenc');
+  $user = Session::getUser();
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('item') && $request->hasQueryVar('action'))
     {

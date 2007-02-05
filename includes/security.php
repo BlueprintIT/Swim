@@ -358,13 +358,10 @@ class UserManager
 {
   public static function login($username,$password)
   {
-    global $_USER;
-    
     $newuser = new User($username);
     if (($newuser->userExists())&&($newuser->login($password)))
     {
-      $_SESSION['Swim.User']=$username;
-      $_USER=$newuser;
+      Session::setUser($newuser);
       return $newuser;
     }
     return false;
@@ -372,10 +369,7 @@ class UserManager
   
   public static function logout()
   {
-    global $_USER;
-    
-    $_USER = new User();
-    unset($_SESSION['Swim.User']);
+    Session::setUser(null);
   }
   
   public static function getUser($name)
@@ -456,22 +450,6 @@ class UserManager
     }
     return $groups;
   }
-}
-
-// Start up the session
-session_name('SwimSession');
-session_cache_limiter('none');
-@session_start();
-
-
-if (isset($_SESSION['Swim.User']))
-{
-	$GLOBALS['_USER'] = UserManager::getUser($_SESSION['Swim.User']);
-  $GLOBALS['_USER']->logged=true;
-}
-else
-{
-	$GLOBALS['_USER'] = new User();
 }
 
 ?>

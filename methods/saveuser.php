@@ -16,13 +16,12 @@
 
 function method_saveuser($request)
 {
-  global $_USER;
-  
   checkSecurity($request, true, true);
+  $user = Session::getUser();
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('users',PERMISSION_WRITE)))
   {
     if (!$request->hasQueryVar('cancel'))
     {

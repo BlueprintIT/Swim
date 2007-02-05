@@ -20,8 +20,6 @@ function formatPlainToHtml($text)
 
 function method_postitem($request)
 {
-  global $_USER;
-  
   $log = Loggermanager::getLogger('swim.postitem');
   
   checkSecurity($request, true, true);

@@ -82,15 +82,16 @@ function create_items($request, $dir, $section, $variant, $sequence)
 
 function method_uploaditem($request)
 {
-  global $_USER,$_PREFS;
+  global $_PREFS;
   
   $log = Loggermanager::getLogger('swim.uploaditem');
+  $user = Session::getUser();
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('targetvariant') && $request->hasQueryVar('targetsection')
         && $request->hasQueryVar('parentitem') && $request->hasQueryVar('parentsequence')

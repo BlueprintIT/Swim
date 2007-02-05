@@ -15,6 +15,7 @@
 {script href="$SHARED/scripts/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/dom`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/sitetree`$smarty.config.YUI`.js"}
+{assign var="variant" value="default"}
 <script>
 {literal}
 function onTreeItemClick(id)
@@ -28,7 +29,7 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{encode method='admin' path='ite
 SiteTree.draggable = false;
 </script>
 <div id="mainpane">
-	{html_form tag_name="mainform" tag_enctype="multipart/form-data" method="import" targetvariant=$session.variant}
+	{html_form tag_name="mainform" tag_enctype="multipart/form-data" method="import" targetvariant=$variant}
 		<input type="hidden" id="parentitem" name="parentitem" value="">
 		<div class="header">
 			<table class="toolbar">

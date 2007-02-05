@@ -16,13 +16,12 @@
 
 function method_deleteuser($request)
 {
-  global $_USER;
-  
   checkSecurity($request, true, true);
+  $user = Session::getUser();
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('users',PERMISSION_DELETE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('users',PERMISSION_DELETE)))
   {
     $user = UserManager::getUser($request->getQueryVar('user'));
     if (UserManager::deleteUser($user))

@@ -16,15 +16,14 @@
 
 function method_copyversion($request)
 {
-  global $_USER;
-  
   $log = Loggermanager::getLogger('swim.copyversion');
+  $user = Session::getUser();
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('itemversion') && $request->hasQueryVar('targetvariant') 
       && ($request->hasQueryVar('targetitem') || $request->hasQueryVar('targetsection')))

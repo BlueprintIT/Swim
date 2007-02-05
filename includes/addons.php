@@ -40,9 +40,7 @@ class AdminSection
   
   public function isAvailable()
   {
-    global $_USER;
-    
-    return $_USER->isLoggedIn();
+    return Session::getUser()->isLoggedIn();
   }
   
   public function isSelected($request)
@@ -224,9 +222,7 @@ class OptionsAdminSection extends AdminSection
   
   public function isAvailable()
   {
-    global $_USER;
-    
-    return $_USER->isLoggedIn();
+    return Session::getUser()->isLoggedIn();
   }
   
   public function isSelected($request)

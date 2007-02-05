@@ -7,8 +7,9 @@
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
 {apiget var="item" type="item" id=$request.query.item}
+{assign var="variant" value="default"}
 {assign var="section" value=$item->getSection()}
-{assign var="itemvariant" value=$item->getVariant($session.variant)}
+{assign var="itemvariant" value=$item->getVariant($variant)}
 {if isset($request.query.version)}
 	{assign var="itemversion" value=$itemvariant->getVersion($request.query.version)}
 {elseif $itemvariant->getCurrentVersion()}
@@ -147,7 +148,7 @@ function moveDown(item, field, link) {
 									{if strtolower($choice->getName())=='category'}
 										{assign var="found" value="true"}
 										<div class="toolbarbutton">
-											<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
+											<a href="{encode method="createitem" class=$choice->getId() targetsection=$section->getId() targetvariant=$variant parentitem=$item->getId() parentsequence=$sequence->getId()}">
 												<img src="{$CONTENT}/icons/add-folder-blue.gif" alt="New category">
 												New category
 											</a>
@@ -168,7 +169,7 @@ function moveDown(item, field, link) {
 						</td>
 						<td>
 							{if $classcount>0}
-								{html_form method="createitem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}
+								{html_form method="createitem" targetsection=$section->getId() targetvariant=$variant parentitem=$item->getId() parentsequence=$sequence->getId()}
 									<p class="toolbarbutton"><a onclick="this.parentNode.parentNode.submit(); return false;" href="#">New <img src="{$CONTENT}/icons/add-page-blue.gif"></a></p>
 									<div><select name="class">
 									{foreach from=$choices item="choice"}
@@ -185,7 +186,7 @@ function moveDown(item, field, link) {
 						</td>
 						{if ($sequence !== null) && ($filecount>0)}
 							<td>
-								{html_form tag_enctype="multipart/form-data" method="uploaditem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$sequence->getId()}
+								{html_form tag_enctype="multipart/form-data" method="uploaditem" targetsection=$section->getId() targetvariant=$variant parentitem=$item->getId() parentsequence=$sequence->getId()}
 									<p class="toolbarbutton">Upload a new item: <input type="file" name="file"> <input type="submit" value="Upload..."></p>
 								{/html_form}
 							</td>
@@ -194,7 +195,7 @@ function moveDown(item, field, link) {
 						<td>
 							{if $class->getVersioning()=='simple'}
 								<div class="toolbarbutton">
-									<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}">
+									<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$variant itemversion=$itemversion->getId()}">
 										<img src="{$CONTENT}/icons/edit-page-blue.gif"/>
 										Edit options
 									</a>
@@ -211,7 +212,7 @@ function moveDown(item, field, link) {
 										</div>
 									{else}
 										<div class="toolbarbutton">
-											<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}">
+											<a href="{encode method="copyversion" targetitem=$item->getId() targetvariant=$variant itemversion=$itemversion->getId()}">
 												<img src="{$CONTENT}/icons/add-page-red.gif"/>
 												New version
 											</a>
@@ -231,7 +232,7 @@ function moveDown(item, field, link) {
 									{if !$itemversion->isComplete()}
 										<a href="{encode method="admin" path="items/editview.tpl" item=$item->getId() version=$itemversion->getVersion()}">
 									{else}
-										<a href="{encode method="copyversion" action="editview" targetitem=$item->getId() targetvariant=$session.variant itemversion=$itemversion->getId()}">
+										<a href="{encode method="copyversion" action="editview" targetitem=$item->getId() targetvariant=$variant itemversion=$itemversion->getId()}">
 									{/if}
 										<img src="{$CONTENT}/icons/view-edit.gif"/>
 										Edit view
@@ -472,9 +473,9 @@ function moveDown(item, field, link) {
 						{if !$field->isSorted()}
 							<table class="sequencelist">
 								{foreach name="itemlist" from=$field->getItems() item="subitem"}
-									{assign var="rlitem" value=$subitem->getCurrentVersion($session.variant)}
+									{assign var="rlitem" value=$subitem->getCurrentVersion($variant)}
 									{if $rlitem===null}
-										{assign var="rlitem" value=$subitem->getNewestVersion($session.variant)}
+										{assign var="rlitem" value=$subitem->getNewestVersion($variant)}
 									{/if}
 									{assign var="itemclass" value=$rlitem->getClass()}
 									{assign var="itemname" value=$rlitem->getField('name')}
@@ -506,7 +507,7 @@ function moveDown(item, field, link) {
 							{/if}
 						{/foreach}
 						{if $classcount>0}
-							{html_form method="createitem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$field->getId()}
+							{html_form method="createitem" targetsection=$section->getId() targetvariant=$variant parentitem=$item->getId() parentsequence=$field->getId()}
 								<p>Add a new <select name="class">
 								{foreach from=$choices item="choice"}
 									{if $choice->getType()=='normal'}
@@ -517,7 +518,7 @@ function moveDown(item, field, link) {
 							{/html_form}
 						{/if}
 						{if $filecount>0}
-							{html_form tag_enctype="multipart/form-data" method="uploaditem" targetsection=$section->getId() targetvariant=$session.variant parentitem=$item->getId() parentsequence=$field->getId()}
+							{html_form tag_enctype="multipart/form-data" method="uploaditem" targetsection=$section->getId() targetvariant=$variant parentitem=$item->getId() parentsequence=$field->getId()}
 								<p>Upload a new item: <input type="file" name="file"> <input type="submit" value="Upload..."></p>
 							{/html_form}
 						{/if}

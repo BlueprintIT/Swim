@@ -15,7 +15,7 @@
 
 function method_admin($request)
 {
-  global $_USER, $_STORAGE, $_PREFS;
+  global $_STORAGE, $_PREFS;
   
   $log = LoggerManager::getLogger('swim.method.admin');
   checkSecurity($request, true, true);
@@ -30,7 +30,6 @@ function method_admin($request)
       displayAdminFile($request, $_PREFS->getPref('storage.admin.templates').'/offline');
     	return;
     }
-    setContentType($type);
 		switch ($type)
 		{
 			case 'text/css':
@@ -44,11 +43,16 @@ function method_admin($request)
     {
       $smarty = createAdminSmarty($request, $type);
       $log->debug('Starting display.');
-      $smarty->display($path);
+      $result = $smarty->fetch($path);
+      setContentType($type);
+      print($result);
       $log->debug('Display complete.');
     }
     else
+    {
+      setContentType($type);
       include($path);
+    }
   }
   else
     displayNotFound($request);

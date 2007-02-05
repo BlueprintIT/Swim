@@ -231,7 +231,7 @@ function retrieve_rss($params, &$smarty)
 
 function configureSmarty($smarty, $request, $type)
 {
-  global $_PREFS,$_USER;
+  global $_PREFS;
 
   $log = LoggerManager::getLogger('page');
 
@@ -239,10 +239,8 @@ function configureSmarty($smarty, $request, $type)
   $req['method'] = $request->getMethod();
   $req['path'] = $request->getPath();
   $req['query'] = $request->getQuery();
-  $smarty->assign('session', $_SESSION['data']);
   $smarty->assign('SHARED', $_PREFS->getPref('url.shared'));
   $smarty->assign_by_ref('SERVER', $_SERVER);
-  $smarty->assign_by_ref('USER', $_USER);
   $smarty->assign_by_ref('REQUEST', $request);
   $smarty->assign_by_ref('request', $req);
   $smarty->assign_by_ref('NESTED', $request->getNested());
@@ -295,7 +293,7 @@ function configureSmarty($smarty, $request, $type)
 
 function createAdminSmarty($request, $type = 'text/html')
 {
-  global $_PREFS,$_USER;
+  global $_PREFS;
   
   $log = LoggerManager::getLogger('page');
   $log->debug('Creating admin smarty.');
@@ -310,6 +308,7 @@ function createAdminSmarty($request, $type = 'text/html')
   recursiveMkDir($smarty->cache_dir);
 
   configureSmarty($smarty, $request, $type);
+  $smarty->assign_by_ref('USER', Session::getUser());
   $smarty->assign('CONTENT', $_PREFS->getPref('url.admin.static'));
   $smarty->assign('SITECONTENT', $_PREFS->getPref('url.site.static'));
   $smarty->assign('BRAND', $_PREFS->getPref('url.branding.static'));
@@ -322,7 +321,7 @@ function createAdminSmarty($request, $type = 'text/html')
 
 function createSmarty($request, $type = 'text/html')
 {
-  global $_PREFS,$_USER;
+  global $_PREFS;
   
   $log = LoggerManager::getLogger('page');
   $log->debug('Creating smarty.');

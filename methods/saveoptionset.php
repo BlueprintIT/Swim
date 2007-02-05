@@ -16,13 +16,13 @@
 
 function method_saveoptionset($request)
 {
-  global $_USER, $_STORAGE;
+  global $_STORAGE;
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if ($_USER->isLoggedIn())
+  if (Session::getUser()->isLoggedIn())
   {
     if ($request->hasQueryVar('optionset'))
     {

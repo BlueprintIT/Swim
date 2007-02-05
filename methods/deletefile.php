@@ -16,15 +16,16 @@
 
 function method_deletefile($request)
 {
-  global $_USER,$_PREFS,$_STORAGE;
+  global $_PREFS,$_STORAGE;
   
   $log = Loggermanager::getLogger('swim.deletefile');
+  $user = Session::getUser();
   
   checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn()) && ($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('itemversion'))
     {

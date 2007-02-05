@@ -10,7 +10,8 @@
 {script href="$CONTENT/scripts/fields.js`$smarty.config.YUI`"}
 {stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {apiget var="item" type="item" id=$request.query.item}
-{assign var="itemvariant" value=$item->getVariant($session.variant)}
+{assign var="variant" value="default"}
+{assign var="itemvariant" value=$item->getVariant($variant)}
 {if isset($request.query.version)}
 	{assign var="itemversion" value=$itemvariant->getVersion($request.query.version)}
 {elseif $itemvariant->getCurrentVersion()}

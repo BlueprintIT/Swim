@@ -1,5 +1,5 @@
 <?
-if ($_USER->isLoggedIn())
+if (Session::getUser()->isLoggedIn())
 {
   foreach (AdminManager::$sections as $section)
   {

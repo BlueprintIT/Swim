@@ -16,14 +16,13 @@
 
 function method_saveitem($request)
 {
-  global $_USER;
-  
   $log = LoggerManager::getLogger('swim.saveitem');
   checkSecurity($request, true, true);
+  $user = Session::getUser();
   
   RequestCache::setNoCache();
   
-  if (($_USER->isLoggedIn())&&($_USER->hasPermission('documents',PERMISSION_WRITE)))
+  if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
     if ($request->hasQueryVar('itemversion'))
     {

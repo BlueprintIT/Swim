@@ -125,9 +125,7 @@ class Section extends AdminSection
   
   public function isAvailable()
   {
-    global $_USER;
-    
-    return $_USER->hasPermission('documents',PERMISSION_READ);
+    return Session::getUser()->hasPermission('documents',PERMISSION_READ);
   }
   
   public function isSelected($request)

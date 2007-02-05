@@ -15,7 +15,7 @@
 
 function method_sitemap($request)
 {
-  global $_USER, $_STORAGE, $_PREFS;
+  global $_STORAGE, $_PREFS;
   
   $log = LoggerManager::getLogger('swim.method.admin');
   checkSecurity($request, false, true);
