@@ -26,10 +26,10 @@
 }
 
 /* float images */
-[$CONTEXT img[ldelim]align="left"[rdelim] {
+[$CONTEXT] img[ldelim]align="left"[rdelim] {
 	float: left;
 }
 
-[$CONTEXT img[ldelim]align="right"[rdelim] {
+[$CONTEXT] img[ldelim]align="right"[rdelim] {
 	float: right;
 }
