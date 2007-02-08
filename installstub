@@ -1,8 +1,7 @@
 #! /bin/bash
 
 SWIM=`dirname $0`
-
-TinyMCE=$SWIM/../tinymce
+TinyMCE=$SWIM/tinymce
 
 mkdir swim
 mkdir swim/admin
