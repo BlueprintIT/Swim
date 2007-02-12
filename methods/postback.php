@@ -42,17 +42,18 @@ function method_postback($request)
 				$request->clearQueryVar('mail_subject');
 			}
 			
+      $responseto = null;
       if ($request->hasQueryVar('from_email'))
       {
       	if ($request->hasQueryVar('from_name'))
-      		$from = $request->getQueryVar('from_name');
+      		$from = $request->getQueryVar('from_name').' <'.$request->getQueryVar('from_email').'>';
       	else
-      		$from = 'Anonymous';
-      	$from.=' <'.$request->getQueryVar('from_email').'>';
+      		$from = $request->getQueryVar('from_email');
       	$request->clearQueryVar('from_email');
       	$request->clearQueryVar('from_name');
       	$from = str_replace("\n", " ", $from);
       	$from = str_replace("\r", " ", $from);
+        $responseto = $from;
       }
       else
 	      $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
@@ -67,16 +68,15 @@ function method_postback($request)
       $email = $field->toString();
       mail($email, $subject, $message, 'From: '.$from);
       
-      if (($itemversion->hasField('response')) && ($request->hasQueryVar('from_email')))
+      if (($itemversion->hasField('response')) && ($responseto !== null))
       {
-        $to = $from;
         $body = $itemversion->getField('response')->toString();
         $subject = 'Re: '.$subject;
         $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
         if ($_PREFS->getPref('method.postback.headernewline'))
           $from.="\r\n";
           
-        mail($to, $subject, $body, 'From: '.$from);
+        mail($responseto, $subject, $body, 'From: '.$from);
       }
       
       $request = new Request();
