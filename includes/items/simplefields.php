@@ -521,17 +521,17 @@ class FileField extends TextField
     if (substr($this->value,0,7)=='global:')
     {
     	$this->filename = $_PREFS->getPref('storage.site.attachments').'/'.substr($this->value,7);
-    	$this->value = $_PREFS->getPref('url.site.attachments').'/'.substr($this->value,7);
+    	$this->value = $_PREFS->getPref('url.site.attachments').'/'.rawurlencode(substr($this->value,7));
     }
     else if (substr($this->value,0,5)=='item:')
     {
     	$this->filename = $this->itemversion->getItem()->getStoragePath().'/'.substr($this->value,5);
-    	$this->value = $this->itemversion->getItem()->getStorageUrl().'/'.substr($this->value,5);
+    	$this->value = $this->itemversion->getItem()->getStorageUrl().'/'.rawurlencode(substr($this->value,5));
     }
     else if (substr($this->value,0,8)=='version:')
    	{
     	$this->filename = $this->itemversion->getStoragePath().'/'.substr($this->value,8);
-    	$this->value = $this->itemversion->getStorageUrl().'/'.substr($this->value,8);
+    	$this->value = $this->itemversion->getStorageUrl().'/'.rawurlencode(substr($this->value,8));
    	}
   }
   
