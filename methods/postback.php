@@ -71,6 +71,11 @@ function method_postback($request)
       if (($itemversion->hasField('response')) && ($responseto !== null))
       {
         $body = $itemversion->getField('response')->toString();
+        if ($itemversion->hasField('responseFile'))
+        {
+          $url = 'http://'.$_SERVER['HTTP_HOST'].$itemversion->getField('responseFile')->toString();
+          $body = str_replace('{$responseFile}', $url, $body);
+        }
         $subject = 'Re: '.$subject;
         $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
         if ($_PREFS->getPref('method.postback.headernewline'))
