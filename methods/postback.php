@@ -67,6 +67,18 @@ function method_postback($request)
       $email = $field->toString();
       mail($email, $subject, $message, 'From: '.$from);
       
+      if (($itemversion->hasField('response')) && ($request->hasQueryVar('from_email')))
+      {
+        $to = $from;
+        $body = $itemversion->getField('response')->toString();
+        $subject = 'Re: '.$subject;
+        $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+        if ($_PREFS->getPref('method.postback.headernewline'))
+          $from.="\r\n";
+          
+        mail($to, $subject, $body, 'From: '.$from);
+      }
+      
       $request = new Request();
       $request->setMethod('view');
       $request->setPath($itemversion->getItem()->getId());
