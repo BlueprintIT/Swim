@@ -15,7 +15,7 @@
 
 function method_layout($request)
 {
-  global $_PREFS;
+  global $_PREFS,$_STORAGE;
   
   $log = LoggerManager::getLogger('swim.method.layout');
   checkSecurity($request, true, true);
