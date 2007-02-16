@@ -26,13 +26,13 @@ function method_postitem($request)
   
   RequestCache::setNoCache();
   
-  if (!$request->hasQueryVar('itemversion'))
+  if (!$request->hasQueryVar('item'))
   {
   	displayNotFound($request);
   	return;
   }
     
-	$item = Item::getItemVersion($request->getQueryVar('itemversion'));
+	$item = Item::getItem($request->getQueryVar('item'));
 	if ($item === null)
 	{
 		displayNotFound($request);
@@ -40,10 +40,10 @@ function method_postitem($request)
 	}
 	
 	if ($request->hasQueryVar('parentsequence'))
-		$sequence = $item->getField($request->getQueryVar('parentsequence'));
+		$sequence = $item->getSequence($request->getQueryVar('parentsequence'));
 	else
 		$sequence = $item->getMainSequence();
-	if (($sequence === null) || ($sequence->getType() != 'sequence') || (!$sequence->allowPosts()))
+	if (($sequence === null) || (!$sequence->allowPosts()))
 	{
 		displayNotFound($request);
 		return;
@@ -66,15 +66,15 @@ function method_postitem($request)
   	return;
   }
   
-  $request->clearQueryVar('itemversion');
+  $request->clearQueryVar('item');
   $request->clearQueryVar('parentsequence');
   $request->clearQueryVar('class');
   
-  $section = $item->getItem()->getSection();
-  $variant = $item->getVariant()->getVariant();
+  $section = $item->getSection();
+  $variant = Session::getCurrentVariant();
   
   $newitem = Item::createItem($section, $class);
-  if ($item !== null)
+  if ($newitem !== null)
   {
 	  $variant = $newitem->createVariant($variant);
 	  if ($variant !== null)
