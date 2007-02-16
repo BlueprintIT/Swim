@@ -22,12 +22,23 @@ function method_postback($request)
   
   RequestCache::setNoCache();
   
-  if ($request->hasQueryVar('itemversion'))
+  if (($request->hasQueryVar('itemversion')) || ($request->hasQueryVar('item')))
   {
-    $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
+    if ($request->hasQueryVar('itemversion'))
+    {
+      $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
+      $item = $itemversion->getItem();
+      $request->clearQueryVar('itemversion');
+    }
+    else
+    {
+      $item = Item::getItem($request->getQuery('item'));
+      $request->clearQueryVar('item');
+    }
+    $itemversion = $item->getCurrentVersion(Session::getCurrentVariant());
+
     if (($itemversion !== null) && ($itemversion->hasField('email')))
     {
-      $request->clearQueryVar('itemversion');
       $subject = 'Email from '.$_SERVER['HTTP_HOST'];
       if ($itemversion->hasField('subject'))
       {
@@ -61,6 +72,19 @@ function method_postback($request)
 			if ($_PREFS->getPref('method.postback.headernewline'))
 				$from.="\r\n";
 				
+      if ($request->hasQueryVar('post_success'))
+      {
+        $redirect = Request::decodeEncodedPath($request->getQueryVar('post_success'));
+        $request->clearQueryVar('post_success');
+      }
+      else
+      {
+        $redirect = new Request();
+        $redirect->setMethod('view');
+        $redirect->setPath($itemversion->getItem()->getId());
+        $redirect->setQueryVar('posted', 'true');
+      }
+      
       foreach ($request->getQuery() as $name => $value)
         $message .= $name.': '.$value."\n\n";
 
@@ -84,11 +108,7 @@ function method_postback($request)
         mail($responseto, $subject, $body, 'From: '.$from);
       }
       
-      $request = new Request();
-      $request->setMethod('view');
-      $request->setPath($itemversion->getItem()->getId());
-      $request->setQueryVar('posted', 'true');
-      redirect($request);
+      redirect($redirect);
     }
     else
       displayGeneralError($request, "No post form specified. This may indicate an attempt to hack this site, the developers have been notified.");

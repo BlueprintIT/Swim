@@ -571,6 +571,20 @@ class Request
 		return Request::decode($path,$query,$protocol);
 	}
 	
+  static function decodeEncodedPath($path)
+  {
+    $pos = strpos($path, '?');
+    if ($pos)
+    {
+      $query = decodeQuery(substr($path, $pos+1));
+      $path=substr($path, 0, $pos);
+    }
+    else
+      $query = array();
+    
+    return self::decode($path, $query);
+  }
+  
 	static function decode($path,$query,$protocol = 'http')
 	{
 		global $_PREFS;
