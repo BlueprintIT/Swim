@@ -87,6 +87,7 @@ if (is_writable($_PREFS->getPref('storage.rootdir')))
 ?>
 RewriteEngine on 
 RewriteBase <?= $_PREFS->getPref('url.base'); ?>/
+Options -Indexes
 
 <?
 	if (is_file($_PREFS->getPref('storage.config').'/htaccess'))
