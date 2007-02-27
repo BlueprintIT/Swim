@@ -4,11 +4,11 @@
 	<head>
 		<title>Swim Resources Browser</title>
 <script type="text/javascript">
-{if (($request.query.api=='fckeditor') || ($request.query.api=='filefield'))}
+{if ($request.query.api=='filefield')}
 {literal}
 function setItem(url, path, name)
 {
-	window.opener.SetUrl(url);
+	window.opener.SetFile(url, name);
 }
 {/literal}
 {elseif $request.query.api=='tinymce'}

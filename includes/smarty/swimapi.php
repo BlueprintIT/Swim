@@ -254,7 +254,7 @@ function get_files($params, &$smarty)
 	        }
 	        else
 	          $fl['extension'] = 'unknown';
-	        $fl['path'] = $url.'/'.$file;
+	        $fl['path'] = $url.'/'.rawurlencode($file);
 	        $files[$file] = $fl;
 	      }
 	    }

@@ -247,20 +247,16 @@ function clearItemBrowser(id) {
 // Filebrowser specific code
 
 function showFileBrowser(id, url) {
-	window.SetUrl = function(uri) { fileBrowserSetUrl(id, uri); };
+	window.SetFile = function(uri, name) { fileBrowserSetUrl(id, uri, name); };
   window.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0');
 }
 
-function fileBrowserSetUrl(id, url) {
+function fileBrowserSetUrl(id, url, name) {
 	var field = document.getElementById(id);
 	field.value = url;
 	
-	var pos = url.lastIndexOf("/");
-	if (pos>=0)
-		url = url.substring(pos+1);
-		
 	var fake = document.getElementById("fbfake-"+id);
-	fake.value = url;
+	fake.value = name;
 }
 
 function clearFileBrowser(id) {

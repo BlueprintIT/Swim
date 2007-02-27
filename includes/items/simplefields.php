@@ -548,21 +548,21 @@ class FileField extends TextField
   	$path = $this->itemversion->getStorageUrl().'/';
   	if (substr($value,0,strlen($path))==$path)
   	{
-  		$value = 'version:'.substr($value,strlen($path));
+  		$value = 'version:'.rawurldecode(substr($value,strlen($path)));
   		parent::setValue($value);
   		return;
   	}
   	$path = $this->itemversion->getItem()->getStorageUrl().'/';
   	if (substr($value,0,strlen($path))==$path)
   	{
-  		$value = 'item:'.substr($value,strlen($path));
+  		$value = 'item:'.rawurldecode(substr($value,strlen($path)));
   		parent::setValue($value);
   		return;
   	}
   	$path = $_PREFS->getPref('url.site.attachments').'/';
   	if (substr($value,0,strlen($path))==$path)
   	{
-  		$value = 'global:'.substr($value,strlen($path));
+  		$value = 'global:'.rawurldecode(substr($value,strlen($path)));
   		parent::setValue($value);
   		return;
   	}
@@ -590,7 +590,7 @@ class FileField extends TextField
   public function output(&$request, &$smarty)
   {
   	$this->retrieve();
-  	return basename($this->value);
+  	return rawurldecode(basename($this->value));
   }
   
   public function getEditor(&$request, &$smarty)
@@ -611,6 +611,7 @@ class FileField extends TextField
       $pos = strrpos($rlvalue, '/');
       if ($pos!==false)
         $rlvalue = substr($rlvalue, $pos+1);
+      $rlvalue = rawurldecode($rlvalue);
     }
     else
       $rlvalue = '[Nothing selected]';
