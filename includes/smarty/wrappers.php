@@ -269,7 +269,7 @@ class ItemWrapper
     {
     	return $_PREFS->getPref('url.pagegen').$path.$extra;
     }
-    else if (($_PREFS->getPref('url.defaultmethod')=='view') && ($_PREFS->getPref('url.defaultpath')==$target->getItem()->getId()))
+    else if (($extra === '') && ($_PREFS->getPref('url.defaultmethod')=='view') && ($_PREFS->getPref('url.defaultpath')==$target->getItem()->getId()))
     {
     	return $_PREFS->getPref('url.pagegen').'/';
     }
