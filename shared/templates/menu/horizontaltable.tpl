@@ -1,5 +1,5 @@
 {if count($items)>0}
-	<table class="vertmenu menu{if $popup}popup{/if}">
+	<table class="horizmenu menu{if $popup}popup{/if}">
 		<tr>
 			{foreach name="itemlist" from=$items item="subitem"}
 				<td class="{if $subitem === $item}selected {/if}menuitem">
