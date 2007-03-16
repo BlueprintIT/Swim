@@ -314,7 +314,7 @@ class CompoundField extends Field
         $rowcount = count($passed);
     }
     
-    $result = "<input type=\"hidden\" name=\"compounds.".$this->getId()."\" value=\"0\">\n";
+    $result = "<input type=\"hidden\" name=\"compounds.".$this->getId()."\" value=\"\">\n";
     $result.= "<script type=\"text/javascript\">\n<!--\n";
     $result.= "var compound_".$this->getId()." = { id: '".$this->getId()."', fields: {";
     foreach ($this->fields as $field)
@@ -426,14 +426,17 @@ class CompoundField extends Field
   {
     global $_STORAGE;
     
-    if ($this->isEditable() && is_array($value))
+    if ($this->isEditable() && (is_array($value) || $value == ""))
     {
       $_STORAGE->queryExec('DELETE FROM Field WHERE itemversion='.$this->itemversion->getId().' AND basefield="'.$_STORAGE->escape($this->id).'";');
       $this->rows = array();
-      foreach ($value as $key => $val)
+      if (is_array($value))
       {
-        $row = $this->getRow($key);
-        $row->setValue($val);
+        foreach ($value as $key => $val)
+        {
+          $row = $this->getRow($key);
+          $row->setValue($val);
+        }
       }
     }
   }

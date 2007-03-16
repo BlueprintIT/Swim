@@ -43,26 +43,40 @@ function method_saveitem($request)
             $itemversion->setView($view);
           unset($query['view']);
         }
+        if ((isset($query['compounds'])) && (is_array($query['compounds'])))
+        {
+          foreach ($query['compounds'] as $name => $count)
+          {
+            if (!isset($query[$name]))
+            {
+              $field = $itemversion->getField($name);
+              if ($field !== null)
+                $field->setValue(array());
+            }
+          }
+          unset($query['compounds']);
+        }
+        if ((isset($query['defaults'])) && (is_array($query['defaults'])))
+        {
+          foreach ($query['defaults'] as $name => $value)
+          {
+            if (!is_array($value) && !isset($query[$name]))
+            {
+              $field = $itemversion->getField($name);
+              if ($field !== null)
+                $field->setValue($value);
+            }
+          }
+          unset($query['defaults']);
+        }
         foreach ($query as $name => $value)
         {
-          if (($name != 'complete') && ($name != 'current') && ($name != 'compounds'))
+          if (($name != 'complete') && ($name != 'current'))
           {
             $field = $itemversion->getField($name);
             if ($field !== null)
               $field->setValue($value);
           }
-        }
-        if ((isset($query['compounds'])) && (is_array($query['compounds'])))
-        {
-        	foreach ($query['compounds'] as $compound => $count)
-        	{
-        		if (!isset($query[$compound]))
-        		{
-	            $field = $itemversion->getField($compound);
-	            if ($field !== null)
-	              $field->setValue(array());
-        		}
-        	}
         }
         if (isset($query['complete']))
           $itemversion->setComplete($query['complete']=='true');

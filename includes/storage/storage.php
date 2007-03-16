@@ -228,6 +228,11 @@ class StorageConnection
     return addslashes($text);
   }
   
+  public function prepare($query)
+  {
+    $this->log->errortrace('Unimplemented storage method');
+  }
+  
   public function query($query)
   {
     $this->log->errortrace('Unimplemented storage method');

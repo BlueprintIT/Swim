@@ -77,6 +77,12 @@ class SimpleField extends Field
     {
       if ($request->hasQueryVar($this->id))
         return $request->getQueryVar($this->id);
+      if ($request->hasQueryVar('defaults'))
+      {
+        $defaults = $request->getQueryVar('defaults');
+        if (is_array($defaults) && isset($defaults[$this->id]))
+          return $defaults[$this->id];
+      }
     }
     else
     {
@@ -88,6 +94,20 @@ class SimpleField extends Field
           $passed = $passed[$this->pos];
           if ((is_array($passed)) && (isset($passed[$this->id])))
             return $passed[$this->id];
+        }
+      }
+      if ($request->hasQueryVar('defaults'))
+      {
+        $defaults = $request->getQueryVar('defaults');
+        if ((is_array($defaults)) && isset($defaults[$this->basefield]))
+        {
+          $passed = $defaults[$this->basefield];
+          if ((is_array($passed)) && (isset($passed[$this->pos])))
+          {
+            $passed = $passed[$this->pos];
+            if ((is_array($passed)) && (isset($passed[$this->id])))
+              return $passed[$this->id];
+          }
         }
       }
     }
@@ -275,6 +295,45 @@ class BaseHTMLField extends TextField
     $result = parent::toString();
     $result = str_replace('<br />', '<br>', $result);
     return $result;
+  }
+}
+
+class BooleanField extends IntegerField
+{
+  public function output(&$request, &$smarty)
+  {
+    $text='';
+    $text.='<input disabled="true" type="checkbox" name="'.$this->getFieldName().'" value="true"';
+    if ($this->getValue()==1)
+      $text.=' checked="checked"';
+    $text.='>';
+    return $text;
+  }
+
+  public function getEditor(&$request, &$smarty)
+  {
+    $text = '';
+    $text.='<input type="hidden" name="defaults.'.$this->getFieldName().'" value="false">';
+    $text.='<input type="checkbox" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'" value="true"';
+    if ($this->getPassedValue($request)=='true')
+      $text.=' checked="checked"';
+    $text.='>';
+    return $text;
+  }
+  
+  public function setValue($value)
+  {
+    if (($value === true) || ($value === "true") || ($value === 1))
+      parent::setValue(1);
+    parent::setValue(0);
+  }
+  
+  public function toString()
+  {
+    if (parent::toString()==1)
+      return "true";
+    else
+      return null;
   }
 }
 
