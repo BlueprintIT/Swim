@@ -5,204 +5,115 @@
  *
  */
 
-BlueprintIT.menus.InstantAnimator = function()
-{
-}
+BlueprintIT.util.Anim = function(el, attributes, duration,  method) {
+  BlueprintIT.util.Anim.superclass.constructor.call(this, el, attributes, duration, method);
+};
 
-BlueprintIT.menus.InstantAnimator.prototype = {
-	startAnimateIn: function(item)
+YAHOO.extend(BlueprintIT.util.Anim, YAHOO.util.Anim);
+
+// shorthand
+var superclass = BlueprintIT.util.Anim.superclass;
+var proto = BlueprintIT.util.Anim.prototype;
+
+BlueprintIT.util.Anim.prototype.toString = function()
+{
+  var el = this.getEl();
+  var id = el.id || el.tagName;
+  return ("ClipAnim " + id);
+};
+
+BlueprintIT.util.Anim.prototype.getClipping = function()
+{
+	var clip = { top: null, right: null, bottom: null, left: null };
+	var el = this.getEl();
+	var region = YAHOO.util.Dom.getRegion(el);
+	var height = region.bottom-region.top;
+	var width = region.right-region.left;
+	var val = YAHOO.util.Dom.getStyle(el, "clip");
+	var results = val.match(/rect\(\s*(\S*)\s*,\s*(\S*)\s*,\s*(\S*)\s*,\s*(\S*)\s*\)/);
+	if (results)
 	{
-		item.setVisible(true);
-		YAHOO.util.Dom.removeClass(item.element, 'hidden');
-		item.state=3;
-	},
-	
-	animateIn: function(item)
-	{
-	},
-	
-	startAnimateOut: function(item)
-	{
-		YAHOO.util.Dom.addClass(item.element, 'hidden');
-		item.state=5;
-		item.timer=BlueprintIT.timing.startTimer(item,5);
-	},
-	
-	animateOut: function(item)
-	{
-		item.setVisible(false);
-		item.state=0;
+		if (results[1] == "auto")
+			clip.top = 0
+		else
+			clip.top = 100*parseInt(results[1])/height;
+		if (results[2] == "auto")
+			clip.right = 100
+		else
+			clip.right = 100*parseInt(results[2])/width;
+		if (results[3] == "auto")
+			clip.bottom = 100
+		else
+			clip.bottom = 100*parseInt(results[3])/height;
+		if (results[4] == "auto")
+			clip.left = 0
+		else
+			clip.left = 100*parseInt(results[4])/width;
 	}
-}
+	else
+	{
+		clip.top = 0
+		clip.right = 100
+		clip.bottom = 100
+		clip.left = 0
+	}
+	return clip;
+};
 
-BlueprintIT.menus.SlideAnimator = function()
+BlueprintIT.util.Anim.prototype.setClipping = function(clip)
 {
-}
+	var el = this.getEl();
+	var region = YAHOO.util.Dom.getRegion(el);
+	var height = region.bottom-region.top;
+	var width = region.right-region.left;
+	var val = "rect(";
+	val += height*clip.top/100+"px, ";
+	val += width*clip.right/100+"px" + ", ";
+	val += height*clip.bottom/100+"px" + ", ";
+	val += width*clip.left/100+"px)";
+	YAHOO.util.Dom.setStyle(el, "clip", val);
+};
 
-BlueprintIT.menus.SlideAnimator.prototype = {
-	steps: 15,
-	delay: 10,
-
-	startAnimateIn: function(item)
-	{
-		item.clippos=0;
-		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
-		YAHOO.util.Dom.removeClass(item.element, 'hidden');
-		item.setVisible(true);
-		item.state=2;
-		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
-	},
-	
-	animateIn: function(item)
-	{
-		var region = YAHOO.util.Dom.getRegion(item.element);
-		var height = region.bottom-region.top;
-		var step = height/this.steps;
-		
-		item.clippos+=step;
-
-		if (item.clippos>=height)
-		{
-			item.clippos=height;
-			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, auto, auto)');
-			item.state=3;
-		}
-		else
-		{
-			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
-			BlueprintIT.timing.startTimer(item,this.delay);
-		}	
-	},
-	
-	startAnimateOut: function(item)
-	{
-		var region = YAHOO.util.Dom.getRegion(item.element);
-		item.clippos=region.bottom-region.top;
-		YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
-		item.state=5;
-		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
-	},
-	
-	animateOut: function(item)
-	{
-		var region = YAHOO.util.Dom.getRegion(item.element);
-		var height = region.bottom-region.top;
-		var step = height/this.steps;
-
-		item.clippos-=step;
-		
-		if (item.clippos<=0)
-		{
-			if (YAHOO.util.Dom.hasClass(item.element, 'hidden'))
-			{
-				item.clippos=0;
-				YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, 0px, auto)');
-				item.setVisible(false);
-				item.state=0;
-			}
-			else
-			{
-				YAHOO.util.Dom.addClass(item.element, 'hidden');
-				BlueprintIT.timing.startTimer(item,5);
-			}
-		}
-		else
-		{
-			YAHOO.util.Dom.setStyle(item.element, 'clip', 'rect(auto, auto, '+item.clippos+'px, auto)');
-			BlueprintIT.timing.startTimer(item,this.delay);
-		}	
-	}		
-}
-
-BlueprintIT.menus.FadeAnimator = function()
+BlueprintIT.util.Anim.prototype.getAttribute = function(attr)
 {
-}
-
-BlueprintIT.menus.FadeAnimator.prototype = {
-	step: 0.05,
-	delay: 10,
-
-	startAnimateIn: function(item)
+	if (attr.substr(0, 4) == "clip")
 	{
-		YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
-		item.setVisible(true);
-		YAHOO.util.Dom.removeClass(item.element, 'hidden');
-		item.state=2;
-		item.opacpos = 0;
-		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
-	},
-	
-	animateIn: function(item)
-	{
-		var next = item.opacpos;
-						
-		next+=this.step;
+    var el = this.getEl();
+    var clip = this.getClipping();
+    return clip[attr.substr(4).toLowerCase()];
+  }
+  else
+  {
+  	return BlueprintIT.util.Anim.superclass.getAttribute.call(this, attr);
+  }
+};
 
-		if (next>=1)
-		{
-			if (item.element.style.filter)
-				item.element.style.filter = '';
-			else
-				YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
-			item.opacpos = 1;
-			item.state=3;
-		}
-		else
-		{
-			YAHOO.util.Dom.setStyle(item.element, 'opacity', next);
-			item.opacpos = next;
-			BlueprintIT.timing.startTimer(item,this.delay);
-		}
-	},
-	
-	startAnimateOut: function(item)
-	{
-		YAHOO.util.Dom.setStyle(item.element, 'opacity', 1);
-		item.state=5;
-		item.opacpos = 1;
-		item.timer=BlueprintIT.timing.startTimer(item,this.delay);
-	},
-	
-	animateOut: function(item)
-	{
-		var next = item.opacpos;
-			
-		next-=this.step;
-
-		if (next<=0)
-		{
-			if (YAHOO.util.Dom.hasClass(item.element, 'hidden'))
-			{
-				YAHOO.util.Dom.setStyle(item.element, 'opacity', 0);
-				item.opacpos = 0;
-				item.setVisible(false);
-				item.state=0;
-			}
-			else
-			{
-				YAHOO.util.Dom.addClass(item.element, 'hidden');
-				BlueprintIT.timing.startTimer(item,5);
-			}
-		}
-		else
-		{
-			YAHOO.util.Dom.setStyle(item.element, 'opacity', next);
-			item.opacpos = next;
-			BlueprintIT.timing.startTimer(item,this.delay);
-		}
-	}		
-}
+BlueprintIT.util.Anim.prototype.setAttribute = function(attr, val, unit)
+{
+ 	if (attr.substr(0, 4) == "clip")
+ 	{
+    var clip = this.getClipping();
+    clip[attr.substring(4).toLowerCase()] = val;
+    this.setClipping(clip);
+  }
+  else
+  {
+  	return BlueprintIT.util.Anim.superclass.setAttribute.call(this, attr, val, unit);
+  }
+};
 
 BlueprintIT.menus.HORIZONTAL = 1;
 BlueprintIT.menus.VERTICAL = 2;
 
+BlueprintIT.menus.CLOSED = 0;
+BlueprintIT.menus.OPENWAIT = 1;
+BlueprintIT.menus.OPENING = 2;
+BlueprintIT.menus.OPEN = 3;
+BlueprintIT.menus.CLOSEWAIT = 4;
+BlueprintIT.menus.CLOSING = 5;
+
 BlueprintIT.menus.MenuManager = function()
 {
-	this.instantAnimator = new BlueprintIT.menus.InstantAnimator();
-	this.slideAnimator = new BlueprintIT.menus.SlideAnimator();
-	this.fadeAnimator = new BlueprintIT.menus.FadeAnimator();
-	this.animator = this.instantAnimator;
-	
 	YAHOO.util.Event.addListener(document, 'keydown', this.keyPressEvent, this, true);
 	var ua = navigator.userAgent.toLowerCase();
   if (ua.indexOf('opera') != -1) // Opera (check first in case of spoof)
@@ -224,10 +135,7 @@ BlueprintIT.menus.MenuManager.prototype = {
 	popupDelay: 200,
 	hideDelay: 200,
 	
-	animator: null,
-	slideAnimator: null,
-	fadeAnimator: null,
-	instantAnimator: null,
+	animator: "instant",
 	
 	browser: 'unknown',
 	
@@ -237,6 +145,7 @@ BlueprintIT.menus.MenuManager.prototype = {
 	
 	log: function(text)
 	{
+		//console.log(text);
 		return;
 		if (!this.textarea)
 			this.textarea=document.getElementById('log');
@@ -417,11 +326,11 @@ BlueprintIT.menus.MenuManager.prototype = {
 			orientation=BlueprintIT.menus.VERTICAL;
 		
 		if (YAHOO.util.Dom.hasClass(element,'fadein'))
-			animator = this.fadeAnimator;
+			animator = "fade";
 		else if (YAHOO.util.Dom.hasClass(element,'slidein'))
-			animator = this.slideAnimator;
+			animator = "slide";
 		else if (YAHOO.util.Dom.hasClass(element,'appearin'))
-			animator = this.instantAnimator;
+			animator = "instant";
 		
 		if (YAHOO.util.Dom.hasClass(element,'menuitem'))
 		{
@@ -461,7 +370,7 @@ function Menu(manager,item,orientation,element,animator)
 {
 	this.manager = manager;
 	//this.manager.log('Created menu from '+element.tagName);
-	this.animator = animator;
+	this.animtype = animator;
 
 	element.menu = this;
 	
@@ -494,22 +403,22 @@ function Menu(manager,item,orientation,element,animator)
 }
 
 /*
-   State 0 - normal
-             can move to state 1 on mouse over
-   State 1 - waiting to appear
-             can move to state 0 on mouse out
-             can move to state 2/3 on timer complete
-   State 2 - animating in
-             can move to state 5 on mouse out
-             can move to state 3 on animation complete
-   State 3 - visible
-             can move to state 4 on mouse out
-   State 4 - waiting to disappear
-             can move to state 3 on mouse over
-             can move to state 5/0 on timer complete
-   State 5 - animating out
-             can move to state 2 on mouse over
-             can move to state 0 on animation complete
+   State CLOSED    - normal
+                     can move to state 1 on mouse over
+   State OPENWAIT  - waiting to appear
+                     can move to state 0 on mouse out
+                     can move to state 2/3 on timer complete
+   State OPENING   - animating in
+                     can move to state 5 on mouse out
+                     can move to state 3 on animation complete
+   State OPEN      - visible
+                     can move to state 4 on mouse out
+   State CLOSEWAIT - waiting to disappear
+                     can move to state 3 on mouse over
+                     can move to state 5/0 on timer complete
+   State CLOSING   - animating out
+                     can move to state 2 on mouse over
+                     can move to state 0 on animation complete
 */
 
 Menu.prototype = {
@@ -519,10 +428,12 @@ Menu.prototype = {
 	orientation: null,
 	element: null,
 	timer: null,
-	state: 0,
+	state: BlueprintIT.menus.CLOSED,
 	animator: null,
+	animtype: null,
 	manager: null,
 	iframe: null,
+	anchor: null,
 		
 	setPosition: function(x,y)
 	{
@@ -550,22 +461,105 @@ Menu.prototype = {
   	}
 	},
 	
+	createDisplayAnimator: function(initial)
+	{
+		this.manager.log("createDisplayAnimator "+this.element.id);
+		this.state = BlueprintIT.menus.OPENING;
+		
+		this.animator = new BlueprintIT.util.Anim(this.element, { }, 0.4, YAHOO.util.Easing.easeOut);
+		this.setVisible(true);
+
+		switch (this.animtype)
+		{
+			case "fade":
+				this.animator.attributes.opacity = { to: 1 };
+				if (initial)
+					this.animator.setAttribute("opacity", 0, "");
+				break;
+			case "slide":
+				var attr, from, to;
+				switch (this.anchor)
+				{
+					case "top":    attr = "clipBottom"; from = 0; to = 100; break;
+					case "bottom": attr = "clipTop";    from = 100; to = 0; break;
+					case "left":   attr = "clipRight";  from = 0; to = 100; break;
+					case "right":  attr = "clipLeft";   from = 100; to = 0; break;
+				}
+				this.animator.attributes[attr] = { to: to };
+				if (initial)
+					this.animator.setAttribute(attr, from, "%");
+				break;
+			default:
+				this.animator = null;
+				this.onAnimatorComplete(null, null, this);
+				return;
+		}
+		
+		this.animator.onComplete.subscribe(this.onAnimatorComplete, this);
+		this.animator.animate();
+	},
+	
+	createHideAnimator: function(initial)
+	{
+		this.manager.log("createHideAnimator "+this.element.id);
+		this.state = BlueprintIT.menus.CLOSING;
+		
+		this.animator = new BlueprintIT.util.Anim(this.element, { }, 0.4, YAHOO.util.Easing.easeOut);
+		
+		switch (this.animtype)
+		{
+			case "fade":
+				this.animator.attributes.opacity = { to: 0 };
+				break;
+			case "slide":
+				var attr, from, to;
+				switch (this.anchor)
+				{
+					case "top":    attr = "clipBottom"; from = 0; to = 100; break;
+					case "bottom": attr = "clipTop";    from = 100; to = 0; break;
+					case "left":   attr = "clipRight";  from = 0; to = 100; break;
+					case "right":  attr = "clipLeft";   from = 100; to = 0; break;
+				}
+				this.animator.attributes[attr] = { to: from };
+				break;
+			default:
+				this.animator = null;
+				this.onAnimatorComplete(null, null, this);
+				return;
+		}
+		
+		this.animator.onComplete.subscribe(this.onAnimatorComplete, this);
+		this.animator.animate();
+	},
+	
 	onTimer: function()
 	{
-		//this.manager.log("onTimer "+this.element.id+" "+this.state);
+		this.manager.log("onTimer "+this.element.id+" "+this.state);
 		switch (this.state)
 		{
-			case 1:
+			case BlueprintIT.menus.OPENWAIT:
 				this.show();
 				break;
-			case 2:
-				this.animator.animateIn(this);
-				break;
-			case 4:
+			case BlueprintIT.menus.CLOSEWAIT:
 				this.hide();
 				break;
-			case 5:
-				this.animator.animateOut(this);
+		}
+	},
+	
+	onAnimatorComplete: function(type, args, menu)
+	{
+		menu.manager.log("onAnimatorComplete "+menu.element.id+" "+menu.state);
+		switch (menu.state)
+		{
+			case BlueprintIT.menus.OPENING:
+				menu.state = BlueprintIT.menus.OPEN;
+				break;
+			case BlueprintIT.menus.CLOSING:
+				menu.state = BlueprintIT.menus.CLOSED;
+				menu.setVisible(false);
+				YAHOO.util.Dom.removeClass(menu.parentItem.element, 'opened');
+				if (menu.parentItem.focusElement)
+					YAHOO.util.Dom.removeClass(menu.parentItem.focusElement, 'opened');
 				break;
 		}
 	},
@@ -574,16 +568,18 @@ Menu.prototype = {
 	{
 		switch (this.state)
 		{
-			case 0:
-			case 1:
-				this.animator.startAnimateIn(this);
+			case BlueprintIT.menus.CLOSED:
+			case BlueprintIT.menus.OPENWAIT:
+				this.createDisplayAnimator(true);
 				break;
-			case 4:
+			case BlueprintIT.menus.CLOSEWAIT:
 				BlueprintIT.timing.cancelTimer(this.timer);
-				this.state=3;
+				this.state=BlueprintIT.menus.OPEN;
 				break;
-			case 5:
-				this.state=2;
+			case BlueprintIT.menus.CLOSING:
+				if (this.animator)
+					this.animator.stop();
+				this.createDisplayAnimator(false);
 				break;
 		}
 	},
@@ -592,56 +588,62 @@ Menu.prototype = {
 	{
 		switch (this.state)
 		{
-			case 1:
+			case BlueprintIT.menus.OPENWAIT:
 				BlueprintIT.timing.cancelTimer(this.timer);
-				this.state=0;
+				this.state=BlueprintIT.menus.CLOSED;
 				break;
-			case 2:
-				this.state=5;
+			case BlueprintIT.menus.OPENING:
+				if (this.animator)
+					this.animator.stop();
+				this.createHideAnimator(false);
 				break;
-			case 3:
-			case 4:
-				this.animator.startAnimateOut(this);
+			case BlueprintIT.menus.OPEN:
+			case BlueprintIT.menus.CLOSEWAIT:
+				this.createHideAnimator(true);
 				break;
 		}
 	},
 	
 	startShow: function()
 	{
-		//this.log('startShow '+this.element.id);
+		this.manager.log('startShow '+this.element.id);
 		switch (this.state)
 		{
-			case 0:
-				this.state=1;
+			case BlueprintIT.menus.CLOSED:
+				this.state=BlueprintIT.menus.OPENWAIT;
 				this.timer=BlueprintIT.timing.startTimer(this,this.manager.popupDelay);
 				break;
-			case 4:
+			case BlueprintIT.menus.CLOSEWAIT:
 				BlueprintIT.timing.cancelTimer(this.timer);
-				this.state=3;
+				this.state=BlueprintIT.menus.OPEN;
 				break;
-			case 5:
-				this.state=2;
+			case BlueprintIT.menus.CLOSING:
+				if (this.animator)
+					this.animator.stop();
+				this.createDisplayAnimator(false);
 				break;
 		}
 	},
 	
 	startHide: function()
 	{
-		//this.log('startHide '+this.element.id);
+		this.manager.log('startHide '+this.element.id);
 		switch (this.state)
 		{
-			case 1:
+			case BlueprintIT.menus.OPENWAIT:
 				BlueprintIT.timing.cancelTimer(this.timer);
 				YAHOO.util.Dom.removeClass(this.parentItem.element, 'opened');
 				if (this.parentItem.focusElement)
 					YAHOO.util.Dom.removeClass(this.parentItem.focusElement, 'opened');
-				this.state=0;
+				this.state=BlueprintIT.menus.CLOSED;
 				break;
-			case 2:
-				this.state=5;
+			case BlueprintIT.menus.OPENING:
+				if (this.animator)
+					this.animator.stop();
+				this.createHideAnimator(false);
 				break;
-			case 3:
-				this.state=4;
+			case BlueprintIT.menus.OPEN:
+				this.state=BlueprintIT.menus.CLOSEWAIT;
 				this.timer=BlueprintIT.timing.startTimer(this,this.manager.hideDelay);
 				break;
 		}
@@ -851,20 +853,24 @@ MenuItem.prototype = {
 			{
 			  var left = region.left
 			  var top = region.bottom;
+			  this.submenu.anchor = "top";
 
 			  if (((top+height)>bwidth) && (region.top >= height))
 			  {
 			  	top = region.top-height;
+			  	this.submenu.anchor = "bottom";
 			  }
 			}
 			else
 			{
 			  var left = region.right;
 			  var top = region.top;
+			  this.submenu.anchor = "left";
 
 			  if (((left+width)>bwidth) && (region.left >= width))
 			  {
 			    left = region.left-width;
+			    this.submenu.anchor = "right";
 			  }
 			}
 			if ((left+width)>bwidth)

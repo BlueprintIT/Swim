@@ -1,5 +1,5 @@
 
-var BlueprintIT={menus:{},dialog:{},widget:{},timing:{},validation:{}}
+var BlueprintIT={menus:{},dialog:{},widget:{},timing:{},forms:{},validation:{},util:{}}
 BlueprintIT.timing.startTimer=function(item,timeout,data)
 {function timerCallback(){item.onTimer(data);}
 return window.setTimeout(timerCallback,timeout);};BlueprintIT.timing.cancelTimer=function(id)

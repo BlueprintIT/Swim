@@ -4,7 +4,8 @@ var BlueprintIT = {
 	widget: {},
 	timing: {},
 	forms: {},
-	validation: {}
+	validation: {},
+	util: {}
 }
 
 BlueprintIT.timing.startTimer = function(item,timeout,data)
