@@ -116,6 +116,8 @@ class BaseField extends XMLSerialized
         return new TextField($el);
       if ($type == 'html')
         return new HTMLField($el);
+      if ($type == 'boolean')
+        return new BooleanField($el);
       if ($type == 'integer')
         return new IntegerField($el);
       if ($type == 'date')
