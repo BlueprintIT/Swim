@@ -468,6 +468,7 @@ Menu.prototype = {
 		
 		this.animator = new BlueprintIT.util.Anim(this.element, { }, 0.4, YAHOO.util.Easing.easeOut);
 		this.setVisible(true);
+		YAHOO.util.Dom.setStyle(this.element, "zIndex", 999);
 
 		switch (this.animtype)
 		{
@@ -503,6 +504,7 @@ Menu.prototype = {
 	{
 		this.manager.log("createHideAnimator "+this.element.id);
 		this.state = BlueprintIT.menus.CLOSING;
+		YAHOO.util.Dom.setStyle(this.element, "zIndex", null);
 		
 		this.animator = new BlueprintIT.util.Anim(this.element, { }, 0.4, YAHOO.util.Easing.easeOut);
 		

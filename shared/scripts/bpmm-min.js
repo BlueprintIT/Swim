@@ -118,14 +118,14 @@ else
 {YAHOO.util.Dom.setStyle(this.element,"display","none");if(this.iframe)
 YAHOO.util.Dom.setStyle(this.iframe,"display","none");YAHOO.util.Dom.removeClass(this.parentItem.element,'opened');if(this.parentItem.focusElement)
 YAHOO.util.Dom.removeClass(this.parentItem.focusElement,'opened');}},createDisplayAnimator:function(initial)
-{this.manager.log("createDisplayAnimator "+this.element.id);this.state=BlueprintIT.menus.OPENING;this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);this.setVisible(true);switch(this.animtype)
+{this.manager.log("createDisplayAnimator "+this.element.id);this.state=BlueprintIT.menus.OPENING;this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);this.setVisible(true);YAHOO.util.Dom.setStyle(this.element,"zIndex",999);switch(this.animtype)
 {case"fade":this.animator.attributes.opacity={to:1};if(initial)
 this.animator.setAttribute("opacity",0,"");break;case"slide":var attr,from,to;switch(this.anchor)
 {case"top":attr="clipBottom";from=0;to=100;break;case"bottom":attr="clipTop";from=100;to=0;break;case"left":attr="clipRight";from=0;to=100;break;case"right":attr="clipLeft";from=100;to=0;break;}
 this.animator.attributes[attr]={to:to};if(initial)
 this.animator.setAttribute(attr,from,"%");break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
 this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.animate();},createHideAnimator:function(initial)
-{this.manager.log("createHideAnimator "+this.element.id);this.state=BlueprintIT.menus.CLOSING;this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);switch(this.animtype)
+{this.manager.log("createHideAnimator "+this.element.id);this.state=BlueprintIT.menus.CLOSING;YAHOO.util.Dom.setStyle(this.element,"zIndex",null);this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);switch(this.animtype)
 {case"fade":this.animator.attributes.opacity={to:0};break;case"slide":var attr,from,to;switch(this.anchor)
 {case"top":attr="clipBottom";from=0;to=100;break;case"bottom":attr="clipTop";from=100;to=0;break;case"left":attr="clipRight";from=0;to=100;break;case"right":attr="clipLeft";from=100;to=0;break;}
 this.animator.attributes[attr]={to:from};break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
