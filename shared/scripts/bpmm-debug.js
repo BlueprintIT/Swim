@@ -105,7 +105,10 @@ BlueprintIT.util.Anim.prototype.setAttribute = function(attr, val, unit)
 			}
 			unit = "px";
 		}
-    var clip = this.getClipping();
+		// This is a hack. Cannot retrieve clipping on opera so can only modify one clip value at a time.
+		// Rather than use auto use massive values so submenus get clipped sensibly.
+		// var clip = this.getClipping();
+    var clip = { top: "-5000px", right: "5000px", bottom: "5000px", left: "-5000px" };
     clip[side] = val+unit;
     this.setClipping(clip);
   }
@@ -504,7 +507,13 @@ Menu.prototype = {
 				}
 				this.animator.attributes[attr] = { to: to };
 				if (initial)
+				{
 					this.animator.setAttribute(attr, from, "px");
+					// Don't know why this causes an flicker on other browsers but it is
+					// absolutely needed for opera
+					if (menuManager.browser == "opera")
+						this.animator.attributes[attr].from = from;
+				}
 				break;
 			default:
 				this.animator = null;
@@ -542,6 +551,8 @@ Menu.prototype = {
 					case "right":  attr = "clipLeft";   from = width; to = 0; break;
 				}
 				this.animator.attributes[attr] = { to: from };
+				if (initial)
+					this.animator.attributes[attr].from = to;
 				break;
 			default:
 				this.animator = null;
@@ -575,7 +586,14 @@ Menu.prototype = {
 			case BlueprintIT.menus.OPENING:
 				menu.state = BlueprintIT.menus.OPEN;
 				if (menu.animtype == "slide")
-					YAHOO.util.Dom.setStyle(menu.element, "clip", "rect(auto, auto, auto, auto)");
+				{
+					if (menuManager.browser == "opera")
+						YAHOO.util.Dom.setStyle(menu.element, "clip", "");
+					else if (menuManager.browser == "ie")
+						YAHOO.util.Dom.setStyle(menu.element, "clip", "rect(auto, auto, auto, auto)");
+					else
+						YAHOO.util.Dom.setStyle(menu.element, "clip", "auto");
+				}
 				break;
 			case BlueprintIT.menus.CLOSING:
 				menu.state = BlueprintIT.menus.CLOSED;
@@ -889,7 +907,6 @@ MenuItem.prototype = {
 			  var left = region.right;
 			  var top = region.top;
 			  this.submenu.anchor = "left";
-
 			  if (((left+width)>bwidth) && (region.left >= width))
 			  {
 			    left = region.left-width;

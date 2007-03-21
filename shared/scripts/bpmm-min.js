@@ -22,7 +22,7 @@ else
 else
 {var width=region.right-region.left;val=100*val/width;}
 unit="px";}
-var clip=this.getClipping();clip[side]=val+unit;this.setClipping(clip);}
+var clip={top:"-5000px",right:"5000px",bottom:"5000px",left:"-5000px"};clip[side]=val+unit;this.setClipping(clip);}
 else
 {return BlueprintIT.util.Anim.superclass.setAttribute.call(this,attr,val,unit);}};BlueprintIT.menus.HORIZONTAL=1;BlueprintIT.menus.VERTICAL=2;BlueprintIT.menus.CLOSED=0;BlueprintIT.menus.OPENWAIT=1;BlueprintIT.menus.OPENING=2;BlueprintIT.menus.OPEN=3;BlueprintIT.menus.CLOSEWAIT=4;BlueprintIT.menus.CLOSING=5;BlueprintIT.menus.MenuManager=function()
 {YAHOO.util.Event.addListener(document,'keydown',this.keyPressEvent,this,true);var ua=navigator.userAgent.toLowerCase();if(ua.indexOf('opera')!=-1)
@@ -118,18 +118,25 @@ YAHOO.util.Dom.removeClass(this.parentItem.focusElement,'opened');}},createDispl
 this.animator.setAttribute("opacity",0,"");break;case"slide":var region=YAHOO.util.Dom.getRegion(this.element);var height=region.bottom-region.top;var width=region.right-region.left;var attr,from,to;switch(this.anchor)
 {case"top":attr="clipBottom";from=0;to=height;break;case"bottom":attr="clipTop";from=height;to=0;break;case"left":attr="clipRight";from=0;to=width;break;case"right":attr="clipLeft";from=width;to=0;break;}
 this.animator.attributes[attr]={to:to};if(initial)
-this.animator.setAttribute(attr,from,"px");break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
+{this.animator.setAttribute(attr,from,"px");if(menuManager.browser=="opera")
+this.animator.attributes[attr].from=from;}
+break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
 this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.animate();},createHideAnimator:function(initial)
 {this.manager.log("createHideAnimator "+this.element.id);this.state=BlueprintIT.menus.CLOSING;YAHOO.util.Dom.setStyle(this.element,"zIndex",null);this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);switch(this.animtype)
 {case"fade":this.animator.attributes.opacity={to:0};break;case"slide":var region=YAHOO.util.Dom.getRegion(this.element);var height=region.bottom-region.top;var width=region.right-region.left;var attr,from,to;switch(this.anchor)
 {case"top":attr="clipBottom";from=0;to=height;break;case"bottom":attr="clipTop";from=height;to=0;break;case"left":attr="clipRight";from=0;to=width;break;case"right":attr="clipLeft";from=width;to=0;break;}
-this.animator.attributes[attr]={to:from};break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
+this.animator.attributes[attr]={to:from};if(initial)
+this.animator.attributes[attr].from=to;break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
 this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.animate();},onTimer:function()
 {this.manager.log("onTimer "+this.element.id+" "+this.state);switch(this.state)
 {case BlueprintIT.menus.OPENWAIT:this.show();break;case BlueprintIT.menus.CLOSEWAIT:this.hide();break;}},onAnimatorComplete:function(type,args,menu)
 {menu.manager.log("onAnimatorComplete "+menu.element.id+" "+menu.state);switch(menu.state)
 {case BlueprintIT.menus.OPENING:menu.state=BlueprintIT.menus.OPEN;if(menu.animtype=="slide")
-YAHOO.util.Dom.setStyle(menu.element,"clip","rect(auto, auto, auto, auto)");break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);YAHOO.util.Dom.removeClass(menu.parentItem.element,'opened');if(menu.parentItem.focusElement)
+{if(menuManager.browser=="opera")
+YAHOO.util.Dom.setStyle(menu.element,"clip","");else if(menuManager.browser=="ie")
+YAHOO.util.Dom.setStyle(menu.element,"clip","rect(auto, auto, auto, auto)");else
+YAHOO.util.Dom.setStyle(menu.element,"clip","auto");}
+break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);YAHOO.util.Dom.removeClass(menu.parentItem.element,'opened');if(menu.parentItem.focusElement)
 YAHOO.util.Dom.removeClass(menu.parentItem.focusElement,'opened');break;}},show:function()
 {switch(this.state)
 {case BlueprintIT.menus.CLOSED:case BlueprintIT.menus.OPENWAIT:this.createDisplayAnimator(true);break;case BlueprintIT.menus.CLOSEWAIT:BlueprintIT.timing.cancelTimer(this.timer);this.state=BlueprintIT.menus.OPEN;break;case BlueprintIT.menus.CLOSING:if(this.animator)
