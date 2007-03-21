@@ -593,8 +593,8 @@ Menu.prototype = {
 				}
 				else if (menu.animtype == "fade")
 				{
-					if (this.element.style.filter)
-						this.element.style.filter = "";
+					if (menu.element.style.filter)
+						menu.element.style.filter = "";
 				}
 				break;
 			case BlueprintIT.menus.CLOSING:

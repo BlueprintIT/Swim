@@ -137,8 +137,8 @@ YAHOO.util.Dom.setStyle(menu.element,"clip","");else if((menuManager.browser=="i
 YAHOO.util.Dom.setStyle(menu.element,"clip","rect(auto, auto, auto, auto)");else
 YAHOO.util.Dom.setStyle(menu.element,"clip","auto");}
 else if(menu.animtype=="fade")
-{if(this.element.style.filter)
-this.element.style.filter="";}
+{if(menu.element.style.filter)
+menu.element.style.filter="";}
 break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);break;}},show:function()
 {switch(this.state)
 {case BlueprintIT.menus.CLOSED:case BlueprintIT.menus.OPENWAIT:this.createDisplayAnimator(true);break;case BlueprintIT.menus.CLOSEWAIT:BlueprintIT.timing.cancelTimer(this.timer);this.state=BlueprintIT.menus.OPEN;break;case BlueprintIT.menus.CLOSING:if(this.animator)
