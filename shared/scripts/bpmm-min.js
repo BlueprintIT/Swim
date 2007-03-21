@@ -110,9 +110,9 @@ Menu.prototype={parentItem:null,menuItems:null,orientation:null,element:null,tim
 {YAHOO.util.Dom.setStyle(this.element,"display","block");if(this.iframe)
 YAHOO.util.Dom.setStyle(this.iframe,"display","block");this.parentItem.setMenuPosition();}
 else
-{YAHOO.util.Dom.setStyle(this.element,"display","none");if(this.iframe)
-YAHOO.util.Dom.setStyle(this.iframe,"display","none");YAHOO.util.Dom.removeClass(this.parentItem.element,'opened');if(this.parentItem.focusElement)
-YAHOO.util.Dom.removeClass(this.parentItem.focusElement,'opened');}},createDisplayAnimator:function(initial)
+{if(this.iframe)
+YAHOO.util.Dom.setStyle(this.iframe,"display","none");YAHOO.util.Dom.setStyle(this.element,"display","none");}
+this.parentItem.setOpened(value);},createDisplayAnimator:function(initial)
 {this.manager.log("createDisplayAnimator "+this.element.id);this.state=BlueprintIT.menus.OPENING;this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);this.setVisible(true);YAHOO.util.Dom.setStyle(this.element,"zIndex",999);switch(this.animtype)
 {case"fade":this.animator.attributes.opacity={to:1};if(initial)
 this.animator.setAttribute("opacity",0,"");break;case"slide":var region=YAHOO.util.Dom.getRegion(this.element);var height=region.bottom-region.top;var width=region.right-region.left;var attr,from,to;switch(this.anchor)
@@ -136,8 +136,10 @@ this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.a
 YAHOO.util.Dom.setStyle(menu.element,"clip","");else if((menuManager.browser=="ie")||(menuManager.browser=="ie7"))
 YAHOO.util.Dom.setStyle(menu.element,"clip","rect(auto, auto, auto, auto)");else
 YAHOO.util.Dom.setStyle(menu.element,"clip","auto");}
-break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);YAHOO.util.Dom.removeClass(menu.parentItem.element,'opened');if(menu.parentItem.focusElement)
-YAHOO.util.Dom.removeClass(menu.parentItem.focusElement,'opened');break;}},show:function()
+else if(menu.animtype=="fade")
+{if(this.element.style.filter)
+this.element.style.filter="";}
+break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);break;}},show:function()
 {switch(this.state)
 {case BlueprintIT.menus.CLOSED:case BlueprintIT.menus.OPENWAIT:this.createDisplayAnimator(true);break;case BlueprintIT.menus.CLOSEWAIT:BlueprintIT.timing.cancelTimer(this.timer);this.state=BlueprintIT.menus.OPEN;break;case BlueprintIT.menus.CLOSING:if(this.animator)
 this.animator.stop();this.createDisplayAnimator(false);break;}},hide:function()
@@ -148,8 +150,7 @@ this.animator.stop();this.createHideAnimator(false);break;case BlueprintIT.menus
 {case BlueprintIT.menus.CLOSED:this.state=BlueprintIT.menus.OPENWAIT;this.timer=BlueprintIT.timing.startTimer(this,this.manager.popupDelay);break;case BlueprintIT.menus.CLOSEWAIT:BlueprintIT.timing.cancelTimer(this.timer);this.state=BlueprintIT.menus.OPEN;break;case BlueprintIT.menus.CLOSING:if(this.animator)
 this.animator.stop();this.createDisplayAnimator(false);break;}},startHide:function()
 {this.manager.log('startHide '+this.element.id);switch(this.state)
-{case BlueprintIT.menus.OPENWAIT:BlueprintIT.timing.cancelTimer(this.timer);YAHOO.util.Dom.removeClass(this.parentItem.element,'opened');if(this.parentItem.focusElement)
-YAHOO.util.Dom.removeClass(this.parentItem.focusElement,'opened');this.state=BlueprintIT.menus.CLOSED;break;case BlueprintIT.menus.OPENING:if(this.animator)
+{case BlueprintIT.menus.OPENWAIT:BlueprintIT.timing.cancelTimer(this.timer);this.parentItem.setOpened(false);this.state=BlueprintIT.menus.CLOSED;break;case BlueprintIT.menus.OPENING:if(this.animator)
 this.animator.stop();this.createHideAnimator(false);break;case BlueprintIT.menus.OPEN:this.state=BlueprintIT.menus.CLOSEWAIT;this.timer=BlueprintIT.timing.startTimer(this,this.manager.hideDelay);break;}}}
 function MenuItem(manager,parent,element)
 {this.manager=manager;element.menuitem=this;this.parentMenu=parent;this.element=element;this.parentMenu.menuItems.push(this);this.pos=this.parentMenu.menuItems.length-1;}
@@ -160,7 +161,13 @@ MenuItem.prototype={parentMenu:null,orientation:null,element:null,submenu:null,p
 {YAHOO.util.Dom.addClass(this.element,'focused');if(this.focusElement)
 YAHOO.util.Dom.addClass(this.focusElement,'focused');},unfocus:function()
 {YAHOO.util.Dom.removeClass(this.element,'focused');if(this.focusElement)
-YAHOO.util.Dom.removeClass(this.focusElement,'focused');},keyPress:function(code)
+YAHOO.util.Dom.removeClass(this.focusElement,'focused');},setOpened:function(value)
+{if(value)
+{YAHOO.util.Dom.addClass(this.element,'opened');if(this.focusElement)
+YAHOO.util.Dom.addClass(this.focusElement,'opened');}
+else
+{YAHOO.util.Dom.removeClass(this.element,'opened');if(this.focusElement)
+YAHOO.util.Dom.removeClass(this.focusElement,'opened');}},keyPress:function(code)
 {var newitem=null;if(this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 {if(code==39)
 {var npos=(this.pos+1)%this.parentMenu.menuItems.length;newitem=this.parentMenu.menuItems[npos];}
@@ -201,14 +208,12 @@ if(newitem)
 newitem.focusElement.focus();else
 this.manager.changeSelection(newitem);return true;}
 return false;},mouseOver:function()
-{this.manager.log('mouseOver '+this.element.id);YAHOO.util.Dom.addClass(this.element,'opened');if(this.focusElement)
-YAHOO.util.Dom.addClass(this.focusElement,'opened');if(this.submenu)
+{this.manager.log('mouseOver '+this.element.id);this.setOpened(true);if(this.submenu)
 this.submenu.startShow();else if(this.parentMenu.parentItem)
 this.parentMenu.startShow();},mouseOut:function()
 {this.manager.log('mouseOut '+this.element.id);if(this.submenu)
 this.submenu.startHide();else
-{YAHOO.util.Dom.removeClass(this.element,'opened');if(this.focusElement)
-YAHOO.util.Dom.removeClass(this.focusElement,'opened');}},setMenuPosition:function()
+this.setOpened(false);},setMenuPosition:function()
 {if(this.submenu)
 {var region=YAHOO.util.Dom.getRegion(this.element);var subregion=YAHOO.util.Dom.getRegion(this.submenu.element);var width=subregion.right-subregion.left;var height=subregion.bottom-subregion.top;var bwidth=YAHOO.util.Dom.getClientWidth();var bheight=YAHOO.util.Dom.getClientHeight();if(this.parentMenu.orientation==BlueprintIT.menus.HORIZONTAL)
 {var left=region.left

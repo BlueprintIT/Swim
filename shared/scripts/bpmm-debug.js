@@ -467,14 +467,11 @@ Menu.prototype = {
   	}
   	else
   	{
-	  	YAHOO.util.Dom.setStyle(this.element, "display", "none");
 	  	if (this.iframe)
 		  	YAHOO.util.Dom.setStyle(this.iframe, "display", "none");
-
-			YAHOO.util.Dom.removeClass(this.parentItem.element, 'opened');
-			if (this.parentItem.focusElement)
-				YAHOO.util.Dom.removeClass(this.parentItem.focusElement, 'opened');
+	  	YAHOO.util.Dom.setStyle(this.element, "display", "none");
   	}
+		this.parentItem.setOpened(value);
 	},
 	
 	createDisplayAnimator: function(initial)
@@ -594,13 +591,15 @@ Menu.prototype = {
 					else
 						YAHOO.util.Dom.setStyle(menu.element, "clip", "auto");
 				}
+				else if (menu.animtype == "fade")
+				{
+					if (this.element.style.filter)
+						this.element.style.filter = "";
+				}
 				break;
 			case BlueprintIT.menus.CLOSING:
 				menu.state = BlueprintIT.menus.CLOSED;
 				menu.setVisible(false);
-				YAHOO.util.Dom.removeClass(menu.parentItem.element, 'opened');
-				if (menu.parentItem.focusElement)
-					YAHOO.util.Dom.removeClass(menu.parentItem.focusElement, 'opened');
 				break;
 		}
 	},
@@ -673,9 +672,7 @@ Menu.prototype = {
 		{
 			case BlueprintIT.menus.OPENWAIT:
 				BlueprintIT.timing.cancelTimer(this.timer);
-				YAHOO.util.Dom.removeClass(this.parentItem.element, 'opened');
-				if (this.parentItem.focusElement)
-					YAHOO.util.Dom.removeClass(this.parentItem.focusElement, 'opened');
+				this.parentItem.setOpened(false);
 				this.state=BlueprintIT.menus.CLOSED;
 				break;
 			case BlueprintIT.menus.OPENING:
@@ -746,6 +743,22 @@ MenuItem.prototype = {
 		YAHOO.util.Dom.removeClass(this.element, 'focused');
 		if (this.focusElement)
 			YAHOO.util.Dom.removeClass(this.focusElement, 'focused');
+	},
+	
+	setOpened: function(value)
+	{
+		if (value)
+		{
+			YAHOO.util.Dom.addClass(this.element, 'opened');
+			if (this.focusElement)
+				YAHOO.util.Dom.addClass(this.focusElement, 'opened');
+		}
+		else
+		{
+			YAHOO.util.Dom.removeClass(this.element, 'opened');
+			if (this.focusElement)
+				YAHOO.util.Dom.removeClass(this.focusElement, 'opened');
+		}
 	},
 	
 	keyPress: function(code)
@@ -853,10 +866,8 @@ MenuItem.prototype = {
 	mouseOver: function()
 	{
 		this.manager.log('mouseOver '+this.element.id);
-
-		YAHOO.util.Dom.addClass(this.element, 'opened');
-		if (this.focusElement)
-			YAHOO.util.Dom.addClass(this.focusElement, 'opened');
+		
+		this.setOpened(true);
 		
 		if (this.submenu)
 			this.submenu.startShow();
@@ -871,11 +882,7 @@ MenuItem.prototype = {
 		if (this.submenu)
 			this.submenu.startHide();
 		else
-		{
-			YAHOO.util.Dom.removeClass(this.element, 'opened');
-			if (this.focusElement)
-				YAHOO.util.Dom.removeClass(this.focusElement, 'opened');
-		}
+			this.setOpened(false);
 	},
 	
 	setMenuPosition: function()
