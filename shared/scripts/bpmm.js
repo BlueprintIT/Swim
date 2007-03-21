@@ -11,9 +11,7 @@ BlueprintIT.util.Anim = function(el, attributes, duration,  method) {
 
 YAHOO.extend(BlueprintIT.util.Anim, YAHOO.util.Anim);
 
-// shorthand
-var superclass = BlueprintIT.util.Anim.superclass;
-var proto = BlueprintIT.util.Anim.prototype;
+BlueprintIT.util.Anim.prototype.clipMatch = /rect\(\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*\)/;
 
 BlueprintIT.util.Anim.prototype.toString = function()
 {
@@ -30,7 +28,7 @@ BlueprintIT.util.Anim.prototype.getClipping = function()
 	var height = region.bottom-region.top;
 	var width = region.right-region.left;
 	var val = YAHOO.util.Dom.getStyle(el, "clip");
-	var results = val.match(/rect\(\s*(\S*)\s*,\s*(\S*)\s*,\s*(\S*)\s*,\s*(\S*)\s*\)/);
+	var results = this.clipMatch.exec(val);
 	if (results)
 	{
 		if (results[1] == "auto")

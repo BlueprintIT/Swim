@@ -1,7 +1,7 @@
 
-BlueprintIT.util.Anim=function(el,attributes,duration,method){BlueprintIT.util.Anim.superclass.constructor.call(this,el,attributes,duration,method);};YAHOO.extend(BlueprintIT.util.Anim,YAHOO.util.Anim);var superclass=BlueprintIT.util.Anim.superclass;var proto=BlueprintIT.util.Anim.prototype;BlueprintIT.util.Anim.prototype.toString=function()
+BlueprintIT.util.Anim=function(el,attributes,duration,method){BlueprintIT.util.Anim.superclass.constructor.call(this,el,attributes,duration,method);};YAHOO.extend(BlueprintIT.util.Anim,YAHOO.util.Anim);BlueprintIT.util.Anim.prototype.clipMatch=/rect\(\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*\)/;BlueprintIT.util.Anim.prototype.toString=function()
 {var el=this.getEl();var id=el.id||el.tagName;return("ClipAnim "+id);};BlueprintIT.util.Anim.prototype.getClipping=function()
-{var clip={top:null,right:null,bottom:null,left:null};var el=this.getEl();var region=YAHOO.util.Dom.getRegion(el);var height=region.bottom-region.top;var width=region.right-region.left;var val=YAHOO.util.Dom.getStyle(el,"clip");var results=val.match(/rect\(\s*(\S*)\s*,\s*(\S*)\s*,\s*(\S*)\s*,\s*(\S*)\s*\)/);if(results)
+{var clip={top:null,right:null,bottom:null,left:null};var el=this.getEl();var region=YAHOO.util.Dom.getRegion(el);var height=region.bottom-region.top;var width=region.right-region.left;var val=YAHOO.util.Dom.getStyle(el,"clip");var results=this.clipMatch.exec(val);if(results)
 {if(results[1]=="auto")
 clip.top=0
 else
