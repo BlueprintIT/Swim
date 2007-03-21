@@ -589,7 +589,7 @@ Menu.prototype = {
 				{
 					if (menuManager.browser == "opera")
 						YAHOO.util.Dom.setStyle(menu.element, "clip", "");
-					else if (menuManager.browser == "ie")
+					else if ((menuManager.browser == "ie") || (menuManager.browser == "ie7"))
 						YAHOO.util.Dom.setStyle(menu.element, "clip", "rect(auto, auto, auto, auto)");
 					else
 						YAHOO.util.Dom.setStyle(menu.element, "clip", "auto");

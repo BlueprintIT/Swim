@@ -133,7 +133,7 @@ this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.a
 {menu.manager.log("onAnimatorComplete "+menu.element.id+" "+menu.state);switch(menu.state)
 {case BlueprintIT.menus.OPENING:menu.state=BlueprintIT.menus.OPEN;if(menu.animtype=="slide")
 {if(menuManager.browser=="opera")
-YAHOO.util.Dom.setStyle(menu.element,"clip","");else if(menuManager.browser=="ie")
+YAHOO.util.Dom.setStyle(menu.element,"clip","");else if((menuManager.browser=="ie")||(menuManager.browser=="ie7"))
 YAHOO.util.Dom.setStyle(menu.element,"clip","rect(auto, auto, auto, auto)");else
 YAHOO.util.Dom.setStyle(menu.element,"clip","auto");}
 break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);YAHOO.util.Dom.removeClass(menu.parentItem.element,'opened');if(menu.parentItem.focusElement)
