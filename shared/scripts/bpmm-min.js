@@ -1,33 +1,28 @@
 
-BlueprintIT.util.Anim=function(el,attributes,duration,method){BlueprintIT.util.Anim.superclass.constructor.call(this,el,attributes,duration,method);};YAHOO.extend(BlueprintIT.util.Anim,YAHOO.util.Anim);BlueprintIT.util.Anim.prototype.clipMatch=/rect\(\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*\)/;BlueprintIT.util.Anim.prototype.toString=function()
+BlueprintIT.util.Anim=function(el,attributes,duration,method){BlueprintIT.util.Anim.superclass.constructor.call(this,el,attributes,duration,method);};YAHOO.extend(BlueprintIT.util.Anim,YAHOO.util.Anim);BlueprintIT.util.Anim.prototype.clipMatch=/rect\(\s*([^\s,]*)\s*,?\s*([^\s,]*)\s*,?\s*([^\s,]*)\s*,?\s*([^\s,]*)\s*\)/;BlueprintIT.util.Anim.prototype.toString=function()
 {var el=this.getEl();var id=el.id||el.tagName;return("ClipAnim "+id);};BlueprintIT.util.Anim.prototype.getClipping=function()
-{var clip={top:null,right:null,bottom:null,left:null};var el=this.getEl();var region=YAHOO.util.Dom.getRegion(el);var height=region.bottom-region.top;var width=region.right-region.left;var val=YAHOO.util.Dom.getStyle(el,"clip");var results=this.clipMatch.exec(val);if(results)
-{if(results[1]=="auto")
-clip.top=0
+{var clip={top:null,right:null,bottom:null,left:null};var el=this.getEl();var val=YAHOO.util.Dom.getStyle(el,"clip");var results=this.clipMatch.exec(val);if(results)
+{clip.top=results[1];clip.right=results[2];clip.bottom=results[3];clip.left=results[4];}
 else
-clip.top=100*parseInt(results[1])/height;if(results[2]=="auto")
-clip.right=100
-else
-clip.right=100*parseInt(results[2])/width;if(results[3]=="auto")
-clip.bottom=100
-else
-clip.bottom=100*parseInt(results[3])/height;if(results[4]=="auto")
-clip.left=0
-else
-clip.left=100*parseInt(results[4])/width;}
-else
-{clip.top=0
-clip.right=100
-clip.bottom=100
-clip.left=0}
+{clip.top="auto";clip.right="auto";clip.bottom="auto";clip.left="auto";}
 return clip;};BlueprintIT.util.Anim.prototype.setClipping=function(clip)
-{var el=this.getEl();var region=YAHOO.util.Dom.getRegion(el);var height=region.bottom-region.top;var width=region.right-region.left;var val="rect(";val+=height*clip.top/100+"px, ";val+=width*clip.right/100+"px"+", ";val+=height*clip.bottom/100+"px"+", ";val+=width*clip.left/100+"px)";YAHOO.util.Dom.setStyle(el,"clip",val);};BlueprintIT.util.Anim.prototype.getAttribute=function(attr)
+{var el=this.getEl();var val="rect(";val+=clip.top+", ";val+=clip.right+", ";val+=clip.bottom+", ";val+=clip.left+")";YAHOO.util.Dom.setStyle(el,"clip",val);};BlueprintIT.util.Anim.prototype.getAttribute=function(attr)
 {if(attr.substr(0,4)=="clip")
-{var el=this.getEl();var clip=this.getClipping();return clip[attr.substr(4).toLowerCase()];}
+{var el=this.getEl();var clip=this.getClipping();var side=attr.substr(4).toLowerCase();if(clip[side]=="auto")
+{var region=YAHOO.util.Dom.getRegion(el);switch(side)
+{case"top":return 0;case"right":return region.right-region.left;case"bottom":return region.bottom-region.top;case"left":return 0;}}
+else
+return parseInt(clip[side]);}
 else
 {return BlueprintIT.util.Anim.superclass.getAttribute.call(this,attr);}};BlueprintIT.util.Anim.prototype.setAttribute=function(attr,val,unit)
 {if(attr.substr(0,4)=="clip")
-{var clip=this.getClipping();clip[attr.substring(4).toLowerCase()]=val;this.setClipping(clip);}
+{var side=attr.substr(4).toLowerCase();if(unit=="%")
+{var region=YAHOO.util.Dom.getRegion(this.element);if((side=="bottom")||(side=="top"))
+{var height=region.bottom-region.top;val=100*val/height;}
+else
+{var width=region.right-region.left;val=100*val/width;}
+unit="px";}
+var clip=this.getClipping();clip[side]=val+unit;this.setClipping(clip);}
 else
 {return BlueprintIT.util.Anim.superclass.setAttribute.call(this,attr,val,unit);}};BlueprintIT.menus.HORIZONTAL=1;BlueprintIT.menus.VERTICAL=2;BlueprintIT.menus.CLOSED=0;BlueprintIT.menus.OPENWAIT=1;BlueprintIT.menus.OPENING=2;BlueprintIT.menus.OPEN=3;BlueprintIT.menus.CLOSEWAIT=4;BlueprintIT.menus.CLOSING=5;BlueprintIT.menus.MenuManager=function()
 {YAHOO.util.Event.addListener(document,'keydown',this.keyPressEvent,this,true);var ua=navigator.userAgent.toLowerCase();if(ua.indexOf('opera')!=-1)
@@ -120,20 +115,21 @@ YAHOO.util.Dom.setStyle(this.iframe,"display","none");YAHOO.util.Dom.removeClass
 YAHOO.util.Dom.removeClass(this.parentItem.focusElement,'opened');}},createDisplayAnimator:function(initial)
 {this.manager.log("createDisplayAnimator "+this.element.id);this.state=BlueprintIT.menus.OPENING;this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);this.setVisible(true);YAHOO.util.Dom.setStyle(this.element,"zIndex",999);switch(this.animtype)
 {case"fade":this.animator.attributes.opacity={to:1};if(initial)
-this.animator.setAttribute("opacity",0,"");break;case"slide":var attr,from,to;switch(this.anchor)
-{case"top":attr="clipBottom";from=0;to=100;break;case"bottom":attr="clipTop";from=100;to=0;break;case"left":attr="clipRight";from=0;to=100;break;case"right":attr="clipLeft";from=100;to=0;break;}
+this.animator.setAttribute("opacity",0,"");break;case"slide":var region=YAHOO.util.Dom.getRegion(this.element);var height=region.bottom-region.top;var width=region.right-region.left;var attr,from,to;switch(this.anchor)
+{case"top":attr="clipBottom";from=0;to=height;break;case"bottom":attr="clipTop";from=height;to=0;break;case"left":attr="clipRight";from=0;to=width;break;case"right":attr="clipLeft";from=width;to=0;break;}
 this.animator.attributes[attr]={to:to};if(initial)
-this.animator.setAttribute(attr,from,"%");break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
+this.animator.setAttribute(attr,from,"px");break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
 this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.animate();},createHideAnimator:function(initial)
 {this.manager.log("createHideAnimator "+this.element.id);this.state=BlueprintIT.menus.CLOSING;YAHOO.util.Dom.setStyle(this.element,"zIndex",null);this.animator=new BlueprintIT.util.Anim(this.element,{},0.4,YAHOO.util.Easing.easeOut);switch(this.animtype)
-{case"fade":this.animator.attributes.opacity={to:0};break;case"slide":var attr,from,to;switch(this.anchor)
-{case"top":attr="clipBottom";from=0;to=100;break;case"bottom":attr="clipTop";from=100;to=0;break;case"left":attr="clipRight";from=0;to=100;break;case"right":attr="clipLeft";from=100;to=0;break;}
+{case"fade":this.animator.attributes.opacity={to:0};break;case"slide":var region=YAHOO.util.Dom.getRegion(this.element);var height=region.bottom-region.top;var width=region.right-region.left;var attr,from,to;switch(this.anchor)
+{case"top":attr="clipBottom";from=0;to=height;break;case"bottom":attr="clipTop";from=height;to=0;break;case"left":attr="clipRight";from=0;to=width;break;case"right":attr="clipLeft";from=width;to=0;break;}
 this.animator.attributes[attr]={to:from};break;default:this.animator=null;this.onAnimatorComplete(null,null,this);return;}
 this.animator.onComplete.subscribe(this.onAnimatorComplete,this);this.animator.animate();},onTimer:function()
 {this.manager.log("onTimer "+this.element.id+" "+this.state);switch(this.state)
 {case BlueprintIT.menus.OPENWAIT:this.show();break;case BlueprintIT.menus.CLOSEWAIT:this.hide();break;}},onAnimatorComplete:function(type,args,menu)
 {menu.manager.log("onAnimatorComplete "+menu.element.id+" "+menu.state);switch(menu.state)
-{case BlueprintIT.menus.OPENING:menu.state=BlueprintIT.menus.OPEN;break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);YAHOO.util.Dom.removeClass(menu.parentItem.element,'opened');if(menu.parentItem.focusElement)
+{case BlueprintIT.menus.OPENING:menu.state=BlueprintIT.menus.OPEN;if(menu.animtype=="slide")
+YAHOO.util.Dom.setStyle(menu.element,"clip","rect(auto, auto, auto, auto)");break;case BlueprintIT.menus.CLOSING:menu.state=BlueprintIT.menus.CLOSED;menu.setVisible(false);YAHOO.util.Dom.removeClass(menu.parentItem.element,'opened');if(menu.parentItem.focusElement)
 YAHOO.util.Dom.removeClass(menu.parentItem.focusElement,'opened');break;}},show:function()
 {switch(this.state)
 {case BlueprintIT.menus.CLOSED:case BlueprintIT.menus.OPENWAIT:this.createDisplayAnimator(true);break;case BlueprintIT.menus.CLOSEWAIT:BlueprintIT.timing.cancelTimer(this.timer);this.state=BlueprintIT.menus.OPEN;break;case BlueprintIT.menus.CLOSING:if(this.animator)

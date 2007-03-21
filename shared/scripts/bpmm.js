@@ -11,7 +11,7 @@ BlueprintIT.util.Anim = function(el, attributes, duration,  method) {
 
 YAHOO.extend(BlueprintIT.util.Anim, YAHOO.util.Anim);
 
-BlueprintIT.util.Anim.prototype.clipMatch = /rect\(\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*,?\s*(\S*)\s*\)/;
+BlueprintIT.util.Anim.prototype.clipMatch = /rect\(\s*([^\s,]*)\s*,?\s*([^\s,]*)\s*,?\s*([^\s,]*)\s*,?\s*([^\s,]*)\s*\)/;
 
 BlueprintIT.util.Anim.prototype.toString = function()
 {
@@ -24,36 +24,21 @@ BlueprintIT.util.Anim.prototype.getClipping = function()
 {
 	var clip = { top: null, right: null, bottom: null, left: null };
 	var el = this.getEl();
-	var region = YAHOO.util.Dom.getRegion(el);
-	var height = region.bottom-region.top;
-	var width = region.right-region.left;
 	var val = YAHOO.util.Dom.getStyle(el, "clip");
 	var results = this.clipMatch.exec(val);
 	if (results)
 	{
-		if (results[1] == "auto")
-			clip.top = 0
-		else
-			clip.top = 100*parseInt(results[1])/height;
-		if (results[2] == "auto")
-			clip.right = 100
-		else
-			clip.right = 100*parseInt(results[2])/width;
-		if (results[3] == "auto")
-			clip.bottom = 100
-		else
-			clip.bottom = 100*parseInt(results[3])/height;
-		if (results[4] == "auto")
-			clip.left = 0
-		else
-			clip.left = 100*parseInt(results[4])/width;
+		clip.top = results[1];
+		clip.right = results[2];
+		clip.bottom = results[3];
+		clip.left = results[4];
 	}
 	else
 	{
-		clip.top = 0
-		clip.right = 100
-		clip.bottom = 100
-		clip.left = 0
+		clip.top = "auto";
+		clip.right = "auto";
+		clip.bottom = "auto";
+		clip.left = "auto";
 	}
 	return clip;
 };
@@ -61,14 +46,11 @@ BlueprintIT.util.Anim.prototype.getClipping = function()
 BlueprintIT.util.Anim.prototype.setClipping = function(clip)
 {
 	var el = this.getEl();
-	var region = YAHOO.util.Dom.getRegion(el);
-	var height = region.bottom-region.top;
-	var width = region.right-region.left;
 	var val = "rect(";
-	val += height*clip.top/100+"px, ";
-	val += width*clip.right/100+"px" + ", ";
-	val += height*clip.bottom/100+"px" + ", ";
-	val += width*clip.left/100+"px)";
+	val += clip.top+", ";
+	val += clip.right+", ";
+	val += clip.bottom+", ";
+	val += clip.left+")";
 	YAHOO.util.Dom.setStyle(el, "clip", val);
 };
 
@@ -78,7 +60,24 @@ BlueprintIT.util.Anim.prototype.getAttribute = function(attr)
 	{
     var el = this.getEl();
     var clip = this.getClipping();
-    return clip[attr.substr(4).toLowerCase()];
+    var side = attr.substr(4).toLowerCase();
+    if (clip[side] == "auto")
+    {
+			var region = YAHOO.util.Dom.getRegion(el);
+			switch (side)
+			{
+				case "top":
+					return 0;
+				case "right":
+					return region.right-region.left;
+				case "bottom":
+					return region.bottom-region.top;
+				case "left":
+					return 0;
+			}
+    }
+    else
+    	return parseInt(clip[side]);
   }
   else
   {
@@ -90,8 +89,24 @@ BlueprintIT.util.Anim.prototype.setAttribute = function(attr, val, unit)
 {
  	if (attr.substr(0, 4) == "clip")
  	{
+ 		var side = attr.substr(4).toLowerCase();
+ 		if (unit == "%")
+ 		{
+			var region = YAHOO.util.Dom.getRegion(this.element);
+			if ((side == "bottom") || (side == "top"))
+			{
+				var height = region.bottom-region.top;
+				val = 100*val/height;
+			}
+			else
+			{
+				var width = region.right-region.left;
+				val = 100*val/width;
+			}
+			unit = "px";
+		}
     var clip = this.getClipping();
-    clip[attr.substring(4).toLowerCase()] = val;
+    clip[side] = val+unit;
     this.setClipping(clip);
   }
   else
@@ -476,17 +491,20 @@ Menu.prototype = {
 					this.animator.setAttribute("opacity", 0, "");
 				break;
 			case "slide":
+				var region = YAHOO.util.Dom.getRegion(this.element);
+				var height = region.bottom-region.top;
+				var width = region.right-region.left;
 				var attr, from, to;
 				switch (this.anchor)
 				{
-					case "top":    attr = "clipBottom"; from = 0; to = 100; break;
-					case "bottom": attr = "clipTop";    from = 100; to = 0; break;
-					case "left":   attr = "clipRight";  from = 0; to = 100; break;
-					case "right":  attr = "clipLeft";   from = 100; to = 0; break;
+					case "top":    attr = "clipBottom"; from = 0; to = height; break;
+					case "bottom": attr = "clipTop";    from = height; to = 0; break;
+					case "left":   attr = "clipRight";  from = 0; to = width; break;
+					case "right":  attr = "clipLeft";   from = width; to = 0; break;
 				}
 				this.animator.attributes[attr] = { to: to };
 				if (initial)
-					this.animator.setAttribute(attr, from, "%");
+					this.animator.setAttribute(attr, from, "px");
 				break;
 			default:
 				this.animator = null;
@@ -512,13 +530,16 @@ Menu.prototype = {
 				this.animator.attributes.opacity = { to: 0 };
 				break;
 			case "slide":
+				var region = YAHOO.util.Dom.getRegion(this.element);
+				var height = region.bottom-region.top;
+				var width = region.right-region.left;
 				var attr, from, to;
 				switch (this.anchor)
 				{
-					case "top":    attr = "clipBottom"; from = 0; to = 100; break;
-					case "bottom": attr = "clipTop";    from = 100; to = 0; break;
-					case "left":   attr = "clipRight";  from = 0; to = 100; break;
-					case "right":  attr = "clipLeft";   from = 100; to = 0; break;
+					case "top":    attr = "clipBottom"; from = 0; to = height; break;
+					case "bottom": attr = "clipTop";    from = height; to = 0; break;
+					case "left":   attr = "clipRight";  from = 0; to = width; break;
+					case "right":  attr = "clipLeft";   from = width; to = 0; break;
 				}
 				this.animator.attributes[attr] = { to: from };
 				break;
@@ -553,6 +574,8 @@ Menu.prototype = {
 		{
 			case BlueprintIT.menus.OPENING:
 				menu.state = BlueprintIT.menus.OPEN;
+				if (menu.animtype == "slide")
+					YAHOO.util.Dom.setStyle(menu.element, "clip", "rect(auto, auto, auto, auto)");
 				break;
 			case BlueprintIT.menus.CLOSING:
 				menu.state = BlueprintIT.menus.CLOSED;
