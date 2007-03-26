@@ -67,13 +67,18 @@ $mainhost = $_PREFS->getPref('url.host.1.hostname');
 LoggerManager::setLogOutput('',new StdOutLogOutput($mainhost.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $mainhost.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
 $log = Loggermanager::getLogger('swim.cron');
 
+$log->info("Cron job startup");
+
 SwimEngine::ensureStarted();
 
 setContentType('text/plain');
 
+$log->info("Consistency check");
 checkConsistency();
+$log->info("Keywords compile");
 SearchEngine::buildIndex();
 
+$log->info("htaccess generate");
 if (is_writable($_PREFS->getPref('storage.rootdir')))
 {
 	$hosts = $_PREFS->getPrefBranch('url.host');
@@ -139,6 +144,7 @@ else
 
 if (isset($_GET['backup']))
 {
+  $log->info("Backup");
 	if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))
 	{
 		$backupfile = $_PREFS->getPref('storage.backup');
@@ -157,5 +163,7 @@ if (isset($_GET['backup']))
 	else
 		$log->error('Unable to backup since tools are unavailable.');
 }
+
+$log->info("Cron job complete");
 
 ?>
