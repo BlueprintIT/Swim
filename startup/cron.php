@@ -63,17 +63,17 @@ function checkConsistency()
   }
 }
 
-setContentType('text/plain');
-
 $mainhost = $_PREFS->getPref('url.host.1.hostname');
 LoggerManager::setLogOutput('',new StdOutLogOutput($mainhost.' [$[txtlevel+5]] $[logger+30]: $[text] ($[file]:$[line])', $mainhost.'       $[logger+30]: $[function]$[arglist] ($[file]:$[line])'));
 $log = Loggermanager::getLogger('swim.cron');
 
 LoggerManager::setLogLevel('swim.cron',LOG_LEVEL_INFO);
 
-$log->info("Cron job startup");
-
 SwimEngine::ensureStarted();
+
+setContentType('text/plain');
+
+$log->info("Cron job startup");
 
 $log->info("Consistency check");
 checkConsistency();
