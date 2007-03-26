@@ -169,7 +169,7 @@ class SearchEngine
     
     $_STORAGE->queryExec('TRUNCATE Keywords;');
     
-    $sections = SectionManager::getSections();
+    $sections = FieldSetManager::getSections();
     foreach ($sections as $section)
     {
       $log->info('Scanning '.$section->getName());

@@ -245,7 +245,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->assign_by_ref('request', $req);
   $smarty->assign_by_ref('NESTED', $request->getNested());
   $smarty->assign_by_ref('PREFS', $_PREFS);
-  $smarty->assign_by_ref('SECTIONS', new SectionManagerWrapper());
+  $smarty->assign_by_ref('SECTIONS', new SectionsWrapper());
   $smarty->assign_by_ref('LOG', $log);
   $smarty->assign_by_ref('SMARTY', $smarty);
   $smarty->register_resource('brand', array(

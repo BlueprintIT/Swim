@@ -96,14 +96,14 @@ class SectionWrapper
 	}
 }
 
-class SectionManagerWrapper
+class SectionsWrapper
 {
 	public function __get($name)
 	{
     switch($name)
     {
       default:
-      	$section = SectionManager::getSection($name);
+      	$section = FieldSetManager::getSection($name);
       	if ($section !== null)
       		return new SectionWrapper($section);
       	break;

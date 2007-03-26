@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-define('SWIM_FIELDSET_CACHE_VERSION',4);
+define('SWIM_FIELDSET_CACHE_VERSION',6);
 
 class FieldSet extends XMLSerialized
 {
@@ -478,6 +478,7 @@ class Option
 
 class FieldSetManager
 {
+  private static $sections = array();
   private static $classes = array();
   private static $views = array();
   private static $options = array();
@@ -510,12 +511,15 @@ class FieldSetManager
       return false;
     if ((!isset($results['options'])) || (!is_array($results['options'])))
       return false;
+    if ((!isset($results['sections'])) || (!is_array($results['sections'])))
+      return false;
 
     self::$classes = $results['classes'];
     self::$views = $results['views'];
     self::$options = $results['options'];
+    self::$sections = $results['sections'];
 
-    self::$log->debug('Loaded '.count(self::$views).' views, '.count(self::$classes).' classes and '.count(self::$options).' optionsets from cache.');
+    self::$log->debug('Loaded '.count(self::$sections).' sections, '.count(self::$views).' views, '.count(self::$classes).' classes and '.count(self::$options).' optionsets from cache.');
     return true;
   }
   
@@ -530,14 +534,24 @@ class FieldSetManager
     	recursiveMkDir($cache);
     	
     $cache = $cache.'/fieldsets.ser';
-    $files = array($_PREFS->getPref('storage.config').'/optionsets.xml', $_PREFS->getPref('storage.config').'/views.xml', $_PREFS->getPref('storage.config').'/classes.xml');
+    $files = array($_PREFS->getPref('storage.config').'/optionsets.xml', 
+                   $_PREFS->getPref('storage.config').'/views.xml', 
+                   $_PREFS->getPref('storage.config').'/classes.xml', 
+                   $_PREFS->getPref('storage.config').'/sections.xml');
     if (!self::isCacheValid($cache, $files) || !self::loadFromCache($cache, $files))
     {
       self::loadFieldSets($files);
-      $results = array('version' => SWIM_FIELDSET_CACHE_VERSION, 'views' => self::$views, 'classes' => self::$classes, 'options' => self::$options);
+      $results = array('version' => SWIM_FIELDSET_CACHE_VERSION, 
+                       'options' => self::$options,
+                       'views' => self::$views, 
+                       'classes' => self::$classes, 
+                       'sections' => self::$sections);
       file_put_contents($cache, serialize($results));
-      self::$log->debug('Loaded '.count(self::$views).' views, '.count(self::$classes).' classes and '.count(self::$options).' optionsets.');
+      self::$log->debug('Loaded '.count(self::$sections).' sections, '.count(self::$views).' views, '.count(self::$classes).' classes and '.count(self::$options).' optionsets.');
     }
+    
+    foreach (self::$sections as $id => $section)
+      AdminManager::addSection($section);
   }
   
   public static function loadFieldSets($files)
@@ -553,6 +567,13 @@ class FieldSetManager
         {
           if ($el->nodeType==XML_ELEMENT_NODE)
           {
+            if ($el->tagName=='section')
+            {
+              $id = $el->getAttribute('id');
+              $section = new Section($id);
+              self::$sections[$id]=$section;
+              array_push($loads, array('item' => $section, 'data' => $el));
+            }
             if ($el->tagName=='class')
             {
               $id = $el->getAttribute('id');
@@ -614,6 +635,19 @@ class FieldSetManager
   {
     if (isset(self::$options[$id]))
       return self::$options[$id];
+    else
+      return null;
+  }
+  
+  public static function getSections()
+  {
+    return self::$sections;
+  }
+  
+  public static function getSection($id)
+  {
+    if (isset(self::$sections[$id]))
+      return self::$sections[$id];
     else
       return null;
   }

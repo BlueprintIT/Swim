@@ -18,7 +18,6 @@ class Section extends AdminSection
   private $id;
   private $name = '';
   private $item;
-  private $variant = 'default';
   private $classes;
   private $log;
   
@@ -28,6 +27,18 @@ class Section extends AdminSection
     $this->log = LoggerManager::getLogger('swim.section');
   }
 
+  public function __sleep()
+  {
+    $vars = get_object_vars($this);
+    unset($vars['log']);
+    return array_keys($vars);
+  }
+  
+  public function __wakeup()
+  {
+    $this->log = LoggerManager::getLogger('swim.section');
+  }
+  
   public function getItems()
   {
     global $_STORAGE;
@@ -70,9 +81,8 @@ class Section extends AdminSection
   
   public function load($element)
   {
-    $this->item = $element->getAttribute('item');
-    if ($element->hasAttribute('variant'))
-      $this->variant = $element->getAttribute('variant');
+    global $_STORAGE;
+    
     $el=$element->firstChild;
     while ($el!==null)
     {
@@ -99,6 +109,53 @@ class Section extends AdminSection
         }
       }
       $el=$el->nextSibling;
+    }
+    
+    $results = $_STORAGE->query('SELECT id FROM Item WHERE root=1 AND section="'.$this->id.'";');
+    if ($results->valid())
+    {
+      $this->item = $results->fetchSingle();
+    }
+    else
+    {
+      if ($element->hasAttribute("roottype"))
+      {
+        $class = FieldSetManager::getClass($element->getAttribute("roottype"));
+        if ($class === null)
+        {
+          $this->log->error('Invalid root type specified for '.$this->id.' section');
+          return;
+        }
+        $item = Item::createItem($this, $class);
+        if ($item === null)
+        {
+          $this->log->error('Unable to create item assertion.');
+          return;
+        }
+        $this->item = $item->getId();
+        $_STORAGE->queryExec('UPDATE Item SET root=1 WHERE id='.$this->item.';');
+        $variant = $item->createVariant('default');
+        if ($item === null)
+        {
+          $this->log->error('Unable to create variant assertion.');
+          return;
+        }
+        $version = $variant->createNewVersion();
+        if ($item === null)
+        {
+          $this->log->error('Unable to create version assertion.');
+          return;
+        }
+        $field = $version->getField('name');
+        if ($item === null)
+        {
+          $this->log->warn('No name field for this class.');
+          return;
+        }
+        $field->setValue($this->name);
+      }
+      else
+        $this->log->error('No root type specified for '.$this->id.' section');
     }
   }
 
@@ -135,67 +192,5 @@ class Section extends AdminSection
     return false;
   }
 }
-
-class SectionManager
-{
-  private static $sections = array();
-  private static $log;
-  
-  public static function init()
-  {
-    global $_PREFS;
-    
-    self::$log = LoggerManager::getLogger('swim.sectionmanager');
-    self::loadSections($_PREFS->getPref('storage.config'));
-  }
-  
-  public static function loadSections($dir)
-  {
-    $file = $dir.'/sections.xml';
-    $doc = new DOMDocument();
-    if ((is_readable($file))&&($doc->load($file)))
-    {
-      $el=$doc->documentElement->firstChild;
-      while ($el!==null)
-      {
-        if ($el->nodeType==XML_ELEMENT_NODE)
-        {
-          if ($el->tagName=='section')
-          {
-            $id = $el->getAttribute('id');
-            $section = new Section($id);
-            self::$sections[$id]=$section;
-            $section->load($el);
-            AdminManager::addSection($section);
-          }
-        }
-        $el=$el->nextSibling;
-      }
-    }
-    else
-    {
-      self::$log->debug('No sections defined at '.$dir);
-    }
-  }
-  
-  public static function getSections()
-  {
-    return self::$sections;
-  }
-  
-  public static function getSection($id)
-  {
-    if (isset(self::$sections[$id]))
-    {
-      return self::$sections[$id];
-    }
-    else
-    {
-      return null;
-    }
-  }
-}
-
-SectionManager::init();
 
 ?>

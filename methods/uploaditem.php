@@ -99,7 +99,7 @@ function method_uploaditem($request)
     {
       $parent = Item::getItem($request->getQueryVar('parentitem'));
       $sequence = $parent->getSequence($request->getQueryVar('parentsequence'));
-      $section = SectionManager::getSection($request->getQueryVar('targetsection'));
+      $section = FieldSetManager::getSection($request->getQueryVar('targetsection'));
       if ($sequence !== null && $section !== null)
       {
         $type = determineContentType($_FILES['file']['tmp_name'], $_FILES['file']['name']);

@@ -92,7 +92,7 @@ function displayArchive($variant)
 	
 	print "[";
 	$i = 0;
-	$sections = SectionManager::getSections();
+	$sections = FieldSetManager::getSections();
 	foreach ($sections as $section)
 	{
 		$i++;
@@ -119,7 +119,7 @@ function displayArchive($variant)
 function displayAllSections($variant)
 {
 	print "[";
-	$sections = SectionManager::getSections();
+	$sections = FieldSetManager::getSections();
 	$i = 0;
 	foreach ($sections as $section)
 	{
@@ -148,7 +148,7 @@ function method_tree($request)
 	}
 	else if ($request->hasQueryVar('section'))
 	{
-		$section = SectionManager::getSection($request->getQueryVar('section'));
+		$section = FieldSetManager::getSection($request->getQueryVar('section'));
 		displaySection($section, Session::getCurrentVariant());
 	}
 	else if ($request->hasQueryVar('archive'))

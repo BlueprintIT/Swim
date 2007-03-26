@@ -29,7 +29,7 @@ function method_createitem($request)
        && $request->hasQueryVar('class'))
     {
       $class = FieldSetManager::getClass($request->getQueryVar('class'));
-      $section = SectionManager::getSection($request->getQueryVar('targetsection'));
+      $section = FieldSetManager::getSection($request->getQueryVar('targetsection'));
       if (($section !== null) && ($class !== null))
       {
         $item = Item::createItem($section, $class);

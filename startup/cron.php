@@ -21,7 +21,7 @@ function checkConsistency()
   
   $log = LoggerManager::getLogger('swim.consistency');
   
-  $sections = SectionManager::getSections();
+  $sections = FieldSetManager::getSections();
   foreach ($sections as $section)
   {
     $log->info('Scanning '.$section->getName());

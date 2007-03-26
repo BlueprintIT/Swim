@@ -140,7 +140,7 @@ function api_get($params, &$smarty)
       else if ($params['type']=='item')
         $result = Item::getItem($params['id']);
       else if ($params['type']=='section')
-        $result = SectionManager::getSection($params['id']);
+        $result = FieldSetManager::getSection($params['id']);
       else if ($params['type']=='class')
         $result = FieldSetManager::getClass($params['id']);
       else if ($params['type']=='view')
@@ -158,7 +158,7 @@ function api_get($params, &$smarty)
       else if ($params['type']=='group')
         $result = UserManager::getAllGroups();
       else if ($params['type']=='section')
-        $result = SectionManager::getSections();
+        $result = FieldSetManager::getSections();
       else if ($params['type']=='optionset')
         $result = FieldSetManager::getOptionSets();
       $smarty->assign_by_ref($params['var'], $result);
@@ -177,7 +177,7 @@ function search_items($params, &$smarty)
   {
     $section = null;
     if (isset($params['section']))
-      $section = SectionManager::getSection($params['section']);
+      $section = FieldSetManager::getSection($params['section']);
     $classes = null;
     if (isset($params['classes']))
     {

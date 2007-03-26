@@ -196,7 +196,7 @@ function initialImportNamespace($namespace, $section, $basedir)
 {
 	global $pagemap;
 	
-	$section = SectionManager::getSection($section);
+	$section = FieldSetManager::getSection($section);
 	
 	$dir = opendir($basedir.'/pages');
 	while (($file = readdir($dir)) !== false)
@@ -214,7 +214,7 @@ function importNamespace($namespace, $section, $basedir)
 {
 	global $OLDSTORAGE, $pagemap;
 	
-	$section = SectionManager::getSection($section);
+	$section = FieldSetManager::getSection($section);
 	
 	$dir = opendir($basedir.'/pages');
 	while (($file = readdir($dir)) !== false)

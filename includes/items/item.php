@@ -94,7 +94,7 @@ class Item
   
   public function getSection()
   {
-    return SectionManager::getSection($this->section);
+    return FieldSetManager::getSection($this->section);
   }
   
   public function getClass()

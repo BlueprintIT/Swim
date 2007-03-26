@@ -24,7 +24,7 @@ var sitedata = {php}
 global $_PREFS;
 $request = $this->get_template_vars('REQUEST');
 include_once $_PREFS->getPref('storage.methods').'/tree.php';
-displaySection(SectionManager::getSection($request->getQueryVar('section')), Session::getCurrentVariant());{/php};
+displaySection(FieldSetManager::getSection($request->getQueryVar('section')), Session::getCurrentVariant());{/php};
 {else}
 var sitedata = null;
 {/if}

@@ -28,6 +28,7 @@ CREATE TABLE Permission (
 
 CREATE TABLE Item (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	root INTEGER,
 	section VARCHAR(20),
 	class VARCHAR(30),
 	path VARCHAR(50),
