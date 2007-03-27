@@ -97,13 +97,13 @@ function encode_form($params, $content, &$smarty, &$repeat)
       if (substr($key,0,4) == 'tag_')
       {
       	if ($key == 'tag_method')
-      		$method = '';
+      		$method = 'method="'.$params[$key].'" ';
         $attrs.=substr($key,4).'="'.$params[$key].'" ';
         unset($params[$key]);
       }
     }
     if (!empty($params['formmethod']))
-      $method = $params['formmethod'];
+      $method = 'method="'.$params['formmethod'].'" ';
     unset($params['formmethod']);
     $request = get_params_request($params, $smarty);
     if ($request instanceof Request)
