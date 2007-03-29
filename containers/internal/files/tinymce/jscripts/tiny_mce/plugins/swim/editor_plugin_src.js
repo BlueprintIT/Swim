@@ -28,49 +28,80 @@ function TinyMCE_swim_file_browser_callback(field_name, url, type, win)
 
 function TinyMCE_swim_convertURL(url, node, on_save)
 {
-	//alert(url);
-	var hostpart="http://"+tinyMCE.getParam('document_host','');;
-	var page=tinyMCE.getParam('document_base_url','');
-	var base=tinyMCE.getParam('swim_view','');
-	
-	if (url.indexOf('tiny_mce')>0)
-	{
-		url=url.substring(url.indexOf('tiny_mce')+9);
-	}
-	else if (url.indexOf(hostpart)==0)
-	{
-		url=url.substring(hostpart.length);
-	}
-	
-	//alert(url);
-	
-	if (url.indexOf(page)==0)
-	{
-		url=url.substring(page.length);
-	}
-	else if (url.indexOf(base)==0)
-	{
-		url=url.substring(base.length-1);
-	}
-	
-	//alert(url);
-	
-	if (!on_save)
-	{
-		if (url.substring(0,1)=='/')
-		{
-			url=hostpart+base+url.substring(1);
-		}
-		else if (url.indexOf('://')>0)
-		{
-		}
-		else
-		{
-			url=hostpart+page+url;
-		}
-		//alert(url);
-	}
-	return url;
+        var hostpart="://"+tinyMCE.getParam('document_host','');
+        var base=tinyMCE.getParam('document_base_url','');
+        var view=tinyMCE.getParam('swim_view','');
+        if (base.indexOf(hostpart)>=0)
+        {
+                base=base.substring(base.indexOf(hostpart)+hostpart.length);
+        }
+
+        //alert("initial: "+url);
+        //alert("hostpart: "+hostpart);
+
+        var page='/'+base.substring(view.length);
+        var basetemp = view+'version/temp'+page;
+
+        if (url.indexOf('tinymce')>0)
+        {
+                url=url.substring(url.indexOf('tinymce')+8);
+        }
+        else if (url.indexOf(hostpart)>=0)
+        {
+                url=url.substring(url.indexOf(hostpart)+hostpart.length);
+        }
+
+        //alert("1st: "+url);
+        //alert("base: "+base);
+        //alert("view: "+view);
+        //alert("page: "+page);
+        //alert("basetemp: "+basetemp);
+
+        if (url.indexOf(base)==0)
+        {
+                url=url.substring(base.length);
+        }
+        else if (url.indexOf(basetemp)==0)
+        {
+                url=url.substring(basetemp.length);
+        }
+        else if (url.indexOf(page)==0)
+        {
+                url=url.substring(page.length);
+        }
+        else if (url.indexOf(view)==0)
+        {
+                url=url.substring(view.length-1);
+        }
+
+        //alert("2nd: "+url);
+
+        if (!on_save)
+        {
+                if (url.substring(0,1)=='/')
+                {
+                        url='http'+hostpart+view+url.substring(1);
+                }
+                else if (url.indexOf(':')>0)
+                {
+                }
+                else
+                {
+                        url='http'+hostpart+basetemp+url;
+                }
+        }
+        else
+        {
+                if (url.substring(0,1)=='/')
+                {
+                        if (tinyMCE.getParam('swim_external',false))
+                        {
+                                url=view+url.substring(1);
+                        }
+                }
+        }
+        //alert("final: "+url);
+        return url;
 }
 
 /**
