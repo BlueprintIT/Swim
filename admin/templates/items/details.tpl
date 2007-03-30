@@ -262,17 +262,19 @@ function moveDown(item, field, link) {
 								{/if}
 							</td>
 						{/if}
-						<td>
-							<div class="toolbarbutton">
-								{assign var="itemid" value=$item->getId()}
-								{assign var="variantname" value=$itemvariant->getVariant()}
-								{assign var="version" value=$itemversion->getVersion()}
-								<a target="_blank" href="{encode method="preview" path="$itemid/$variantname/$version"}">
-									<img src="{$CONTENT}/icons/web-page-green.gif"/>
-									Preview
-								</a>
-							</div>
-						</td>
+						{if $section->getType()=='content'}
+							<td>
+								<div class="toolbarbutton">
+									{assign var="itemid" value=$item->getId()}
+									{assign var="variantname" value=$itemvariant->getVariant()}
+									{assign var="version" value=$itemversion->getVersion()}
+									<a target="_blank" href="{encode method="preview" path="$itemid/$variantname/$version"}">
+										<img src="{$CONTENT}/icons/web-page-green.gif"/>
+										Preview
+									</a>
+								</div>
+							</td>
+						{/if}
 						<td class="separator"></td>
 						<td>
 							{if $item !== $section->getRootItem()}

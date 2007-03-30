@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-define('SWIM_FIELDSET_CACHE_VERSION',6);
+define('SWIM_FIELDSET_CACHE_VERSION',7);
 
 class FieldSet extends XMLSerialized
 {
@@ -569,9 +569,8 @@ class FieldSetManager
           {
             if ($el->tagName=='section')
             {
-              $id = $el->getAttribute('id');
-              $section = new Section($id);
-              self::$sections[$id]=$section;
+              $section = Section::getSection($el);
+              self::$sections[$section->getId()]=$section;
               array_push($loads, array('item' => $section, 'data' => $el));
             }
             if ($el->tagName=='class')

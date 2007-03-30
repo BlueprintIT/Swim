@@ -15,11 +15,12 @@
 
 class Section extends AdminSection
 {
-  private $id;
-  private $name = '';
-  private $item;
-  private $classes;
-  private $log;
+  protected $id;
+  protected $name = '';
+  protected $item;
+  protected $classes;
+  protected $log;
+  protected $roottype;
   
   public function __construct($id)
   {
@@ -75,6 +76,17 @@ class Section extends AdminSection
     return $this->name;
   }
   
+  private function getRootClass()
+  {
+    return $this->roottype;
+  }
+  
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute('roottype'))
+      $this->roottype = $element->getAttribute('roottype');
+  }
+  
   protected function parseElement($element)
   {
   }
@@ -83,6 +95,7 @@ class Section extends AdminSection
   {
     global $_STORAGE;
     
+    $this->parseAttributes($element);
     $el=$element->firstChild;
     while ($el!==null)
     {
@@ -118,47 +131,69 @@ class Section extends AdminSection
     }
     else
     {
-      if ($element->hasAttribute("roottype"))
+      $class = FieldSetManager::getClass($this->getRootClass());
+      if ($class === null)
       {
-        $class = FieldSetManager::getClass($element->getAttribute("roottype"));
-        if ($class === null)
-        {
-          $this->log->error('Invalid root type specified for '.$this->id.' section');
-          return;
-        }
-        $item = Item::createItem($this, $class);
-        if ($item === null)
-        {
-          $this->log->error('Unable to create item assertion.');
-          return;
-        }
-        $this->item = $item->getId();
-        $_STORAGE->queryExec('UPDATE Item SET root=1 WHERE id='.$this->item.';');
-        $variant = $item->createVariant('default');
-        if ($item === null)
-        {
-          $this->log->error('Unable to create variant assertion.');
-          return;
-        }
-        $version = $variant->createNewVersion();
-        if ($item === null)
-        {
-          $this->log->error('Unable to create version assertion.');
-          return;
-        }
-        $field = $version->getField('name');
-        if ($item === null)
-        {
-          $this->log->warn('No name field for this class.');
-          return;
-        }
-        $field->setValue($this->name);
+        $this->log->error('Invalid root type specified for '.$this->id.' section');
+        return;
       }
-      else
-        $this->log->error('No root type specified for '.$this->id.' section');
+      $item = Item::createItem($this, $class);
+      if ($item === null)
+      {
+        $this->log->error('Unable to create item assertion.');
+        return;
+      }
+      $this->item = $item->getId();
+      $_STORAGE->queryExec('UPDATE Item SET root=1 WHERE id='.$this->item.';');
+      $variant = $item->createVariant('default');
+      if ($item === null)
+      {
+        $this->log->error('Unable to create variant assertion.');
+        return;
+      }
+      $version = $variant->createNewVersion();
+      if ($item === null)
+      {
+        $this->log->error('Unable to create version assertion.');
+        return;
+      }
+      $field = $version->getField('name');
+      if ($item === null)
+      {
+        $this->log->warn('No name field for this class.');
+        return;
+      }
+      $field->setValue($this->name);
     }
   }
 
+  public function getPriority()
+  {
+    return ADMIN_PRIORITY_CONTENT;
+  }
+  
+  public static function getSection($element)
+  {
+    $id = $element->getAttribute('id');
+    if ($element->hasAttribute('type'))
+      $type = $element->hasAttribute('type');
+    else
+      $type = 'content';
+    if ($type == 'contacts')
+      return new ContactsSection($id);
+    if ($type == 'mailing')
+      return new MailingSection($id);
+    return new ContentSection($id);
+  }
+}
+
+class ContentSection extends Section
+{
+  public function getType()
+  {
+    return 'content';
+  }
+  
   public function getIcon()
   {
     global $_PREFS;
@@ -166,17 +201,12 @@ class Section extends AdminSection
     return $_PREFS->getPref('url.admin.static').'/icons/sitemap-blue.gif';
   }
   
-  public function getPriority()
-  {
-    return ADMIN_PRIORITY_CONTENT;
-  }
-  
   public function getURL()
   {
     $request = new Request();
     $request->setMethod('admin');
     $request->setPath('items/index.tpl');
-    $request->setQueryVar('section', $this->id);
+    $request->setQueryVar('section', $this->getId());
     return $request->encode();
   }
   
@@ -187,7 +217,79 @@ class Section extends AdminSection
   
   public function isSelected($request)
   {
-    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,6)=='items/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->id))
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,6)=='items/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
+      return true;
+    return false;
+  }
+}
+
+class MailingSection extends Section
+{
+  public function getType()
+  {
+    return 'mailing';
+  }
+  
+  public function getIcon()
+  {
+    global $_PREFS;
+    
+    return $_PREFS->getPref('url.admin.static').'/icons/email-blue.gif';
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('mailing/index.tpl');
+    $request->setQueryVar('section', $this->getId());
+    return $request->encode();
+  }
+  
+  public function isAvailable()
+  {
+    return Session::getUser()->hasPermission('mailing',PERMISSION_READ);
+  }
+  
+  public function isSelected($request)
+  {
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,8)=='mailing/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
+      return true;
+    return false;
+  }
+}
+
+class ContactsSection extends Section
+{
+  public function getType()
+  {
+    return 'contacts';
+  }
+  
+  public function getIcon()
+  {
+    global $_PREFS;
+    
+    return $_PREFS->getPref('url.admin.static').'/icons/email-contact-blue.gif';
+  }
+  
+  public function getURL()
+  {
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('contacts/index.tpl');
+    $request->setQueryVar('section', $this->getId());
+    return $request->encode();
+  }
+  
+  public function isAvailable()
+  {
+    return Session::getUser()->hasPermission('contacts',PERMISSION_READ);
+  }
+  
+  public function isSelected($request)
+  {
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,9)=='contacts/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
       return true;
     return false;
   }

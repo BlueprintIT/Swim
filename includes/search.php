@@ -172,6 +172,8 @@ class SearchEngine
     $sections = FieldSetManager::getSections();
     foreach ($sections as $section)
     {
+      if ($section->getType()=='contacts')
+        continue;
       $log->info('Scanning '.$section->getName());
       $items = $section->getItems();
       foreach ($items as $item)
