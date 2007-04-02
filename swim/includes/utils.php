@@ -199,6 +199,13 @@ function displayServerError($request)
 	}
 }
 
+function setNoCache()
+{
+  header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+  header('Pragma: no-cache');
+  header('Expires: '.httpdate(time()-3600));
+}
+
 function setDefaultCache()
 {
 	header('Cache-Control: must-revalidate');

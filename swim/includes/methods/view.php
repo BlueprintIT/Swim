@@ -137,21 +137,11 @@ function method_view($request)
 			if ($_USER->canRead($resource))
 			{
 				$template=null;
-				setDefaultCache();
-				$modified=$resource->getTotalModifiedDate();
+				setNoCache();
 				if (isset($request->query['template']))
-				{
 					$template=Resource::decodeResource(substr($request->query['template'],1));
-					if ($template!==null)
-					{
-						$modified=max($modified,$template->getModifiedDate());
-					}
-				}
 				if ($template===null)
-				{
 					$template=$resource->getReferencedTemplate();
-				}
-				setCacheInfo($modified,$resource->getETag());
 				$template->display($request,$resource);
 			}
 			else

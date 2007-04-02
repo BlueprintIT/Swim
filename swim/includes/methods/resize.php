@@ -38,16 +38,19 @@ function method_resize($request)
 				{
 					if ($resource->exists())
 					{
-						if (((isset($request->query['version']))&&($request->query['version']!='temp'))||($resource->version===false))
-						{
-							setValidTime(60);
-						}
-						else
-						{
-							setDefaultCache();
-						}
-						setCacheInfo($resource->getModifiedDate(),$resource->getETag());
-						$mimetype=$resource->getContentType();
+            $mimetype=$resource->getContentType();
+            $cachefile = $_PREFS->getPref('storage.basedir').'/cache/'.$resource->getPath();
+            if ((is_file($cachefile)) && (filemtime($cachefile)>$resource->getModifiedDate()))
+            {
+              setCacheInfo(filemtime($cachefile),$resource->getETag());
+              if ($mimetype=="image/jpeg")
+                setContentType($mimetype);
+              else
+                setContentType("image/png");
+              readfile($cachefile);
+              return;
+            }
+
 						$resource->lockRead();
 						$filename = $resource->getFileName();
 						if ($mimetype=="image/jpeg")
@@ -171,22 +174,24 @@ function method_resize($request)
 							imagecopyresized($newimage,$image,$x,$y,0,0,$newwidth,$newheight,$width,$height);
 						}
 						
+            recursiveMkDir(dirname($cachefile));
 						if ($mimetype=="image/jpeg")
 						{
 							setContentType($mimetype);
-							imageinterlace($image);
-							imagejpeg($newimage,"",75);
+							imageinterlace($newimage);
+							imagejpeg($newimage,$cachefile,75);
 						}
-						else if ($mimetype=="image/gif")
+						else
 						{
 							setContentType("image/png");
-							imagepng($newimage);
-						}
-						else if ($mimetype=="image/png")
-						{
-							setContentType($mimetype);
-							imagepng($newimage);
-						}
+							imagepng($newimage,$cachefile);
+            }
+            setDefaultCache();
+            setCacheInfo(filemtime($cachefile),$resource->getETag());
+            if ($mimetype=="image/jpeg")
+              imagejpeg($newimage,"",75);
+            else
+              imagepng($newimage);
 					}
 					else
 					{
