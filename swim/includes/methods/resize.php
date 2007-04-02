@@ -194,7 +194,7 @@ function method_resize($request)
             if (isset($cachefile))
               setCacheInfo(filemtime($cachefile),$resource->getETag());
             else
-              setCacheInfo($resource->getLastModifiedDate(),$resource->getETag());
+              setCacheInfo($resource->getModifiedDate(),$resource->getETag());
             if ($mimetype=="image/jpeg")
               imagejpeg($newimage,"",75);
             else
