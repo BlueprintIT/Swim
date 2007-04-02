@@ -87,8 +87,10 @@ function method_resize($request)
 						if ((isset($request->query['maxwidth'])) && (isset($request->query['maxheight'])))
 						{
 							$newwidth = $request->query['maxwidth'];
+              $actualwidth = $newwidth;
 							$newheight = $request->query['maxheight'];
 							$targetaspect = $newwidth/$newheight;
+              $actualheight = $newheight;
 							
               if ($targetaspect>$sourceaspect)
                 $newwidth = $newheight*$sourceaspect;
@@ -97,9 +99,6 @@ function method_resize($request)
 
 							if (isset($request->query['padding']))
 							{
-								$actualwidth = $newwidth;
-								$actualheight = $newheight;
-								
                 if ($request->query['padding']=='transparent')
                 {
                   $transparent=true;
