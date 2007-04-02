@@ -360,8 +360,13 @@ class Template extends Resource
     }
     if (isset($attrs['maxwidth']))
     {
-    	$params['maxwidth']=$attrs['maxwidth'];
-    	unset($attrs['maxwidth']);
+      $params['maxwidth']=$attrs['maxwidth'];
+      unset($attrs['maxwidth']);
+    }
+    if (isset($attrs['cachekey']))
+    {
+      $params['cachekey']=$attrs['cachekey'];
+      unset($attrs['cachekey']);
     }
     if (count($params)>0)
     	$method='resize';
