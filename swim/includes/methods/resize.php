@@ -39,16 +39,19 @@ function method_resize($request)
 					if ($resource->exists())
 					{
             $mimetype=$resource->getContentType();
-            $cachefile = $_PREFS->getPref('storage.basedir').'/cache/'.$resource->getPath();
-            if ((is_file($cachefile)) && (filemtime($cachefile)>$resource->getModifiedDate()))
+            if (isset($request->query['cachekey']))
             {
-              setCacheInfo(filemtime($cachefile),$resource->getETag());
-              if ($mimetype=="image/jpeg")
-                setContentType($mimetype);
-              else
-                setContentType("image/png");
-              readfile($cachefile);
-              return;
+              $cachefile = $_PREFS->getPref('storage.basedir').'/cache/'.$request->query['cachekey'].'/'.$resource->getPath();
+              if ((is_file($cachefile)) && (filemtime($cachefile)>$resource->getModifiedDate()))
+              {
+                setCacheInfo(filemtime($cachefile),$resource->getETag());
+                if ($mimetype=="image/jpeg")
+                  setContentType($mimetype);
+                else
+                  setContentType("image/png");
+                readfile($cachefile);
+                return;
+              }
             }
 
 						$resource->lockRead();
@@ -178,15 +181,20 @@ function method_resize($request)
 						{
 							setContentType($mimetype);
 							imageinterlace($newimage);
-							imagejpeg($newimage,$cachefile,75);
+              if (isset($cachefile))
+  							imagejpeg($newimage,$cachefile,75);
 						}
 						else
 						{
 							setContentType("image/png");
-							imagepng($newimage,$cachefile);
+              if (isset($cachefile))
+  							imagepng($newimage,$cachefile);
             }
             setDefaultCache();
-            setCacheInfo(filemtime($cachefile),$resource->getETag());
+            if (isset($cachefile))
+              setCacheInfo(filemtime($cachefile),$resource->getETag());
+            else
+              setCacheInfo($resource->getLastModifiedDate(),$resource->getETag());
             if ($mimetype=="image/jpeg")
               imagejpeg($newimage,"",75);
             else
