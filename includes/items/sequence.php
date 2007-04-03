@@ -37,8 +37,6 @@ class ItemSorter
   
   public function compare($a, $b)
   {
-    if ($a instanceof ItemWrapper)
-      
     $a = $this->getItemVersion($a);
     $b = $this->getItemVersion($b);
     if ($a !== null)
@@ -220,8 +218,7 @@ class Sequence extends ClassField
   public function getSortedItems($field)
   {
     $items = $this->internalGetItems();
-    ItemSorter::sortItems($items, $field);
-    return $items;
+    return ItemSorter::sortItems($items, $field);
   }
   
   public function getItems()

@@ -146,24 +146,26 @@ class Section extends AdminSection
       $this->item = $item->getId();
       $_STORAGE->queryExec('UPDATE Item SET root=1 WHERE id='.$this->item.';');
       $variant = $item->createVariant('default');
-      if ($item === null)
+      if ($variant === null)
       {
         $this->log->error('Unable to create variant assertion.');
         return;
       }
       $version = $variant->createNewVersion();
-      if ($item === null)
+      if ($version === null)
       {
         $this->log->error('Unable to create version assertion.');
         return;
       }
       $field = $version->getField('name');
-      if ($item === null)
+      if ($field === null)
       {
         $this->log->warn('No name field for this class.');
         return;
       }
       $field->setValue($this->name);
+      //$version->setComplete(true);
+      //$version->setCurrent(true);
     }
   }
 

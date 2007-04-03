@@ -404,6 +404,35 @@ class Item
     }
     return $item;
   }
+  
+  public static function findItems($fieldname, $fieldvalue, $section = null, $class = null, $variant = null)
+  {
+    global $_STORAGE;
+    
+    if (($section !== null) || ($class !== null))
+      $tables = '((Item JOIN ItemVariant ON Item.id=ItemVariant.item) JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
+    else
+      $tables = '(ItemVariant JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
+    $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' JOIN Field ON Field.itemversion=VariantVersion.id WHERE';
+    $query.=' Field.basefield="base" AND Field.field="'.$fieldname.'"';
+    $query.=' AND Field.textValue="'.$_STORAGE->escape($fieldvalue).'"';
+    $query.=' AND VariantVersion.current=1';
+    if ($class !== null)
+      $query.=' AND Item.class="'.$class->getId().'"';
+    if ($section !== null)
+      $query.=' AND Item.section="'.$section->getId().'"';
+    if ($variant !== null)
+      $query.=' AND ItemVariant.variant="'.$variant.'"';
+    $log = LoggerManager::getLogger('testing');
+    $items = array();
+    $results = $_STORAGE->query($query);
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      array_push($items, Item::getItemVersion($details['item'], $details['variant'], $details['version']));
+    }
+    return $items;
+  }
 
   public function getStoragePath()
   {

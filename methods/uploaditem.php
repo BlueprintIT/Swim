@@ -176,7 +176,7 @@ function method_uploaditem($request)
     }
     else
     {
-      $log->error('Invalid paramaters specified.');
+      $log->error('Invalid parameters specified.');
       displayServerError($request);
     }
   }
