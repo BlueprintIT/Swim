@@ -78,7 +78,7 @@ $log->info("Cron job startup");
 $log->info("Consistency check");
 checkConsistency();
 $log->info("Keywords compile");
-SearchEngine::buildIndex();
+//SearchEngine::buildIndex();
 
 $log->info("htaccess generate");
 if (is_writable($_PREFS->getPref('storage.rootdir')))
@@ -144,7 +144,7 @@ RewriteRule .* swim/startup/swim.php [L]
 else
 	$log->error('Unable to write configuration. htaccess in unwritable');
 
-if (isset($_GET['backup']))
+if ((isset($_GET['backup'])) || (in_array('--backup', $argv)))
 {
   $log->info("Backup");
 	if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))
