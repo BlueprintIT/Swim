@@ -78,7 +78,7 @@ $log->info("Cron job startup");
 $log->info("Consistency check");
 checkConsistency();
 $log->info("Keywords compile");
-//SearchEngine::buildIndex();
+SearchEngine::buildIndex();
 
 $log->info("htaccess generate");
 if (is_writable($_PREFS->getPref('storage.rootdir')))
