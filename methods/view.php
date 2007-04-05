@@ -31,7 +31,18 @@ function method_view($request)
 		$id = substr($request->getPath(), 0, $pos);
 		$extra = substr($request->getPath(), $pos+1);
 	}
+  
 	$item = Item::getItem($id);
+  if ((!$request->isModified()) && ($item->getPath() !== null))
+  {
+    $path = $item->getPath();
+    if (substr($path,0,1) == '/')
+      $path = substr($path, 1);
+    $request->setMethod($path);
+    $request->setPath($extra);
+    redirect($request);
+    return;
+  }
 	
   if ($item !== null && $item->isArchived())
     $item = null;

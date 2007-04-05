@@ -142,6 +142,7 @@ class SwimEngine
 			  	$log->debug('Found item '.$item->getId());
 		  		$request->setMethod('view');
 		  		$request->setPath($item->getId().substr($path,strlen($item->getPath())));
+          $request->setModified(true);
 			  	$log->debug('New path is '.$request->getPath());
 		  		self::processRequest($request);
 		  		return;

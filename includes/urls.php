@@ -274,7 +274,7 @@ class Request
   private $path = '';
   private $query = array();
   private $nested = null;
-  private $data = array();
+  private $modified;
 	
   function Request($clone=null)
   {
@@ -289,13 +289,25 @@ class Request
       $this->method=$clone->method;
       $this->query=$clone->query;
       $this->nested=$clone->nested;
+      $this->modified=$clone->modified;
     }
     else
     {
+      $this->modified = false;
       $this->protocol='http';
       if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on')&&($_PREFS->getPref('security.sslenabled')))
         $this->protocol='https';
     }
+  }
+  
+  public function isModified()
+  {
+    return $this->modified;
+  }
+  
+  public function setModified($value)
+  {
+    $this->modified = $value;
   }
   
   public function getProtocol()
@@ -441,14 +453,12 @@ class Request
 	  if ($_PREFS->getPref('url.encoding')=='path')
 	  {
 	  	$url='/'.$this->method;
-      $res = $this->path;
-      if (strlen($res)>0)
+      if (strlen($this->path)>0)
 	  	{
-	  	    
-	  		if (substr($res,0,1)!='/')
-		  		$url.='/'.$res;
+	  		if (substr($this->path,0,1)!='/')
+		  		$url.='/'.$this->path;
 		  	else
-		  		$url.=$res;
+		  		$url.=$this->path;
 	  	}
 	    return $host.$_PREFS->getPref('url.pagegen').urlPathEncode($url);
 	  }
