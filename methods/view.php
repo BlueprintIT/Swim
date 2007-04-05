@@ -40,7 +40,7 @@ function method_view($request)
       $path = substr($path, 1);
     $request->setMethod($path);
     $request->setPath($extra);
-    redirect($request);
+    redirectPermanent($request);
     return;
   }
 	

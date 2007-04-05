@@ -120,7 +120,7 @@ class RequestCache
 				}
 			}
 			$log->debug('Resource is cached');
-			header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
+			header($_SERVER['SERVER_PROTOCOL'].' 304 Not Modified');
 			SwimEngine::shutdown();
 		}
     else

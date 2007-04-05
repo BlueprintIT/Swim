@@ -202,7 +202,7 @@ function decodePostQuery()
 	return $query;
 }
 
-function redirect($request)
+function redirect($request, $statuscode = 302, $status = 'Moved Permanently')
 {
   $protocol='http';
   if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
@@ -220,8 +220,19 @@ function redirect($request)
   {
     $url=$protocol.'://'.$_SERVER['HTTP_HOST'].$url;
   }
+  header($_SERVER['SERVER_PROTOCOL'].' '.$statuscode.' '.$status);
 	header('Location: '.$url);
 	SwimEngine::shutdown();
+}
+
+function redirectTemporary($request)
+{
+  redirect($request, 307, 'Temporary Redirect');
+}
+
+function redirectPermanent($request)
+{
+  redirect($request, 301, 'Moved Permanently');
 }
 
 function checkSecurity($request, $required, $allowed)
