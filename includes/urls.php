@@ -202,7 +202,7 @@ function decodePostQuery()
 	return $query;
 }
 
-function redirect($request, $statuscode = 302, $status = 'Moved Permanently')
+function redirect($request, $statuscode = 302, $status = 'Found')
 {
   $protocol='http';
   if ((isset($_SERVER['HTTPS']))&&($_SERVER['HTTPS']=='on'))
