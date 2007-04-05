@@ -111,7 +111,7 @@ class SimpleField extends Field
         }
       }
     }
-    return $this->toString();
+    return $this->getValue();
   }
   
   protected function getFieldName()
@@ -148,10 +148,15 @@ class SimpleField extends Field
     return $this->toString();
   }
   
-  public function toString()
+  public function getValue()
   {
     $this->retrieve();
     return $this->value;
+  }
+  
+  public function toString()
+  {
+    return $this->getValue();
   }
   
   protected function escapeValue($value)
@@ -204,11 +209,6 @@ class TextField extends SimpleField
       return '<textarea '.$state.'style="width: 100%; height: 100px;" id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">'.htmlentities($this->getPassedValue($request)).'</textarea>';
     else
       return parent::getEditor($request, $smarty);
-  }
-  
-  public function getPlainText()
-  {
-    return $this->toString();
   }
   
   protected function escapeValue($value)
@@ -292,7 +292,23 @@ class BaseHTMLField extends TextField
   
   public function toString()
   {
+    global $_PREFS;
+    
+    $viewpath = $_PREFS->getPref('url.pagegen').'/view/';
     $result = parent::toString();
+    $count = preg_match_all('|href="'.$viewpath.'(\d+)(/.*?)?"|', $result, $matches, PREG_OFFSET_CAPTURE);
+    for ($p = $count-1; $p>=0; $p--)
+    {
+      $item = Item::getItem($matches[1][$p][0]);
+      if (($item !== null) && ($item->getPath() !== null))
+      {
+        $start = substr($result, 0, $matches[0][$p][1]+6);
+        $end = substr($result, $matches[0][$p][1] + strlen($matches[0][$p][0])-1);
+        $extra = $matches[2][$p][0];
+        $path = $_PREFS->getPref('url.pagegen').$item->getPath().$extra;
+        $result = $start.$path.$end;
+      }
+    }
     $result = str_replace('<br />', '<br>', $result);
     return $result;
   }
@@ -328,7 +344,7 @@ class BooleanField extends IntegerField
     parent::setValue(0);
   }
   
-  public function toString()
+  public function getValue()
   {
     if (parent::toString()==1)
       return "true";
@@ -355,7 +371,7 @@ class DateField extends IntegerField
   
   public function output(&$request, &$smarty)
   {
-    return date('d/m/Y', $this->toString());
+    return date('d/m/Y', $this->getValue());
   }
   
   protected function getDefaultValue()
@@ -454,7 +470,7 @@ class OptionField extends IntegerField
     return $this->option;
   }
   
-  public function toString()
+  public function getValue()
   {
     $this->retrieve();
     if ($this->option !== null)
@@ -492,7 +508,7 @@ class ItemField extends IntegerField
     return $this->item;
   }
   
-  public function toString()
+  public function getValue()
   {
     $this->retrieve();
     if ($this->item !== null)
