@@ -388,12 +388,18 @@ class DateField extends IntegerField
 class OptionField extends IntegerField
 {
   protected $option;
+  protected $optionset;
+  
+  public function getOptionSet()
+  {
+    return FieldSetManager::getOptionSet($this->optionset);
+  }
   
   public function getClientAttributes()
   {
     $attrs = parent::getClientAttributes();
     $result = array();
-    $optionset = FieldSetManager::getOptionSet($this->id);
+    $optionset = $this->getOptionSet();
     $options = $optionset->getOptions();
     if (count($options)>0)
     {
@@ -411,7 +417,7 @@ class OptionField extends IntegerField
     $this->retrieve();
     $text = '';
     $text.= '<select id="'.$this->getFieldId().'" name="'.$this->getFieldName().'">';
-    $optionset = FieldSetManager::getOptionSet($this->id);
+    $optionset = $this->getOptionSet();
     $options = $optionset->getOptions();
     foreach ($options as $id => $option)
     {
@@ -426,7 +432,7 @@ class OptionField extends IntegerField
 
   protected function getDefaultValue()
   {
-    $optionset = FieldSetManager::getOptionSet($this->id);
+    $optionset = $this->getOptionSet();
     $options = $optionset->getOptions();
     $option = reset($options);
     return $option->getId();
@@ -435,7 +441,7 @@ class OptionField extends IntegerField
   public function setValue($value)
   {
     $option = null;
-    $optionset = FieldSetManager::getOptionSet($this->id);
+    $optionset = $this->getOptionSet();
     if ($value != -1)
       $option = $optionset->getOption($value);
 
@@ -457,7 +463,7 @@ class OptionField extends IntegerField
   protected function retrieve()
   {
     parent::retrieve();
-    $optionset = FieldSetManager::getOptionSet($this->id);
+    $optionset = $this->getOptionSet();
     if ($this->value != -1)
       $this->option = $optionset->getOption($this->value);
     if ($this->option === null)
@@ -477,6 +483,15 @@ class OptionField extends IntegerField
       return $this->option->getValue();
     else
       return '';
+  }
+
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute('optionset'))
+      $this->optionset = $element->getAttribute('optionset');
+    else
+      $this->optionset = $element->getAttribute('id');
+    parent::parseAttributes($element);
   }
 }
 
