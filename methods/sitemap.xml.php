@@ -13,11 +13,11 @@
  * $Revision$
  */
 
-function method_sitemap($request)
+function method_sitemap_xml($request)
 {
   global $_PREFS;
   
-  $log = LoggerManager::getLogger('swim.method.sitemap');
+  $log = LoggerManager::getLogger('swim.method.sitemap.xml');
   checkSecurity($request, false, true);
   
   RequestCache::setNoCache();

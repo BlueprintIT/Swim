@@ -86,7 +86,8 @@ if (is_writable($_PREFS->getPref('storage.rootdir')))
 	$hosts = $_PREFS->getPrefBranch('url.host');
 	
 	$rewrites = AddonManager::getRewrites();
-	array_push($rewrites, array('pattern' => 'tinymce/jscripts/tiny_mce/plugins/advblockformat/(.*)', 'target' => 'swim/admin/static/tinymce/advblockformat/$1'));
+  array_unshift($rewrites, array('pattern' => '^sitemap$', 'target' => 'sitemap.xml [L,R=permanent]'));
+  array_push($rewrites, array('pattern' => 'tinymce/jscripts/tiny_mce/plugins/advblockformat/(.*)', 'target' => 'swim/admin/static/tinymce/advblockformat/$1'));
 	array_push($rewrites, array('pattern' => '^$', 'target' => 'swim/startup/swim.php [L]'));
 	
 	ob_start();
@@ -102,28 +103,26 @@ Options -Indexes
 ?>
 
 <?
-	
+	$hostpattern = '^(';
+  foreach ($hosts as $host)
+  {
+    $hostpattern .= $host.'|';
+  }
+  $hostpattern = substr($hostpattern, 0, -1).')$';
+  
 	foreach ($rewrites as $rewrite)
 	{
-		foreach ($hosts as $host)
-		{
-			print("RewriteCond %{HTTP_HOST} ^".$host."$\n");
-			print("RewriteRule ".$rewrite['pattern']." ".$rewrite['target']."\n");
-		}
+		print('RewriteCond %{HTTP_HOST} '.$hostpattern."\n");
+		print('RewriteRule '.$rewrite['pattern'].' '.$rewrite['target']."\n");
 		print("\n");
 	}
 	
-	foreach ($hosts as $host)
-	{
 ?>
-RewriteCond %{HTTP_HOST} ^<?= $host ?>$
+RewriteCond %{HTTP_HOST} <?= $hostpattern ?>
+
 RewriteCond %{REQUEST_FILENAME} !-f 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* swim/startup/swim.php [L]
-<?
-	}
-	
-?>
 
 <Files .*>
 	Deny from all
@@ -144,7 +143,7 @@ RewriteRule .* swim/startup/swim.php [L]
 else
 	$log->error('Unable to write configuration. htaccess in unwritable');
 
-if ((isset($_GET['backup'])) || (in_array('--backup', $argv)))
+if ((isset($_GET['backup'])) || ((isset($argv)) && (in_array('--backup', $argv))))
 {
   $log->info("Backup");
 	if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))

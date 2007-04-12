@@ -304,7 +304,10 @@ class BaseHTMLField extends TextField
       {
         $start = substr($result, 0, $matches[0][$p][1]+6);
         $end = substr($result, $matches[0][$p][1] + strlen($matches[0][$p][0])-1);
-        $extra = $matches[2][$p][0];
+        if (count($matches[2][$p]) > 0)
+          $extra = $matches[2][$p][0];
+        else
+          $extra = '';
         $path = $_PREFS->getPref('url.pagegen').$item->getPath().$extra;
         $result = $start.$path.$end;
       }
