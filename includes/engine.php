@@ -64,6 +64,11 @@ class SwimEngine
     return self::$requests[count(self::$requests)-1];
   }
   
+  static function escapeMethod($method)
+  {
+    return str_replace('.', '_', $method);
+  }
+  
   static function isMethod($method)
   {
   	global $_PREFS;
@@ -93,7 +98,7 @@ class SwimEngine
     $_STATE=STATE_PROCESSING;
     
     $methodfile=$request->getMethod().'.php';
-    $methodfunc='method_'.$request->getMethod();
+    $methodfunc='method_'.self::escapeMethod($request->getMethod());
     if (is_readable($_PREFS->getPref('storage.methods').'/'.$methodfile))
     {
       require_once($_PREFS->getPref('storage.methods').'/'.$methodfile);

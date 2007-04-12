@@ -3,26 +3,26 @@
 /*
  * Swim
  *
- * Google Sitemap method
+ * Item viewing method
  *
  * Copyright Blueprint IT Ltd. 2007
  *
- * $HeadURL$
- * $LastChangedBy$
- * $Date$
- * $Revision$
+ * $HeadURL: svn://svn.blueprintit.co.uk/blueprintit/BlueprintIT/Swim/trunk/methods/view.php $
+ * $LastChangedBy: dave $
+ * $Date: 2007-04-05 14:48:05 +0100 (Thu, 05 Apr 2007) $
+ * $Revision: 1414 $
  */
 
-function method_sitemap($request)
+function method_robots_txt($request)
 {
   global $_PREFS;
   
-  $log = LoggerManager::getLogger('swim.method.sitemap');
+  $log = LoggerManager::getLogger('swim.method.robots.txt');
   checkSecurity($request, false, true);
   
   RequestCache::setNoCache();
   
-  $path = $_PREFS->getPref('storage.admin.templates').'/sitemap.tpl.xml';
+  $path = $_PREFS->getPref('storage.admin.templates').'/robots.tpl.txt';
   if ($path != null)
   {
     $type = determineContentType($path);
@@ -35,5 +35,3 @@ function method_sitemap($request)
   else
     displayNotFound($request);
 }
-
-?>

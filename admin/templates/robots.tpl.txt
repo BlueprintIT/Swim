@@ -1,0 +1,4 @@
+Sitemap: http://{$SERVER.HTTP_HOST}{encode method="sitemap"}
+
+User-agent: *
+Disallow: /admin
