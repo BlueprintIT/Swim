@@ -7,7 +7,7 @@ BlueprintIT.validation.validateField = function(input, allowempty) {
 BlueprintIT.validation.validateAsNumber = function(input, allowempty, constraints) {
   if (allowempty && (input.value == ''))
     return true;
-  return /^\d*$/.test(input.value);
+  return /^\d+$/.test(input.value);
 }
 
 BlueprintIT.validation.validateAsEmail = function(input, allowempty, constraints) {
