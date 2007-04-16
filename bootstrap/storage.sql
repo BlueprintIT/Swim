@@ -78,8 +78,8 @@ CREATE TABLE Sequence (
 
 CREATE TABLE File (
 	itemversion INTEGER,
-	file VARCHAR(30),
-	description VARCHAR(50),
+	file VARCHAR(100),
+	description VARCHAR(200),
 	UNIQUE (itemversion,file)
 );
 
