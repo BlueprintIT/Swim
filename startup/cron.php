@@ -15,6 +15,15 @@
 
 require('startup.php');
 
+function hasArgument($name)
+{
+  if ($_GET[$name])
+    return true;
+  if ((isset($argv)) && (in_array('--'.$name, $argv)))
+    return true;
+  return false;
+}
+
 function checkConsistency()
 {
   global $_STORAGE,$_PREFS;
@@ -143,7 +152,7 @@ RewriteRule .* swim/startup/swim.php [L]
 else
 	$log->error('Unable to write configuration. htaccess in unwritable');
 
-if ((isset($_GET['backup'])) || ((isset($argv)) && (in_array('--backup', $argv))))
+if (hasArgument('backup'))
 {
   $log->info("Backup");
 	if ((is_executable($_PREFS->getPref('tools.tar'))) && (is_executable($_PREFS->getPref('tools.mysqldump'))))
