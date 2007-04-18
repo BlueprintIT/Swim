@@ -17,7 +17,7 @@ require('startup.php');
 
 function hasArgument($name)
 {
-  if ($_GET[$name])
+  if ((isset($_GET)) && (in_array($name, $_GET)))
     return true;
   if ((isset($argv)) && (in_array('--'.$name, $argv)))
     return true;
