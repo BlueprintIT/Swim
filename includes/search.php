@@ -178,7 +178,7 @@ class SearchEngine
       $items = $section->getItems();
       foreach ($items as $item)
       {
-        if (!$item->isArchived())
+        if (!$item->isArchived() && $item->getClass()->allowsLink())
         {
           $versioncount = 0;
           $words = array();

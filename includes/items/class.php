@@ -161,6 +161,18 @@ class ItemClass extends FieldSet
   private $versioning;
   private $type;
   private $mimetypes;
+  private $alternates;
+  
+  public function getAlternates()
+  {
+    if (isset($this->alternates))
+      return $this->alternates;
+
+    if ($this->parent !== null)
+      return $this->parent->getAlternates();
+      
+    return array();
+  }
   
   public function getType()
   {
@@ -273,6 +285,10 @@ class ItemClass extends FieldSet
     else if ($element->tagName=='mimetypes')
     {
       $this->mimetypes = explode(",", getDOMText($element));
+    }
+    else if ($element->tagName=='alternates')
+    {
+      $this->alternates = explode(",", getDOMText($element));
     }
     else
       parent::parseElement($element);

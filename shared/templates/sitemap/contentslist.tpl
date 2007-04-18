@@ -1,5 +1,5 @@
 <li><a href="{$item->url}">{$item->name}</a>
-	{if $depth>0}
+	{if $depth!=0}
 		{assign var="sequence" value=$item->mainsequence}
 		{if count($sequence)>0}
 			<ul>
