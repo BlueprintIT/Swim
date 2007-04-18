@@ -304,7 +304,7 @@ class BaseHTMLField extends TextField
       {
         $start = substr($result, 0, $matches[0][$p][1]+6);
         $end = substr($result, $matches[0][$p][1] + strlen($matches[0][$p][0])-1);
-        if (count($matches[2][$p]) > 0)
+        if (isset($matches[2][$p][0]))
           $extra = $matches[2][$p][0];
         else
           $extra = '';
