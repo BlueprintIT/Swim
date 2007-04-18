@@ -1,4 +1,4 @@
-<li><a href="{$item->url}">{$item->name}</a>
+<li>{if $item->allowsLink}<a href="{$item->url}">{/if}{$item->name}{if $item->allowsLink}</a>{/if}
 	{if $depth!=0}
 		{assign var="sequence" value=$item->mainsequence}
 		{if count($sequence)>0}

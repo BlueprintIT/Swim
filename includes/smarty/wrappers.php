@@ -286,6 +286,9 @@ class ItemWrapper
   {
     switch($name)
     {
+      case 'allowsLink':
+        return $this->itemversion->getClass()->allowsLink();
+        break;
       case 'modified':
         return $this->itemversion->getModified();
         break;
