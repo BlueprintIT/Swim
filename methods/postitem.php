@@ -110,6 +110,27 @@ function method_postitem($request)
 		  	if ($sequence->postPublished())
 		  		$itemversion->setCurrent(true);
 		  	$sequence->appendItem($newitem);
+        
+        if ($item->getClass()->hasField('postemail'))
+        {
+          $iv = $item->getCurrentVersion(Session::getCurrentVariant());
+          $field = $iv->getField('postemail');
+          $email = $field->toString();
+          if (strlen($email) > 0)
+          {
+            $field = $iv->getField('name');
+            $subject = 'Comment posted to '.$field->toString();
+            $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+            $message = '';
+            if ($_PREFS->getPref('method.postback.headernewline'))
+              $from.="\r\n";
+
+            foreach ($query as $name => $value)
+              $message .= $name.': '.$value."\n\n";
+            
+            mail($email, $subject, $message, 'From: '.$from);
+          }
+        }
 		  	
 		  	redirect($request->getNested());
 		  }
