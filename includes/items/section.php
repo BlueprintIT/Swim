@@ -281,7 +281,7 @@ class MailingSection extends Section
   
   public function isSelected($request)
   {
-    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,9)=='contacts/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
+    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,8)=='mailing/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
       return true;
     return false;
   }

@@ -1,5 +1,5 @@
 {secure contacts="read" login="true"}
-{include file='includes/adminheader.tpl' title="Contact management"}
+{include file='includes/frameheader.tpl' title="Contact management"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {apiget var="section" type="section" id=$request.query.section}
@@ -12,7 +12,7 @@
 {else}
 	{assign var="sortkey" value="lastname"}
 {/if}
-<div id="mainpane" class="pane">
+<div id="mainpane">
 	<div class="header">
 		{secure contacts="write"}
 			{html_form tag_name="uploadform" tag_enctype="multipart/form-data" method="uploadcontacts" parentitem=$item->getId() nestcurrent="true"}
@@ -33,7 +33,7 @@
 		<h2>Contacts</h2>
 	</div>
 	<div class="body">
-		<table width="90%" style="margin: auto">
+		<table width="95%" style="margin: auto">
 			<thead>
 				<tr>
 					<th></th>
@@ -96,5 +96,5 @@
 		</table>
 	</div>
 </div>
-{include file='includes/adminfooter.tpl'}
+{include file='includes/framefooter.tpl'}
 {/secure}
