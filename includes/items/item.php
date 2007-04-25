@@ -409,6 +409,22 @@ class Item
   {
     global $_STORAGE;
     
+    if (is_array($class))
+    {
+      if (count($class)==0)
+        $class = null;
+      else if (count($class)==1)
+        $class = $class[0];
+    }
+    
+    if (is_array($section))
+    {
+      if (count($section)==0)
+        $section = null;
+      else if (count($section)==1)
+        $section = $section[0];
+    }
+    
     if (($section !== null) || ($class !== null))
       $tables = '((Item JOIN ItemVariant ON Item.id=ItemVariant.item) JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
     else
@@ -417,12 +433,42 @@ class Item
     $query.=' Field.basefield="base" AND Field.field="'.$fieldname.'"';
     $query.=' AND Field.textValue="'.$_STORAGE->escape($fieldvalue).'"';
     $query.=' AND VariantVersion.current=1';
+    
     if ($class !== null)
-      $query.=' AND Item.class="'.$class->getId().'"';
+    {
+      $query.=' AND ';
+      if (is_array($class))
+      {
+        $query .= '(';
+        foreach ($class as $c)
+        {
+          $query .= 'Item.class="'.$c->getId().'" OR ';
+        }
+        $query = substr($query, 0, -4).')';
+      }
+      else
+        $query .= 'Item.class="'.$class->getId().'"';
+    }
+    
     if ($section !== null)
-      $query.=' AND Item.section="'.$section->getId().'"';
+    {
+      $query.=' AND ';
+      if (is_array($section))
+      {
+        $query .= '(';
+        foreach ($section as $c)
+        {
+          $query .= 'Item.section="'.$c->getId().'" OR ';
+        }
+        $query = substr($query, 0, -4).')';
+      }
+      else
+        $query .= 'Item.section="'.$section->getId().'"';
+    }
+
     if ($variant !== null)
       $query.=' AND ItemVariant.variant="'.$variant.'"';
+
     $log = LoggerManager::getLogger('testing');
     $items = array();
     $results = $_STORAGE->query($query);
