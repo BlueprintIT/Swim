@@ -3,7 +3,7 @@
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {apiget var="section" type="section" id=$request.query.section}
-{assign var="item" value=$section->getRootItem()}
+{assign var="item" value=$section->getRootContacts()}
 {assign var="itemvariant" value=$item->getVariant('default')}
 {assign var="itemversion" value=$itemvariant->getNewestVersion()}
 {assign var="sequence" value=$itemversion->getMainSequence()}

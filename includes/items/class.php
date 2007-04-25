@@ -550,7 +550,8 @@ class FieldSetManager
     	recursiveMkDir($cache);
     	
     $cache = $cache.'/fieldsets.ser';
-    $files = array($_PREFS->getPref('storage.config').'/optionsets.xml', 
+    $files = array($_PREFS->getPref('storage.admin.config').'/defaults.xml',
+                   $_PREFS->getPref('storage.config').'/optionsets.xml', 
                    $_PREFS->getPref('storage.config').'/views.xml', 
                    $_PREFS->getPref('storage.config').'/classes.xml', 
                    $_PREFS->getPref('storage.config').'/sections.xml');

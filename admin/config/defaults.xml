@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<classes>
+
+  <!-- Mailing categories -->
+  <class id="_mailingcategory" mainsequence="children" versioning="simple">
+    <views>default</views>
+    <name>Category</name>
+    <field id="name" type="text" priority="10">
+      <name>Name</name>
+    </field>
+    <field id="children" type="sequence">
+      <name>Items</name>
+      <classes>_mailing</classes>
+    </field>
+  </class>
+
+  <class id="_mailing" mainsequence="children" versioning="simple">
+    <views>default</views>
+    <name>Category</name>
+    <field id="name" type="text" priority="10">
+      <name>Name</name>
+    </field>
+    <field id="children" type="sequence">
+      <name>Items</name>
+      <classes>_mailing</classes>
+    </field>
+  </class>
+
+  <class id="_contactcategory" mainsequence="children" versioning="simple">
+    <views>default</views>
+    <name>Category</name>
+    <field id="name" type="text" priority="10">
+      <name>Name</name>
+    </field>
+    <field id="children" type="sequence">
+      <name>Items</name>
+      <classes>_contactcategory,_contact</classes>
+    </field>
+  </class>
+
+  <class id="_contact" versioning="simple">
+    <views>default</views>
+    <name>Contact</name>
+    <field id="title" type="text">
+      <name>Title</name>
+    </field>
+    <field id="firstname" type="text">
+      <name>First Name</name>
+    </field>
+    <field id="middlename" type="text">
+      <name>Middle Name</name>
+    </field>
+    <field id="lastname" type="text">
+      <name>Last Name</name>
+    </field>
+    <field id="company" type="text">
+      <name>Company</name>
+    </field>
+    <field id="emailaddress" type="text">
+      <name>E-mail Address</name>
+    </field>
+  </class>
+
+</classes>

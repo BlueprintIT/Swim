@@ -91,40 +91,11 @@ class Section extends AdminSection
   {
   }
   
-  public function load($element)
+  protected function findRoot()
   {
     global $_STORAGE;
     
-    $this->parseAttributes($element);
-    $el=$element->firstChild;
-    while ($el!==null)
-    {
-      if ($el->nodeType==XML_ELEMENT_NODE)
-      {
-        if ($el->tagName=='name')
-        {
-          $this->name=getDOMText($el);
-        }
-        else if ($el->tagName=='classes')
-        {
-          $this->classes = array();
-          $items = explode(',', getDOMText($el));
-          foreach ($items as $name)
-          {
-            $class = FieldSetManager::getClass($name);
-            if ($class !== null)
-              $this->classes[$name] = $class; 
-          }
-        }
-        else
-        {
-          $this->parseElement($el);
-        }
-      }
-      $el=$el->nextSibling;
-    }
-    
-    $results = $_STORAGE->query('SELECT id FROM Item WHERE root=1 AND section="'.$this->id.'";');
+    $results = $_STORAGE->query('SELECT id FROM Item WHERE root=1 AND section="'.$this->id.'" AND class="'.$this->getRootClass().'";');
     if ($results->valid())
     {
       $this->item = $results->fetchSingle();
@@ -168,6 +139,42 @@ class Section extends AdminSection
       //$version->setCurrent(true);
     }
   }
+  
+  public function load($element)
+  {
+    global $_STORAGE;
+    
+    $this->parseAttributes($element);
+    $el=$element->firstChild;
+    while ($el!==null)
+    {
+      if ($el->nodeType==XML_ELEMENT_NODE)
+      {
+        if ($el->tagName=='name')
+        {
+          $this->name=getDOMText($el);
+        }
+        else if ($el->tagName=='classes')
+        {
+          $this->classes = array();
+          $items = explode(',', getDOMText($el));
+          foreach ($items as $name)
+          {
+            $class = FieldSetManager::getClass($name);
+            if ($class !== null)
+              $this->classes[$name] = $class; 
+          }
+        }
+        else
+        {
+          $this->parseElement($el);
+        }
+      }
+      $el=$el->nextSibling;
+    }
+    
+    $this->findRoot();
+  }
 
   public function getPriority()
   {
@@ -181,8 +188,6 @@ class Section extends AdminSection
       $type = $element->hasAttribute('type');
     else
       $type = 'content';
-    if ($type == 'contacts')
-      return new ContactsSection($id);
     if ($type == 'mailing')
       return new MailingSection($id);
     return new ContentSection($id);
@@ -227,6 +232,8 @@ class ContentSection extends Section
 
 class MailingSection extends Section
 {
+  protected $contacts;
+  
   public function getType()
   {
     return 'mailing';
@@ -239,47 +246,30 @@ class MailingSection extends Section
     return $_PREFS->getPref('url.admin.static').'/icons/email-blue.gif';
   }
   
+  public function getRootContacts()
+  {
+    return Item::getItem($this->contacts);
+  }
+  
+  private function getRootClass()
+  {
+    return "_mailingcategory";
+  }
+  
+  protected function findRoot()
+  {
+    $this->roottype = '_contactcategory';
+    parent::findRoot();
+    $this->contacts = $this->item;
+    $this->roottype = '_mailingcategory';
+    parent::findRoot();
+  }
+
   public function getURL()
   {
     $request = new Request();
     $request->setMethod('admin');
     $request->setPath('mailing/index.tpl');
-    $request->setQueryVar('section', $this->getId());
-    return $request->encode();
-  }
-  
-  public function isAvailable()
-  {
-    return Session::getUser()->hasPermission('mailing',PERMISSION_READ);
-  }
-  
-  public function isSelected($request)
-  {
-    if (($request->getMethod()=='admin') && (substr($request->getPath(),0,8)=='mailing/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
-      return true;
-    return false;
-  }
-}
-
-class ContactsSection extends Section
-{
-  public function getType()
-  {
-    return 'contacts';
-  }
-  
-  public function getIcon()
-  {
-    global $_PREFS;
-    
-    return $_PREFS->getPref('url.admin.static').'/icons/email-contact-blue.gif';
-  }
-  
-  public function getURL()
-  {
-    $request = new Request();
-    $request->setMethod('admin');
-    $request->setPath('contacts/index.tpl');
     $request->setQueryVar('section', $this->getId());
     return $request->encode();
   }
