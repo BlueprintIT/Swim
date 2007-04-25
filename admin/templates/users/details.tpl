@@ -19,7 +19,7 @@
 					{if $selected->getUsername() ne $USER->getUsername()}
 						<td>
 							<div class="toolbarbutton">
-								<a href="{encode method="deleteuser" user=$selected->getUsername()}">Delete this User</a>
+								<a href="{encode method="deleteuser" user=$selected->getUsername()}"><image src="{$CONTENT}/icons/delete-page-red.gif"/> Delete this User</a>
 							</div>
 						</td>
 					{/if}
