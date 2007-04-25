@@ -345,6 +345,31 @@ class Item
     return null;
   }
   
+  private function internalGetSubitems($depth, $types, &$items)
+  {
+    $sequence = $this->getMainSequence();
+    if ($sequence !== null)
+    {
+      foreach ($sequence->getItems() as $subitem)
+      {
+        if (!isset($items[$subitem->getId()]))
+        {
+          if (($types === null) || (in_array($subitem->getClass()->getId(), $types)))
+            $items[$subitem->getId()] = $subitem;
+          if ($depth!=0)
+            $subitem->internalGetSubitems($depth-1, $types, $items);
+        }
+      }
+    }
+  }
+  
+  public function getSubitems($types = null, $depth = -1)
+  {
+    $results = array();
+    $this->internalGetSubitems($depth, $types, $results);
+    return $results;
+  }
+  
   public static function createItem($section, $class)
   {
     global $_STORAGE;

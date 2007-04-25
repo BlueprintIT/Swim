@@ -264,35 +264,13 @@ function get_files($params, &$smarty)
   }
 }
 
-function getSubitems($item, $depth, $types, &$items)
-{
-  $sequence = $item->getMainSequence();
-  if ($sequence !== null)
-  {
-    foreach ($sequence->getItems() as $subitem)
-    {
-      if (!isset($items[$subitem->getId()]))
-      {
-        if (($types === null) || (in_array($subitem->getClass()->getId(), $types)))
-        {
-          $iv = $subitem->getCurrentVersion(Session::getCurrentVariant());
-          if ($iv !== null)
-            $items[$subitem->getId()] = ItemWrapper::getWrapper($iv);
-        }
-        if ($depth!=0)
-          getSubitems($subitem, $depth-1, $types, $items);
-      }
-    }
-  }
-}
-
 function fetch_subitems($params, &$smarty)
 {
   if (!empty($params['item']) && !empty($params['var']))
   {
     $item = $params['item'];
     if ($item instanceof ItemWrapper)
-      $item = $item->item;
+      $item = $item->item->getItem();
     
     if (isset($params['types']))
       $types = explode(',', $params['types']);
@@ -303,8 +281,13 @@ function fetch_subitems($params, &$smarty)
     if (isset($params['depth']))
       $depth = $params['depth'];
 
-    $items = array();
-    getSubitems($item, $depth, $types, $items);
+    $items = $item->getSubitems($types, $depth);
+    foreach ($items as $id => $subitem)
+    {
+      $iv = $subitem->getCurrentVersion(Session::getCurrentVariant());
+      if ($iv !== null)
+        $items[$id] = ItemWrapper::getWrapper($iv);
+    }
     $smarty->assign_by_ref($params['var'], array_values($items));
   }
 }
