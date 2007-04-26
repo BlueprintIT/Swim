@@ -315,9 +315,9 @@ class Mailing extends XMLSerialized
   {
     global $_STORAGE;
     
+    $this->retrieve();
     $_STORAGE->queryExec('UPDATE Mailing SET contacts='.$item->getId().';');
-    if (isset($this->values))
-      $this->values['contacts'] = $item->getId();
+    $this->values['contacts'] = $item->getId();
   }
   
   public function getIntro()
@@ -330,9 +330,9 @@ class Mailing extends XMLSerialized
   {
     global $_STORAGE;
     
+    $this->retrieve();
     $_STORAGE->queryExec('UPDATE Mailing SET intro="'.$_STORAGE->escape($value).'";');
-    if (isset($this->values))
-      $this->values['intro'] = $value;
+    $this->values['intro'] = $value;
   }
   
   protected function parseElement($element)
