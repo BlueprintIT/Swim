@@ -15,15 +15,17 @@
     </field>
   </class>
 
-  <class id="_mailing" mainsequence="children" versioning="simple">
+  <class id="_mailing" versioning="simple">
     <views>default</views>
-    <name>Category</name>
+    <name>Mailing</name>
     <field id="name" type="text" priority="10">
       <name>Name</name>
     </field>
-    <field id="children" type="sequence">
-      <name>Items</name>
-      <classes>_mailing</classes>
+    <field id="date" type="date">
+      <name>Date</name>
+    </field>
+    <field id="intro" type="html" styles="content.xml" stylesheet="styles/text.css">
+      <name>Introduction</name>
     </field>
   </class>
 

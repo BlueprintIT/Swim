@@ -230,9 +230,136 @@ class ContentSection extends Section
   }
 }
 
+class MailingClass extends ItemClass
+{
+}
+
+class Mailing extends XMLSerialized
+{
+  protected $id;
+  protected $section;
+  protected $log;
+  protected $name;
+  protected $subject;
+  protected $class;
+  protected $frequencycount = 1;
+  protected $frequencyperiod = 'month';
+  protected $values;
+  
+  public function __construct($id, $section)
+  {
+    $this->id = $id;
+    $this->section = $section;
+    $this->log = LoggerManager::getLogger('swim.mailing');
+    $mailclass = FieldSetManager::getClass('_mailing');
+    $this->class = new MailingClass($id, $mailclass);
+  }
+
+  public function __sleep()
+  {
+    $vars = get_object_vars($this);
+    unset($vars['log']);
+    unset($vars['values']);
+    return array_keys($vars);
+  }
+  
+  public function __wakeup()
+  {
+    $this->log = LoggerManager::getLogger('swim.mailing');
+  }
+  
+  private function retrieve()
+  {
+    global $_STORAGE;
+    
+    if (isset($this->values))
+      return;
+      
+    $results = $_STORAGE->query('SELECT * FROM Mailing WHERE id="'.$this->id.'";');
+    if ($results->valid())
+      $this->values = $results->fetch();
+    else
+    {
+      $this->values = array('id' => $this->id,
+                            'section' => $this->section->getId(),
+                            'contacts' => $this->section->getRootContacts()->getId(),
+                            'lastsent' => -1,
+                            'intro' => '');
+      $_STORAGE->queryExec('INSERT INTO Mailing (id, section, contacts, lastsent, intro) VALUES ' .
+                           '('.$this->id.',"'.$this->values['section'].'",'.$this->values['contacts'].',-1,"");');
+    }
+  }
+  
+  public function getId()
+  {
+    return $this->id;
+  }
+
+  public function getName()
+  {
+    return $this->name;
+  }
+
+  public function getSubject()
+  {
+    return $this->subject;
+  }
+  
+  public function getContacts()
+  {
+    $this->retrieve();
+    return Item::getItem($this->values['contacts']);
+  }
+  
+  public function setContacts($item)
+  {
+    global $_STORAGE;
+    
+    $_STORAGE->queryExec('UPDATE Mailing SET contacts='.$item->getId().';');
+    if (isset($this->values))
+      $this->values['contacts'] = $item->getId();
+  }
+  
+  public function getIntro()
+  {
+    $this->retrieve();
+    return $this->values['intro'];
+  }
+  
+  public function setIntro($value)
+  {
+    global $_STORAGE;
+    
+    $_STORAGE->queryExec('UPDATE Mailing SET intro="'.$_STORAGE->escape($value).'";');
+    if (isset($this->values))
+      $this->values['intro'] = $value;
+  }
+  
+  protected function parseElement($element)
+  {
+    if ($element->tagName == 'name')
+    {
+      $this->name = getDOMText($element);
+    }
+    else if ($element->tagName == 'subject')
+    {
+      $this->subject = getDOMText($element);
+    }
+    else if ($element->tagName == 'frequency')
+    {
+      if ($element->hasAttribute('period'))
+        $this->frequencyperiod = $element->getAttribute('period');
+      $this->frequencycount = getDOMText($element);
+    }
+    else
+      parent::parseElement($element);
+  }
+}
+
 class MailingSection extends Section
 {
   protected $contacts;
+  protected $mailings;
   
   public function getType()
   {
@@ -284,6 +411,31 @@ class MailingSection extends Section
     if (($request->getMethod()=='admin') && (substr($request->getPath(),0,8)=='mailing/') && ($request->hasQueryVar('section')) && ($request->getQueryVar('section')==$this->getId()))
       return true;
     return false;
+  }
+
+  public function getMailing($id)
+  {
+    if (isset($this->mailings[$id]))
+      return $this->mailings[$id];
+    return null;
+  }
+  
+  public function getMailings()
+  {
+    return $this->mailings;
+  }
+  
+  protected function parseElement($element)
+  {
+    if ($element->tagName == 'mailing')
+    {
+      $id = $element->getAttribute('id');
+      $mailing = new Mailing($id, $this);
+      $this->mailings[$id] = $mailing;
+      $mailing->load($element);
+    }
+    else
+      parent::parseElement($element);
   }
 }
 

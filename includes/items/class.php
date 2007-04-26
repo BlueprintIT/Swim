@@ -155,13 +155,13 @@ class ItemView extends FieldSet
 
 class ItemClass extends FieldSet
 {
-  private $views;
-  private $mainsequence;
-  private $allowlink;
-  private $versioning;
-  private $type;
-  private $mimetypes;
-  private $alternates;
+  protected $views;
+  protected $mainsequence;
+  protected $allowlink;
+  protected $versioning;
+  protected $type;
+  protected $mimetypes;
+  protected $alternates;
   
   public function getAlternates()
   {
@@ -642,6 +642,11 @@ class FieldSetManager
     	$item['item']->load($item['data']);
   }
   
+  public static function addOptionSet($optionset)
+  {
+    self::$options[$optionset->getId()] = $optionset;
+  }
+  
   public static function getOptionSets()
   {
     return self::$options;
@@ -653,6 +658,11 @@ class FieldSetManager
       return self::$options[$id];
     else
       return null;
+  }
+  
+  public static function addSection($section)
+  {
+    self::$sections[$section->getId()] = $section;
   }
   
   public static function getSections()
@@ -668,6 +678,11 @@ class FieldSetManager
       return null;
   }
   
+  public static function addClass($class)
+  {
+    self::$classes[$class->getId()] = $class;
+  }
+  
   public static function getClasses()
   {
     return self::$classes;
@@ -679,6 +694,11 @@ class FieldSetManager
       return self::$classes[$id];
     else
       return null;
+  }
+  
+  public static function addView($view)
+  {
+    self::$views[$view->getId()] = $view;
   }
   
   public static function getViews()
@@ -694,7 +714,5 @@ class FieldSetManager
       return null;
   }
 }
-
-FieldSetManager::init();
 
 ?>

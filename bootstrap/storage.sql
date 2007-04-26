@@ -98,6 +98,14 @@ CREATE TABLE Keywords (
 	UNIQUE (word, item)
 );
 
+CREATE TABLE Mailing (
+	id VARCHAR(30) PRIMARY KEY,
+	section VARCHAR(20),
+	contacts INTEGER,
+	lastsent INTEGER,
+	intro TEXT
+);
+
 INSERT INTO User (id,password,name) VALUES ('blueprintit','ab9debd6b50c6d5b64c64f2c93a74580','Blueprint IT');
 INSERT INTO Access (id,name,description) VALUES ('root',NULL,NULL);
 INSERT INTO Access (id,name,description) VALUES ('admin','Full Access','Provides full control over the website.');

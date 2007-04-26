@@ -23,9 +23,11 @@ else if ($_PREFS->getPref('admin.htmleditor')=='tinymce')
   require $_PREFS->getPref('storage.includes').'/items/tinymce.php';
 
 require $_PREFS->getPref('storage.includes').'/items/sequence.php';
-require $_PREFS->getPref('storage.includes').'/items/section.php';
 require $_PREFS->getPref('storage.includes').'/items/class.php';
-  
+require $_PREFS->getPref('storage.includes').'/items/section.php';
+
+FieldSetManager::init();
+
 class ArchiveAdminSection extends AdminSection
 {
   public function getIcon()

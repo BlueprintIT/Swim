@@ -32,12 +32,21 @@ function displayTree(event)
     type: "category"
   {rdelim};
   var mailings = new BlueprintIT.widget.IconNode(details, root, true);
+{foreach from=$section->getMailings() item="mailing"}
+  details = {ldelim}
+    label: "{$mailing->getName()}",
+    href: "{encode method="admin" path="mailing/maildetails.tpl" section=$section->getId() mailing=$mailing->getId()}",
+    target: "main",
+    type: "mailing"
+  {rdelim};
+  new BlueprintIT.widget.IconNode(details, mailings, false);
+{/foreach}
   {assign var="item" value=$section->getRootItem()}
   details = {ldelim}
     label: "Past Mailings",
     type: "category"
   {rdelim};
-  var mailings = new BlueprintIT.widget.IconNode(details, root, true);
+  mailings = new BlueprintIT.widget.IconNode(details, root, true);
   tree.draw();
 {rdelim}
 
