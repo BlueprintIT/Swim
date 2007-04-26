@@ -1,9 +1,23 @@
 {secure contacts="read" login="true"}
-{include file='includes/frameheader.tpl' title="Content management"}
+{include file='includes/frameheader.tpl' title="Mailing Details"}
 {apiget var="section" type="section" id=$request.query.section}
 {assign var="mailing" value=$section->getMailing($request.query.mailing)}
 <div id="mainpane">
 	<div class="header">
+		{secure contacts="write"}
+			<table class="toolbar">
+				<tr>
+					<td>
+						<div class="toolbarbutton">
+							<a href="{encode method="admin" path="mailing/mailedit.tpl" section=$section->getId() mailing=$mailing->getId()}">
+								<img src="{$CONTENT}/icons/edit-page-blue.gif" alt="Edit">
+								Edit
+							</a>
+						</div>
+					</td>
+				</tr>
+			</table>
+		{/secure}
 		<h2>Mailing Details</h2>
 		<div style="clear: left"></div>
 	</div>
