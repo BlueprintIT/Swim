@@ -286,7 +286,7 @@ class Mailing extends XMLSerialized
                             'lastsent' => -1,
                             'intro' => '');
       $_STORAGE->queryExec('INSERT INTO Mailing (id, section, contacts, lastsent, intro) VALUES ' .
-                           '('.$this->id.',"'.$this->values['section'].'",'.$this->values['contacts'].',-1,"");');
+                           '("'.$this->id.'","'.$this->values['section'].'",'.$this->values['contacts'].',-1,"");');
     }
   }
   
