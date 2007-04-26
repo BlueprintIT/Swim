@@ -32,6 +32,16 @@
 						<td class="label">Subject:</td>
 						<td class="details">{$mailing->getSubject()}</td>
 					</tr>
+					{if $mailing->hasFrequency()}
+						<tr>
+							<td class="label">Frequency:</td>
+							<td class="details">Every {$mailing->getFrequencyCount()} {$mailing->getFrequencyPeriod()}s</td>
+						</tr>
+					{/if}
+					<tr>
+						<td class="label">Last Sent:</td>
+						<td class="details">{if $mailing->getLastSent()==-1}Never{else}{$mailing->getLastSent()|date_format:"%d/%m/%Y"}{/if}</td>
+					</tr>
 				</table>
 			</div>
 		</div>

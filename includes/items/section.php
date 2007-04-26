@@ -242,7 +242,7 @@ class Mailing extends XMLSerialized
   protected $name;
   protected $subject;
   protected $class;
-  protected $frequencycount = 1;
+  protected $frequencycount;
   protected $frequencyperiod = 'month';
   protected $values;
   
@@ -303,6 +303,27 @@ class Mailing extends XMLSerialized
   public function getSubject()
   {
     return $this->subject;
+  }
+  
+  public function hasFrequency()
+  {
+    return isset($this->frequencycount);
+  }
+  
+  public function getFrequencyCount()
+  {
+    return $this->frequencycount;
+  }
+  
+  public function getFrequencyPeriod()
+  {
+    return $this->frequencyperiod;
+  }
+  
+  public function getLastSent()
+  {
+    $this->retrieve();
+    return $this->values['lastsent'];
   }
   
   public function getContacts()
