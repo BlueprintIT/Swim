@@ -14,6 +14,7 @@
 {assign var="class" value=$item->getClass()}
 {assign var="mailing" value=$class->getMailing()}
 {request var="details" method="admin" path="mailing/details.tpl" item=$item->getId()}
+{request var="sendmail" method="sendmail" item=$item->getId() nested=$details}
 <div id="mainpane">
 	{html_form tag_name="mainform" method="saveitem" itemversion=$itemversion->getId()}
 		<div class="header">
@@ -22,6 +23,11 @@
 					<td>
 						<div class="toolbarbutton">
 							<a href="javascript:BlueprintIT.forms.submitForm('mainform','redirect','{$details->encode()}')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
+						</div>
+					</td>
+					<td>
+						<div class="toolbarbutton">
+							<a href="javascript:BlueprintIT.forms.submitForm('mainform','redirect','{$sendmail->encode()}')"><img src="{$CONTENT}/icons/save.gif"/> Send</a>
 						</div>
 					</td>
 				</tr>

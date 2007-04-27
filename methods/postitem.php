@@ -124,7 +124,7 @@ function method_postitem($request)
             $subject = 'Comment posted to '.$field->toString();
             $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
             $message = '';
-            if ($_PREFS->getPref('method.postback.headernewline'))
+            if ($_PREFS->getPref('mail.headernewline'))
               $from.="\r\n";
 
             foreach ($query as $name => $value)

@@ -4,13 +4,14 @@
 {assign var="variant" value="default"}
 {assign var="section" value=$item->getSection()}
 {assign var="itemvariant" value=$item->getVariant($variant)}
-{if $itemvariant->getCurrentVersion}
+{if $itemvariant->getCurrentVersion()}
 	{assign var="itemversion" value=$itemvariant->getCurrentVersion()}
-{else $itemvariant->getCurrentVersion()}
+{else}
 	{assign var="itemversion" value=$itemvariant->getDraftVersion()}
 {/if}
 {assign var="class" value=$itemversion->getClass()}
 {assign var="mailing" value=$class->getMailing()}
+{request var="details" method="admin" path="mailing/details.tpl" item=$item->getId()}
 <div id="mainpane">
 	<div class="header">
 		{secure contacts="write"}
@@ -22,6 +23,14 @@
 								<a href="{encode method="admin" path="mailing/edit.tpl" item=$item->getId()}">
 									<img src="{$CONTENT}/icons/edit-page-blue.gif"/>
 									Edit
+								</a>
+							</div>
+						</td>
+						<td>
+							<div class="toolbarbutton">
+								<a href="{encode method="sendmail"  item=$item->getId() nested=$details}">
+									<img src="{$CONTENT}/icons/save.gif"/>
+									Send
 								</a>
 							</div>
 						</td>
@@ -52,6 +61,13 @@
 						<td class="label">{$field->getName()|escape}:</td>
 						<td class="details">{$field->output($REQUEST,$SMARTY)}</td>
 					</tr>
+					{if $itemversion->isComplete()}
+						{assign var="field" value=$itemversion->getField('date')}
+						<tr>
+							<td class="label">{$field->getName()|escape}:</td>
+							<td class="details">{$field->output($REQUEST,$SMARTY)}</td>
+						</tr>
+					{/if}
 					{foreach from=$mailing->getItemSets() item="itemset"}
 						{assign var="field" value=$itemversion->getField($itemset->getId())}
 						<tr>

@@ -69,7 +69,7 @@ function method_postback($request)
       else
 	      $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
 
-			if ($_PREFS->getPref('method.postback.headernewline'))
+			if ($_PREFS->getPref('mail.headernewline'))
 				$from.="\r\n";
 				
       if ($request->hasQueryVar('post_success'))
@@ -102,7 +102,7 @@ function method_postback($request)
         }
         $subject = 'Re: '.$subject;
         $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-        if ($_PREFS->getPref('method.postback.headernewline'))
+        if ($_PREFS->getPref('mail.headernewline'))
           $from.="\r\n";
           
         mail($responseto, $subject, $body, 'From: '.$from);

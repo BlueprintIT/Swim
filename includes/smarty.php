@@ -235,15 +235,18 @@ function configureSmarty($smarty, $request, $type)
 
   $log = LoggerManager::getLogger('page');
 
-  $req = array();
-  $req['method'] = $request->getMethod();
-  $req['path'] = $request->getPath();
-  $req['query'] = $request->getQuery();
+  if ($request !== null)
+  {
+    $req = array();
+    $req['method'] = $request->getMethod();
+    $req['path'] = $request->getPath();
+    $req['query'] = $request->getQuery();
+    $smarty->assign_by_ref('REQUEST', $request);
+    $smarty->assign_by_ref('request', $req);
+    $smarty->assign_by_ref('NESTED', $request->getNested());
+  }
   $smarty->assign('SHARED', $_PREFS->getPref('url.shared'));
   $smarty->assign_by_ref('SERVER', $_SERVER);
-  $smarty->assign_by_ref('REQUEST', $request);
-  $smarty->assign_by_ref('request', $req);
-  $smarty->assign_by_ref('NESTED', $request->getNested());
   $smarty->assign_by_ref('PREFS', $_PREFS);
   $smarty->assign_by_ref('SECTIONS', new SectionsWrapper());
   $smarty->assign_by_ref('LOG', $log);
@@ -277,8 +280,6 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_block('style', 'encode_style');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
-  $smarty->register_object('HEAD', new HtmlHeader());
-  $smarty->register_outputfilter('header_outputfilter');
 
   if ($type == 'text/css')
   {
@@ -289,6 +290,11 @@ function configureSmarty($smarty, $request, $type)
   {
     $smarty->left_delimiter = '{[';
     $smarty->right_delimiter = ']}';
+  }
+  else if ($type == 'text/html')
+  {
+    $smarty->register_object('HEAD', new HtmlHeader());
+    $smarty->register_outputfilter('header_outputfilter');
   }
 }
 
@@ -342,6 +348,11 @@ function createSmarty($request, $type = 'text/html')
   //$smarty->caching = true;
 
   return $smarty;
+}
+
+function createMailSmarty($type = 'text/html')
+{
+  return createSmarty(null, $type);
 }
 
 ?>
