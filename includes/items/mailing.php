@@ -255,12 +255,18 @@ class Mailing extends XMLSerialized
     $this->values['intro'] = $value;
   }
   
+  public function getItemSets()
+  {
+    return $this->itemsets;
+  }
+  
   public function createMail()
   {
     $item = Item::createItem($this->section, $this->mailclass);
-    $variant = $item->createVariant(SessionCache::getCurrentVariant());
+    $variant = $item->createVariant(Session::getCurrentVariant());
     $iv = $variant->createNewVersion();
     $iv->setFieldValue('name', $this->getSubject());
+    $iv->setFieldValue('contacts', $this->getContacts()->getId());
     $iv->setFieldValue('sent', false);
     $iv->setFieldValue('intro', $this->getIntro());
     
@@ -339,10 +345,10 @@ class MailingSection extends Section
   protected function findRoot()
   {
     $this->roottype = '_contactcategory';
-    parent::findRoot();
+    parent::findRoot(true);
     $this->contacts = $this->item;
     $this->roottype = '_mailingcategory';
-    parent::findRoot();
+    parent::findRoot(true);
   }
 
   public function getURL()
@@ -386,6 +392,7 @@ class MailingSection extends Section
       $mailing = new Mailing($id, $this);
       $this->mailings[$id] = $mailing;
       $mailing->load($element);
+      FieldSetManager::addClass($mailing->getClass());
     }
     else
       parent::parseElement($element);

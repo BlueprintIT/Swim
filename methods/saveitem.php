@@ -48,11 +48,7 @@ function method_saveitem($request)
           foreach ($query['compounds'] as $name => $count)
           {
             if (!isset($query[$name]))
-            {
-              $field = $itemversion->getField($name);
-              if ($field !== null)
-                $field->setValue(array());
-            }
+              $field = $itemversion->setFieldValue($name, array());
           }
           unset($query['compounds']);
         }
@@ -61,22 +57,14 @@ function method_saveitem($request)
           foreach ($query['defaults'] as $name => $value)
           {
             if (!is_array($value) && !isset($query[$name]))
-            {
-              $field = $itemversion->getField($name);
-              if ($field !== null)
-                $field->setValue($value);
-            }
+              $field = $itemversion->setFieldValue($name, $value);
           }
           unset($query['defaults']);
         }
         foreach ($query as $name => $value)
         {
           if (($name != 'complete') && ($name != 'current'))
-          {
-            $field = $itemversion->getField($name);
-            if ($field !== null)
-              $field->setValue($value);
-          }
+            $field = $itemversion->setFieldValue($name, $value);
         }
         if (isset($query['complete']))
           $itemversion->setComplete($query['complete']=='true');

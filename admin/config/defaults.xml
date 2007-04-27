@@ -19,7 +19,10 @@
     <views>default</views>
     <name>Mailing</name>
     <field id="name" type="text" priority="10">
-      <name>Name</name>
+      <name>Subject</name>
+    </field>
+    <field id="contacts" type="item">
+      <name>Contacts</name>
     </field>
     <field id="date" type="date">
       <name>Date</name>

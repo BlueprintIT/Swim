@@ -47,6 +47,25 @@ function displayTree(event)
     type: "category"
   {rdelim};
   mailings = new BlueprintIT.widget.IconNode(details, root, true);
+{assign var="sequence" value=$item->getMainSequence()}
+{foreach from=$sequence->getItems() item="item"}
+  details = {ldelim}
+  {assign var="variant" value=$item->getVariant('default')}
+  {if $variant->getCurrentVersion()}
+  	{assign var="itemversion" value=$variant->getCurrentVersion()}
+  	href: "{encode method="admin" path="mailing/view.tpl" item=$item->getId()}",
+  	type: "pastmail",
+  {else}
+  	{assign var="itemversion" value=$variant->getDraftVersion()}
+  	href: "{encode method="admin" path="mailing/prepare.tpl" item=$item->getId()}",
+  	type: "pastmail",
+  {/if}
+  	{assign var="name" value=$itemversion->getField('name')}
+  	label: "{$name->getValue()}",
+  	target: "main"
+  {rdelim}
+  new BlueprintIT.widget.IconNode(details, mailings, true);
+{/foreach}
   tree.draw();
 {rdelim}
 

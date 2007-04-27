@@ -30,9 +30,15 @@ function method_createmail($request)
       $section = FieldSetManager::getSection($request->getQueryVar('section'));
       if ($section !== null)
       {
-        $mailing = $section->getMailing($query->getQueryVar('mailing'));
+        $mailing = $section->getMailing($request->getQueryVar('mailing'));
         if ($mailing !== null)
         {
+          $mail = $mailing->createMail();
+          $req = new Request();
+          $req->setMethod('admin');
+          $req->setPath('mailing/prepare.tpl');
+          $req->setQueryVar('item', $mail->getItem()->getId());
+          redirect($req);
         }
         else
           displayNotFound($request);

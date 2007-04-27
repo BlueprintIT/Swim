@@ -103,8 +103,7 @@ function method_uploadcontacts($request)
                 if ($headers[$i] === null)
                   continue;
                   
-                $field = $version->getField($headers[$i]);
-                $field->setValue($record[$i]);
+                $field = $version->setFieldValue($headers[$i], $record[$i]);
               }
               $version->setComplete(true);
               $version->setCurrent(true);

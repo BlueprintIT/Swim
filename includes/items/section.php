@@ -91,7 +91,7 @@ class Section extends AdminSection
   {
   }
   
-  protected function findRoot()
+  protected function findRoot($complete = false)
   {
     global $_STORAGE;
     
@@ -135,8 +135,11 @@ class Section extends AdminSection
         return;
       }
       $field->setValue($this->name);
-      //$version->setComplete(true);
-      //$version->setCurrent(true);
+      if ($complete)
+      {
+        $version->setComplete(true);
+        $version->setCurrent(true);
+      }
     }
   }
   
