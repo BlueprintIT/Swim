@@ -53,15 +53,13 @@ function displayTree(event)
   {assign var="variant" value=$item->getVariant('default')}
   {if $variant->getCurrentVersion()}
   	{assign var="itemversion" value=$variant->getCurrentVersion()}
-  	href: "{encode method="admin" path="mailing/view.tpl" item=$item->getId()}",
-  	type: "pastmail",
+  	type: "pastmailsent",
   {else}
   	{assign var="itemversion" value=$variant->getDraftVersion()}
-  	href: "{encode method="admin" path="mailing/prepare.tpl" item=$item->getId()}",
-  	type: "pastmail",
+  	type: "pastmaildraft",
   {/if}
-  	{assign var="name" value=$itemversion->getField('name')}
-  	label: "{$name->getValue()}",
+  	label: "{$itemversion->getFieldValue('name')}",
+  	href: "{encode method="admin" path="mailing/details.tpl" item=$item->getId()}",
   	target: "main"
   {rdelim}
   new BlueprintIT.widget.IconNode(details, mailings, true);

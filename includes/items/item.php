@@ -1114,6 +1114,14 @@ class ItemVersion
     return $field;
   }
   
+  public function getFieldValue($name)
+  {
+    $field = $this->getField($name);
+    if ($field !== null)
+      return $field->getValue();
+    return null;
+  }
+  
   public function setFieldValue($name, $value)
   {
     $field = $this->getField($name);

@@ -283,7 +283,7 @@ class Mailing extends XMLSerialized
     
     $parent = $this->section->getRootItem();
     $sequence = $parent->getMainSequence();
-    $sequence->appendItem($item);
+    $sequence->insertItem(0, $item);
     
     return $iv;
   }

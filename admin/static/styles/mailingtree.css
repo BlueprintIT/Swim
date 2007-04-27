@@ -36,6 +36,10 @@
   background-image: url('../icons/email-blue.gif');
 }
 
-.iconnode_leaf_pastmail {
-  background-image: url('../icons/email-open-blue.gif');
+.iconnode_leaf_pastmailsent {
+  background-image: url('../icons/email-open-green.gif');
+}
+
+.iconnode_leaf_pastmaildraft {
+  background-image: url('../icons/email-open-grey.gif');
 }

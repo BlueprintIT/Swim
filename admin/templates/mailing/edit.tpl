@@ -1,5 +1,5 @@
 {secure contacts="write" login="true"}
-{include file='includes/frameheader.tpl' title="Content management"}
+{include file='includes/frameheader.tpl' title="Mail Editor"}
 {script method="admin" path="scripts/request.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}

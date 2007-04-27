@@ -36,7 +36,7 @@ function method_createmail($request)
           $mail = $mailing->createMail();
           $req = new Request();
           $req->setMethod('admin');
-          $req->setPath('mailing/prepare.tpl');
+          $req->setPath('mailing/edit.tpl');
           $req->setQueryVar('item', $mail->getItem()->getId());
           redirect($req);
         }
