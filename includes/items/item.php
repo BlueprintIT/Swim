@@ -44,6 +44,41 @@ class Item
       $this->archived = false;
   }
   
+  public function delete()
+  {
+    global $_STORAGE;
+    
+    $variants = $this->getVariants();
+    foreach ($variants as $variant)
+    {
+      $variant->delete();
+    }
+
+    $results = $_STORAGE->query('SELECT parent,field,position FROM Sequence WHERE item='.$this->getId().' ORDER BY position DESC;');
+    while ($results->valid())
+    {
+      $details = $results->fetch();
+      $item = Item::getItem($details['parent']);
+      $sequence = $item->getSequence($details['field']);
+      $sequence->removeItem($details['position']);
+    }
+    
+    $fields = $this->itemclass->getFields();
+    foreach ($fields as $name => $field)
+    {
+      if ($field->getType() == 'sequence')
+      {
+        $sequence = $this->getSequence($name);
+        $sequence->onDeleted();
+      }
+    }
+    
+    $_STORAGE->queryExec('DELETE FROM Sequence WHERE parent='.$this->id.';');
+    $_STORAGE->queryExec('DELETE FROM Keyword WHERE item='.$this->id.';');
+    $_STORAGE->queryExec('DELETE FROM Item WHERE id='.$this->id.';');
+    ObjectCache::removeItem('dbitem', $this->id);
+  }
+  
   public function getId()
   {
     return $this->id;
@@ -69,16 +104,6 @@ class Item
     if ($_STORAGE->queryExec('UPDATE Item SET archived='.$value.' WHERE id='.$this->getId().';'))
       $this->archived = $value;
       
-    $fields = $this->itemclass->getFields();
-    foreach ($fields as $name => $field)
-    {
-      if ($field->getType() == 'sequence')
-      {
-        $sequence = $this->getSequence($name);
-        $sequence->onArchivedChanged($value);
-      }
-    }
-    
     if ($value)
     {
       $results = $_STORAGE->query('SELECT parent,field,position FROM Sequence WHERE item='.$this->getId().' ORDER BY position DESC;');
@@ -88,6 +113,16 @@ class Item
         $item = Item::getItem($details['parent']);
         $sequence = $item->getSequence($details['field']);
         $sequence->removeItem($details['position']);
+      }
+    }
+
+    $fields = $this->itemclass->getFields();
+    foreach ($fields as $name => $field)
+    {
+      if ($field->getType() == 'sequence')
+      {
+        $sequence = $this->getSequence($name);
+        $sequence->onArchivedChanged($value);
       }
     }
   }
@@ -455,7 +490,11 @@ class Item
     else
       $tables = '(ItemVariant JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
     $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' JOIN Field ON Field.itemversion=VariantVersion.id WHERE';
-    $query.=' Field.basefield="base" AND Field.field="'.$fieldname.'"';
+    $pos = strpos($fieldname, '.');
+    if ($pos !== false)
+      $query.=' Field.basefield="'.substr($fieldname, 0, $pos).'" AND Field.field="'.substr($fieldname, $pos+1).'"';
+    else
+      $query.=' Field.basefield="base" AND Field.field="'.$fieldname.'"';
     $query.=' AND Field.textValue="'.$_STORAGE->escape($fieldvalue).'"';
     $query.=' AND VariantVersion.current=1';
     
@@ -537,6 +576,18 @@ class ItemVariant
     $this->id = $details['id'];
   }
 
+  public function delete()
+  {
+    global $_STORAGE;
+    
+    foreach ($this->getVersions() as $version)
+    {
+      $version->delete();
+    }
+    
+    $_STORAGE->queryExec('DELETE FROM ItemVariant WHERE id='.$this->id.';');
+  }
+  
   public function getItem()
   {
     return Item::getItem($this->item);
@@ -773,6 +824,17 @@ class ItemVersion
       $this->current = true;
     else
       $this->current = false;
+  }
+  
+  public function delete()
+  {
+    global $_STORAGE;
+    
+    recursiveDelete($this->getStoragePath());
+    rmdir($this->getStoragePath());
+    $_STORAGE->queryExec('DELETE FROM Field WHERE itemversion='.$this->id.';');
+    $_STORAGE->queryExec('DELETE FROM File WHERE itemversion='.$this->id.';');
+    $_STORAGE->queryExec('DELETE FROM VariantVersion WHERE id='.$this->id.';');
   }
   
   public function getStoragePath()
@@ -1050,6 +1112,13 @@ class ItemVersion
       $this->fields[$name] = $field;
       
     return $field;
+  }
+  
+  public function setFieldValue($name, $value)
+  {
+    $field = $this->getField($name);
+    if ($field !== null)
+      $field->setValue($value);
   }
   
   public function updateModified($newtime = null)

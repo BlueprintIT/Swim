@@ -93,6 +93,11 @@ class FieldSet extends XMLSerialized
     return false;
   }
   
+  public function addField($field)
+  {
+    $this->fields[$field->getId()] = $field;
+  }
+  
   public function getField($item, $name)
   {
     if (isset($this->fields[$name]))

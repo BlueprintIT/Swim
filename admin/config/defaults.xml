@@ -24,6 +24,9 @@
     <field id="date" type="date">
       <name>Date</name>
     </field>
+    <field id="sent" type="boolean">
+      <name>Sent</name>
+    </field>
     <field id="intro" type="html" styles="content.xml" stylesheet="styles/text.css">
       <name>Introduction</name>
     </field>

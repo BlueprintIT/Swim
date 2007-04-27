@@ -15,6 +15,14 @@
 							</a>
 						</div>
 					</td>
+					<td>
+						<div class="toolbarbutton">
+							<a href="{encode method="createmail" section=$section->getId() mailing=$mailing->getId()}">
+								<img src="{$CONTENT}/icons/email-open-blue.gif" alt="Create Mail">
+								Create Mail
+							</a>
+						</div>
+					</td>
 				</tr>
 			</table>
 		{/secure}

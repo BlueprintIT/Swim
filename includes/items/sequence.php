@@ -78,6 +78,16 @@ class Sequence extends ClassField
     parent::__construct($metadata);
   }
   
+  public function onDeleted()
+  {
+    if ($this->relationship == 'composition')
+    {
+      $items = $this->getItems();
+      foreach ($items as $item)
+        $item->delete();
+    }
+  }
+  
   public function onArchivedChanged($archived)
   {
     global $_STORAGE;

@@ -232,6 +232,116 @@ class ContentSection extends Section
 
 class MailingClass extends ItemClass
 {
+  protected $mailing;
+  
+  public function __construct($id, $mailing)
+  {
+    parent::__construct($id, FieldSetManager::getClass('_mailing'));
+    $this->mailing = $mailing;
+  }
+  
+  public function getMailing()
+  {
+    return $this->mailing;
+  }
+}
+
+class MailingItemSet extends XMLSerialized
+{
+  protected $id;
+  protected $mailing;
+  protected $log;
+  protected $name;
+
+  public function __construct($id, $mailing)
+  {
+    $this->id = $id;
+    $this->mailing = $mailing;
+    $this->log = LoggerManager::getLogger('swim.mailingitemset');
+  }
+
+  public function __sleep()
+  {
+    $vars = get_object_vars($this);
+    unset($vars['log']);
+    return array_keys($vars);
+  }
+  
+  public function __wakeup()
+  {
+    $this->log = LoggerManager::getLogger('swim.mailingitemset');
+  }
+  
+  public function getId()
+  {
+    return $this->id;
+  }
+
+  public function getName()
+  {
+    return $this->name;
+  }
+  
+  public function getItems()
+  {
+    return array();
+  }
+
+  protected function parseElement($element)
+  {
+    if ($element->tagName == 'name')
+    {
+      $this->name = getDOMText($element);
+    }
+    else
+      parent::parseElement($element);
+  }
+  
+  public function load($element)
+  {
+    parent::load($element);
+
+    $field = $element->ownerDocument->createElement('field');
+    $field->setAttribute('id', $element->getAttribute('id'));
+    $field->setAttribute('type', 'compound');
+    $name = $field->ownerDocument->createElement('name');
+    $field->appendChild($name);
+    setDOMText($name, $this->name);
+
+    $subfield = $field->ownerDocument->createElement('field');
+    $field->appendChild($subfield);
+    $subfield->setAttribute('id', 'item');
+    $subfield->setAttribute('type', 'item');
+
+    $this->mailing->getClass()->addField($field);
+  }
+}
+
+class MailingSelection extends MailingItemSet
+{
+  protected $classes;
+  protected $sections;
+  protected $maxcount;
+  
+  protected function parseAttributes($element)
+  {
+    if ($element->hasAttribute('maxcount'))
+      $this->maxcount = $element->getAttribute('maxcount');
+  }
+  
+  protected function parseElement($element)
+  {
+    if ($element->tagName == 'classes')
+    {
+      $this->classes = split(',', getDOMText($element));
+    }
+    else if ($element->tagName == 'sections')
+    {
+      $this->sections = split(',', getDOMText($element));
+    }
+    else
+      parent::parseElement($element);
+  }
 }
 
 class Mailing extends XMLSerialized
@@ -241,9 +351,10 @@ class Mailing extends XMLSerialized
   protected $log;
   protected $name;
   protected $subject;
-  protected $class;
+  protected $mailclass;
   protected $frequencycount;
   protected $frequencyperiod = 'month';
+  protected $itemsets;
   protected $values;
   
   public function __construct($id, $section)
@@ -251,8 +362,8 @@ class Mailing extends XMLSerialized
     $this->id = $id;
     $this->section = $section;
     $this->log = LoggerManager::getLogger('swim.mailing');
-    $mailclass = FieldSetManager::getClass('_mailing');
-    $this->class = new MailingClass($id, $mailclass);
+    $this->mailclass = new MailingClass($id, $this);
+    $this->itemsets = array();
   }
 
   public function __sleep()
@@ -295,6 +406,11 @@ class Mailing extends XMLSerialized
     return $this->id;
   }
 
+  public function getClass()
+  {
+    return $this->mailclass;
+  }
+  
   public function getName()
   {
     return $this->name;
@@ -356,6 +472,33 @@ class Mailing extends XMLSerialized
     $this->values['intro'] = $value;
   }
   
+  public function createMail()
+  {
+    $item = Item::createItem($this->section, $this->mailclass);
+    $variant = $item->createVariant(SessionCache::getCurrentVariant());
+    $iv = $variant->createNewVersion();
+    $iv->setFieldValue('name', $this->getSubject());
+    $iv->setFieldValue('sent', false);
+    $iv->setFieldValue('intro', $this->getIntro());
+    
+    foreach ($this->itemssets as $id => $itemset)
+    {
+      $items = $itemset->getItems();
+      $compound = $iv->getField($id);
+      foreach ($items as $item)
+      {
+        $row = $id->appendRow();
+        $row->setFieldValue('item', $item->getId());
+      }
+    }
+    
+    $parent = $this->section->getRootItem();
+    $sequence = $parent->getMainSequence();
+    $sequence->appendItem($item);
+    
+    return $iv;
+  }
+  
   protected function parseElement($element)
   {
     if ($element->tagName == 'name')
@@ -371,6 +514,12 @@ class Mailing extends XMLSerialized
       if ($element->hasAttribute('period'))
         $this->frequencyperiod = $element->getAttribute('period');
       $this->frequencycount = getDOMText($element);
+    }
+    else if ($element->tagName == 'selection')
+    {
+      $itemset = new MailingSelection($element->getAttribute('id'), $this);
+      $itemset->load($element);
+      $this->itemsets[$itemset->getId()] = $itemset;
     }
     else
       parent::parseElement($element);

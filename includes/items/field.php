@@ -612,6 +612,12 @@ class CompoundRow
   {
     return $this->fields[$name];
   }
+  
+  public function setFieldValue($name, $value)
+  {
+    if (isset($this->fields[$name]))
+      $this->fields[$name]->setValue($value);
+  }
 }
 
 ?>

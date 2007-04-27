@@ -28,6 +28,14 @@ function getDOMText($element)
   return $text;
 }
 
+function setDOMText($element, $value)
+{
+  $text='';
+  while ($element->listChild !== null)
+    $element->removeChild($element->lastChild);
+  $element->appendChild($element->ownerDocument->createTextNode($value));
+}
+
 class XMLSerialized
 {
   protected function parseElement($element)
@@ -42,13 +50,18 @@ class XMLSerialized
 
   public function load($element)
   {
-    $this->parseAttributes($element);
+    self::parse($this, $element);
+  }
+  
+  public static function parse($sink, $element)
+  {
+    $sink->parseAttributes($element);
     $el=$element->firstChild;
     while ($el!==null)
     {
       if ($el->nodeType==XML_ELEMENT_NODE)
       {
-        $this->parseElement($el);
+        $sink->parseElement($el);
       }
       $el=$el->nextSibling;
     }
