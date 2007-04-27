@@ -134,6 +134,7 @@ class Mailing extends XMLSerialized
   protected $log;
   protected $name;
   protected $subject;
+  protected $from;
   protected $mailclass;
   protected $frequencycount;
   protected $frequencyperiod = 'month';
@@ -290,7 +291,7 @@ class Mailing extends XMLSerialized
   
   public function sendMail($itemversion)
   {
-    global $_PREFS;
+    global $_PREFS,$_STORAGE;
     
     $itemversion->setFieldValue('sent', true);
     $itemversion->setFieldValue('date', time());
@@ -314,16 +315,22 @@ class Mailing extends XMLSerialized
     }
     
     $body = $mail->get();
-    $headers = array('From' => 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>',
-                     'Subject' => $itemversion->getFieldValue('name'));
+    $headers = array('Subject' => $itemversion->getFieldValue('name'));
+    if (isset($this->from))
+      $headers['From'] = $this->from;
+    else
+      $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
     $headers = $mail->headers($headers);
     
     $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
     $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
     
-    
     //$itemversion->setComplete(true);
     //$itemversion->setCurrent(true);
+
+    $this->retrieve();
+    $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
+    $this->values['lastsent'] = time();
   }
   
   protected function parseElement($element)
@@ -335,6 +342,10 @@ class Mailing extends XMLSerialized
     else if ($element->tagName == 'subject')
     {
       $this->subject = getDOMText($element);
+    }
+    else if ($element->tagName == 'from')
+    {
+      $this->from = getDOMText($element);
     }
     else if ($element->tagName == 'frequency')
     {
