@@ -295,8 +295,9 @@ class Mailing extends XMLSerialized
     $itemversion->setFieldValue('sent', true);
     $itemversion->setFieldValue('date', time());
     
+    require_once('Mail.php');
     require_once('Mail/mime.php');
-    $mail = new Mail_Mime();
+    $mail = new Mail_mime("\n");
     $path = $_PREFS->getPref('storage.site.templates').'/mail/'.$itemversion->getClass()->getId();
     if (is_file($path.'.html.tpl'))
     {
@@ -304,6 +305,7 @@ class Mailing extends XMLSerialized
       $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
       $mail->setHTMLBody($smarty->fetch($path.'.html.tpl', $itemversion->getItem()->getId()));
     }
+    
     if (is_file($path.'.text.tpl'))
     {
       $smarty = createMailSmarty('text/plain');
@@ -312,18 +314,16 @@ class Mailing extends XMLSerialized
     }
     
     $body = $mail->get();
-    $headers = '';
-    foreach ($mail->headers() as $name => $value)
-      $headers .= $name.': '.$value."\r\n";
-    $headers .= 'From: Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-    if ($_PREFS->getPref('mail.headernewline'))
-      $headers .= "\r\n";
+    $headers = array('From' => 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>',
+                     'Subject' => $itemversion->getFieldValue('name'));
+    $headers = $mail->headers($headers);
     
-    mail('dave.townsend@blueprintit.co.uk', $itemversion->getFieldValue('subject'), $body, $headers);
+    $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
+    $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
     
     
-    $itemversion->setComplete(true);
-    $itemversion->setCurrent(true);
+    //$itemversion->setComplete(true);
+    //$itemversion->setCurrent(true);
   }
   
   protected function parseElement($element)
