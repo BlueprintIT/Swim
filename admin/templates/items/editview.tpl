@@ -25,8 +25,9 @@
 {else}
 	{assign var="view" value=$itemversion->getView()}
 {/if}
+{request var="detailsreq" method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}
 <div id="mainpane">
-	{html_form tag_name="mainform" method="saveitem" item=$item->getId() version=$itemversion->getVersion() itemversion=$itemversion->getId()}
+	{html_form tag_name="mainform" method="saveitem" item=$item->getId() version=$itemversion->getVersion() itemversion=$itemversion->getId() nested=$detailsreq}
 		<div class="header">
 			<table class="toolbar">
 				<tr>

@@ -41,8 +41,11 @@ function get_params_request(&$params, $smarty)
       $request->setPath($params['path']);
     if ((!empty($params['nestcurrent'])) && ($params['nestcurrent'] == "true"))
       $request->setNested($smarty->get_template_vars('REQUEST'));
+    else if (!empty($params['nested']))
+      $request->setNested($params['nested']);
     unset($params['method']);
     unset($params['path']);
+    unset($params['nested']);
     unset($params['nestcurrent']);
     $request->setQueryVars($params);
   }
@@ -123,6 +126,16 @@ function encode_form($params, $content, &$smarty, &$repeat)
   {
     print($content);
     print('</form>');
+  }
+}
+
+function generate_request($params, &$smarty)
+{
+  if (!empty($params['var']))
+  {
+    $request = get_params_request($params, $smarty);
+    if ($request instanceof Request)
+      $smarty->assign_by_ref($params['var'], $request);
   }
 }
 

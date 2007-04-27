@@ -25,6 +25,8 @@
 	{assign var="bestversion" value=$itemvariant->getNewestVersion()}
 {/if}
 {assign var="bestname" value=$bestversion->getField("name")}
+{request var="detailsreq" method="admin" path="items/details.tpl" item=$item->getId() version=$itemversion->getVersion()}
+
 <script>
 {if isset($request.query.reloadtree)}
   window.top.SiteTree.loadTree();
@@ -254,7 +256,7 @@ function moveDown(item, field, link) {
 									</div>
 								{else}
 									<div class="toolbarbutton">
-										<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true" current="true" nestcurrent="true"}">
+										<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true" current="true" nested=$detailsreq}">
 											<img src="{$CONTENT}/icons/complete-grey.gif"/>
 											Publish
 										</a>
@@ -312,7 +314,7 @@ function moveDown(item, field, link) {
 								</td>
 								<td>
 									<div class="toolbarbutton">
-										<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true"}">
+										<a href="{encode method="saveitem" itemversion=$itemversion->getId() complete="true" nested=$detailsreq}">
 											<img src="{$CONTENT}/icons/complete-grey.gif"/>
 											Mark complete
 										</a>
@@ -354,7 +356,7 @@ function moveDown(item, field, link) {
 										</div>
 									{else}
 										<div class="toolbarbutton">
-											<a href="{encode method="saveitem" itemversion=$itemversion->getId() current="true" nestcurrent="true"}">
+											<a href="{encode method="saveitem" itemversion=$itemversion->getId() current="true" nested=$detailsreq}">
 												<img src="{$CONTENT}/icons/complete-grey.gif"/>
 												Publish
 											</a>

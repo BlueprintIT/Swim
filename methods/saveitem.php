@@ -29,12 +29,16 @@ function method_saveitem($request)
       $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
       if ($itemversion !== null)
       {
-        $req = new Request();
-        $req->setMethod('admin');
-        $req->setPath('items/details.tpl');
-        $req->setQueryVar('item', $itemversion->getItem()->getId());
-        $req->setQueryVar('version', $itemversion->getVersion());
         $query = $request->getQuery();
+        if ($request->hasQueryVar('redirect'))
+        {
+          $req = $request->getQueryVar('redirect');
+          unset($query['redirect']);
+        }
+        else
+        {
+          $req = $request->getNested();
+        }
         unset($query['itemversion']);
         if (isset($query['view']))
         {

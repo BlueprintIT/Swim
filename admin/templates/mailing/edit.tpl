@@ -13,14 +13,15 @@
 {assign var="itemversion" value=$itemvariant->getDraftVersion()}
 {assign var="class" value=$item->getClass()}
 {assign var="mailing" value=$class->getMailing()}
+{request var="details" method="admin" path="mailing/details.tpl" item=$item->getId()}
 <div id="mainpane">
-	{html_form tag_name="mainform" method="sendmail" itemversion=$itemversion->getId()}
+	{html_form tag_name="mainform" method="saveitem" itemversion=$itemversion->getId()}
 		<div class="header">
 			<table class="toolbar">
 				<tr>
 					<td>
 						<div class="toolbarbutton">
-							<a href="javascript:BlueprintIT.forms.submitForm('mainform')"><img src="{$CONTENT}/icons/save.gif"/> Send</a>
+							<a href="javascript:BlueprintIT.forms.submitForm('mainform','redirect','{$details->encode()}')"><img src="{$CONTENT}/icons/save.gif"/> Save</a>
 						</div>
 					</td>
 				</tr>
