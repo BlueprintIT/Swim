@@ -279,8 +279,6 @@ class Request
   private $protocol;
   private $xml = false;
 
-  var $resObject = null;
-
   private $method = '';
   private $path = '';
   private $query = array();
@@ -296,7 +294,6 @@ class Request
     {
       $this->protocol=$clone->protocol;
       $this->path=$clone->path;
-      $this->resObject=$clone->resObject;
       $this->method=$clone->method;
       $this->query=$clone->query;
       $this->nested=$clone->nested;
@@ -444,9 +441,6 @@ class Request
 	{
 		global $_PREFS;
 		
-    if ($this->resObject === FALSE)
-      Resource::decodeResource($this);
-      
     $host='';
     $thisprotocol=$this->protocol;
     if (!$_PREFS->getPref('security.sslenabled'))
