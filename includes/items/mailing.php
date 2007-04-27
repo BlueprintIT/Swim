@@ -298,39 +298,48 @@ class Mailing extends XMLSerialized
     
     require_once('Mail.php');
     require_once('Mail/mime.php');
-    $mail = new Mail_mime("\n");
     $path = $_PREFS->getPref('storage.site.templates').'/mail/'.$itemversion->getClass()->getId();
-    if (is_file($path.'.html.tpl'))
-    {
-      $smarty = createMailSmarty('text/html');
-      $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-      $mail->setHTMLBody($smarty->fetch($path.'.html.tpl', $itemversion->getItem()->getId()));
-    }
+    $textpath = $path.'.text.tpl';
+    $htmlpath = $path.'.html.tpl';
     
-    if (is_file($path.'.text.tpl'))
+    if (is_file($textpath) || is_file($htmlpath))
     {
-      $smarty = createMailSmarty('text/plain');
-      $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-      $mail->setTxtBody($smarty->fetch($path.'.text.tpl', $itemversion->getItem()->getId()));
+      $mail = new Mail_mime("\n");
+  
+      if (is_file($htmlpath))
+      {
+        $smarty = createMailSmarty('text/html');
+        $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+        $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
+      }
+      
+      if (is_file($textpath))
+      {
+        $smarty = createMailSmarty('text/plain');
+        $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+        $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
+      }
+      
+      $body = $mail->get();
+      $headers = array('Subject' => $itemversion->getFieldValue('name'));
+      if (isset($this->from))
+        $headers['From'] = $this->from;
+      else
+        $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+      $headers = $mail->headers($headers);
+      
+      $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
+      $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
+      
+      //$itemversion->setComplete(true);
+      //$itemversion->setCurrent(true);
+  
+      $this->retrieve();
+      $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
+      $this->values['lastsent'] = time();
     }
-    
-    $body = $mail->get();
-    $headers = array('Subject' => $itemversion->getFieldValue('name'));
-    if (isset($this->from))
-      $headers['From'] = $this->from;
     else
-      $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-    $headers = $mail->headers($headers);
-    
-    $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
-    $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
-    
-    //$itemversion->setComplete(true);
-    //$itemversion->setCurrent(true);
-
-    $this->retrieve();
-    $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
-    $this->values['lastsent'] = time();
+      $log->error('There are no mail templates defined for '.$itemversion->getClass()->getId().' classes.');
   }
   
   protected function parseElement($element)
