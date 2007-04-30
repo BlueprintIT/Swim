@@ -13,7 +13,7 @@
  * $Revision$
  */
 
-function brand_get_template ($tpl_name, &$tpl_source, &$smarty)
+function brand_get_template($tpl_name, &$tpl_source, &$smarty)
 {
   global $_PREFS;
   

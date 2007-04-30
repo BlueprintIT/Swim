@@ -229,6 +229,64 @@ function retrieve_rss($params, &$smarty)
   }
 }
 
+function summarise_html($value, $count = 1)
+{
+  $pos = 0;
+  while ($count > 0)
+  {
+    $npos = strpos($value, '</p>', $pos);
+    if ($npos === false)
+      break;
+    $pos = $npos + 4;
+    $count--;
+  }
+  return substr($value, 0, $pos);
+}
+
+function htmltotext($value, $width = 78)
+{
+  $search = array('<li>',
+                  '&amp;',
+                  '&nbsp;',
+                  '&quot;',
+                  '&lt;',
+                  '&gt;');
+  $replaces = array('* ',
+                    '&',
+                    ' ',
+                    '"',
+                    '<',
+                    '>');
+  $blocks = array('/<\/?h[123456]>/',
+                  '/<\/?(?:p|br|ol|ul)>/',
+                  '/<\/?li>/');
+  
+  $value = preg_replace('/\s\s+/', ' ', $value);
+  $value = str_replace($search, $replaces, $value);
+  $value = preg_replace('/&#(\d+);/e', "chr($1)", $value);
+  $value = preg_replace($blocks, "\n", $value);
+  $value = preg_replace('/<\/?[^>]*>/', '', $value);
+  $value = trim($value);
+  
+  $result = '';
+  $lstart = 0;
+  while ($lstart < strlen($value))
+  {
+    $lend = strpos($value, "\n", $lstart);
+    if ($lend === false)
+      $lend = strlen($value);
+    
+    if (($lend - $lstart) > $width)
+      $result .= wordwrap(substr($value, $lstart, $lend - $lstart), $width) . "\n";
+    else
+      $result .= substr($value, $lstart, $lend - $lstart) . "\n";
+    $lstart = $lend + 1;
+  }
+  
+  $value = preg_replace('/\n\s+\n/', "\n\n", trim($result));
+  return $value;
+}
+
 function configureSmarty($smarty, $request, $type)
 {
   global $_PREFS;
@@ -280,6 +338,8 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_block('style', 'encode_style');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
+  $smarty->register_modifier('summarise', 'summarise_html');
+  $smarty->register_modifier('plaintext', 'htmltotext');
 
   if ($type == 'text/css')
   {
