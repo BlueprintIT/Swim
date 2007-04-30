@@ -310,22 +310,20 @@ function configureSmarty($smarty, $request, $type)
   $smarty->assign_by_ref('LOG', $log);
   $smarty->assign_by_ref('SMARTY', $smarty);
   $smarty->register_resource('brand', array(
-                             'brand_get_template',
-                             'brand_get_timestamp',
-                             'brand_get_secure',
-                             'brand_get_trusted'));
+                             new SmartyResource($_PREFS->getPref('storage.branding.templates')),
+                             'getTemplate',
+                             'getTimestamp',
+                             'getSecure',
+                             'getTrusted'));
   $smarty->register_resource('shared', array(
-                             'shared_get_template',
-                             'shared_get_timestamp',
-                             'shared_get_secure',
-                             'shared_get_trusted'));
+                             new SmartyResource($_PREFS->getPref('storage.shared.templates')),
+                             'getTemplate',
+                             'getTimestamp',
+                             'getSecure',
+                             'getTrusted'));
   $smarty->register_function('wrap', 'item_wrap');
   $smarty->register_function('getfiles', 'get_files');
-  $smarty->register_function('meta', 'encode_meta');
-  $smarty->register_function('link', 'encode_link');
   $smarty->register_function('retrieverss', 'retrieve_rss');
-  $smarty->register_function('stylesheet', 'encode_stylesheet');
-  $smarty->register_function('script', 'encode_script');
   $smarty->register_function('encode', 'encode_url');
   $smarty->register_function('apiget', 'api_get');
   $smarty->register_function('sort', 'sort_array');
@@ -335,7 +333,6 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_function('paginate', 'paginate');
   $smarty->register_function('request', 'generate_request');
-  $smarty->register_block('style', 'encode_style');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_modifier('summarise', 'summarise_html');
@@ -353,8 +350,13 @@ function configureSmarty($smarty, $request, $type)
   }
   else if ($type == 'text/html')
   {
-    $smarty->register_object('HEAD', new HtmlHeader());
-    $smarty->register_outputfilter('header_outputfilter');
+    $header = new HtmlHeader();
+    $smarty->register_function('meta', array($header, 'encodeMeta'));
+    $smarty->register_function('link', array($header, 'encodeLink'));
+    $smarty->register_function('stylesheet', array($header, 'encodeStylesheet'));
+    $smarty->register_function('script', array($header, 'encodeScript'));
+    $smarty->register_block('style', array($header, 'encodeStyle'));
+    $smarty->register_outputfilter(array($header, 'outputfilter'));
   }
 }
 

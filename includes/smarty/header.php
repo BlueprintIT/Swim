@@ -20,24 +20,24 @@ class HtmlHeader
   private $headers = array();
   private $styles = array();
   
-  public function addStyleSheet($path, $media = null)
+  private function addStyleSheet($path, $media = null)
   {
     if (!isset($this->stylesheets[$path]))
       $this->stylesheets[$path]=$media;
   }
   
-  public function addScript($path)
+  private function addScript($path)
   {
     if (!isset($this->scripts[$path]))
       $this->scripts[$path]=true;
   }
   
-  public function addMeta($name, $content)
+  private function addMeta($name, $content)
   {
     array_push($this->headers, '<meta name="'.$name.'" content="'.$content.'">');
   }
   
-  public function addLink($params)
+  private function addLink($params)
   {
     if (count($params)>0)
     {
@@ -51,12 +51,12 @@ class HtmlHeader
     }
   }
   
-  public function addStyle($content)
+  private function addStyle($content)
   {
   	array_push($this->styles, $content);
   }
   
-  public function getHtml()
+  private function getHtml()
   {
     $result = '';
     if (false)   // Need to fix media handling
@@ -104,85 +104,75 @@ class HtmlHeader
     }
     return $result;
   }
-}
 
-function encode_stylesheet($params, &$smarty)
-{
-  if (isset($params['tag_media']))
-    $media = $params['tag_media'];
-  else
-    $media = null;
-  unset($params['tag_media']);
-  $request = get_params_request($params, $smarty);
-  if ($request instanceof Request)
-    $path = $request->encode();
-  else
-    $path = $request;
-  $head = $smarty->get_registered_object('HEAD');
-  $head->addStyleSheet($path,$media);
-}
-
-function encode_script($params, &$smarty)
-{
-  $request = get_params_request($params, $smarty);
-  if ($request instanceof Request)
-    $path = $request->encode();
-  else
-    $path = $request;
-  $head = $smarty->get_registered_object('HEAD');
-  $head->addScript($path);
-}
-
-function encode_meta($params, &$smarty)
-{
-  if (!empty($params['name']) && !empty($params['content']))
+  public function encodeStylesheet($params, &$smarty)
   {
-    $head = $smarty->get_registered_object('HEAD');
-    $head->addMeta($params['name'], $params['content']);
+    if (isset($params['tag_media']))
+      $media = $params['tag_media'];
+    else
+      $media = null;
+    unset($params['tag_media']);
+    $request = get_params_request($params, $smarty);
+    if ($request instanceof Request)
+      $path = $request->encode();
+    else
+      $path = $request;
+    $this->addStyleSheet($path,$media);
   }
-}
-
-function encode_link($params, &$smarty)
-{
-  $tparams = array();
-  foreach ($params as $name => $value)
+  
+  public function encodeScript($params, &$smarty)
   {
-    if (substr($name,0,4)=='tag_')
+    $request = get_params_request($params, $smarty);
+    if ($request instanceof Request)
+      $path = $request->encode();
+    else
+      $path = $request;
+    $this->addScript($path);
+  }
+  
+  public function encodeMeta($params, &$smarty)
+  {
+    if (!empty($params['name']) && !empty($params['content']))
+      $this->addMeta($params['name'], $params['content']);
+  }
+  
+  public function encodeLink($params, &$smarty)
+  {
+    $tparams = array();
+    foreach ($params as $name => $value)
     {
-      unset($params[$name]);
-      $tparams[substr($name,4)] = $value;
+      if (substr($name,0,4)=='tag_')
+      {
+        unset($params[$name]);
+        $tparams[substr($name,4)] = $value;
+      }
     }
+    $request = get_params_request($params, $smarty);
+    if ($request instanceof Request)
+      $tparams['href'] = $request->encode();
+    else
+      $tparams['href'] = $request;
+    $this->addLink($tparams);
   }
-  $request = get_params_request($params, $smarty);
-  if ($request instanceof Request)
-    $tparams['href'] = $request->encode();
-  else
-    $tparams['href'] = $request;
-  $head = $smarty->get_registered_object('HEAD');
-  $head->addLink($tparams);
-}
-
-function encode_style($params, $content, &$smarty, &$repeat)
-{
-	if (!$repeat)
-	{
-	  $head = $smarty->get_registered_object('HEAD');
-	  $head->addStyle($content);
-	}
-}
-
-function header_outputfilter($tpl_output, &$smarty)
-{
-  $pos = strpos($tpl_output, '</head>');
-  if ($pos !== false)
+  
+  public function encodeStyle($params, $content, &$smarty, &$repeat)
   {
-    $start = substr($tpl_output, 0, $pos);
-    $end = substr($tpl_output, $pos);
-    $head = $smarty->get_registered_object('HEAD');
-    $extra = $head->getHtml();
-    return $start.$extra.$end;
+    if (!$repeat)
+      $this->addStyle($content);
   }
-  return $tpl_output;
+  
+  public function outputfilter($tpl_output, &$smarty)
+  {
+    $pos = strpos($tpl_output, '</head>');
+    if ($pos !== false)
+    {
+      $start = substr($tpl_output, 0, $pos);
+      $end = substr($tpl_output, $pos);
+      $extra = $this->getHtml();
+      return $start.$extra.$end;
+    }
+    return $tpl_output;
+  }
 }
 
 ?>

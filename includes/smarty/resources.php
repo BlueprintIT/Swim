@@ -13,79 +13,47 @@
  * $Revision$
  */
 
-function brand_get_template($tpl_name, &$tpl_source, &$smarty)
+class SmartyResource
 {
-  global $_PREFS;
+  private $source;
   
-  $file = $_PREFS->getPref('storage.branding.templates').'/'.$tpl_name;
-  if (is_file($file))
+  public function __construct($source)
   {
-    $tpl_source = file_get_contents($file);
+    $this->source = $source;
+  }
+
+  function getTemplate($tpl_name, &$tpl_source, &$smarty)
+  {
+    $file = $this->source.'/'.$tpl_name;
+    if (is_file($file))
+    {
+      $tpl_source = file_get_contents($file);
+      return true;
+    }
+    else
+      return false;
+  }
+  
+  function getTimestamp($tpl_name, &$tpl_timestamp, &$smarty)
+  {
+    $file = $this->source.'/'.$tpl_name;
+    if (is_file($file))
+    {
+      $tpl_timestamp = filemtime($file);
+      return true;
+    }
+    else
+      return false;
+  }
+  
+  function getSecure($tpl_name, &$smarty)
+  {
     return true;
   }
-  else
-    return false;
-}
-
-function brand_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty)
-{
-  global $_PREFS;
   
-  $file = $_PREFS->getPref('storage.branding.templates').'/'.$tpl_name;
-  if (is_file($file))
+  function getTrusted($tpl_name, &$smarty)
   {
-    $tpl_timestamp = filemtime($file);
-    return true;
   }
-  else
-    return false;
-}
-
-function brand_get_secure($tpl_name, &$smarty)
-{
-  return true;
-}
-
-function brand_get_trusted($tpl_name, &$smarty)
-{
-}
-
-
-function shared_get_template ($tpl_name, &$tpl_source, &$smarty)
-{
-  global $_PREFS;
-  
-  $file = $_PREFS->getPref('storage.shared.templates').'/'.$tpl_name;
-  if (is_file($file))
-  {
-    $tpl_source = file_get_contents($file);
-    return true;
-  }
-  else
-    return false;
-}
-
-function shared_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty)
-{
-  global $_PREFS;
-  
-  $file = $_PREFS->getPref('storage.shared.templates').'/'.$tpl_name;
-  if (is_file($file))
-  {
-    $tpl_timestamp = filemtime($file);
-    return true;
-  }
-  else
-    return false;
-}
-
-function shared_get_secure($tpl_name, &$smarty)
-{
-  return true;
-}
-
-function shared_get_trusted($tpl_name, &$smarty)
-{
 }
 
 ?>
