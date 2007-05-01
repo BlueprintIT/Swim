@@ -13,6 +13,12 @@
 {assign var="mailing" value=$class->getMailing()}
 {request var="details" method="admin" path="mailing/details.tpl" item=$item->getId()}
 <script type="text/javascript">
+var items = window.top.SiteTree.getItems({$item->getId()});
+if (items) {ldelim}
+  for (var i=0; i<items.length; i++) {ldelim}
+    items[i].setLabel("{$itemversion->getFieldValue('name')}");
+  {rdelim}
+{rdelim}
 window.top.SiteTree.selectItem("{$request.query.item}");
 </script>
 <div id="mainpane">
