@@ -112,8 +112,33 @@ class MailingSelection extends MailingItemSet
   
   public function getItems()
   {
-    $items = Item::findItems($this->sections, $this->classes);
-    return $items;
+    if ($this->sections != null)
+    {
+      $sections = array();
+      foreach ($this->sections as $section)
+      {
+        $c = FieldSetManager::getSection($section);
+        if ($c !== null)
+          array_push($sections, $c);
+      }
+    }
+    else
+      $sections = null;
+
+    if ($this->classes != null)
+    {
+      $classes = array();
+      foreach ($this->classes as $class)
+      {
+        $c = FieldSetManager::getClass($class);
+        if ($c !== null)
+          array_push($classes, $c);
+      }
+    }
+    else
+      $classes = null;
+
+    $items = Item::findItems($sections, $classes);
     if ($this->sortorder == 'random')
       $maxcount = null;
     else
@@ -132,7 +157,10 @@ class MailingSelection extends MailingItemSet
       else
         shuffle($items);
     }
-    return $items;
+    $results = array();
+    foreach ($items as $item)
+      array_push($results, $item->getItem());
+    return $results;
   }
 
   protected function parseAttributes($element)
@@ -308,14 +336,14 @@ class Mailing extends XMLSerialized
     $iv->setFieldValue('sent', false);
     $iv->setFieldValue('intro', $this->getIntro());
     
-    foreach ($this->itemssets as $id => $itemset)
+    foreach ($this->itemsets as $id => $itemset)
     {
       $items = $itemset->getItems();
       $compound = $iv->getField($id);
-      foreach ($items as $item)
+      foreach ($items as $i)
       {
-        $row = $id->appendRow();
-        $row->setFieldValue('item', $item->getId());
+        $row = $compound->appendRow();
+        $row->setFieldValue('item', $i->getId());
       }
     }
     

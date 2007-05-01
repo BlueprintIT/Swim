@@ -489,7 +489,9 @@ class Item
       $tables = '((Item JOIN ItemVariant ON Item.id=ItemVariant.item) JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
     else
       $tables = '(ItemVariant JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
-    $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' JOIN Field ON Field.itemversion=VariantVersion.id WHERE';
+    if ($fieldname !== null)
+      $tables .= ' JOIN Field ON Field.itemversion=VariantVersion.id';
+    $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' WHERE';
     $query.=' VariantVersion.current=1';
     if ($fieldname !== null)
     {
@@ -536,7 +538,6 @@ class Item
     if ($variant !== null)
       $query.=' AND ItemVariant.variant="'.$variant.'"';
 
-    $log = LoggerManager::getLogger('testing');
     $items = array();
     $results = $_STORAGE->query($query);
     while ($results->valid())
