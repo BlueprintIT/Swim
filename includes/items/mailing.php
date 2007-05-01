@@ -376,33 +376,33 @@ class Mailing extends XMLSerialized
     
     if (is_file($textpath) || is_file($htmlpath))
     {
-      $mail = new Mail_mime("\n");
-  
-      if (is_file($htmlpath))
-      {
-        $smarty = createMailSmarty('text/html');
-        $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-        $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
-      }
-      
-      if (is_file($textpath))
-      {
-        $smarty = createMailSmarty('text/plain');
-        $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-        $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
-      }
-      
-      $body = $mail->get();
-      $headers = array('Subject' => $itemversion->getFieldValue('name'));
-      if (isset($this->from))
-        $headers['From'] = $this->from;
-      else
-        $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-      $headers = $mail->headers($headers);
-      
       $start = time();
-      for ($i = 0; $i < 1; $i++)
+      for ($i = 0; $i < 100; $i++)
       {
+        $mail = new Mail_mime("\n");
+    
+        if (is_file($htmlpath))
+        {
+          $smarty = createMailSmarty('text/html');
+          $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+          $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
+        }
+        
+        if (is_file($textpath))
+        {
+          $smarty = createMailSmarty('text/plain');
+          $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+          $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
+        }
+        
+        $body = $mail->get();
+        $headers = array('Subject' => $itemversion->getFieldValue('name'));
+        if (isset($this->from))
+          $headers['From'] = $this->from;
+        else
+          $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+        $headers = $mail->headers($headers);
+        
         $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
         $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
       }

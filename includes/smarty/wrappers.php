@@ -28,17 +28,7 @@ class RowWrapper
     {
       default:
         $field = $this->row->getField($name);
-        if ($field !== null)
-        {
-          if ($field->getType() == 'optionset')
-          {
-            $option = $field->getOption();
-            return new OptionWrapper($option);
-          }
-          else
-            return $field->toString();
-        }
-        return '';
+        return ItemFieldWrapper::getFieldWrapper($field);
     }
   }
 }
@@ -166,14 +156,8 @@ class ItemFieldWrapper
     $this->results = array();
   }
   
-  public function __get($name)
+  public static function getFieldWrapper($field)
   {
-  	if (isset($this->results[$name]))
-  		return $this->results[$name];
-  	
-  	$result = null;
-  	
-    $field = $this->itemversion->getField($name);
     if ($field !== null)
     {
       if ($field->getType() == 'sequence')
@@ -205,23 +189,36 @@ class ItemFieldWrapper
       }
       else if ($field->getType() == 'file')
       {
-      	if ($field->toString())
-        	$result = new FileWrapper($field);
+        if ($field->toString())
+          $result = new FileWrapper($field);
       }
       else if ($field->getType() == 'item')
       {
-      	$item = $field->getItem();
-      	if ($item)
-      		$item = $item->getCurrentVersion(Session::getCurrentVariant());
-      	if ($item)
-      		$result = ItemWrapper::getWrapper($item);
+        $item = $field->getItem();
+        if ($item)
+          $item = $item->getCurrentVersion(Session::getCurrentVariant());
+        if ($item)
+          $result = ItemWrapper::getWrapper($item);
       }
       else
         $result = $field->toString();
     }
     
     if ($result === null)
-    	$result = '';
+      $result = '';
+      
+    return $result;
+  }
+  
+  public function __get($name)
+  {
+  	if (isset($this->results[$name]))
+  		return $this->results[$name];
+  	
+  	$result = null;
+  	
+    $field = $this->itemversion->getField($name);
+    $result = self::getFieldWrapper($field);
     $this->results[$name] = $result;
     
     return $result;
