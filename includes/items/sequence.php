@@ -24,7 +24,36 @@ class ItemSorter
     $this->ascending = $ascending;
   }
   
-  public function getItemVersion($i)
+  public function compare($a, $b)
+  {
+    $a = self::getItemVersion($a);
+    $b = self::getItemVersion($b);
+    if ($this->field === null)
+    {
+      $result = $a->getPublished() - $b->getPublished();
+    }
+    else
+    {
+      if ($a !== null)
+        $a = $a->getField($this->field);
+      if ($b !== null)
+        $b = $b->getField($this->field);
+      if (($b === null) && ($a === null))
+        $result = 0;
+      else if ($b === null)
+        $result = -1;
+      else if ($a === null)
+        $result = 1;
+      else
+        $result = $a->compareTo($b);
+    }
+
+    if (!$this->ascending)
+      $result = -$result;
+    return $result;
+  }
+  
+  public static function getItemVersion($i)
   {
     if ($i instanceof Item)
       return $i->getCurrentVersion(Session::getCurrentVariant());
@@ -35,32 +64,68 @@ class ItemSorter
     return null;
   }
   
-  public function compare($a, $b)
-  {
-    $a = $this->getItemVersion($a);
-    $b = $this->getItemVersion($b);
-    if ($a !== null)
-      $a = $a->getField($this->field);
-    if ($b !== null)
-      $b = $b->getField($this->field);
-    if (($b === null) && ($a === null))
-      $result = 0;
-    else if ($b === null)
-      $result = -1;
-    else if ($a === null)
-      $result = 1;
-    else
-      $result = $a->compareTo($b);
-
-    if (!$this->ascending)
-      $result = -$result;
-    return $result;
-  }
-  
-  public static function sortItems($items, $field, $ascending = true)
+  public static function sortItems($items, $field = null, $ascending = true)
   {
     $sorter = new ItemSorter($field, $ascending);
     usort($items, array($sorter, 'compare'));
+    return $items;
+  }
+  
+  public static function selectItems($items, $field = null, $ascending = true, $maxcount = null, $min = null, $max = null)
+  {
+    $items = self::sortItems($items, $field);
+    
+    $start = 0;
+    $end = count($items);
+    if ($min !== null)
+    {
+      while ($start<$end)
+      {
+        $iv = self::getItemVersion($items[$end-1]);
+        if ($field !== null)
+        {
+          if ($iv->getField($field)->compareTo($min)>=0)
+            break;
+        }
+        else
+        {
+          if ($iv->getPublished() >= $min)
+            break;
+        }
+        $start++;
+      }
+    }
+    
+    if ($max !== null)
+    {
+      while ($end>$start)
+      {
+        $iv = self::getItemVersion($items[$end-1]);
+        if ($field !== null)
+        {
+          if ($iv->getField($field)->compareTo($max)<=0)
+            break;
+        }
+        else
+        {
+          if ($iv->getPublished() <= $max)
+            break;
+        }
+        $end--;
+      }
+    }
+    
+    if ($end == $start)
+      return array();
+    
+    $items = array_slice($items, $start, $end-$start);
+    
+    if (!$ascending)
+      $items = array_reverse($items);
+      
+    if ($maxcount !== null)
+      $items = array_slice($items, 0, $maxcount);
+    
     return $items;
   }
 }

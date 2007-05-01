@@ -465,7 +465,7 @@ class Item
     return $item;
   }
   
-  public static function findItems($fieldname, $fieldvalue, $section = null, $class = null, $variant = null)
+  public static function findItems($section = null, $class = null, $variant = null, $fieldname = null, $fieldvalue = null)
   {
     global $_STORAGE;
     
@@ -490,13 +490,16 @@ class Item
     else
       $tables = '(ItemVariant JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
     $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' JOIN Field ON Field.itemversion=VariantVersion.id WHERE';
-    $pos = strpos($fieldname, '.');
-    if ($pos !== false)
-      $query.=' Field.basefield="'.substr($fieldname, 0, $pos).'" AND Field.field="'.substr($fieldname, $pos+1).'"';
-    else
-      $query.=' Field.basefield="base" AND Field.field="'.$fieldname.'"';
-    $query.=' AND Field.textValue="'.$_STORAGE->escape($fieldvalue).'"';
-    $query.=' AND VariantVersion.current=1';
+    $query.=' VariantVersion.current=1';
+    if ($fieldname !== null)
+    {
+      $pos = strpos($fieldname, '.');
+      if ($pos !== false)
+        $query.=' AND Field.basefield="'.substr($fieldname, 0, $pos).'" AND Field.field="'.substr($fieldname, $pos+1).'"';
+      else
+        $query.=' AND Field.basefield="base" AND Field.field="'.$fieldname.'"';
+      $query.=' AND Field.textValue="'.$_STORAGE->escape($fieldvalue).'"';
+    }
     
     if ($class !== null)
     {

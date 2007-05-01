@@ -83,7 +83,7 @@ function method_uploadcontacts($request)
             }
             if (($emailfield < count($record)) && (strlen($record[$emailfield]) > 0))
             {
-              $items = Item::findItems('emailaddress', $record[$emailfield], $section, $class);
+              $items = Item::findItems($section, $class, null, 'emailaddress', $record[$emailfield]);
               if (count($items) > 0)
               {
                 $version = $items[0];

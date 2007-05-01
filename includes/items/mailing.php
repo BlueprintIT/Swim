@@ -102,14 +102,50 @@ class MailingItemSet extends XMLSerialized
 
 class MailingSelection extends MailingItemSet
 {
-  protected $classes;
-  protected $sections;
-  protected $maxcount;
+  protected $classes = null;
+  protected $sections = null;
+  protected $maxcount = null;
+  protected $sortfield = null;
+  protected $sortdir = 'ascending';
+  protected $min = null;
+  protected $max = null;
   
+  public function getItems()
+  {
+    $items = Item::findItems($this->sections, $this->classes);
+    if ($this->sortorder == 'random')
+      $maxcount = null;
+    else
+      $maxcount = $this->maxcount;
+    $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortdir != 'descending'), $maxcount, $this->min, $this->max);
+    if ($this->sortorder == 'random')
+    {
+      if ($this->maxcount !== null)
+      {
+        $keys = array_rand($items, $this->maxcount);
+        $results = array();
+        foreach ($keys as $key)
+          array_push($results, $items[$key]);
+        $items = $results;
+      }
+      else
+        shuffle($items);
+    }
+    return $items;
+  }
+
   protected function parseAttributes($element)
   {
+    if ($element->hasAttribute('min'))
+      $this->min = $element->getAttribute('min');
+    if ($element->hasAttribute('max'))
+      $this->max = $element->getAttribute('max');
     if ($element->hasAttribute('maxcount'))
       $this->maxcount = $element->getAttribute('maxcount');
+    if ($element->hasAttribute('sortorder'))
+      $this->sortdir = $element->getAttribute('sortorder');
+    if ($element->hasAttribute('sortfield'))
+      $this->sortfield = $element->getAttribute('sortfield');
   }
   
   protected function parseElement($element)
@@ -328,8 +364,14 @@ class Mailing extends XMLSerialized
         $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
       $headers = $mail->headers($headers);
       
-      $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
-      $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
+      $start = time();
+      for ($i = 0; $i < 100; $i++)
+      {
+        $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
+        $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
+      }
+      $diff = time() - $start;
+      $this->log->warn('Send took '.$diff.' seconds');
       
       //$itemversion->setComplete(true);
       //$itemversion->setCurrent(true);
@@ -339,7 +381,7 @@ class Mailing extends XMLSerialized
       $this->values['lastsent'] = time();
     }
     else
-      $log->error('There are no mail templates defined for '.$itemversion->getClass()->getId().' classes.');
+      $this->log->error('There are no mail templates defined for '.$itemversion->getClass()->getId().' classes.');
   }
   
   protected function parseElement($element)

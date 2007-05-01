@@ -20,24 +20,24 @@ class HtmlHeader
   private $headers = array();
   private $styles = array();
   
-  private function addStyleSheet($path, $media = null)
+  public function addStyleSheet($path, $media = null)
   {
     if (!isset($this->stylesheets[$path]))
       $this->stylesheets[$path]=$media;
   }
   
-  private function addScript($path)
+  public function addScript($path)
   {
     if (!isset($this->scripts[$path]))
       $this->scripts[$path]=true;
   }
   
-  private function addMeta($name, $content)
+  public function addMeta($name, $content)
   {
     array_push($this->headers, '<meta name="'.$name.'" content="'.$content.'">');
   }
   
-  private function addLink($params)
+  public function addLink($params)
   {
     if (count($params)>0)
     {
@@ -51,7 +51,7 @@ class HtmlHeader
     }
   }
   
-  private function addStyle($content)
+  public function addStyle($content)
   {
   	array_push($this->styles, $content);
   }

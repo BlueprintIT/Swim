@@ -20,7 +20,7 @@ require $_PREFS->getPref('storage.includes').'/smarty/wrappers.php';
 
 function array_select($params, &$smarty)
 {
-  if ((!empty($params['var'])) && (!empty($params['from'])) && (!empty($params['field'])))
+  if ((!empty($params['var'])) && (!empty($params['from'])))
   {
     $source = $params['from'];
     
@@ -34,48 +34,29 @@ function array_select($params, &$smarty)
     $order = true;
     if ((!empty($params['order'])) && ($params['order'] == 'descending'))
       $order = false;
-      
-    $field = $params['field'];
-      
-    $source = ItemSorter::sortItems($source, $field);
     
-    $start = 0;
-    $end = count($source);
+    if (!empty($params['field']))
+      $field = $params['field'];
+    else
+      $field = null;
+    
+    if (!empty($params['maxcount']))
+      $maxcount = $params['maxcount'];
+    else
+      $maxcount = null;
+    
     if (!empty($params['min']))
-    {
-    	while ($start<$end)
-    	{
-    		if ($source[$start]->item->getField($field)->compareTo($params['min'])>=0)
-    			break;
-    		$start++;
-    	}
-    }
+      $min = $params['min'];
+    else
+      $min = null;
     
     if (!empty($params['max']))
-    {
-    	while ($end>$start)
-    	{
-    		if ($source[$end-1]->item->getField($field)->compareTo($params['max'])<=0)
-    			break;
-    		$end--;
-    	}
-    }
+      $max = $params['max'];
+    else
+      $max = null;
     
-    if ($end == $start)
-    {
-    	$source = array();
-    	$smarty->assign_by_ref($params['var'], $source);
-    	return;
-    }
-    
-    $source = array_slice($source, $start, $end-$start);
-    
-    if (!$order)
-    	$source = array_reverse($source);
-    	
-   	if (!empty($params['maxcount']))
-   		$source = array_slice($source, 0, $params['maxcount']);
-  
+    $source = ItemSorter::selectItems($source, $field, $order, $maxcount, $min, $max);
+
     $smarty->assign_by_ref($params['var'], $source);
   }
 }
@@ -351,6 +332,7 @@ function configureSmarty($smarty, $request, $type)
   else if ($type == 'text/html')
   {
     $header = new HtmlHeader();
+    $smarty->register_object('HEAD', $header);
     $smarty->register_function('meta', array($header, 'encodeMeta'));
     $smarty->register_function('link', array($header, 'encodeLink'));
     $smarty->register_function('stylesheet', array($header, 'encodeStylesheet'));
