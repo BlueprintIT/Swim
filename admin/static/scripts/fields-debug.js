@@ -181,10 +181,13 @@ function switchCompoundRows(compound, row1, row2)
 function deleteCompoundRow(compound, row)
 {
 	var body = row.parentNode;
-	var pos = row.sectionRowIndex;
+	var pos = row.sectionRowIndex+1;
 	var rows = body.rows.length;
-	if (pos != (rows-1))
-		switchCompoundRows(compound, pos, rows-1);
+  while (pos < rows)
+  {
+    switchCompoundRows(compound, pos-1, pos);
+    pos++;
+  }
 	
 	row = body.rows[rows-1];
 	body.removeChild(row);

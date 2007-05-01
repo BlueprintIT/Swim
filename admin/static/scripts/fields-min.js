@@ -35,8 +35,9 @@ function switchCompoundRows(compound,row1,row2)
 {for(var i in compound.fields)
 {switchCompoundField(compound.id,i,row1,row2,compound.fields[i]);}}
 function deleteCompoundRow(compound,row)
-{var body=row.parentNode;var pos=row.sectionRowIndex;var rows=body.rows.length;if(pos!=(rows-1))
-switchCompoundRows(compound,pos,rows-1);row=body.rows[rows-1];body.removeChild(row);}
+{var body=row.parentNode;var pos=row.sectionRowIndex+1;var rows=body.rows.length;while(pos<rows)
+{switchCompoundRows(compound,pos-1,pos);pos++;}
+row=body.rows[rows-1];body.removeChild(row);}
 function moveCompoundRow(compound,row,moveup)
 {var body=row.parentNode;var pos1=row.sectionRowIndex;var pos2;if(moveup)
 pos2=pos1-1;else
