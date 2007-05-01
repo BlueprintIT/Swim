@@ -138,12 +138,19 @@ class MailingSelection extends MailingItemSet
     else
       $classes = null;
 
+    $min = $this->min;
+    if (($min !== null) && (substr($min, 0, 3) == 'now'))
+      $min = strtotime(substr($min, 3));
+    $max = $this->max;
+    if (($max !== null) && (substr($max, 0, 3) == 'now'))
+      $max = strtotime(substr($max, 3));
+    
     $items = Item::findItems($sections, $classes);
     if ($this->sortorder == 'random')
       $maxcount = null;
     else
       $maxcount = $this->maxcount;
-    $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortdir != 'descending'), $maxcount, $this->min, $this->max);
+    $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortdir != 'descending'), $maxcount, $min, $max);
     if ($this->sortorder == 'random')
     {
       if ($this->maxcount !== null)

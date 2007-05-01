@@ -472,7 +472,7 @@ class Item
     if (is_array($class))
     {
       if (count($class)==0)
-        $class = null;
+        return array();
       else if (count($class)==1)
         $class = $class[0];
     }
@@ -480,19 +480,16 @@ class Item
     if (is_array($section))
     {
       if (count($section)==0)
-        $section = null;
+        return array();
       else if (count($section)==1)
         $section = $section[0];
     }
     
-    if (($section !== null) || ($class !== null))
-      $tables = '((Item JOIN ItemVariant ON Item.id=ItemVariant.item) JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
-    else
-      $tables = '(ItemVariant JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
+    $tables = '((Item JOIN ItemVariant ON Item.id=ItemVariant.item) JOIN VariantVersion ON ItemVariant.id = VariantVersion.itemvariant)';
     if ($fieldname !== null)
       $tables .= ' JOIN Field ON Field.itemversion=VariantVersion.id';
     $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' WHERE';
-    $query.=' VariantVersion.current=1';
+    $query.=' VariantVersion.current=1 AND Item.archived<>1';
     if ($fieldname !== null)
     {
       $pos = strpos($fieldname, '.');
