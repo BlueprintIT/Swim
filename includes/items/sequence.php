@@ -81,7 +81,7 @@ class ItemSorter
     {
       while ($start<$end)
       {
-        $iv = self::getItemVersion($items[$end-1]);
+        $iv = self::getItemVersion($items[$start]);
         if ($field !== null)
         {
           if ($iv->getField($field)->compareTo($min)>=0)
