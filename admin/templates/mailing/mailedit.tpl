@@ -6,6 +6,9 @@
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {apiget var="section" type="section" id=$request.query.section}
 {assign var="mailing" value=$section->getMailing($request.query.mailing)}
+<script type="text/javascript">
+window.top.SiteTree.selectItem("mailing_{$request.query.mailing}");
+</script>
 <div id="mainpane">
 	{html_form tag_name="mainform" method="savemailing" section=$section->getId() mailing=$mailing->getId()}
 		<div class="header">

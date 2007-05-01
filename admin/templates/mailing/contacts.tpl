@@ -12,6 +12,9 @@
 {else}
 	{assign var="sortkey" value="lastname"}
 {/if}
+<script type="text/javascript">
+window.top.SiteTree.selectItem("contacts");
+</script>
 <div id="mainpane">
 	<div class="header">
 		{secure contacts="write"}

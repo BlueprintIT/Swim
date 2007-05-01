@@ -2,6 +2,9 @@
 {include file='includes/frameheader.tpl' title="Mailing Details"}
 {apiget var="section" type="section" id=$request.query.section}
 {assign var="mailing" value=$section->getMailing($request.query.mailing)}
+<script type="text/javascript">
+window.top.SiteTree.selectItem("mailing_{$request.query.mailing}");
+</script>
 <div id="mainpane">
 	<div class="header">
 		{secure contacts="write"}

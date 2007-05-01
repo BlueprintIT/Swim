@@ -12,6 +12,9 @@
 {assign var="class" value=$itemversion->getClass()}
 {assign var="mailing" value=$class->getMailing()}
 {request var="details" method="admin" path="mailing/details.tpl" item=$item->getId()}
+<script type="text/javascript">
+window.top.SiteTree.selectItem("{$request.query.item}");
+</script>
 <div id="mainpane">
 	<div class="header">
 		{secure contacts="write"}

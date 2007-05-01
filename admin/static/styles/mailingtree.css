@@ -1,45 +1,15 @@
-#categorytree .selected div {
-  background-color: Highlight;
-}
-
-#categorytree a,
-#categorytree a:active,
-#categorytree a:hover,
-.categorytree a:visited {
-  color: WindowText;
-  text-decoration: none;
-}
-
-#categorytree .selected a,
-#categorytree .selected a:active,
-#categorytree .selected a:hover,
-.categorytree .selected a:visited {
-  color: HighlightText;
-}
-
-.iconnode_branch_category_open {
-  background-image: url('../icons/ctopen.gif');
-}
-
-.iconnode_leaf_category,
-.iconnode_branch_category_clsd {
-  background-image: url('../icons/ctclsd.gif');
-}
-
-.iconnode_leaf_users,
-.iconnode_branch_users_open,
-.iconnode_branch_users_clsd {
+.site_icon__contactcategory {
   background-image: url('../icons/user-group2.gif');
 }
 
-.iconnode_leaf_mailing {
+.site_icon_mailing {
   background-image: url('../icons/email-blue.gif');
 }
 
-.iconnode_leaf_pastmailsent {
+.site_icon_sentmail {
   background-image: url('../icons/email-open-green.gif');
 }
 
-.iconnode_leaf_pastmaildraft {
+.site_icon_draftmail {
   background-image: url('../icons/email-open-grey.gif');
 }

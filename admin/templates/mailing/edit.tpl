@@ -15,6 +15,9 @@
 {assign var="mailing" value=$class->getMailing()}
 {request var="details" method="admin" path="mailing/details.tpl" item=$item->getId()}
 {request var="sendmail" method="sendmail" item=$item->getId() nested=$details}
+<script type="text/javascript">
+window.top.SiteTree.selectItem("{$request.query.item}");
+</script>
 <div id="mainpane">
 	{html_form tag_name="mainform" method="saveitem" itemversion=$itemversion->getId()}
 		<div class="header">

@@ -1,7 +1,7 @@
 {secure contacts="read" login="true"}
 {include file='includes/adminheader.tpl' title="Mailing Options"}
 {stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
-{stylesheet href="$SHARED/treeview/iconnode.css"}
+{stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$CONTENT/styles/mailingtree.css"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
@@ -13,61 +13,106 @@
 {script href="$SHARED/scripts/dialogs`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/dom`$smarty.config.YUI`.js"}
-{script href="$SHARED/scripts/treeview`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/sitetree`$smarty.config.YUI`.js"}
 {apiget var="section" type="section" id=$request.query.section}
 <script type="text/javascript">
-function displayTree(event)
+function onTreeItemClick(id)
 {ldelim}
-  var tree = new YAHOO.widget.TreeView("categorytree");
-  var root = tree.getRoot();
-  var details = {ldelim}
-    label: "Contacts",
-    href: "{encode method="admin" path="mailing/contacts.tpl" section=$section->getId()}",
-    target: "main",
-    type: "users"
-  {rdelim};
-  new BlueprintIT.widget.IconNode(details, root, true);
-  details = {ldelim}
-    label: "Mailings",
-    type: "category"
-  {rdelim};
-  var mailings = new BlueprintIT.widget.IconNode(details, root, true);
-{foreach from=$section->getMailings() item="mailing"}
-  details = {ldelim}
-    label: "{$mailing->getName()}",
-    href: "{encode method="admin" path="mailing/maildetails.tpl" section=$section->getId() mailing=$mailing->getId()}",
-    target: "main",
-    type: "mailing"
-  {rdelim};
-  new BlueprintIT.widget.IconNode(details, mailings, false);
-{/foreach}
-  {assign var="item" value=$section->getRootItem()}
-  details = {ldelim}
-    label: "Past Mailings",
-    type: "category"
-  {rdelim};
-  mailings = new BlueprintIT.widget.IconNode(details, root, true);
-{assign var="sequence" value=$item->getMainSequence()}
-{foreach from=$sequence->getItems() item="item"}
-  details = {ldelim}
-  {assign var="variant" value=$item->getVariant('default')}
-  {if $variant->getCurrentVersion()}
-  	{assign var="itemversion" value=$variant->getCurrentVersion()}
-  	type: "pastmailsent",
-  {else}
-  	{assign var="itemversion" value=$variant->getDraftVersion()}
-  	type: "pastmaildraft",
-  {/if}
-  	label: "{$itemversion->getFieldValue('name')}",
-  	href: "{encode method="admin" path="mailing/details.tpl" item=$item->getId()}",
-  	target: "main"
-  {rdelim}
-  new BlueprintIT.widget.IconNode(details, mailings, true);
-{/foreach}
-  tree.draw();
+	if (!SiteTree.dragging) {ldelim}
+		var src = '';
+		if (id == 'contacts') {ldelim}
+			src = '{encode method="admin" path="mailing/contacts.tpl" section=$section->getId()}';
+		{rdelim}
+		else if (id.substr(0, 8) == 'mailing_') {ldelim}
+			var request = new Request();
+			request.setMethod('admin');
+			request.setPath('mailing/maildetails.tpl');
+			request.setQueryVar('section', '{$request.query.section}');
+			request.setQueryVar('mailing', id.substr(8));
+			src = request.encode();
+		{rdelim}
+		else {ldelim}
+			var request = new Request();
+			request.setMethod('admin');
+			request.setPath('mailing/details.tpl');
+			request.setQueryVar('item', id);
+			src = request.encode();
+		{rdelim}
+		document.getElementById('main').src = src;
+	{rdelim}
 {rdelim}
 
-YAHOO.util.Event.addListener(window, "load", displayTree);
+var maildata = [
+	{ldelim}
+		id: "contacts",
+		name: "Contacts",
+		class: "_contactcategory",
+		published: true
+	{rdelim},
+	{ldelim}
+		id: "mailings",
+		name: "Mailings",
+		class: "category",
+		published: true,
+		contains: "mailing",
+		subitems: [
+{foreach from=$section->getMailings() item="mailing"}
+			{ldelim}
+				id: "mailing_{$mailing->getId()}",
+				name: "{$mailing->getName()}",
+				class: "mailing",
+				published: true
+			{rdelim},
+{/foreach}
+		]
+	},
+	{ldelim}
+		id: "drafts",
+		name: "Draft Mailings",
+		class: "category",
+		published: true,
+		contains: "draftmail",
+		subitems: [
+{assign var="item" value=$section->getRootItem()}
+{assign var="sequence" value=$item->getMainSequence()}
+{foreach from=$sequence->getItems() item="item"}
+		{assign var="variant" value=$item->getVariant('default')}
+		{if !$variant->getCurrentVersion()}
+ 			{ldelim}
+					{assign var="itemversion" value=$variant->getDraftVersion()}
+					class: "draftmail",
+					name: "{$itemversion->getFieldValue('name')}",
+					id: "{$item->getId()}",
+					published: false
+			{rdelim},
+		{/if}
+{/foreach}
+		]
+	{rdelim},
+	{ldelim}
+		id: "archive",
+		name: "Past Mailings",
+		class: "category",
+		published: true,
+		contains: "sentmail",
+		subitems: [
+{foreach from=$sequence->getItems() item="item"}
+		{assign var="variant" value=$item->getVariant('default')}
+		{if $variant->getCurrentVersion()}
+ 			{ldelim}
+					{assign var="itemversion" value=$variant->getCurrentVersion()}
+					class: "sentmail",
+					name: "{$itemversion->getFieldValue('name')}",
+					id: "{$item->getId()}",
+					published: true
+			{rdelim},
+		{/if}
+{/foreach}
+		]
+	{rdelim}
+];
+
+var SiteTree = new BlueprintIT.widget.SiteTree('{$request.query.section}', '', 'categorytree', maildata);
 </script>
 <div id="leftpane" class="pane">
 	<div class="header">
