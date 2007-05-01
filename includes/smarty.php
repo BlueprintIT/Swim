@@ -18,6 +18,67 @@ require $_PREFS->getPref('storage.includes').'/smarty/resources.php';
 require $_PREFS->getPref('storage.includes').'/smarty/swimapi.php';
 require $_PREFS->getPref('storage.includes').'/smarty/wrappers.php';
 
+function output_subtemplate($params, &$smarty)
+{
+  global $_PREFS;
+  
+  if (!empty($params['file']))
+  {
+    $request = new Request();
+    $file = $params['file'];
+    unset($params['file']);
+    foreach ($params as $name => $value)
+    {
+      $request->setQueryVar($name, $value);
+    }
+    $template = findDisplayableFile($_PREFS->GetPref('storage.site.templates').'/'.$file);
+    $type = determineContentType($template);
+    $smarty = createSmarty($request, $type);
+    $result = $smarty->display($template);
+  }
+}
+
+function output_file($params, &$smarty)
+{
+  global $_PREFS;
+  
+  if (!empty($params['path']))
+  {
+    $path = $_PREFS->getPref('url.shared');
+    if (substr($params['path'], 0, strlen($path)) == $path)
+    {
+      $file = $_PREFS->getPref('storage.shared').substr($params['path'], strlen($path));
+      if (is_file($file))
+      {
+        readfile($file);
+        return;
+      }
+    }
+
+    $path = $_PREFS->getPref('url.site.static');
+    if (substr($params['path'], 0, strlen($path)) == $path)
+    {
+      $file = $_PREFS->getPref('storage.site.static').substr($params['path'], strlen($path));
+      if (is_file($file))
+      {
+        readfile($file);
+        return;
+      }
+    }
+
+    $path = $_PREFS->getPref('url.admin.static');
+    if (substr($params['path'], 0, strlen($path)) == $path)
+    {
+      $file = $_PREFS->getPref('storage.admin.static').substr($params['path'], strlen($path));
+      if (is_file($file))
+      {
+        readfile($file);
+        return;
+      }
+    }
+  }
+}
+
 function array_select($params, &$smarty)
 {
   if ((!empty($params['var'])) && (!empty($params['from'])))
@@ -314,6 +375,8 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('dynamic', 'dynamic_section', false);
   $smarty->register_function('paginate', 'paginate');
   $smarty->register_function('request', 'generate_request');
+  $smarty->register_function('outputfile', 'output_file');
+  $smarty->register_function('subtemplate', 'output_subtemplate');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_modifier('summarise', 'summarise_html');

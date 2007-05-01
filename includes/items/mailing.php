@@ -401,7 +401,7 @@ class Mailing extends XMLSerialized
       $headers = $mail->headers($headers);
       
       $start = time();
-      for ($i = 0; $i < 100; $i++)
+      for ($i = 0; $i < 1; $i++)
       {
         $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
         $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
