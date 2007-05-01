@@ -8,7 +8,7 @@ function create_simple_field(basefield,position,field,container,fielddata)
 function create_date_field(basefield,position,field,container,fielddata)
 {}
 function create_item_field(basefield,position,field,container,fielddata)
-{}
+{var content='<input id="'+getFieldId(basefield,position,field)+'" name="'+getFieldName(basefield,position,field)+'" type="hidden" value="0"> ';content+='<input id="ibfake-'+getFieldId(basefield,position,field)+'" disabled="true" type="text" value="[Nothing selected]"> ';content+='<div class="toolbarbutton">';content+='<a href="javascript:showItemBrowser(\''+getFieldId(basefield,position,field)+'\',\''+fielddata.request+'\')">Select...</a>';content+='</div> ';content+='<div class="toolbarbutton">';content+='<a href="javascript:clearItemBrowser(\''+getFieldId(basefield,position,field)+'\')">Clear</a>';content+='</div> ';container.innerHTML=content;}
 function create_file_field(basefield,position,field,container,fielddata)
 {var content='<input id="'+getFieldId(basefield,position,field)+'" name="'+getFieldName(basefield,position,field)+'" type="hidden" value=""> ';content+='<input id="fbfake-'+getFieldId(basefield,position,field)+'" disabled="true" type="text" value="[Nothing selected]"> ';content+='<div class="toolbarbutton">';content+='<a href="javascript:showFileBrowser(\''+getFieldId(basefield,position,field)+'\',\''+fielddata.request+'\')">Select...</a>';content+='</div> ';content+='<div class="toolbarbutton">';content+='<a href="javascript:clearFileBrowser(\''+getFieldId(basefield,position,field)+'\')">Clear</a>';content+='</div> ';container.innerHTML=content;}
 function create_option_field(basefield,position,field,container,fielddata)
@@ -21,7 +21,7 @@ function switch_simple_field(basefield,field,pos1,pos2,fielddata)
 function switch_date_field(basefield,field,pos1,pos2,fielddata)
 {}
 function switch_item_field(basefield,field,pos1,pos2,fielddata)
-{switch_simple_field(basefield,field,pos1,pos2,fielddata);var field1=document.getElementById("fbfake-"+getFieldId(basefield,pos1,field));var field2=document.getElementById("fbfake-"+getFieldId(basefield,pos2,field));var temp=field1.value;field1.value=field2.value;field2.value=temp;}
+{switch_simple_field(basefield,field,pos1,pos2,fielddata);var field1=document.getElementById("ibfake-"+getFieldId(basefield,pos1,field));var field2=document.getElementById("ibfake-"+getFieldId(basefield,pos2,field));var temp=field1.value;field1.value=field2.value;field2.value=temp;}
 function switch_file_field(basefield,field,pos1,pos2,fielddata)
 {switch_simple_field(basefield,field,pos1,pos2,fielddata);var field1=document.getElementById("fbfake-"+getFieldId(basefield,pos1,field));var field2=document.getElementById("fbfake-"+getFieldId(basefield,pos2,field));var temp=field1.value;field1.value=field2.value;field2.value=temp;}
 function switchCompoundField(basefield,field,pos1,pos2,fielddata)
@@ -47,8 +47,10 @@ function selectDate(calendar,input)
 date=Date.now();else
 date=dates[0].getTime();field.value=date/1000;}
 function displayCalendar(id,value)
-{var date=new Date(value*1000);var datestr=(date.getMonth()+1)+"/"+date.getDate()+"/"+date.getFullYear();var calendar=new YAHOO.widget.Calendar("cal_"+id,"calendar_"+id,"",datestr);calendar.onSelect=function(){selectDate(calendar,id)};calendar.render();return calendar;}
-function showFileBrowser(id,url){window.SetUrl=function(uri){fileBrowserSetUrl(id,uri);};window.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0');}
-function fileBrowserSetUrl(id,url){var field=document.getElementById(id);field.value=url;var pos=url.lastIndexOf("/");if(pos>=0)
-url=url.substring(pos+1);var fake=document.getElementById("fbfake-"+id);fake.value=url;}
+{var date=new Date(value*1000);var datestr=(date.getMonth()+1)+"/"+date.getDate()+"/"+date.getFullYear();var monthstr=(date.getMonth()+1)+"/"+date.getFullYear();var calendar=new YAHOO.widget.Calendar("cal_"+id,"calendar_"+id,{pagedate:monthstr,selected:datestr});calendar.selectEvent.subscribe(function(){selectDate(calendar,id)},calendar,true);calendar.render();return calendar;}
+function showItemBrowser(id,url){window.SetItem=function(item,name){itemBrowserSetItem(id,item,name);};window.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0');}
+function itemBrowserSetItem(id,item,name){var field=document.getElementById(id);field.value=item;var fake=document.getElementById("ibfake-"+id);fake.value=name;}
+function clearItemBrowser(id){var field=document.getElementById(id);field.value="-1";var fake=document.getElementById("ibfake-"+id);fake.value="[Nothing selected]";}
+function showFileBrowser(id,url){window.SetFile=function(uri,name){fileBrowserSetUrl(id,uri,name);};window.open(url,'swimbrowser','modal=1,status=0,menubar=0,directories=0,location=0,toolbar=0');}
+function fileBrowserSetUrl(id,url,name){var field=document.getElementById(id);field.value=url;var fake=document.getElementById("fbfake-"+id);fake.value=name;}
 function clearFileBrowser(id){var field=document.getElementById(id);field.value="";var fake=document.getElementById("fbfake-"+id);fake.value="[Nothing selected]";}

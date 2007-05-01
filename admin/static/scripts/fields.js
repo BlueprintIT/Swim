@@ -25,6 +25,16 @@ function create_date_field(basefield, position, field, container, fielddata)
 
 function create_item_field(basefield, position, field, container, fielddata)
 {
+  var content = '<input id="'+getFieldId(basefield, position, field)+'" name="'+getFieldName(basefield, position, field)+'" type="hidden" value="0"> ';
+  content+='<input id="ibfake-'+getFieldId(basefield, position, field)+'" disabled="true" type="text" value="[Nothing selected]"> ';
+  content+='<div class="toolbarbutton">';
+  content+='<a href="javascript:showItemBrowser(\''+getFieldId(basefield, position, field)+'\',\''+fielddata.request+'\')">Select...</a>';
+  content+='</div> ';
+  content+='<div class="toolbarbutton">';
+  content+='<a href="javascript:clearItemBrowser(\''+getFieldId(basefield, position, field)+'\')">Clear</a>';
+  content+='</div> ';
+  
+  container.innerHTML = content;
 }
 
 function create_file_field(basefield, position, field, container, fielddata)
@@ -94,8 +104,8 @@ function switch_date_field(basefield, field, pos1, pos2, fielddata)
 function switch_item_field(basefield, field, pos1, pos2, fielddata)
 {
 	switch_simple_field(basefield, field, pos1, pos2, fielddata);
-	var field1 = document.getElementById("fbfake-"+getFieldId(basefield, pos1, field));
-	var field2 = document.getElementById("fbfake-"+getFieldId(basefield, pos2, field));
+	var field1 = document.getElementById("ibfake-"+getFieldId(basefield, pos1, field));
+	var field2 = document.getElementById("ibfake-"+getFieldId(basefield, pos2, field));
 	var temp = field1.value;
 	field1.value = field2.value;
 	field2.value = temp;

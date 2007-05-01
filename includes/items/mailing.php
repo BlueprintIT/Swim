@@ -95,8 +95,8 @@ class MailingItemSet extends XMLSerialized
     $field->appendChild($subfield);
     $subfield->setAttribute('id', 'item');
     $subfield->setAttribute('type', 'item');
-
-    $this->mailing->getClass()->addField($field);
+    
+    $this->mailing->getClass()->addField(Field::getField($field));
   }
 }
 
@@ -113,6 +113,7 @@ class MailingSelection extends MailingItemSet
   public function getItems()
   {
     $items = Item::findItems($this->sections, $this->classes);
+    return $items;
     if ($this->sortorder == 'random')
       $maxcount = null;
     else

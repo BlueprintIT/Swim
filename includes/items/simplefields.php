@@ -535,6 +535,21 @@ class ItemField extends IntegerField
       return -1;
   }
   
+  public function getClientAttributes()
+  {
+    $attrs = parent::getClientAttributes();
+    
+    $request = new Request();
+    $request->setMethod('admin');
+    $request->setPath('browser/filebrowser.tpl');
+    $request->setQueryVar('type', 'item');
+    $request->setQueryVar('api', 'itemfield');
+
+    $attrs['request'] = $request->encode();
+    
+    return $attrs;
+  }
+  
   public function output(&$request, &$smarty)
   {
   	$this->retrieve();
