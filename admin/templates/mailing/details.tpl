@@ -49,6 +49,14 @@ window.top.SiteTree.selectItem("{$request.query.item}");
 								</a>
 							</div>
 						</td>
+					{else}
+						<td>
+							{if $itemversion->getFieldValue('sent')}
+								Sent
+							{else}
+								Not sent
+							{/if}
+						</td>
 					{/if}
 					<td>
 						<div class="toolbarbutton">

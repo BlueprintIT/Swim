@@ -287,24 +287,15 @@ function summarise_html($value, $count = 1)
 
 function htmltotext($value, $width = 78)
 {
-  $search = array('<li>',
-                  '&amp;',
-                  '&nbsp;',
-                  '&quot;',
-                  '&lt;',
-                  '&gt;');
-  $replaces = array('* ',
-                    '&',
-                    ' ',
-                    '"',
-                    '<',
-                    '>');
+  $search = array('<li>');
+  $replaces = array('* ');
   $blocks = array('/<\/?h[123456]>/',
                   '/<\/?(?:p|br|ol|ul)>/',
                   '/<\/?li>/');
   
   $value = preg_replace('/\s\s+/', ' ', $value);
   $value = str_replace($search, $replaces, $value);
+  $value = html_entity_decode($value, ENT_QUOTES, "UTF-8");
   $value = preg_replace('/&#(\d+);/e', "chr($1)", $value);
   $value = preg_replace($blocks, "\n", $value);
   $value = preg_replace('/<\/?[^>]*>/', '', $value);

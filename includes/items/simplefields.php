@@ -156,7 +156,8 @@ class SimpleField extends Field
   
   public function toString()
   {
-    return $this->getValue();
+    $this->retrieve();
+    return $this->value;
   }
   
   protected function escapeValue($value)
@@ -349,7 +350,7 @@ class BooleanField extends IntegerField
   
   public function getValue()
   {
-    if (parent::toString()==1)
+    if ($this->toString()==1)
       return "true";
     else
       return null;
