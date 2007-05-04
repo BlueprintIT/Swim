@@ -34,7 +34,7 @@ function method_sendmail($request)
         else
           $req = $request->getNested();
         $mailing = $itemversion->getClass()->getMailing();
-        $mailing->sendMail($itemversion);
+        $mailing->prepareSend($itemversion);
         redirect($req);
       }
       else

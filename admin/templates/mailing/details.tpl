@@ -21,6 +21,7 @@ if (items) {ldelim}
     window.top.SiteTree.removeNode(items[0]);
     items = window.top.SiteTree.getItems("archive");
     window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
+    items[0].redrawChildren();
   {rdelim}
 {/if}
 {rdelim}

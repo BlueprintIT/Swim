@@ -298,7 +298,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 		bucket.splice(pos,1);
 		if (bucket.length == 0) {
 			delete this.items[node.data.id];
-			if (this.selected == id)
+			if (this.selected == node.data.id)
 				this.selected = null;
 		}
 	},
@@ -306,7 +306,7 @@ BlueprintIT.widget.SiteTree.prototype = {
 	loadItem: function(item, parentnode) {
 		var label = item["name"];
 		var type = item["class"];
-		var published = item["published"] == "true";
+		var published = (item["published"] == "true") || (item["published"] === true);
 		var contents = null;
 		
 		if (item["contains"]) {

@@ -1,12 +1,12 @@
-.site_icon__contactcategory {
+.site_icon__contactcategory_published {
   background-image: url('../icons/user-group2.gif');
 }
 
-.site_icon_mailing {
+.site_icon_mailing_published {
   background-image: url('../icons/email-blue.gif');
 }
 
-.site_icon_sentmail {
+.site_icon_sentmail_published {
   background-image: url('../icons/email-open-green.gif');
 }
 

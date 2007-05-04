@@ -20,10 +20,8 @@ var items = window.top.SiteTree.getItems({$request.query.item});
 if (!items) {ldelim}
   items = window.top.SiteTree.getItems("drafts");
   if (items) {ldelim}
-    for (var i=0; i<items.length; i++) {ldelim}
-      window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "draftmail", false, null, items[i]);
-      items[i].redrawChildren();
-    {rdelim}
+    window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "draftmail", false, null, items[0]);
+    items[0].redrawChildren();
   {rdelim}
 {rdelim}
 window.top.SiteTree.selectItem("{$request.query.item}");

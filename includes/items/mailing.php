@@ -361,12 +361,24 @@ class Mailing extends XMLSerialized
     return $iv;
   }
   
+  public function prepareSend($itemversion)
+  {
+    global $_STORAGE;
+    
+    $itemversion->setFieldValue('date', time());
+    $itemversion->setComplete(true);
+    $itemversion->setCurrent(true);
+
+    $this->retrieve();
+    $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
+    $this->values['lastsent'] = time();
+  }
+  
   public function sendMail($itemversion)
   {
-    global $_PREFS,$_STORAGE;
+    global $_PREFS;
     
     $itemversion->setFieldValue('sent', true);
-    $itemversion->setFieldValue('date', time());
     
     require_once('Mail.php');
     require_once('Mail/mime.php');
@@ -408,13 +420,6 @@ class Mailing extends XMLSerialized
       }
       $diff = time() - $start;
       $this->log->warn('Send took '.$diff.' seconds');
-      
-      //$itemversion->setComplete(true);
-      //$itemversion->setCurrent(true);
-  
-      $this->retrieve();
-      $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
-      $this->values['lastsent'] = time();
     }
     else
       $this->log->error('There are no mail templates defined for '.$itemversion->getClass()->getId().' classes.');
