@@ -23,15 +23,6 @@ if (items) {ldelim}
     window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
   {rdelim}
 {/if}
-{rdelim} else {ldelim}
-{if $itemversion->isComplete()}
-  items = window.top.SiteTree.getItems("archive");
-  window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
-{else}
-  items = window.top.SiteTree.getItems("drafts");
-  window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "draftmail", false, null, items[0]);
-{/if}
-  items[0].redrawChildren();
 {rdelim}
 window.top.SiteTree.selectItem("{$request.query.item}");
 </script>

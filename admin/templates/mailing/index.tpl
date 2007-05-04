@@ -23,6 +23,10 @@ function onTreeItemClick(id)
 		if (id == 'contacts') {ldelim}
 			src = '{encode method="admin" path="mailing/contacts.tpl" section=$section->getId()}';
 		{rdelim}
+		else if ((id == 'mailings') || (id == 'drafts') || (id == 'archive')) {ldelim}
+			var node = SiteTree.getItems(id);
+			node[0].toggle();
+		{rdelim}
 		else if (id.substr(0, 8) == 'mailing_') {ldelim}
 			var request = new Request();
 			request.setMethod('admin');
