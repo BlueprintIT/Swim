@@ -15,9 +15,23 @@
 <script type="text/javascript">
 var items = window.top.SiteTree.getItems({$item->getId()});
 if (items) {ldelim}
-  for (var i=0; i<items.length; i++) {ldelim}
-    items[i].setLabel("{$itemversion->getFieldValue('name')}");
+  items[0].setLabel("{$itemversion->getFieldValue('name')}");
+{if $itemversion->isComplete()}
+  if (items[0].parent.data.id == "drafts") {ldelim}
+    window.top.SiteTree.removeNode(items[0]);
+    items = window.top.SiteTree.getItems("archive");
+    window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
   {rdelim}
+{/if}
+{rdelim} else {ldelim}
+{if $itemversion->isComplete()}
+  items = window.top.SiteTree.getItems("archive");
+  window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
+{else}
+  items = window.top.SiteTree.getItems("drafts");
+  window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "draftmail", false, null, items[0]);
+{/if}
+  items[0].redrawChildren();
 {rdelim}
 window.top.SiteTree.selectItem("{$request.query.item}");
 </script>
