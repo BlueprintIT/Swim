@@ -17,7 +17,7 @@ require('startup.php');
 
 function hasArgument($name)
 {
-  if ((isset($_GET)) && (in_array($name, $_GET)))
+  if ((isset($_GET)) && (isset($_GET[$name])))
     return true;
   if ((isset($argv)) && (in_array('--'.$name, $argv)))
     return true;
@@ -84,10 +84,17 @@ setContentType('text/plain');
 
 $log->info("Cron job startup");
 
-$log->info("Consistency check");
-checkConsistency();
-$log->info("Keywords compile");
-SearchEngine::buildIndex();
+if (hasArgument('consistency'))
+{
+  $log->info("Consistency check");
+  checkConsistency();
+}
+
+if (hasArgument('keywords'))
+{
+  $log->info("Keywords compile");
+  SearchEngine::buildIndex();
+}
 
 $log->info("htaccess generate");
 if (is_writable($_PREFS->getPref('storage.rootdir')))
@@ -151,6 +158,33 @@ RewriteRule .* swim/startup/swim.php [L]
 }
 else
 	$log->error('Unable to write configuration. htaccess in unwritable');
+
+if (hasArgument('mailing'))
+{
+  $log->info('Mailing');
+  $sections = FieldSetManager::getSections();
+  foreach ($sections as $section)
+  {
+    if ($section->getType() == 'mailing')
+    {
+      $mailings = $section->getMailings();
+      $classes = array();
+      foreach ($mailings as $mailing)
+        array_push($classes, $mailing->getClass());
+
+      $items = Item::findItems($section, $classes, null, 'sent', true, 'boolean', false, false);
+      foreach ($items as $itemversion)
+      {
+        $mailing = $itemversion->getClass()->getMailing();
+        $log->info('Sending mail for item '.$itemversion->getItem()->getId().' type '.$mailing->getId());
+        $start = time();
+        $mailing->sendMail($itemversion);
+        $diff = time() - $start;
+        $log->info('Send took '.$diff.' seconds');
+      }
+    }
+  }
+}
 
 if (hasArgument('backup'))
 {

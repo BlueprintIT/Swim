@@ -465,7 +465,7 @@ class Item
     return $item;
   }
   
-  public static function findItems($section = null, $class = null, $variant = null, $fieldname = null, $fieldvalue = null)
+  public static function findItems($section = null, $class = null, $variant = null, $fieldname = null, $fieldvalue = null, $fieldtype = 'text', $complete = true, $current = true, $archived = false)
   {
     global $_STORAGE;
     
@@ -489,52 +489,93 @@ class Item
     if ($fieldname !== null)
       $tables .= ' JOIN Field ON Field.itemversion=VariantVersion.id';
     $query = 'SELECT ItemVariant.item,ItemVariant.variant,VariantVersion.version FROM '.$tables.' WHERE';
-    $query.=' VariantVersion.current=1 AND Item.archived<>1';
+    $params = '';
+
+    if ($current !== null)
+    {
+      if ($current)
+        $params .= ' AND VariantVersion.current=1';
+      else
+        $params .= ' AND VariantVersion.current<>1';
+    }
+
+    if ($complete !== null)
+    {
+      if ($complete)
+        $params .= ' AND VariantVersion.complete=1';
+      else
+        $params .= ' AND VariantVersion.complete<>1';
+    }
+
+    if ($archived !== null)
+    {
+      if ($archived)
+        $params .= ' AND Item.archived=1';
+      else
+        $params .= ' AND Item.archived<>1';
+    }
+
     if ($fieldname !== null)
     {
       $pos = strpos($fieldname, '.');
       if ($pos !== false)
-        $query.=' AND Field.basefield="'.substr($fieldname, 0, $pos).'" AND Field.field="'.substr($fieldname, $pos+1).'"';
+        $params.=' AND Field.basefield="'.substr($fieldname, 0, $pos).'" AND Field.field="'.substr($fieldname, $pos+1).'"';
       else
-        $query.=' AND Field.basefield="base" AND Field.field="'.$fieldname.'"';
-      $query.=' AND Field.textValue="'.$_STORAGE->escape($fieldvalue).'"';
+        $params.=' AND Field.basefield="base" AND Field.field="'.$fieldname.'"';
+      $params.=' AND Field.';
+      switch ($fieldtype)
+      {
+        case 'date':
+          $params .= 'dateValue='.$fieldvalue;
+          break;
+        case 'boolean':
+          if (($fieldvalue === true) || ($fieldvalue === 'true') || ($fieldvalue === 1))
+            $fieldvalue = 1;
+          else
+            $fieldvalue = 0;
+        case 'int':
+          $params .= 'intValue='.$fieldvalue;
+          break;
+        default:
+          $params .= 'textValue="'.$_STORAGE->escape($fieldvalue).'"';
+          break;
+      }
     }
     
     if ($class !== null)
     {
-      $query.=' AND ';
+      $params.=' AND ';
       if (is_array($class))
       {
-        $query .= '(';
+        $params .= '(';
         foreach ($class as $c)
-        {
-          $query .= 'Item.class="'.$c->getId().'" OR ';
-        }
-        $query = substr($query, 0, -4).')';
+          $params .= 'Item.class="'.$c->getId().'" OR ';
+        $params = substr($query, 0, -4).')';
       }
       else
-        $query .= 'Item.class="'.$class->getId().'"';
+        $params .= 'Item.class="'.$class->getId().'"';
     }
     
     if ($section !== null)
     {
-      $query.=' AND ';
+      $params.=' AND ';
       if (is_array($section))
       {
-        $query .= '(';
+        $params .= '(';
         foreach ($section as $c)
-        {
-          $query .= 'Item.section="'.$c->getId().'" OR ';
-        }
-        $query = substr($query, 0, -4).')';
+          $params .= 'Item.section="'.$c->getId().'" OR ';
+        $params = substr($query, 0, -4).')';
       }
       else
-        $query .= 'Item.section="'.$section->getId().'"';
+        $params .= 'Item.section="'.$section->getId().'"';
     }
 
     if ($variant !== null)
-      $query.=' AND ItemVariant.variant="'.$variant.'"';
+      $params.=' AND ItemVariant.variant="'.$variant.'"';
 
+    if (strlen($params) > 0)
+      $query .= substr($params, 4);
+    
     $items = array();
     $results = $_STORAGE->query($query);
     while ($results->valid())

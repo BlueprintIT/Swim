@@ -388,11 +388,10 @@ class Mailing extends XMLSerialized
       $itemversion->setComplete(true);
       $itemversion->setCurrent(true);
 
-      $start = time();
+      $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
+      $mail = new Mail_mime("\n");
       for ($i = 0; $i < 100; $i++)
       {
-        $mail = new Mail_mime("\n");
-    
         if (is_file($htmlpath))
         {
           $smarty = createMailSmarty('text/html');
@@ -415,11 +414,8 @@ class Mailing extends XMLSerialized
           $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
         $headers = $mail->headers($headers);
         
-        $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
         $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
       }
-      $diff = time() - $start;
-      $this->log->warn('Send took '.$diff.' seconds');
     }
     else
       $this->log->error('There are no mail templates defined for '.$itemversion->getClass()->getId().' classes.');
