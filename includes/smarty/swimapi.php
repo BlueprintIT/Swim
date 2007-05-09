@@ -138,6 +138,7 @@ function generate_request($params, &$smarty)
     $request = get_params_request($params, $smarty);
     if ($request instanceof Request)
       $smarty->assign_by_ref($var, $request);
+    print_r($smarty->get_template_vars('optout'));
   }
 }
 

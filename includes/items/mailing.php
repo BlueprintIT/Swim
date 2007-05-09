@@ -385,36 +385,50 @@ class Mailing extends XMLSerialized
     
     if (is_file($textpath) || is_file($htmlpath))
     {
-      $itemversion->setComplete(true);
-      $itemversion->setCurrent(true);
+      //$itemversion->setComplete(true);
+      //$itemversion->setCurrent(true);
+
+      $contacts = Item::getItem($itemversion->getFieldValue('contacts'));
+      $contactsversion = $contacts->getCurrentVersion('default');
+      $sequence = $contacts->getMainSequence();
+      $items = $sequence->getItems();
 
       $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
       $mail = new Mail_mime("\n");
-      for ($i = 0; $i < 100; $i++)
+      foreach ($items as $contact)
       {
-        if (is_file($htmlpath))
+        $contactversion = $contact->getCurrentVersion('default');
+        if ($contactversion->getFieldValue('optedin') == 'true')
         {
-          $smarty = createMailSmarty('text/html');
-          $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-          $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
+          if (is_file($htmlpath))
+          {
+            $smarty = createMailSmarty('text/html');
+            $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+            $smarty->assign_by_ref('contacts', ItemWrapper::getWrapper($contactsversion));
+            $smarty->assign_by_ref('contact', ItemWrapper::getWrapper($contactversion));
+            $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
+          }
+          
+          if (is_file($textpath))
+          {
+            $smarty = createMailSmarty('text/plain');
+            $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+            $smarty->assign_by_ref('contacts', ItemWrapper::getWrapper($contactsversion));
+            $smarty->assign_by_ref('contact', ItemWrapper::getWrapper($contactversion));
+            $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
+          }
+          
+          $body = $mail->get();
+          $headers = array('Subject' => $itemversion->getFieldValue('name'));
+          if (isset($this->from))
+            $headers['From'] = $this->from;
+          else
+            $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+          $headers = $mail->headers($headers);
+          
+          //$smtp->send($contactversion->getFieldValue('emailaddress'), $headers, $body);
+          $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
         }
-        
-        if (is_file($textpath))
-        {
-          $smarty = createMailSmarty('text/plain');
-          $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-          $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
-        }
-        
-        $body = $mail->get();
-        $headers = array('Subject' => $itemversion->getFieldValue('name'));
-        if (isset($this->from))
-          $headers['From'] = $this->from;
-        else
-          $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-        $headers = $mail->headers($headers);
-        
-        $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
       }
     }
     else

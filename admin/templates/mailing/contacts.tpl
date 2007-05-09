@@ -95,7 +95,7 @@ window.top.SiteTree.selectItem("contacts");
 							<td><a href="{encode method="admin" path="mailing/editcontact" item=$subitem->getId() section=$section->getId() parentitem=$item->getId()}">{$rlitem->getFieldValue('lastname')}</a></td>
 							<td>{$rlitem->getFieldValue('company')}</td>
 							<td>{$rlitem->getFieldValue('emailaddress')}</td>
-							<td></td>
+							<td><input disabled="disabled" type="checkbox" {if $rlitem->getFieldValue('optedin')=='true'}checked="checked"{/if}></td>
 						</tr>
 					{/if}
 				{/foreach}

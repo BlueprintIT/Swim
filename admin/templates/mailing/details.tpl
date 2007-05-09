@@ -50,7 +50,7 @@ window.top.SiteTree.selectItem("{$request.query.item}");
 						</td>
 						<td>
 							<div class="toolbarbutton">
-								<a href="{encode method="sendmail"  item=$item->getId() nested=$details}">
+								<a href="{encode method="sendmail" item=$item->getId() nested=$details}">
 									<img src="{$CONTENT}/icons/save.gif"/>
 									Send
 								</a>

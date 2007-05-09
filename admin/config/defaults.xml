@@ -41,7 +41,7 @@
     <field id="name" type="text" priority="10">
       <name>Name</name>
     </field>
-    <field id="children" type="sequence">
+    <field id="children" type="sequence" allowpost="true">
       <name>Items</name>
       <classes>_contactcategory,_contact</classes>
     </field>
@@ -67,6 +67,9 @@
     </field>
     <field id="emailaddress" type="text">
       <name>E-mail Address</name>
+    </field>
+    <field id="optedin" type="boolean">
+      <name>Opted in</name>
     </field>
   </class>
 

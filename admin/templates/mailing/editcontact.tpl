@@ -82,6 +82,12 @@ window.top.SiteTree.selectItem("contacts");
 							<td class="details"><input type="text" id="field_emailaddress" name="emailaddress" value="{if $itemversion}{$itemversion->getFieldValue('emailaddress')}{/if}"></td>
 							<td class="description"></td>
 						</tr>
+						<tr>
+							<input type="hidden" name="defaults.optedin" value="false">
+							<td class="label"><label for="field_optedin">Opted In:</label></td>
+							<td class="details"><input type="checkbox" id="field_optedin" name="optedin" value="true" {if $itemversion && $itemversion->getFieldValue('optedin')=='true'}checked="checked"{/if}"></td>
+							<td class="description"></td>
+						</tr>
 					</table>
 				</div>
 			</div>

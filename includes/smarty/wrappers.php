@@ -78,6 +78,14 @@ class SectionWrapper
       	if ($iv !== null)
 	        return ItemWrapper::getWrapper($iv);
         break;
+      case 'contacts':
+        if ($this->section->getType() == 'mailing')
+        {
+          $iv = $this->section->getRootContacts()->getCurrentVersion(Session::getCurrentVariant());
+          if ($iv !== null)
+            return ItemWrapper::getWrapper($iv);
+        }
+        break;
       case 'name':
       	return $this->section->getName();
       	break;
@@ -204,7 +212,7 @@ class ItemFieldWrapper
         $result = $field->toString();
     }
     
-    if ($result === null)
+    if ((!isset($result)) || ($result === null))
       $result = '';
       
     return $result;

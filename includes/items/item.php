@@ -550,7 +550,7 @@ class Item
         $params .= '(';
         foreach ($class as $c)
           $params .= 'Item.class="'.$c->getId().'" OR ';
-        $params = substr($query, 0, -4).')';
+        $params = substr($params, 0, -4).')';
       }
       else
         $params .= 'Item.class="'.$class->getId().'"';
@@ -564,7 +564,7 @@ class Item
         $params .= '(';
         foreach ($section as $c)
           $params .= 'Item.section="'.$c->getId().'" OR ';
-        $params = substr($query, 0, -4).')';
+        $params = substr($params, 0, -4).')';
       }
       else
         $params .= 'Item.section="'.$section->getId().'"';

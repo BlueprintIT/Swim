@@ -149,7 +149,11 @@ var SiteTree = new BlueprintIT.widget.SiteTree('{$request.query.section}', '', '
 </div>
 
 <div id="mainpane" class="pane">
+{if $request.query.item}
+<iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method="admin" path="mailing/details.tpl" item=$request.query.item"}></iframe>
+{else}
 <iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src=""></iframe>
+{/if}
 </div>
 {include file='includes/adminfooter.tpl'}
 {/secure}
