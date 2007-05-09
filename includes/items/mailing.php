@@ -106,7 +106,7 @@ class MailingSelection extends MailingItemSet
   protected $sections = null;
   protected $maxcount = null;
   protected $sortfield = null;
-  protected $sortdir = 'ascending';
+  protected $sortorder = 'ascending';
   protected $min = null;
   protected $max = null;
   
@@ -150,7 +150,7 @@ class MailingSelection extends MailingItemSet
       $maxcount = null;
     else
       $maxcount = $this->maxcount;
-    $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortdir != 'descending'), $maxcount, $min, $max);
+    $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortorder != 'descending'), $maxcount, $min, $max);
     if ($this->sortorder == 'random')
     {
       if ($this->maxcount !== null)
@@ -179,7 +179,7 @@ class MailingSelection extends MailingItemSet
     if ($element->hasAttribute('maxcount'))
       $this->maxcount = $element->getAttribute('maxcount');
     if ($element->hasAttribute('sortorder'))
-      $this->sortdir = $element->getAttribute('sortorder');
+      $this->sortorder = $element->getAttribute('sortorder');
     if ($element->hasAttribute('sortfield'))
       $this->sortfield = $element->getAttribute('sortfield');
   }
@@ -210,6 +210,7 @@ class Mailing extends XMLSerialized
   protected $mailclass;
   protected $frequencycount;
   protected $frequencyperiod = 'month';
+  protected $moderator;
   protected $itemsets;
   protected $values;
   
@@ -277,6 +278,16 @@ class Mailing extends XMLSerialized
     return $this->subject;
   }
   
+  public function hasModerator()
+  {
+    return isset($this->moderator);
+  }
+  
+  public function getModerator()
+  {
+    return $this->moderator;
+  }
+  
   public function hasFrequency()
   {
     return isset($this->frequencycount);
@@ -296,6 +307,17 @@ class Mailing extends XMLSerialized
   {
     $this->retrieve();
     return $this->values['lastsent'];
+  }
+  
+  public function getNextSend()
+  {
+    if (!$this->hasFrequency())
+      return null;
+    $last = $this->getLastSent();
+    if ($last == -1)
+      return time();
+    $next = strtotime('+'.$this->frequencycount.' '.$this->frequencyperiod, $last);
+    return $next;
   }
   
   public function getContacts()
@@ -385,8 +407,8 @@ class Mailing extends XMLSerialized
     
     if (is_file($textpath) || is_file($htmlpath))
     {
-      //$itemversion->setComplete(true);
-      //$itemversion->setCurrent(true);
+      $itemversion->setComplete(true);
+      $itemversion->setCurrent(true);
 
       $contacts = Item::getItem($itemversion->getFieldValue('contacts'));
       $contactsversion = $contacts->getCurrentVersion('default');
@@ -426,8 +448,7 @@ class Mailing extends XMLSerialized
             $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
           $headers = $mail->headers($headers);
           
-          //$smtp->send($contactversion->getFieldValue('emailaddress'), $headers, $body);
-          $smtp->send('dave.townsend@blueprintit.co.uk', $headers, $body);
+          $smtp->send($contactversion->getFieldValue('emailaddress'), $headers, $body);
         }
       }
     }
@@ -453,6 +474,8 @@ class Mailing extends XMLSerialized
     {
       if ($element->hasAttribute('period'))
         $this->frequencyperiod = $element->getAttribute('period');
+      if ($element->hasAttribute('moderator'))
+        $this->moderator = $element->getAttribute('moderator');
       $this->frequencycount = getDOMText($element);
     }
     else if ($element->tagName == 'selection')

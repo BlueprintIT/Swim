@@ -53,6 +53,12 @@ window.top.SiteTree.selectItem("mailing_{$request.query.mailing}");
 						<td class="label">Last Sent:</td>
 						<td class="details">{if $mailing->getLastSent()==-1}Never{else}{$mailing->getLastSent()|date_format:"%d/%m/%Y"}{/if}</td>
 					</tr>
+					{if $mailing->hasFrequency()}
+						<tr>
+							<td class="label">Next scheduled send:</td>
+							<td class="details">{$mailing->getNextSend()|date_format:"%d/%m/%Y"}</td>
+						</tr>
+					{/if}
 				</table>
 			</div>
 		</div>

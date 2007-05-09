@@ -170,7 +170,41 @@ if (hasArgument('mailing'))
       $mailings = $section->getMailings();
       $classes = array();
       foreach ($mailings as $mailing)
+      {
+        if (($mailing->hasFrequency()) && ($mailing->getNextSend()<=time()))
+        {
+          $itemversion = $mailing->createMail();
+          if ($mailing->hasModerator())
+          {
+            require_once('Mail.php');
+            require_once('Mail/mime.php');
+
+            $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
+            $mail = new Mail_mime("\n");
+            
+            $url = new Request();
+            $url->setMethod('admin');
+            $url->setPath('mailing/index.tpl');
+            $url->setQueryVar('section', $section->getId());
+            $url->setQueryVar('item', $itemversion->getItem()->getId());
+            $mail->setTxtBody('A new automated mail has been prepared. Please visit http://'.Session::getHost().$url->encode().' to review and send it.');
+            
+            $body = $mail->get();
+            $headers = array('Subject' => 'New automated mailing ready to send');
+            $headers['From'] = 'Swim CMS running on '.Session::getHost().' <swim@'.Session::getHost().'>';
+            $headers = $mail->headers($headers);
+
+            $smtp->send($mailing->getModerator(), $headers, $body);
+            $log->info('New mailing prepared and '.$mailing->getModerator().' notified');
+          }
+          else
+          {
+            $mailing->prepareMail($itemversion);
+            $log->info('New automated mail placed into queue');
+          }
+        }
         array_push($classes, $mailing->getClass());
+      }
 
       $items = Item::findItems($section, $classes, null, 'sent', true, 'boolean', false, false);
       foreach ($items as $itemversion)

@@ -45,6 +45,18 @@ class Session
     self::$initialised = true;
   }
   
+  public static function getHost()
+  {
+    if ((isset($_SERVER)) && (isset($_SERVER['HTTP_HOST'])))
+      return $_SERVER['HTTP_HOST'];
+    if ($_PREFS->isPrefSet('url.primaryhost'))
+    {
+      $primary = $_PREFS->getPref('url.primaryhost');
+      return $_PREFS->getPref('url.host.'.$primary.'.hostname');
+    }
+    return $_PREFS->getPref('url.host.1.hostname');
+  }
+  
   public static function getUser()
   {
     if (self::$user !== null)
