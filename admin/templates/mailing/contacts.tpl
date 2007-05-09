@@ -18,9 +18,14 @@ window.top.SiteTree.selectItem("contacts");
 <div id="mainpane">
 	<div class="header">
 		{secure contacts="write"}
-			{html_form tag_name="uploadform" tag_enctype="multipart/form-data" method="uploadcontacts" parentitem=$item->getId() nestcurrent="true"}
-				<table class="toolbar">
-					<tr>
+			<table class="toolbar">
+				<tr>
+					<td>
+						<div class="toolbarbutton">
+							<a href="{encode method="admin" path="mailing/editcontact.tpl" section=$request.query.section parentitem=$item->getId()}"><img src="{$CONTENT}/icons/up-blue.gif"/> Add a Contact</a>
+						</div>
+					</td>
+					{html_form tag_name="uploadform" tag_enctype="multipart/form-data" method="uploadcontacts" parentitem=$item->getId() nestcurrent="true"}
 						<td>
 							Upload new contacts: <input type="file" name="file">
 						</td>
@@ -29,9 +34,9 @@ window.top.SiteTree.selectItem("contacts");
 								<a href="javascript:BlueprintIT.forms.submitForm('uploadform')"><img src="{$CONTENT}/icons/up-blue.gif"/> Upload</a>
 							</div>
 						</td>
-					</tr>
-				</table>
-			{/html_form}
+					{/html_form}
+				</tr>
+			</table>
 		{/secure}
 		<h2>Contacts</h2>
 	</div>
@@ -81,19 +86,18 @@ window.top.SiteTree.selectItem("contacts");
 			<tbody>
 				{foreach name="itemlist" from=$sequence->getSortedItems($sortkey) item="subitem"}
 					{assign var="rlitem" value=$subitem->getCurrentVersion($variant)}
-					{if $rlitem===null}
-						{assign var="rlitem" value=$subitem->getNewestVersion($variant)}
+					{if $rlitem!==null}
+						<tr>
+							<td>
+							</td>
+							<td>{$rlitem->getFieldValue('title')}</td>
+							<td>{$rlitem->getFieldValue('firstname')}</td>
+							<td><a href="{encode method="admin" path="mailing/editcontact" item=$subitem->getId() section=$section->getId() parentitem=$item->getId()}">{$rlitem->getFieldValue('lastname')}</a></td>
+							<td>{$rlitem->getFieldValue('company')}</td>
+							<td>{$rlitem->getFieldValue('emailaddress')}</td>
+							<td></td>
+						</tr>
 					{/if}
-					<tr>
-						<td>
-						</td>
-						<td>{assign var="field" value=$rlitem->getField('title')}{$field->toString()}</td>
-						<td>{assign var="field" value=$rlitem->getField('firstname')}{$field->toString()}</td>
-						<td>{assign var="field" value=$rlitem->getField('lastname')}{$field->toString()}</td>
-						<td>{assign var="field" value=$rlitem->getField('company')}{$field->toString()}</td>
-						<td>{assign var="field" value=$rlitem->getField('emailaddress')}{$field->toString()}</td>
-						<td></td>
-					</tr>
 				{/foreach}
 			</tbody>
 		</table>

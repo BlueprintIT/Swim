@@ -24,9 +24,57 @@ function method_saveitem($request)
   
   if (($user->isLoggedIn())&&($user->hasPermission('documents',PERMISSION_WRITE)))
   {
-    if ($request->hasQueryVar('itemversion'))
+    if (($request->hasQueryVar('itemversion')) || (($request->hasQueryVar('variant')) &&
+         (($request->hasQueryVar('item')) ||
+        (($request->hasQueryVar('section')) && ($request->hasQueryVar('class'))))))
     {
-      $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
+      if ($request->hasQueryVar('itemversion'))
+        $itemversion = Item::getItemVersion($request->getQueryVar('itemversion'));
+      else if ($request->hasQueryVar('item'))
+      {
+        $item = Item::getItem($request->getQueryVar('item'));
+        if ($item !== null)
+        {
+          $variant = $item->getVariant($request->getQueryVar('variant'));
+          $itemversion = $variant->getDraftVersion();
+          if ($itemversion === null)
+          {
+            $itemversion = $variant->getCurrentVersion();
+            if ($itemversion === null)
+              $itemversion = $variant->createNewVersion();
+            else
+              $itemversion = $variant->createNewVersion($itemversion);
+          }
+        }
+      }
+      else
+      {
+        $class = FieldSetManager::getClass($request->getQueryVar('class'));
+        $section = FieldSetManager::getSection($request->getQueryVar('section'));
+        if (($class !== null) && ($section !== null))
+        {
+          $item = Item::createItem($section, $class);
+          $variant = $item->createVariant($request->getQueryVar('variant'));
+          $itemversion = $variant->createNewVersion();
+
+          if ($request->hasQueryVar('parentitem') && $request->hasQueryVar('parentsequence'))
+          {
+            $parent = Item::getItem($request->getQueryVar('parentitem'));
+            $sequence = $parent->getSequence($request->getQueryVar('parentsequence'));
+            if ($sequence !== null)
+              $sequence->appendItem($item);
+            $request->clearQueryVar('parentitem');
+            $request->clearQueryVar('parentsequence');
+          }
+        }
+      }
+
+      $request->clearQueryVar('itemversion');
+      $request->clearQueryVar('item');
+      $request->clearQueryVar('variant');
+      $request->clearQueryVar('section');
+      $request->clearQueryVar('class');
+
       if ($itemversion !== null)
       {
         $query = $request->getQuery();
@@ -39,7 +87,6 @@ function method_saveitem($request)
         {
           $req = $request->getNested();
         }
-        unset($query['itemversion']);
         if (isset($query['view']))
         {
           $view = FieldSetManager::getView($query['view']);

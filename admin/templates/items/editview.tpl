@@ -86,7 +86,7 @@
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								{assign var="field" value=$view->getField($itemversion, $field->getId())}
 								<tr>
-									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
+									<td class="label"><label for="field_{$field->getId()}">{$field->getName()|escape}:</label></td>
 									<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
 									<td class="description">{$field->getDescription()|escape}</td>
 								</tr>

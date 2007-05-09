@@ -30,7 +30,7 @@ function method_uploadcontacts($request)
         && $_FILES['file']['error']==UPLOAD_ERR_OK && is_uploaded_file($_FILES['file']['tmp_name']))
     {
       $parent = Item::getItem($request->getQueryVar('parentitem'));
-      $class = FieldSetManager::getClass('contact');
+      $class = FieldSetManager::getClass('_contact');
       if (($parent !== null) && ($class !== null))
       {
         if ($request->hasQueryVar('parentsequence'))

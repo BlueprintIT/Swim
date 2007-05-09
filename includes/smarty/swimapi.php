@@ -133,9 +133,11 @@ function generate_request($params, &$smarty)
 {
   if (!empty($params['var']))
   {
+    $var = $params['var'];
+    unset($params['var']);
     $request = get_params_request($params, $smarty);
     if ($request instanceof Request)
-      $smarty->assign_by_ref($params['var'], $request);
+      $smarty->assign_by_ref($var, $request);
   }
 }
 

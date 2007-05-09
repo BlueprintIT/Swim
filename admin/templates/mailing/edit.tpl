@@ -55,14 +55,14 @@ window.top.SiteTree.selectItem("{$request.query.item}");
 					<table class="admin">
 						{assign var="field" value=$itemversion->getField('name')}
 						<tr>
-							<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
+							<td class="label"><label for="field_{$field->getId()}">{$field->getName()|escape}:</label></td>
 							<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
 							<td class="description">{$field->getDescription()|escape}</td>
 						</tr>
 						{foreach from=$mailing->getItemSets() item="itemset"}
 							{assign var="field" value=$itemversion->getField($itemset->getId())}
 							<tr>
-								<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
+								<td class="label"><label for="field_{$field->getId()}">{$field->getName()|escape}:</label></td>
 								<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
 								<td class="description">{$field->getDescription()|escape}</td>
 							</tr>

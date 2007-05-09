@@ -110,7 +110,7 @@ var item = {ldelim}
 						{foreach from=$itemversion->getClassFields() item="field"}
 							{if $field->getType()!='html' && $field->getType()!='sequence'}
 								<tr>
-									<td class="label"><label for="field:{$field->getId()}">{$field->getName()|escape}:</label></td>
+									<td class="label"><label for="field_{$field->getId()}">{$field->getName()|escape}:</label></td>
 									<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
 									<td class="description">{$field->getDescription()|escape}</td>
 								</tr>
