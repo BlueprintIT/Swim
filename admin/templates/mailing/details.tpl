@@ -23,6 +23,13 @@ if (items) {ldelim}
     window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
     items[0].redrawChildren();
   {rdelim}
+{elseif $itemversion->getFieldValue('sent')=='true'}
+  if (items[0].parent.data.id == "drafts") {ldelim}
+    window.top.SiteTree.removeNode(items[0]);
+    items = window.top.SiteTree.getItems("pending");
+    window.top.SiteTree.createNode({$item->getId()}, "{$itemversion->getFieldValue('name')}", "sentmail", true, null, items[0]);
+    items[0].redrawChildren();
+  {rdelim}
 {/if}
 {rdelim}
 window.top.SiteTree.selectItem("{$request.query.item}");
@@ -32,7 +39,7 @@ window.top.SiteTree.selectItem("{$request.query.item}");
 		{secure contacts="write"}
 			<table class="toolbar">
 				<tr>
-					{if !$itemversion->isComplete()}
+					{if $itemversion->getFieldValue('sent')!='true'}
 						<td>
 							<div class="toolbarbutton">
 								<a href="{encode method="admin" path="mailing/edit.tpl" item=$item->getId()}">
@@ -48,14 +55,6 @@ window.top.SiteTree.selectItem("{$request.query.item}");
 									Send
 								</a>
 							</div>
-						</td>
-					{else}
-						<td>
-							{if $itemversion->getFieldValue('sent')}
-								Sent
-							{else}
-								Not sent
-							{/if}
 						</td>
 					{/if}
 					<td>

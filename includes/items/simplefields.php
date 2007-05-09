@@ -345,7 +345,8 @@ class BooleanField extends IntegerField
   {
     if (($value === true) || ($value === "true") || ($value === 1))
       parent::setValue(1);
-    parent::setValue(0);
+    else
+      parent::setValue(0);
   }
   
   public function getValue()

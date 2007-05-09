@@ -366,8 +366,7 @@ class Mailing extends XMLSerialized
     global $_STORAGE;
     
     $itemversion->setFieldValue('date', time());
-    $itemversion->setComplete(true);
-    $itemversion->setCurrent(true);
+    $itemversion->setFieldValue('sent', true);
 
     $this->retrieve();
     $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
@@ -378,8 +377,6 @@ class Mailing extends XMLSerialized
   {
     global $_PREFS;
     
-    $itemversion->setFieldValue('sent', true);
-    
     require_once('Mail.php');
     require_once('Mail/mime.php');
     $path = $_PREFS->getPref('storage.site.templates').'/mail/'.$itemversion->getClass()->getId();
@@ -388,6 +385,9 @@ class Mailing extends XMLSerialized
     
     if (is_file($textpath) || is_file($htmlpath))
     {
+      $itemversion->setComplete(true);
+      $itemversion->setCurrent(true);
+
       $start = time();
       for ($i = 0; $i < 100; $i++)
       {

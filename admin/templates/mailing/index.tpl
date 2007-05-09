@@ -23,7 +23,7 @@ function onTreeItemClick(id)
 		if (id == 'contacts') {ldelim}
 			src = '{encode method="admin" path="mailing/contacts.tpl" section=$section->getId()}';
 		{rdelim}
-		else if ((id == 'mailings') || (id == 'drafts') || (id == 'archive')) {ldelim}
+		else if ((id == 'mailings') || (id == 'drafts') || (id == 'archive') || (id == 'pending')) {ldelim}
 			var node = SiteTree.getItems(id);
 			node[0].toggle();
 		{rdelim}
@@ -81,13 +81,34 @@ var maildata = [
 {assign var="sequence" value=$item->getMainSequence()}
 {foreach from=$sequence->getItems() item="item"}
 		{assign var="variant" value=$item->getVariant('default')}
-		{if !$variant->getCurrentVersion()}
+		{assign var="itemversion" value=$variant->getDraftVersion()}
+		{if $itemversion && ($itemversion->getFieldValue('sent') != 'true')}
  			{ldelim}
-					{assign var="itemversion" value=$variant->getDraftVersion()}
 					class: "draftmail",
 					name: "{$itemversion->getFieldValue('name')}",
 					id: "{$item->getId()}",
 					published: false
+			{rdelim},
+		{/if}
+{/foreach}
+		]
+	{rdelim},
+	{ldelim}
+		id: "pending",
+		name: "Pending Mailings",
+		class: "category",
+		published: true,
+		contains: "sentmail",
+		subitems: [
+{foreach from=$sequence->getItems() item="item"}
+		{assign var="variant" value=$item->getVariant('default')}
+		{assign var="itemversion" value=$variant->getDraftVersion()}
+		{if $itemversion && ($itemversion->getFieldValue('sent') == 'true')}
+ 			{ldelim}
+					class: "sentmail",
+					name: "{$itemversion->getFieldValue('name')}",
+					id: "{$item->getId()}",
+					published: true
 			{rdelim},
 		{/if}
 {/foreach}
@@ -102,9 +123,9 @@ var maildata = [
 		subitems: [
 {foreach from=$sequence->getItems() item="item"}
 		{assign var="variant" value=$item->getVariant('default')}
-		{if $variant->getCurrentVersion()}
+		{assign var="itemversion" value=$variant->getCurrentVersion()}
+		{if $itemversion}
  			{ldelim}
-					{assign var="itemversion" value=$variant->getCurrentVersion()}
 					class: "sentmail",
 					name: "{$itemversion->getFieldValue('name')}",
 					id: "{$item->getId()}",
