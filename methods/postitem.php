@@ -107,6 +107,9 @@ function method_postitem($request)
             	$field->setValue($value);
           }
         }
+        
+        if ($itemversion->hasField('ipaddress'))
+          $itemversion->setFieldValue('ipaddress', $_SERVER['REMOTE_ADDR']);
 		  	
 		  	$itemversion->setComplete(true);
 		  	if ($sequence->postPublished())
