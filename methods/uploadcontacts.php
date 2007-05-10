@@ -81,7 +81,7 @@ function method_uploadcontacts($request)
               displayServerError($request);
               return;
             }
-            if (($emailfield < count($record)) && (strlen($record[$emailfield]) > 0))
+            if (($emailfield < count($record)) && (preg_match('/\S+\@\S+\.\S+/', $record[$emailfield]) > 0))
             {
               $items = Item::findItems($section, $class, null, 'emailaddress', $record[$emailfield]);
               if (count($items) > 0)
@@ -96,6 +96,7 @@ function method_uploadcontacts($request)
                 $item = Item::createItem($section, $class);
                 $variant = $item->createVariant('default');
                 $version = $variant->createNewVersion();
+                $version->setFieldValue('optedin', true);
                 $sequence->appendItem($item);
               }
               for ($i = 0; $i<count($record); $i++)
