@@ -49,9 +49,9 @@ function onTreeItemClick(id)
 	document.getElementById('main').src = request.encode();
 	SiteTree.selectItem(id);
 	var btn = document.getElementById("okbtn");
-	btn.style.display = null;
+	YAHOO.util.Dom.setStyle(btn, "display", "block");
 	btn = document.getElementById("okbtn-disabled");
-	btn.style.display = 'none';
+	YAHOO.util.Dom.setStyle(btn, "display", "none");
 }
 {/literal}
 var SiteTree = new BlueprintIT.widget.SiteTree('all', '{encode method='tree'}', 'categorytree', sitedata);
