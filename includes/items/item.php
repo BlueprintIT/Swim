@@ -21,6 +21,7 @@ class Item
   private $itemclass;
   private $path;
   private $archived;
+  private $created;
   private $complete;
   private $variants = array();
   private $fields = array();
@@ -42,6 +43,10 @@ class Item
       $this->archived = true;
     else
       $this->archived = false;
+    if (isset($details['created']))
+      $this->created = $details['created'];
+    else
+      $this->created = 0;
   }
   
   public function delete()
@@ -82,6 +87,11 @@ class Item
   public function getId()
   {
     return $this->id;
+  }
+  
+  public function getCreated()
+  {
+    return $this->created;
   }
   
   public function isArchived()

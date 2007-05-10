@@ -28,9 +28,13 @@ class ItemSorter
   {
     $a = self::getItemVersion($a);
     $b = self::getItemVersion($b);
-    if ($this->field === null)
+    if (($this->field === null) || ($this->field === 'published'))
     {
       $result = $a->getPublished() - $b->getPublished();
+    }
+    else if ($this->field === 'created')
+    {
+      $result = $a->getItem()->getCreated() - $b->getItem()->getCreated();
     }
     else
     {
@@ -82,14 +86,19 @@ class ItemSorter
       while ($start<$end)
       {
         $iv = self::getItemVersion($items[$start]);
-        if ($field !== null)
+        if (($field === null) || ($field == 'published'))
         {
-          if ($iv->getField($field)->compareTo($min)>=0)
+          if ($iv->getPublished() >= $min)
+            break;
+        }
+        else if ($field === 'created')
+        {
+          if ($iv->getItem()->getCreated() >= $min)
             break;
         }
         else
         {
-          if ($iv->getPublished() >= $min)
+          if ($iv->getField($field)->compareTo($min)>=0)
             break;
         }
         $start++;
@@ -101,14 +110,19 @@ class ItemSorter
       while ($end>$start)
       {
         $iv = self::getItemVersion($items[$end-1]);
-        if ($field !== null)
+        if (($field === null) || ($field === 'published'))
         {
-          if ($iv->getField($field)->compareTo($max)<=0)
+          if ($iv->getPublished() <= $max)
+            break;
+        }
+        else if ($field === 'created')
+        {
+          if ($iv->getItem()->getCreated() <= $max)
             break;
         }
         else
         {
-          if ($iv->getPublished() <= $max)
+          if ($iv->getField($field)->compareTo($max)<=0)
             break;
         }
         $end--;

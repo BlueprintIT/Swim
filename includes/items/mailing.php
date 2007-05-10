@@ -140,26 +140,49 @@ class MailingSelection extends MailingItemSet
 
     $min = $this->min;
     if (($min !== null) && (substr($min, 0, 3) == 'now'))
-      $min = strtotime(substr($min, 3));
+    {
+      if ($min == 'now')
+        $min = time();
+      else
+        $min = strtotime(substr($min, 3));
+    }
     $max = $this->max;
     if (($max !== null) && (substr($max, 0, 3) == 'now'))
-      $max = strtotime(substr($max, 3));
+    {
+      if ($max == 'now')
+        $max = time();
+      else
+        $max = strtotime(substr($max, 3));
+    }
     
     $items = Item::findItems($sections, $classes);
+    if (count($items) == 0)
+      return $items;
+    
     if ($this->sortorder == 'random')
       $maxcount = null;
     else
       $maxcount = $this->maxcount;
     $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortorder != 'descending'), $maxcount, $min, $max);
+    if (count($items) == 0)
+      return $items;
+    
     if ($this->sortorder == 'random')
     {
       if ($this->maxcount !== null)
       {
         $keys = array_rand($items, $this->maxcount);
-        $results = array();
-        foreach ($keys as $key)
-          array_push($results, $items[$key]);
-        $items = $results;
+        if ($this->maxcount == 1)
+        {
+          $items = array($items[$keys]);
+        }
+        else
+        {
+          $results = array();
+          foreach ($keys as $key)
+            array_push($results, $items[$key]);
+          $items = $results;
+        }
       }
       else
         shuffle($items);
