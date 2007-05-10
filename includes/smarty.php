@@ -282,7 +282,21 @@ function summarise_html($value, $count = 1)
     $pos = $npos + 4;
     $count--;
   }
-  return substr($value, 0, $pos);
+  $result = substr($value, 0, $pos);
+  $opens = substr_count($result, '<div');
+  $closes = substr_count($result, '</div>');
+  $extra = $opens - $closes;
+  if ($extra > 0)
+  {
+    for ($i = 0; $i < $extra; $i++)
+      $result .= '</div>';
+  }
+  else if ($extra < 0)
+  {
+    for ($i = 0; $i > $extra; $i--)
+      $result = '<div>'.$result;
+  }
+  return $result;
 }
 
 function htmltotext($value, $width = 78)

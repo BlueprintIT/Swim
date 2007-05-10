@@ -314,6 +314,8 @@ class BaseHTMLField extends TextField
       }
     }
     $result = str_replace('<br />', '<br>', $result);
+    $result = preg_replace('/<div[^>]*>/', '', $result);
+    $result = str_replace('</div>', '', $result);
     return $result;
   }
 }
