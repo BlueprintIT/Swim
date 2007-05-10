@@ -248,6 +248,8 @@ class ItemWrapper
   
   public static function getWrapper($itemversion)
   {
+    if ($itemversion === null)
+      return new ItemWrapper();
     $wrapper = ObjectCache::getItem('itemwrapper', $itemversion->getId());
     if ($wrapper === null)
     {
@@ -289,6 +291,8 @@ class ItemWrapper
   
   public function __get($name)
   {
+    if ($this->itemversion === null)
+      return '';
     switch($name)
     {
       case 'allowsLink':

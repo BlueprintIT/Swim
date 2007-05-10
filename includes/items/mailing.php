@@ -418,6 +418,46 @@ class Mailing extends XMLSerialized
     $this->values['lastsent'] = time();
   }
   
+  public function sendMailTo($itemversion, $email, $contact = null)
+  {
+    global $_PREFS;
+    
+    require_once('Mail.php');
+    require_once('Mail/mime.php');
+    $path = $_PREFS->getPref('storage.site.templates').'/mail/'.$itemversion->getClass()->getId();
+    $textpath = $path.'.text.tpl';
+    $htmlpath = $path.'.html.tpl';
+
+    $smtp = Mail::factory('smtp', array('host' => $_PREFS->getPref('mail.smtphost')));
+    $mail = new Mail_mime("\n");
+
+    if (is_file($htmlpath))
+    {
+      $smarty = createMailSmarty('text/html');
+      $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+      $smarty->assign_by_ref('contact', ItemWrapper::getWrapper($contact));
+      $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
+    }
+    
+    if (is_file($textpath))
+    {
+      $smarty = createMailSmarty('text/plain');
+      $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
+      $smarty->assign_by_ref('contact', ItemWrapper::getWrapper($contact));
+      $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
+    }
+    
+    $body = $mail->get();
+    $headers = array('Subject' => $itemversion->getFieldValue('name'));
+    if (isset($this->from))
+      $headers['From'] = $this->from;
+    else
+      $headers['From'] = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
+    $headers = $mail->headers($headers);
+    
+    $smtp->send($email, $headers, $body);
+  }
+  
   public function sendMail($itemversion)
   {
     global $_PREFS;
@@ -449,7 +489,6 @@ class Mailing extends XMLSerialized
           {
             $smarty = createMailSmarty('text/html');
             $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-            $smarty->assign_by_ref('contacts', ItemWrapper::getWrapper($contactsversion));
             $smarty->assign_by_ref('contact', ItemWrapper::getWrapper($contactversion));
             $mail->setHTMLBody($smarty->fetch($htmlpath, $itemversion->getItem()->getId()));
           }
@@ -458,7 +497,6 @@ class Mailing extends XMLSerialized
           {
             $smarty = createMailSmarty('text/plain');
             $smarty->assign_by_ref('item', ItemWrapper::getWrapper($itemversion));
-            $smarty->assign_by_ref('contacts', ItemWrapper::getWrapper($contactsversion));
             $smarty->assign_by_ref('contact', ItemWrapper::getWrapper($contactversion));
             $mail->setTxtBody($smarty->fetch($textpath, $itemversion->getItem()->getId()));
           }

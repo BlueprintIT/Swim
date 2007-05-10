@@ -1,5 +1,7 @@
 {secure contacts="read" login="true"}
 {include file='includes/frameheader.tpl' title="Mail Details"}
+{script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
+{script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="variant" value="default"}
 {assign var="section" value=$item->getSection()}
@@ -68,6 +70,21 @@ window.top.SiteTree.selectItem("{$request.query.item}");
 							</a>
 						</div>
 					</td>
+					{if $itemversion->getFieldValue('sent')!='true'}
+						{html_form tag_name="mainform" method="previewmail" itemversion=$itemversion->getId() nestcurrent="true"}
+							<td>
+								Preview to: <input type="text" name="email" value="">
+							</td>
+							<td>
+								<div class="toolbarbutton">
+									<a href="javascript:BlueprintIT.forms.submitForm('mainform')">
+										<img src="{$CONTENT}/icons/arrow-blue.gif"/>
+										Send Preview
+									</a>
+								</div>
+							</td>
+						{/html_form}
+					{/if}
 				</tr>
 			</table>
 		{/secure}
