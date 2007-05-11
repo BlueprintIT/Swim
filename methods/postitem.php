@@ -123,10 +123,16 @@ function method_postitem($request)
           $email = $field->toString();
           if (strlen($email) > 0)
           {
+            $url = new Request();
+            $url->setMethod('admin');
+            $url->setPath('items/index.tpl');
+            $url->setQueryVar('section', $section->getId());
+            $url->setQueryVar('item', $newitem->getId());
+
             $field = $iv->getField('name');
             $subject = 'Comment posted to '.$field->toString();
             $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-            $message = '';
+            $message = 'New item posted. Visit '.$url->encode()." to edit it.\n\n";
             if ($_PREFS->getPref('mail.headernewline'))
               $from.="\r\n";
 

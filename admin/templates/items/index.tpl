@@ -81,7 +81,11 @@ SiteTree.draggable = true;
 </div>
 
 <div id="mainpane" class="pane">
+{if $request.query.item}
+<iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$request.query.id}"></iframe>
+{else}
 <iframe id="main" name="main" style="height: 100%; width: 100%" scrolling="no" frameborder="0" src="{encode method='admin' path='items/details.tpl' item=$root->getId()}"></iframe>
+{/if}
 </div>
 {include file='includes/adminfooter.tpl'}
 {/secure}
