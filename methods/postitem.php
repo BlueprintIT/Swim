@@ -132,7 +132,7 @@ function method_postitem($request)
             $field = $iv->getField('name');
             $subject = 'Comment posted to '.$field->toString();
             $from = 'Swim CMS running on '.$_SERVER['HTTP_HOST'].' <swim@'.$_SERVER['HTTP_HOST'].'>';
-            $message = 'New item posted. Visit '.$url->encode()." to edit it.\n\n";
+            $message = 'New item posted. Visit http://'.Session::getHost().$url->encode()." to edit it.\n\n";
             if ($_PREFS->getPref('mail.headernewline'))
               $from.="\r\n";
 
