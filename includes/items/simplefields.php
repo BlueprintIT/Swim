@@ -483,7 +483,7 @@ class OptionField extends IntegerField
     return $this->option;
   }
   
-  public function getValue()
+  public function toString()
   {
     $this->retrieve();
     if ($this->option !== null)
