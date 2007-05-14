@@ -48,35 +48,35 @@ function onTreeItemClick(id)
 
 var maildata = [
 	{ldelim}
-		id: "contacts",
-		name: "Contacts",
-		class: "_contactcategory",
-		published: true
+		"id": "contacts",
+		"name": "Contacts",
+		"class": "_contactcategory",
+		"published": true
 	{rdelim},
 	{ldelim}
-		id: "mailings",
-		name: "Mailings",
-		class: "category",
-		published: true,
-		contains: "mailing",
-		subitems: [
+		"id": "mailings",
+		"name": "Mailings",
+		"class": "category",
+		"published": true,
+		"contains": "mailing",
+		"subitems": [
 {foreach from=$section->getMailings() item="mailing"}
 			{ldelim}
-				id: "mailing_{$mailing->getId()}",
-				name: "{$mailing->getName()}",
-				class: "mailing",
-				published: true
+				"id": "mailing_{$mailing->getId()}",
+				"name": "{$mailing->getName()}",
+				"class": "mailing",
+				"published": true
 			{rdelim},
 {/foreach}
 		]
 	},
 	{ldelim}
-		id: "drafts",
-		name: "Draft Mailings",
-		class: "category",
-		published: true,
-		contains: "draftmail",
-		subitems: [
+		"id": "drafts",
+		"name": "Draft Mailings",
+		"class": "category",
+		"published": true,
+		"contains": "draftmail",
+		"subitems": [
 {assign var="item" value=$section->getRootItem()}
 {assign var="sequence" value=$item->getMainSequence()}
 {foreach from=$sequence->getItems() item="item"}
@@ -84,52 +84,52 @@ var maildata = [
 		{assign var="itemversion" value=$variant->getDraftVersion()}
 		{if $itemversion && ($itemversion->getFieldValue('sent') != 'true')}
  			{ldelim}
-					class: "draftmail",
-					name: "{$itemversion->getFieldValue('name')}",
-					id: "{$item->getId()}",
-					published: false
+					"class": "draftmail",
+					"name": "{$itemversion->getFieldValue('name')}",
+					"id": "{$item->getId()}",
+					"published": false
 			{rdelim},
 		{/if}
 {/foreach}
 		]
 	{rdelim},
 	{ldelim}
-		id: "pending",
-		name: "Pending Mailings",
-		class: "category",
-		published: true,
-		contains: "sentmail",
-		subitems: [
+		"id": "pending",
+		"name": "Pending Mailings",
+		"class": "category",
+		"published": true,
+		"contains": "sentmail",
+		"subitems": [
 {foreach from=$sequence->getItems() item="item"}
 		{assign var="variant" value=$item->getVariant('default')}
 		{assign var="itemversion" value=$variant->getDraftVersion()}
 		{if $itemversion && ($itemversion->getFieldValue('sent') == 'true')}
  			{ldelim}
-					class: "sentmail",
-					name: "{$itemversion->getFieldValue('name')}",
-					id: "{$item->getId()}",
-					published: true
+					"class": "sentmail",
+					"name": "{$itemversion->getFieldValue('name')}",
+					"id": "{$item->getId()}",
+					"published": true
 			{rdelim},
 		{/if}
 {/foreach}
 		]
 	{rdelim},
 	{ldelim}
-		id: "archive",
-		name: "Past Mailings",
-		class: "category",
-		published: true,
-		contains: "sentmail",
-		subitems: [
+		"id": "archive",
+		"name": "Past Mailings",
+		"class": "category",
+		"published": true,
+		"contains": "sentmail",
+		"subitems": [
 {foreach from=$sequence->getItems() item="item"}
 		{assign var="variant" value=$item->getVariant('default')}
 		{assign var="itemversion" value=$variant->getCurrentVersion()}
 		{if $itemversion}
  			{ldelim}
-					class: "sentmail",
-					name: "{$itemversion->getFieldValue('name')}",
-					id: "{$item->getId()}",
-					published: true
+					"class": "sentmail",
+					"name": "{$itemversion->getFieldValue('name')}",
+					"id": "{$item->getId()}",
+					"published": true
 			{rdelim},
 		{/if}
 {/foreach}
