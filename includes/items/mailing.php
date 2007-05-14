@@ -380,6 +380,8 @@ class Mailing extends XMLSerialized
   
   public function createMail()
   {
+    global $_STORAGE;
+    
     $item = Item::createItem($this->section, $this->mailclass);
     $variant = $item->createVariant(Session::getCurrentVariant());
     $iv = $variant->createNewVersion();
@@ -412,8 +414,6 @@ class Mailing extends XMLSerialized
   
   public function prepareSend($itemversion)
   {
-    global $_STORAGE;
-    
     $itemversion->setFieldValue('date', time());
     $itemversion->setFieldValue('sent', true);
   }
