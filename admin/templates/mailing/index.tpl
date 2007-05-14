@@ -51,13 +51,13 @@ var maildata = [
 		"id": "contacts",
 		"name": "Contacts",
 		"class": "_contactcategory",
-		"published": true
+		"published": "true"
 	{rdelim},
 	{ldelim}
 		"id": "mailings",
 		"name": "Mailings",
 		"class": "category",
-		"published": true,
+		"published": "true",
 		"contains": "mailing",
 		"subitems": [
 {foreach from=$section->getMailings() item="mailing"}
@@ -65,7 +65,7 @@ var maildata = [
 				"id": "mailing_{$mailing->getId()}",
 				"name": "{$mailing->getName()}",
 				"class": "mailing",
-				"published": true
+				"published": "true"
 			{rdelim},
 {/foreach}
 		]
@@ -74,7 +74,7 @@ var maildata = [
 		"id": "drafts",
 		"name": "Draft Mailings",
 		"class": "category",
-		"published": true,
+		"published": "true",
 		"contains": "draftmail",
 		"subitems": [
 {assign var="item" value=$section->getRootItem()}
@@ -87,7 +87,7 @@ var maildata = [
 					"class": "draftmail",
 					"name": "{$itemversion->getFieldValue('name')}",
 					"id": "{$item->getId()}",
-					"published": false
+					"published": "false"
 			{rdelim},
 		{/if}
 {/foreach}
@@ -97,7 +97,7 @@ var maildata = [
 		"id": "pending",
 		"name": "Pending Mailings",
 		"class": "category",
-		"published": true,
+		"published": "true",
 		"contains": "sentmail",
 		"subitems": [
 {foreach from=$sequence->getItems() item="item"}
@@ -108,7 +108,7 @@ var maildata = [
 					"class": "sentmail",
 					"name": "{$itemversion->getFieldValue('name')}",
 					"id": "{$item->getId()}",
-					"published": true
+					"published": "true"
 			{rdelim},
 		{/if}
 {/foreach}
@@ -118,7 +118,7 @@ var maildata = [
 		"id": "archive",
 		"name": "Past Mailings",
 		"class": "category",
-		"published": true,
+		"published": "true",
 		"contains": "sentmail",
 		"subitems": [
 {foreach from=$sequence->getItems() item="item"}
@@ -129,7 +129,7 @@ var maildata = [
 					"class": "sentmail",
 					"name": "{$itemversion->getFieldValue('name')}",
 					"id": "{$item->getId()}",
-					"published": true
+					"published": "true"
 			{rdelim},
 		{/if}
 {/foreach}
