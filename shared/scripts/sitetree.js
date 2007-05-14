@@ -324,8 +324,10 @@ BlueprintIT.widget.SiteTree.prototype = {
 	loadCategory: function(root, treenode) {
 		if (root && root.length>0) {
 			treenode.expanded = true;
-			for (var i=0; i<root.length; i++)
-				this.loadItem(root[i], treenode);
+			for (var i=0; i<root.length; i++) {
+				if (root[i])
+					this.loadItem(root[i], treenode);
+			}
 		}
 	},
 

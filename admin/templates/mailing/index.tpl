@@ -60,13 +60,13 @@ var maildata = [
 		"published": "true",
 		"contains": "mailing",
 		"subitems": [
-{foreach from=$section->getMailings() item="mailing"}
+{foreach name="items" from=$section->getMailings() item="mailing"}
 			{ldelim}
 				"id": "mailing_{$mailing->getId()}",
 				"name": "{$mailing->getName()}",
 				"class": "mailing",
 				"published": "true"
-			{rdelim},
+			{rdelim}{if !$smarty.foreach.items.last},{/if}
 {/foreach}
 		]
 	},
@@ -79,7 +79,7 @@ var maildata = [
 		"subitems": [
 {assign var="item" value=$section->getRootItem()}
 {assign var="sequence" value=$item->getMainSequence()}
-{foreach from=$sequence->getItems() item="item"}
+{foreach name="items" from=$sequence->getItems() item="item"}
 		{assign var="variant" value=$item->getVariant('default')}
 		{assign var="itemversion" value=$variant->getDraftVersion()}
 		{if $itemversion && ($itemversion->getFieldValue('sent') != 'true')}
