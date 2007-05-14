@@ -90,6 +90,9 @@ require_once $swimdir.'/bootstrap/prefs.php';
 loadBasePreferences();
 loadSitePreferences();
 
+if ($_PREFS->isPrefSet('php.extra_includes'))
+  set_include_path($_PREFS->getPref('php.extra_includes').PATH_SEPARATOR.get_include_path());
+
 LoggerManager::setLogOutput('',new FileLogOutput($_PREFS->getPref('logging.logfile')));
 LoggerManager::setBaseDir($_PREFS->getPref('storage.swimdir'));
 
