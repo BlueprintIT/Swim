@@ -402,6 +402,10 @@ class Mailing extends XMLSerialized
     $parent = $this->section->getRootItem();
     $sequence = $parent->getMainSequence();
     $sequence->insertItem(0, $item);
+
+    $this->retrieve();
+    $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
+    $this->values['lastsent'] = time();
     
     return $iv;
   }
@@ -412,10 +416,6 @@ class Mailing extends XMLSerialized
     
     $itemversion->setFieldValue('date', time());
     $itemversion->setFieldValue('sent', true);
-
-    $this->retrieve();
-    $_STORAGE->queryExec('UPDATE Mailing SET lastsent='.time().';');
-    $this->values['lastsent'] = time();
   }
   
   public function sendMailTo($itemversion, $email, $contact = null)

@@ -47,6 +47,8 @@ class Session
   
   public static function getHost()
   {
+    global $_PREFS;
+    
     if ((isset($_SERVER)) && (isset($_SERVER['HTTP_HOST'])))
       return $_SERVER['HTTP_HOST'];
     if ($_PREFS->isPrefSet('url.primaryhost'))

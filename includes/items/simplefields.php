@@ -246,8 +246,11 @@ class BaseHTMLField extends TextField
   
   public function setValue($value)
   {
-    $value = str_replace('href="http://'.$_SERVER['HTTP_HOST'].'/', 'href="/', $value);
-    $value = str_replace('src="http://'.$_SERVER['HTTP_HOST'].'/', 'src="/', $value);
+    if (isset($_SERVER['HTTP_HOST']))
+    {
+      $value = str_replace('href="http://'.$_SERVER['HTTP_HOST'].'/', 'href="/', $value);
+      $value = str_replace('src="http://'.$_SERVER['HTTP_HOST'].'/', 'src="/', $value);
+    }
     parent::setValue($value);
   }
   
