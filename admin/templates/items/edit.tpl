@@ -2,6 +2,7 @@
 {include file='includes/frameheader.tpl' title="Content management"}
 {stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {script method="admin" path="scripts/request.js"}
+{script href="$CONTENT/scripts/help.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
@@ -19,6 +20,7 @@
 {else}
 	{assign var="itemversion" value=$itemvariant->getVersions()[0]}
 {/if}
+{assign var="section" value=$item->getSection()}
 {assign var="class" value=$itemversion->getClass()}
 {assign var="view" value=$itemversion->getView()}
 {if $itemvariant->getCurrentVersion()}
@@ -112,7 +114,7 @@ var item = {ldelim}
 								<tr>
 									<td class="label"><label for="field_{$field->getId()}">{$field->getName()|escape}:</label></td>
 									<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
-									<td class="description">{$field->getDescription()|escape}</td>
+									<td class="description">{if $field->getDescription()}<img class="helpicon" onclick="openClassHelp('{$section->getId()}','{$class->getId()}','field_{$field->getId()}')" src="{$CONTENT}/images/question.png">{/if}</td>
 								</tr>
 							{/if}
 						{/foreach}
@@ -121,7 +123,7 @@ var item = {ldelim}
 			</div>
 			{foreach name="fieldlist" from=$itemversion->getFields() item="field"}
 				{if $field->getType()=='html'}
-					<p class="htmlfield">{$field->getName()|escape}:</p>
+					<p class="htmlfield">{$field->getName()|escape}{if $field->getDescription()} <img class="helpicon" onclick="openClassHelp('{$section->getId()}','{$class->getId()}','field_{$field->getId()}')" src="{$CONTENT}/images/question.png">{/if}:</p>
 					<div id="outer_field_{$field->getId()}">{$field->getEditor($REQUEST,$SMARTY)}</div>
 				{/if}
 			{/foreach}

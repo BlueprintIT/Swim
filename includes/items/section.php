@@ -17,6 +17,7 @@ class Section extends AdminSection
 {
   protected $id;
   protected $name = '';
+  protected $description;
   protected $item;
   protected $classes;
   protected $log;
@@ -74,6 +75,11 @@ class Section extends AdminSection
   public function getName()
   {
     return $this->name;
+  }
+  
+  public function getDescription()
+  {
+    return $this->description;
   }
   
   private function getRootClass()
@@ -156,6 +162,10 @@ class Section extends AdminSection
         if ($el->tagName=='name')
         {
           $this->name=getDOMText($el);
+        }
+        else if ($el->tagName=='description')
+        {
+          $this->description=getDOMText($el);
         }
         else if ($el->tagName=='classes')
         {

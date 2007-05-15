@@ -1,6 +1,7 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
 {script method="admin" path="scripts/request.js"}
+{script href="$CONTENT/scripts/help.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
@@ -10,6 +11,7 @@
 {script href="$CONTENT/scripts/fields.js`$smarty.config.YUI`"}
 {stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
 {apiget var="item" type="item" id=$request.query.item}
+{assign var="section" value=$item->getSection()}
 {assign var="variant" value="default"}
 {assign var="itemvariant" value=$item->getVariant($variant)}
 {if isset($request.query.version)}
@@ -88,7 +90,7 @@
 								<tr>
 									<td class="label"><label for="field_{$field->getId()}">{$field->getName()|escape}:</label></td>
 									<td class="details">{$field->getEditor($REQUEST,$SMARTY)}</td>
-									<td class="description">{$field->getDescription()|escape}</td>
+									<td class="description">{if $field->getDescription()}<img class="helpicon" onclick="openViewHelp('{$section->getId()}','{$view->getId()}','field_{$field->getId()}')" src="{$CONTENT}/images/question.png">{/if}</td>
 								</tr>
 							{/if}
 						{/foreach}

@@ -196,3 +196,7 @@ table.compound {
   padding-right: 5px;
   margin: 1em 0 0.5em 0;
 }
+
+.helpicon {
+  cursor: pointer;
+}

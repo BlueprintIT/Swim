@@ -6,6 +6,7 @@
 {script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
 {script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
+{script href="$CONTENT/scripts/help.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="variant" value="default"}
 {assign var="section" value=$item->getSection()}
@@ -471,7 +472,7 @@ function moveDown(item, field, link) {
 			{if $field->getType()=='sequence' && $field !== $itemversion->getMainSequence()}
 				<div class="section">
 					<div class="sectionheader">
-						<h3>{$field->getName()|escape}</h3>
+						<h3>{$field->getName()|escape}{if $field->getDescription()} <img class="helpicon" onclick="openClassHelp('{$section->getId()}','{$class->getId()}','field_{$field->getId()}')" src="{$CONTENT}/images/question.png">{/if}</h3>
 					</div>
 					<div class="sectionbody">
 						{if !$field->isSorted()}
