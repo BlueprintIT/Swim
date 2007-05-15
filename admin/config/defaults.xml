@@ -50,6 +50,10 @@
   <class id="_contact" versioning="simple">
     <views>default</views>
     <name>Contact</name>
+    <field id="name" type="text">
+      <name>Title</name>
+      <description>Do not use this.</description>
+    </field>
     <field id="title" type="text">
       <name>Title</name>
     </field>
