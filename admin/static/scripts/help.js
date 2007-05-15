@@ -8,7 +8,7 @@ function openClassHelp(section, class, target)
   window.open(request.encode()+"#"+target, "SWIMHelp", "width=600,height=400,menubar=no,toolbar=no,location=no,directories=no,status=no,resizable");
 }
 
-function openClassHelp(section, class, target)
+function openViewHelp(section, class, target)
 {
   var request = new Request();
   request.setMethod("admin");
