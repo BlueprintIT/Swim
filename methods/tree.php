@@ -17,7 +17,7 @@ function displayTreeItem($item, $variant)
 {
 	global $_STORAGE;
 	
-	$results = $_STORAGE->query('SELECT VariantVersion.current AS published,Field.textValue AS name FROM (ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant) LEFT JOIN Field ON VariantVersion.id=Field.itemversion WHERE ItemVariant.item='.$item->getId().' AND ItemVariant.variant="default" AND Field.field="name" ORDER BY VariantVersion.current DESC, VariantVersion.version DESC;');
+	$results = $_STORAGE->query('SELECT VariantVersion.current AS published,Field.textValue AS name FROM (ItemVariant JOIN VariantVersion ON ItemVariant.id=VariantVersion.itemvariant) LEFT JOIN Field ON VariantVersion.id=Field.itemversion WHERE ItemVariant.item='.$item->getId().' AND ItemVariant.variant="default" AND Field.basefield="base" AND Field.field="name" ORDER BY VariantVersion.current DESC, VariantVersion.version DESC;');
 	if ($results->valid())
 		$details = $results->fetch();
 	else
