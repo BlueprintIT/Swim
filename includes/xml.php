@@ -31,7 +31,7 @@ function getDOMText($element)
 function setDOMText($element, $value)
 {
   $text='';
-  while ($element->listChild !== null)
+  while ($element->lastChild !== null)
     $element->removeChild($element->lastChild);
   $element->appendChild($element->ownerDocument->createTextNode($value));
 }

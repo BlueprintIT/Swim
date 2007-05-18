@@ -138,54 +138,57 @@ class MailingSelection extends MailingItemSet
     else
       $classes = null;
 
-    $min = $this->min;
-    if (($min !== null) && (substr($min, 0, 3) == 'now'))
-    {
-      if ($min == 'now')
-        $min = time();
-      else
-        $min = strtotime(substr($min, 3));
-    }
-    $max = $this->max;
-    if (($max !== null) && (substr($max, 0, 3) == 'now'))
-    {
-      if ($max == 'now')
-        $max = time();
-      else
-        $max = strtotime(substr($max, 3));
-    }
-    
     $items = Item::findItems($sections, $classes);
     if (count($items) == 0)
       return $items;
     
-    if ($this->sortorder == 'random')
-      $maxcount = null;
-    else
-      $maxcount = $this->maxcount;
-    $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortorder != 'descending'), $maxcount, $min, $max);
-    if (count($items) == 0)
-      return $items;
-    
-    if ($this->sortorder == 'random')
+    if ($this->sortfield !== null)
     {
-      if ($this->maxcount !== null)
+      $min = $this->min;
+      if (($min !== null) && (substr($min, 0, 3) == 'now'))
       {
-        $keys = array_rand($items, $this->maxcount);
-        if ($this->maxcount == 1)
+        if ($min == 'now')
+          $min = time();
+        else
+          $min = strtotime(substr($min, 3));
+      }
+      $max = $this->max;
+      if (($max !== null) && (substr($max, 0, 3) == 'now'))
+      {
+        if ($max == 'now')
+          $max = time();
+        else
+          $max = strtotime(substr($max, 3));
+      }
+      
+      if ($this->sortorder == 'random')
+        $maxcount = null;
+      else
+        $maxcount = $this->maxcount;
+      $items = ItemSorter::selectItems($items, $this->sortfield, ($this->sortorder != 'descending'), $maxcount, $min, $max);
+      if (count($items) == 0)
+        return $items;
+      
+      if ($this->sortorder == 'random')
+      {
+        if ($this->maxcount !== null)
         {
-          $items = array($items[$keys]);
+          $keys = array_rand($items, $this->maxcount);
+          if ($this->maxcount == 1)
+          {
+            $items = array($items[$keys]);
+          }
+          else
+          {
+            $results = array();
+            foreach ($keys as $key)
+              array_push($results, $items[$key]);
+            $items = $results;
+          }
         }
         else
-        {
-          $results = array();
-          foreach ($keys as $key)
-            array_push($results, $items[$key]);
-          $items = $results;
-        }
+          shuffle($items);
       }
-      else
-        shuffle($items);
     }
     $results = array();
     foreach ($items as $item)

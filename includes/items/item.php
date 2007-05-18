@@ -506,7 +506,7 @@ class Item
       if ($current)
         $params .= ' AND VariantVersion.current=1';
       else
-        $params .= ' AND VariantVersion.current<>1';
+        $params .= ' AND (VariantVersion.current=0 OR ISNULL(VariantVersion.current))';
     }
 
     if ($complete !== null)
@@ -514,7 +514,7 @@ class Item
       if ($complete)
         $params .= ' AND VariantVersion.complete=1';
       else
-        $params .= ' AND VariantVersion.complete<>1';
+        $params .= ' AND (VariantVersion.complete=0 OR ISNULL(VariantVersion.complete))';
     }
 
     if ($archived !== null)
@@ -522,7 +522,7 @@ class Item
       if ($archived)
         $params .= ' AND Item.archived=1';
       else
-        $params .= ' AND Item.archived<>1';
+        $params .= ' AND (Item.archived=0 OR ISNULL(Item.archived))';
     }
 
     if ($fieldname !== null)
