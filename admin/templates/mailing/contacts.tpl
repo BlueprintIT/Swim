@@ -88,11 +88,10 @@ window.top.SiteTree.selectItem("contacts");
 					{assign var="rlitem" value=$subitem->getCurrentVersion($variant)}
 					{if $rlitem!==null}
 						<tr>
-							<td>
-							</td>
+							<td><a href="{encode method="admin" path="mailing/editcontact" item=$subitem->getId() section=$section->getId() parentitem=$item->getId()}"><img style="border: 0" src="{$CONTENT}/icons/edit-purple.gif"></a></td>
 							<td>{$rlitem->getFieldValue('title')}</td>
 							<td>{$rlitem->getFieldValue('firstname')}</td>
-							<td><a href="{encode method="admin" path="mailing/editcontact" item=$subitem->getId() section=$section->getId() parentitem=$item->getId()}">{$rlitem->getFieldValue('lastname')}</a></td>
+							<td>{$rlitem->getFieldValue('lastname')}</td>
 							<td>{$rlitem->getFieldValue('company')}</td>
 							<td>{$rlitem->getFieldValue('emailaddress')}</td>
 							<td><input disabled="disabled" type="checkbox" {if $rlitem->getFieldValue('optedin')=='true'}checked="checked"{/if}></td>
