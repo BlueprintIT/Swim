@@ -33,8 +33,8 @@ function output_subtemplate($params, &$smarty)
     }
     $template = findDisplayableFile($_PREFS->GetPref('storage.site.templates').'/'.$file);
     $type = determineContentType($template);
-    $smarty = createSmarty($request, $type);
-    $result = $smarty->display($template);
+    $newsmarty = createSmarty($request, $type);
+    $result = $newsmarty->display($template);
   }
 }
 
