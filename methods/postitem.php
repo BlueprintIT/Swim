@@ -50,7 +50,32 @@ function method_postitem($request)
 		displayNotFound($request);
 		return;
 	}
-    	
+  
+  $rules = $sequence->getPostRules();
+  if ($rules !== null)
+  {
+    $rules = $_PREFS->evaluatePref($rules);
+    if (is_readable($rules))
+    {
+      $rules = explode("\n", file_get_contents($rules));
+      $query = $request->getQuery();
+      foreach ($rules as $rule)
+      {
+        if (substr($rule, 0, 1) == '/')
+        {
+          foreach ($query as $name => $value)
+          {
+            if (preg_match($rule, $value) == 1)
+            {
+              displayGeneralError($request, 'Illegal content in posting');
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+  
 	if ($request->hasQueryVar('class'))
     $class = FieldSetManager::getClass($request->getQueryVar('class'));
   else

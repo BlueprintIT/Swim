@@ -151,6 +151,7 @@ class Sequence extends ClassField
   protected $relationship = 'aggregation';
   protected $allowposts = false;
   protected $postpublished = true;
+  protected $postrules = null;
   
   public function __construct($metadata)
   {
@@ -210,6 +211,8 @@ class Sequence extends ClassField
     			break;
     	}
     }
+    if ($element->hasAttribute('postrules'))
+      $this->postrules = $element->getAttribute('postrules');
     parent::parseAttributes($element);
   }
   
@@ -273,6 +276,11 @@ class Sequence extends ClassField
     }
     
     return $this->classes;
+  }
+  
+  public function getPostRules()
+  {
+    return $this->postrules;
   }
   
   public function allowPosts()
