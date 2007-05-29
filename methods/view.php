@@ -33,7 +33,7 @@ function method_view($request)
 	}
   
 	$item = Item::getItem($id);
-  if ((!$request->isModified()) && ($item->getPath() !== null))
+  if (($item !== null) && (!$request->isModified()) && ($item->getPath() !== null))
   {
     $path = $item->getPath();
     if (substr($path,0,1) == '/')
