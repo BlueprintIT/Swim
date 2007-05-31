@@ -68,6 +68,32 @@ function loadSitePreferences()
   }
   $_PREFSCOPES['site']->setParent($_PREFSCOPES['host']);
   
+  if (isset($_SERVER) && isset($_GET['$_SERVER']))
+  {
+    $hosts = $_PREFSCOPES['site']->getPrefBranch('url.host');
+    foreach ($hosts as $key => $host)
+    {
+      if ((substr($key, -9) == '.hostname') && ($host == $_SERVER['HTTP_HOST']))
+      {
+        $pref = 'url.host.'.substr($key, 0, -9).'.config';
+        if ($_PREFSCOPES['site']->isPrefSet($pref))
+        {
+          $path = $_PREFSCOPES['site']->getPref($pref);
+          if (is_readable($path))
+          {
+            $subsite = new Preferences();
+            $subsite->setParent($_PREFSCOPES['site']);
+            $_PREFSCOPES['site'] = $subsite;
+            $file=fopen($path, 'r');
+            $subsite->loadPreferences($file);
+            fclose($file);
+          }
+        }
+        break;
+      }
+    }
+  }
+  
   $_PREFSCOPES['default']->setDelegate($_PREFSCOPES['site']);
   
   $_PREFS=$_PREFSCOPES['site'];

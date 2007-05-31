@@ -120,9 +120,10 @@ Options -Indexes
 
 <?
 	$hostpattern = '^(';
-  foreach ($hosts as $host)
+  foreach ($hosts as $key => $host)
   {
-    $hostpattern .= $host.'|';
+    if (substr($key, -9) == '.hostname')
+      $hostpattern .= $host.'|';
   }
   $hostpattern = substr($hostpattern, 0, -1).')$';
   
