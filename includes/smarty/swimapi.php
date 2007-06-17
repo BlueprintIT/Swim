@@ -129,6 +129,36 @@ function encode_form($params, $content, &$smarty, &$repeat)
   }
 }
 
+function encode_itemurl($params, &$smarty)
+{
+  if (!empty($params['item']))
+  {
+    $item = $params['item'];
+    unset($params['item']);
+  }
+  else
+    $item = $smarty->get_template_vars('item');
+  if ($item !== null)
+  {
+    if (!($item instanceof ItemWrapper))
+    {
+      if ($item instanceof Item)
+        $item = $item->getCurrentVersion(Session::getCurrentVariant());
+      else if ($item instanceof ItemVariant)
+        $item = $item->getCurrentVersion();
+      $item = ItemWrapper::getWrapper($item);
+    }
+    if (!empty($params['path']))
+    {
+      $path = $params['path'];
+      unset($params['path']);
+    }
+    else
+      $path = '';
+    print($item->getUrl($path, $params));
+  }
+}
+
 function generate_request($params, &$smarty)
 {
   if (!empty($params['var']))

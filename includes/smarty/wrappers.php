@@ -259,7 +259,7 @@ class ItemWrapper
     return $wrapper;
   }
   
-  public function getUrl($extra = '')
+  public function getUrl($extra = '', $params = array())
   {
   	global $_PREFS;
   	
@@ -274,17 +274,22 @@ class ItemWrapper
   	}
     if ($path !== null)
     {
+      if (count($params) > 0)
+        $extra.='?'.encodeQuery($params);
     	return $_PREFS->getPref('url.pagegen').$path.$extra;
     }
     else if (($extra === '') && ($_PREFS->getPref('url.defaultmethod')=='view') && ($_PREFS->getPref('url.defaultpath')==$target->getItem()->getId()))
     {
-    	return $_PREFS->getPref('url.pagegen').'/';
+      if (count($params) > 0)
+        $extra.='?'.encodeQuery($params);
+    	return $_PREFS->getPref('url.pagegen').'/'.$extra;
     }
     else
     {
       $req = new Request();
       $req->setMethod('view');
       $req->setPath($target->getItem()->getId().$extra);
+      $req->setQueryVars($params);
       return $req->encode();
     }
   }
