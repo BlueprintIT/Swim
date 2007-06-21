@@ -73,12 +73,25 @@ class MySQLStorage extends StorageConnection
   {
   	parent::__construct();
     $this->db = new mysqli($host, $user, $pass, $db);
-    $this->log->debug('Loaded '.$db.' database from '.$host);
-    $result = $this->query("SHOW TABLES;");
-    if (($result instanceof MySQLResult) && (!$result->valid()))
+    if ($this->db === FALSE)
+    {
+      $this->db = null;
+      $this->log->error('Failed to connect to database.');
+    }
+    else
+    {
+      $this->log->debug('Loaded '.$db.' database from '.$host);
+      $result = $this->query("SHOW TABLES;");
+      if (($result instanceof MySQLResult) && (!$result->valid()))
       $this->new = true;
+    }
   }
   
+  public function isConnected()
+  {
+    return $this->db !== null;
+  }
+
   public function escape($text)
   {
     return $this->db->escape_string($text);

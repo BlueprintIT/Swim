@@ -222,6 +222,12 @@ class StorageConnection
 		}
 	}
 	
+  public function isConnected()
+  {
+    $this->log->warntrace('Unimplemented storage method');
+    return true;
+  }
+
   public function escape($text)
   {
     $this->log->warntrace('Unimplemented storage method');
@@ -355,7 +361,13 @@ function storage_init()
     $database = $_PREFS->getPref('storage.mysql.database');
     $_STORAGE = new MysqlStorage($host, $user, $pass, $database);
   }
-    
+   
+  if (!$_STORAGE->isConnected())
+  {
+    print "Unable to connect to database.";
+    exit;
+  }
+ 
   if ($_STORAGE->isNew())
   {
     $log->debug('Initialising database');

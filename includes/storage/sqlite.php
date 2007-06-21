@@ -85,6 +85,11 @@ class SqliteStorage extends StorageConnection
     $this->log->debug('Loaded database from '.$filename);
   }
   
+  public function isConnected()
+  {
+    return true;
+  }
+
   public function escape($text)
   {
     return sqlite_escape_string($text);
