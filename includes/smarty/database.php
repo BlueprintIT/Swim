@@ -17,7 +17,7 @@ function database_exec($params, &$smarty)
 {
   global $_STORAGE;
   
-  if (!empty($params['query'))
+  if (!empty($params['query']))
   {
     $_STORAGE->queryExec($params['query']);
     if (!empty($params['var']))
