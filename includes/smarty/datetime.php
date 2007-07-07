@@ -3,7 +3,7 @@
 /*
  * Swim
  *
- * Smarty dat and time functions
+ * Smarty date and time functions
  *
  * Copyright Blueprint IT Ltd. 2007
  *

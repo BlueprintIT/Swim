@@ -18,6 +18,7 @@ require $_PREFS->getPref('storage.includes').'/smarty/resources.php';
 require $_PREFS->getPref('storage.includes').'/smarty/swimapi.php';
 require $_PREFS->getPref('storage.includes').'/smarty/wrappers.php';
 require $_PREFS->getPref('storage.includes').'/smarty/datetime.php';
+require $_PREFS->getPref('storage.includes').'/smarty/database.php';
 
 function output_subtemplate($params, &$smarty)
 {
@@ -386,6 +387,8 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('subtemplate', 'output_subtemplate');
   $smarty->register_function('mktime', 'datetime_mktime');
   $smarty->register_function('datesequence', 'datetime_sequence');
+  $smarty->register_function('sqlquery', 'database_query');
+  $smarty->register_function('sqlexec', 'database_exec');
   $smarty->register_block('html_form', 'encode_form');
   $smarty->register_block('secure', 'check_security');
   $smarty->register_modifier('summarise', 'summarise_html');
