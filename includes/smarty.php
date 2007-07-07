@@ -393,6 +393,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_block('secure', 'check_security');
   $smarty->register_modifier('summarise', 'summarise_html');
   $smarty->register_modifier('plaintext', 'htmltotext');
+  $smarty->register_modifier('sqlescape', 'database_escape');
 
   if ($type == 'text/css')
   {

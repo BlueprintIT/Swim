@@ -35,4 +35,11 @@ function database_query($params, &$smarty)
   }
 }
 
+function database_escape($value)
+{
+  global $_STORAGE;
+  
+  return $_STORAGE->escape($value);
+}
+
 ?>
