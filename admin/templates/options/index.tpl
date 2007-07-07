@@ -1,15 +1,15 @@
 {secure documents="read" login="true"}
 {include file='includes/adminheader.tpl' title="General Options"}
-{stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/tree.css"}
 {stylesheet href="$SHARED/treeview/iconnode.css"}
 {stylesheet href="$CONTENT/styles/optionstree.css"}
-{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
-{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/event/event`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/dragdrop/dragdrop`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/dom/dom`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/treeview/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/dialogs`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/dom`$smarty.config.YUI`.js"}

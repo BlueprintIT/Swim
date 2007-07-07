@@ -1,14 +1,14 @@
 {secure documents="write" login="true"}
 {include file='includes/frameheader.tpl' title="Content management"}
-{stylesheet href="$SHARED/yui/calendar/assets/calendar.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/calendar/assets/calendar.css"}
 {script method="admin" path="scripts/request.js"}
 {script href="$CONTENT/scripts/help.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/calendar/calendar`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/dom/dom`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/event/event`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/calendar/calendar`$smarty.config.YUI`.js"}
 {script href="$CONTENT/scripts/fields`$smarty.config.YUI`.js"}
 {apiget var="item" type="item" id=$request.query.item}
 {assign var="variant" value="default"}

@@ -6,8 +6,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="Content-Script-Type" content="text/javascript">
   <title>{$title}</title>
-  {stylesheet href="$SHARED/yui/reset/reset-min.css"}
-  {stylesheet href="$SHARED/yui/fonts/fonts-min.css"}
+  {stylesheet href="`$smarty.config.YUISOURCE`/reset/reset-min.css"}
+  {stylesheet href="`$smarty.config.YUISOURCE`/fonts/fonts-min.css"}
   {stylesheet method="admin" path="styles/frame.css"}
   {stylesheet method="admin" path="styles/body.css"}
 </head>

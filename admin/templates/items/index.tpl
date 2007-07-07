@@ -1,18 +1,18 @@
 {secure documents="read" login="true"}
 {include file='includes/adminheader.tpl' title="Content management"}
-{stylesheet href="$SHARED/yui/treeview/assets/tree.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/tree.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
 {script href="$SHARED/json/json`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
-{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/logger/logger`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/treeview/treeview`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dragdrop/dragdrop`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/event/event`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/dom/dom`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/logger/logger`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/connection/connection`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/treeview/treeview`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/dragdrop/dragdrop`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/dialogs`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/treeview`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/dom`$smarty.config.YUI`.js"}

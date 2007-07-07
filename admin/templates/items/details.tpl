@@ -2,9 +2,9 @@
 {include file='includes/frameheader.tpl' title="Content management"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
-{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/connection/connection`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/event/event`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/connection/connection`$smarty.config.YUI`.js"}
 {script method="admin" path="scripts/request.js"}
 {script href="$CONTENT/scripts/help.js"}
 {apiget var="item" type="item" id=$request.query.item}

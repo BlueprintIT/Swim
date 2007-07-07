@@ -2,9 +2,9 @@
 {include file='includes/frameheader.tpl' title="Contact management"}
 {script href="$SHARED/scripts/BlueprintIT`$smarty.config.YUI`.js"}
 {script href="$SHARED/scripts/forms`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/yahoo/yahoo`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/dom/dom`$smarty.config.YUI`.js"}
-{script href="$SHARED/yui/event/event`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/dom/dom`$smarty.config.YUI`.js"}
+{script href="`$smarty.config.YUISOURCE`/event/event`$smarty.config.YUI`.js"}
 {script href="$CONTENT/scripts/fields`$smarty.config.YUI`.js"}
 {apiget var="section" type="section" id=$request.query.section}
 {if $request.query.item}
