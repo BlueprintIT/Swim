@@ -146,8 +146,8 @@ Request.prototype = {
   {
     var result = '';
     for (var name in query) {
-    	if (query.hasOwnProperty(name))
-	      result += '&' + escape(name) + '=' + escape(query[name]);
+      if (query.hasOwnProperty(name))
+        result += '&' + escape(name) + '=' + escape(query[name]);
     }
     if (result.length > 0)
       result = result.substr(1);
