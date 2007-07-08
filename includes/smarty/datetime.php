@@ -41,7 +41,33 @@ function datetime_mktime($params, &$smarty)
       $year = $params['year'];
     else
       $year = 0;
-    $smarty->assign($params['var'], mktime($hour, $minute, $second, $month, $day, $year, -1));
+
+    if (!empty($params['zone']) && $params['zone']=='gmt')
+      $result = gmmktime($hour, $minute, $second, $month, $day, $year, 0);
+    else
+      $result = mktime($hour, $minute, $second, $month, $day, $year, -1);
+    $smarty->assign($params['var'], $result);
+  }
+}
+
+function datetime_splittime($params, &$smarty)
+{
+  if (!empty($params['var']))
+  {
+    if (!empty($params['zone']) && $params['zone']=='gmt')
+    {
+      $oz = date_default_timezone_get();
+      date_default_timezone_set("UTC");
+    }
+    if (!empty($params['value']))
+      $result = getdate($params['value']);
+    else
+      $result = getdate();
+    $result['month'] = $result['mon'];
+    $result['day'] = $result['mday'];
+    $smarty->assign_by_ref($params['var'], $result);
+    if (!empty($params['zone']) && $params['zone']=='gmt')
+      date_default_timezone_set($oz);
   }
 }
 

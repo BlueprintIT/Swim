@@ -386,6 +386,7 @@ function configureSmarty($smarty, $request, $type)
   $smarty->register_function('outputfile', 'output_file');
   $smarty->register_function('subtemplate', 'output_subtemplate');
   $smarty->register_function('mktime', 'datetime_mktime');
+  $smarty->register_function('splittime', 'datetime_splittime');
   $smarty->register_function('datesequence', 'datetime_sequence');
   $smarty->register_function('sqlquery', 'database_query');
   $smarty->register_function('sqlexec', 'database_exec');
