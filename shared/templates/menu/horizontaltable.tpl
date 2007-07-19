@@ -1,3 +1,6 @@
+{if empty($depth)}
+	{assign var="depth" value="0"}
+{/if}
 {if count($items)>0}
 	<table class="horizmenu menu{if $popup}popup{/if}">
 		<tr>

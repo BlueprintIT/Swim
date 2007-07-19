@@ -76,7 +76,10 @@ Request.prototype = {
   setQueryVars: function(values)
   {
     for (var key in values)
-      this.query[key]=values[key];
+    {
+      if (values.hasOwnProperty(key))
+        this.query[key]=values[key];
+    }
   },
   
   getQuery: function()
