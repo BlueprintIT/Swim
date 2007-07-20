@@ -239,8 +239,6 @@ function findDisplayableFile($path)
 
     if (is_file($path.'/index.tpl'))
       return $path.'/index.tpl';
-    
-    return null;
   }
   
   if (is_file($path.'.tpl'))
