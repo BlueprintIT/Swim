@@ -191,15 +191,15 @@ function retrieve_rss($params, &$smarty)
   if ((!empty($params['items'])) && (!empty($params['src'])))
   {
     $source = '';
-    $filename = $_PREFS->getPref('storage.sitecache').'/'.urlencode($params['src']);
+    $src = html_entity_decode($params['src']);
+    $filename = $_PREFS->getPref('storage.sitecache').'/'.urlencode($src);
     
-    $handle = @fopen($params['src'], 'r');
-    if ($handle !== FALSE)
-    {
-      $source = stream_get_contents($handle);
-      fclose($handle);
+    $ch = curl_init($src);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $source = curl_exec($ch);
+    curl_close($ch);
+    if ($source !== FALSE)
       file_put_contents($filename, $source);
-    }
     else if (is_readable($filename))
       $source = file_get_contents($filename);
     $xml = new DOMDocument('1.0', 'UTF8');
