@@ -348,6 +348,7 @@ function configureSmarty($smarty, $request, $type)
     $req['method'] = $request->getMethod();
     $req['path'] = $request->getPath();
     $req['query'] = $request->getQuery();
+    $req['protocol'] = $request->getProtocol();
     $smarty->assign_by_ref('REQUEST', $request);
     $smarty->assign_by_ref('request', $req);
     $smarty->assign_by_ref('NESTED', $request->getNested());
