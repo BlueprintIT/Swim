@@ -18,7 +18,7 @@ function method_view($request)
 	global $_PREFS,$_STORAGE;
 	
   $log = LoggerManager::getLogger('swim.method.view');
-  checkSecurity($request, false, false);
+  checkSecurity($request, false, true);
   
   $pos = strpos($request->getPath(), '/');
   if ($pos === false)

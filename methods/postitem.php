@@ -24,7 +24,7 @@ function method_postitem($request)
 
   $log = Loggermanager::getLogger('swim.postitem');
   
-  checkSecurity($request, true, true);
+  checkSecurity($request, false, true);
   
   RequestCache::setNoCache();
   

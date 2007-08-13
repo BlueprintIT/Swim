@@ -20,6 +20,8 @@ function method_resize($request)
 	
 	$log=LoggerManager::getLogger("swim.method.resize");
   
+  checkSecurity($request, false, true);
+
   $filepath = '/'.$request->getPath();
   $base = $_PREFS->getPref('url.base');
   $filepath = substr($filepath, strlen($base));

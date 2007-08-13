@@ -18,7 +18,7 @@ function method_layout($request)
   global $_PREFS,$_STORAGE;
   
   $log = LoggerManager::getLogger('swim.method.layout');
-  checkSecurity($request, true, true);
+  checkSecurity($request, false, true);
   
   $path = $_PREFS->getPref('storage.site.templates').'/'.$request->getPath();
   $path = findDisplayableFile($path);

@@ -18,7 +18,7 @@ function method_preview($request)
 	global $_PREFS;
 	
   $log = LoggerManager::getLogger('swim.method.preview');
-  checkSecurity($request, false, false);
+  checkSecurity($request, true, true);
   
   RequestCache::setNoCache();
   

@@ -17,7 +17,7 @@ function method_optout($request)
 {
   $log = Loggermanager::getLogger('swim.optout');
   
-  checkSecurity($request, true, true);
+  checkSecurity($request, false, true);
   
   RequestCache::setNoCache();
   

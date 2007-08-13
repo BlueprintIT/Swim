@@ -18,7 +18,7 @@ function method_postback($request)
 	global $_PREFS;
 	
   $log = LoggerManager::getLogger('swim.postback');
-  checkSecurity($request, true, true);
+  checkSecurity($request, false, true);
   
   RequestCache::setNoCache();
   
