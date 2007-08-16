@@ -2,7 +2,7 @@
 Copyright (c) 2007, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version: 2.2.1
+version: 2.3.0
 */
 /**
  * Provides Attribute configurations.
@@ -474,7 +474,7 @@ YAHOO.util.Element.prototype = {
     /**
      * Wrapper for HTMLElement method.
      * @method appendChild
-     * @param {Boolean} deep Whether or not to do a deep clone
+     * @param {YAHOO.util.Element || HTMLElement} child The element to append. 
      */
     appendChild: function(child) {
         child = child.get ? child.get('element') : child;
@@ -572,10 +572,9 @@ YAHOO.util.Element.prototype = {
             }
             
             this.createEvent(type, this);
-            this._events[type] = true;
         }
         
-        this.subscribe.apply(this, arguments); // notify via customEvent
+        YAHOO.util.EventProvider.prototype.subscribe.apply(this, arguments); // notify via customEvent
     },
     
     
@@ -589,6 +588,15 @@ YAHOO.util.Element.prototype = {
      */
     on: function() { this.addListener.apply(this, arguments); },
     
+    /**
+     * Alias for addListener
+     * @method subscribe
+     * @param {String} type The name of the event to listen for
+     * @param {Function} fn The function call when the event fires
+     * @param {Any} obj A variable to pass to the handler
+     * @param {Object} scope The object to use for the scope of the handler 
+     */
+    subscribe: function() { this.addListener.apply(this, arguments); },
     
     /**
      * Remove an event listener
@@ -740,6 +748,23 @@ YAHOO.util.Element.prototype = {
         return AttributeProvider.prototype.get.call(this, key);
     },
 
+    setAttributes: function(map, silent){
+        var el = this.get('element');
+        for (var key in map) {
+            // need to configure if setting unconfigured HTMLElement attribute 
+            if ( !this._configs[key] && !YAHOO.lang.isUndefined(el[key]) ) {
+                this.setAttributeConfig(key);
+            }
+        }
+
+        // set based on configOrder
+        for (var i = 0, len = this._configOrder.length; i < len; ++i) {
+            if (map[this._configOrder[i]]) {
+                this.set(this._configOrder[i], map[this._configOrder[i]], silent);
+            }
+        }
+    },
+
     set: function(key, value, silent) {
         var el = this.get('element');
         if (!el) {
@@ -767,6 +792,7 @@ YAHOO.util.Element.prototype = {
         } else {
             AttributeProvider.prototype.setAttributeConfig.apply(this, arguments);
         }
+        this._configOrder.push(key);
     },
     
     getAttributeKeys: function() {
@@ -782,6 +808,11 @@ YAHOO.util.Element.prototype = {
         
         return keys;
     },
+
+    createEvent: function(type, scope) {
+        this._events[type] = true;
+        AttributeProvider.prototype.createEvent.apply(this, arguments);
+    },
     
     init: function(el, attr) {
         _initElement.apply(this, arguments); 
@@ -792,6 +823,7 @@ var _initElement = function(el, attr) {
     this._queue = this._queue || [];
     this._events = this._events || {};
     this._configs = this._configs || {};
+    this._configOrder = []; 
     attr = attr || {};
     attr.element = attr.element || el || null;
 
@@ -811,53 +843,51 @@ var _initElement = function(el, attr) {
         'submit': true
     };
 
+    var isReady = false;  // to determine when to init HTMLElement and content
+
     if (YAHOO.lang.isString(el) ) { // defer until available/ready
         _registerHTMLAttr.call(this, 'id', { value: attr.element });
     }
 
     if (Dom.get(el)) {
-        _availableHandler.call(this, attr);  
-        _readyHandler.call(this, attr);
-        return; // note return
+        isReady = true;
+        _initHTMLElement.call(this, attr);
+        _initContent.call(this, attr);
     } 
 
     YAHOO.util.Event.onAvailable(attr.element, function() {
-        _availableHandler.call(this, attr);  
+        if (!isReady) { // otherwise already done
+            _initHTMLElement.call(this, attr);
+        }
+
+        this.fireEvent('available', { type: 'available', target: attr.element });  
     }, this, true);
     
     YAHOO.util.Event.onContentReady(attr.element, function() {
-        _readyHandler.call(this, attr);
+        if (!isReady) { // otherwise already done
+            _initContent.call(this, attr);
+        }
+        this.fireEvent('contentReady', { type: 'contentReady', target: attr.element });  
     }, this, true);
 };
 
-var _availableHandler = function(attr) {
-    attr.element = Dom.get(attr.element);
-
+var _initHTMLElement = function(attr) {
     /**
      * The HTMLElement the Element instance refers to.
      * @config element
      * @type HTMLElement
      */
     this.setAttributeConfig('element', {
-        value: attr.element,
+        value: Dom.get(attr.element),
         readOnly: true
      });
-
-    this.fireEvent('available', {
-        type: 'available',
-        target: attr.element
-    }); 
 };
 
-var _readyHandler = function(attr) {
+var _initContent = function(attr) {
     this.initAttributes(attr);
     this.setAttributes(attr, true);
     this.fireQueue();
 
-    this.fireEvent('contentReady', {
-        type: 'contentReady',
-        target: attr.element
-    });
 };
 
 /**
@@ -910,4 +940,4 @@ var _registerHTMLAttr = function(key, map) {
 YAHOO.augment(YAHOO.util.Element, AttributeProvider);
 })();
 
-YAHOO.register("element", YAHOO.util.Element, {version: "2.2.1", build: "193"});
+YAHOO.register("element", YAHOO.util.Element, {version: "2.3.0", build: "442"});

@@ -1,5 +1,13 @@
 Element Release Notes
 
+*** version 2.3.0 ***
+* setAttributes now sets in order configs were added
+* added subscribe alias for on/addListener
+
+** version 2.2.2 ***
+
+* fixed contentReady timing regression
+
 *** version 2.2.1 ***
 
 * Added support for "dblclick", "focus", "blur", and "submit" event (for elements that support them)
