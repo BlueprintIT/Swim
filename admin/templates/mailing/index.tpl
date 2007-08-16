@@ -1,6 +1,6 @@
 {secure contacts="read" login="true"}
 {include file='includes/adminheader.tpl' title="Mailing Options"}
-{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/tree.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/treeview.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$CONTENT/styles/mailingtree.css"}
 {script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}

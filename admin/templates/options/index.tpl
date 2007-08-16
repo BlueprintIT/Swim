@@ -1,6 +1,6 @@
 {secure documents="read" login="true"}
 {include file='includes/adminheader.tpl' title="General Options"}
-{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/tree.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/treeview.css"}
 {stylesheet href="$SHARED/treeview/iconnode.css"}
 {stylesheet href="$CONTENT/styles/optionstree.css"}
 {script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}

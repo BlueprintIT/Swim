@@ -1,5 +1,5 @@
 {include file='includes/frameheader.tpl' title="Import Data"}
-{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/tree.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/treeview.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
 {script href="`$smarty.config.YUISOURCE`/yahoo/yahoo`$smarty.config.YUI`.js"}

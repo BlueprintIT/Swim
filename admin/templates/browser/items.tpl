@@ -1,6 +1,6 @@
 {secure documents="read" login="true"}
 {include file="includes/singletabbedheader.tpl" title="Item Browser"}
-{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/tree.css"}
+{stylesheet href="`$smarty.config.YUISOURCE`/treeview/assets/treeview.css"}
 {stylesheet href="$CONTENT/styles/sitetree.css"}
 {stylesheet href="$SITECONTENT/sitetree.css"}
 {script href="$SHARED/json/json`$smarty.config.YUI`.js"}
