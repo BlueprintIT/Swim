@@ -21,6 +21,10 @@ function isGD2()
 
 function method_resize($request)
 {
+	
+	// RPL -> Added to solve out of memory error
+	ini_set ( "memory_limit", "20M");
+
 	global $_USER,$_PREFS;
 	
 	$resource=$request->resource;
