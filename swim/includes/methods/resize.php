@@ -23,7 +23,7 @@ function method_resize($request)
 {
 	
 	// RPL -> Added to solve out of memory error
-	ini_set ( "memory_limit", "20M");
+	ini_set ( "memory_limit", "30M");
 
 	global $_USER,$_PREFS;
 	
